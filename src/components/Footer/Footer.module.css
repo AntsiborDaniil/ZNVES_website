@@ -231,10 +231,6 @@
     letter-spacing: 0%;
 }
 
-.metaNote span {
-    max-width: 582px;
-}
-
 .metaPrimary {
     display: flex;
     flex-direction: column;

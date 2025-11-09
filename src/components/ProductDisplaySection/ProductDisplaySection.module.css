@@ -82,17 +82,16 @@
 
 .arrowButton:hover,
 .arrowButton:focus-visible {
-    color: #1f1f1f;
-    transform: translateY(-2px);
+    color: #3d3d3d;
+
 }
 
 .arrowButtonActive {
-    color: #1f1f1f;
-    transform: translateY(-2px);
+    color: #3d3d3d;
 }
 
 .arrowButtonInactive {
-    color: #cccccc;
+    color: #525252;
 }
 
 .arrowSvgActive {

@@ -277,7 +277,7 @@
 
 .CatalogPage_catalogCardBadge__BRIaw {
     position: absolute;
-    top: -38px;
+    top: -47px;
     right: 26px;
     padding: 8px 14px;
     background-color: #525252;
@@ -807,10 +807,6 @@
     letter-spacing: 0%;
 }
 
-.Footer_metaNote__n5h7C span {
-    max-width: 582px;
-}
-
 .Footer_metaPrimary__D7Sbr {
     display: flex;
     flex-direction: column;
@@ -958,7 +954,6 @@
     background-color: #fff7df;
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     display: block;
-    border-radius: 2px;
     transform-origin: center;
 }
 

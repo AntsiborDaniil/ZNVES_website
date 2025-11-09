@@ -282,6 +282,7 @@
     font-size: 15px;
     line-height: 15px;
     letter-spacing: 0.02em;
+    text-underline-offset: 4px;
     color: rgba(82, 82, 82, 0.48);
     cursor: pointer;
     transition: color 0.25s ease, transform 0.25s ease;
