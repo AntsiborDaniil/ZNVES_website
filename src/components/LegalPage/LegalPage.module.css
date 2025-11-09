@@ -1,0 +1,133 @@
+.page {
+    min-height: calc(100vh - 120px);
+    padding: 140px 48px 120px;
+    background: linear-gradient(180deg, #f6f3e6 0%, #ffffff 40%);
+    color: #1f1f1f;
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-inter), sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #0a5840;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.backLink:hover,
+.backLink:focus-visible {
+    color: #063f2d;
+    transform: translateX(-4px);
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-bottom: 1px solid rgba(10, 88, 64, 0.12);
+    padding-bottom: 32px;
+}
+
+.title {
+    font-family: "Playfair Display SC", serif;
+    font-size: 56px;
+    line-height: 1.1;
+    letter-spacing: 0.5px;
+    color: #0a5840;
+    text-transform: uppercase;
+}
+
+.meta {
+    font-family: var(--font-inter), sans-serif;
+    font-size: 16px;
+    color: rgba(31, 31, 31, 0.7);
+}
+
+.sections {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    font-family: var(--font-inter), sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sectionTitle {
+    font-size: 22px;
+    font-weight: 600;
+    color: #0a5840;
+}
+
+.paragraph {
+    color: rgba(31, 31, 31, 0.82);
+}
+
+.list {
+    margin: 0;
+    padding-left: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.listItem {
+    color: rgba(31, 31, 31, 0.82);
+}
+
+@media (max-width: 1024px) {
+    .page {
+        padding: 120px 32px 100px;
+    }
+
+    .title {
+        font-size: 44px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page {
+        padding: 100px 24px 80px;
+    }
+
+    .container {
+        gap: 36px;
+    }
+
+    .title {
+        font-size: 34px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page {
+        padding: 80px 18px 64px;
+    }
+
+    .title {
+        font-size: 28px;
+    }
+
+    .sections {
+        gap: 32px;
+    }
+}

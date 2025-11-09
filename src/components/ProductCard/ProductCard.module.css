@@ -1,0 +1,144 @@
+.productCard {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    outline: none;
+}
+
+.imageWrapper {
+    padding: 82px 33px;
+    background-color: #5252520f;
+}
+
+.productCard:hover,
+.productCard:focus-visible {
+    transform: none;
+}
+
+.imageContainer {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+.productImage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transform: scale(1.08);
+    filter: blur(12px);
+    transition: opacity 0.45s ease, transform 0.45s ease, filter 0.45s ease;
+}
+
+.productImageLoading {
+    opacity: 0;
+}
+
+.productImageLoaded {
+    transform: scale(1);
+    filter: blur(0);
+}
+
+.productImageVisible {
+    opacity: 1;
+}
+
+.newBadge {
+    position: absolute;
+    top: -44px;
+    right: 0px;
+    background-color: #525252;
+    color: #f2f0ec;
+    padding: 7px 14px;
+    border-radius: 4px;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 22.29px;
+    line-height: 22.29px;
+    letter-spacing: -0.89px;
+    text-align: center;
+    vertical-align: middle;
+    text-transform: lowercase;
+}
+
+.productTitle {
+    font-weight: 300;
+    font-size: 38px;
+    letter-spacing: 0px;
+    text-transform: uppercase;
+    color: #525252;
+    transition: color 0.25s ease;
+}
+
+.productCard:hover .productTitle,
+.productCard:focus-visible .productTitle {
+    color: #1f1f1f;
+}
+
+.productPrice {
+    color: #525252;
+    font-weight: 500;
+    font-size: 26.38px;
+    line-height: 31.56px;
+    letter-spacing: 0px;
+    transition: color 0.25s ease;
+}
+
+.productCard:hover .productPrice,
+.productCard:focus-visible .productPrice {
+    color: #1f1f1f;
+}
+
+@media (max-width: 768px) {
+    .imageWrapper {
+        padding: 64px 24px;
+    }
+
+    .newBadge {
+        top: 18px;
+        right: 18px;
+        padding: 5px 10px;
+        font-size: 16px;
+        line-height: 16px;
+    }
+
+    .productTitle {
+        font-size: 28px;
+    }
+
+    .productPrice {
+        font-size: 20px;
+        line-height: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .imageContainer {
+        margin-bottom: 10px;
+    }
+
+    .imageWrapper {
+        padding: 48px 18px;
+    }
+
+    .newBadge {
+        top: 12px;
+        right: 12px;
+        padding: 4px 8px;
+        font-size: 14px;
+        line-height: 14px;
+    }
+
+    .productTitle {
+        font-size: 22px;
+    }
+
+    .productPrice {
+        font-size: 18px;
+        line-height: 22px;
+    }
+}

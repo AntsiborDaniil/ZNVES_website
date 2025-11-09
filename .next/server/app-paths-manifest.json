@@ -1,0 +1,8 @@
+{
+  "/page": "app/page.js",
+  "/catalog/[id]/page": "app/catalog/[id]/page.js",
+  "/new-in/page": "app/new-in/page.js",
+  "/privacy/page": "app/privacy/page.js",
+  "/catalog/page": "app/catalog/page.js",
+  "/placeholder/page": "app/placeholder/page.js"
+}
