@@ -18,35 +18,11 @@
       "static/css/app/new-in/page.css",
       "static/chunks/app/new-in/page.js"
     ],
-    "/catalog/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/catalog/[id]/page.css",
-      "static/chunks/app/catalog/[id]/page.js"
-    ],
-    "/public-offer/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/public-offer/page.css",
-      "static/chunks/app/public-offer/page.js"
-    ],
-    "/privacy/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/privacy/page.css",
-      "static/chunks/app/privacy/page.js"
-    ],
     "/catalog/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/catalog/page.css",
       "static/chunks/app/catalog/page.js"
-    ],
-    "/placeholder/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/placeholder/page.css",
-      "static/chunks/app/placeholder/page.js"
     ]
   }
 }
