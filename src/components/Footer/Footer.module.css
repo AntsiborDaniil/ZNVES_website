@@ -194,7 +194,15 @@
 }
 
 .underlinedLink {
-  text-decoration: underline !important;
+  text-decoration: none !important;
+  border-bottom: 2px solid #fff5d991;
+  padding-bottom: 6px;
+  display: inline-block;
+  transition: border-color 0.2s ease;
+}
+
+.underlinedLink:hover {
+  border-color: #ffffff;
 }
 
 .legalLinks {
