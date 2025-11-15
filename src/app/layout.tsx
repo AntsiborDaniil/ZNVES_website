@@ -2,6 +2,7 @@ import { Inter, Montserrat, Plus_Jakarta_Sans } from "next/font/google";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
+import NavigationTracker from "../components/NavigationTracker/NavigationTracker";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <body
                 className={`${inter.variable} ${montserrat.variable} ${plusJakarta.variable}`}
             >
+                <NavigationTracker />
                 {children}
             </body>
         </html>

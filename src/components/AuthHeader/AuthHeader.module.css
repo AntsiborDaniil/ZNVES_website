@@ -1,48 +1,51 @@
 .authHeader {
-  background-color: #0a5840;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
-  position: relative;
-  width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 30px 52px;
+    position: relative;
+    width: 100%;
+    background-color: #0a5840;
+    border-bottom: 0.6px solid #7a7a79;
+}
+
+.transparent {
+    background-color: transparent;
 }
 
 .backButton,
 .closeButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.2s ease;
-  flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease;
+    flex-shrink: 0;
 }
 
 .backButton:hover,
 .closeButton:hover {
-  opacity: 0.7;
+    opacity: 0.7;
 }
 
 .title {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  color: white;
-  font-size: 18px;
-  font-weight: 500;
-  margin: 0;
-  white-space: nowrap;
+    color: #525252;
+    font-weight: 500;
+    font-style: Medium;
+    font-size: 38.8px;
+    line-height: 32.94px;
+    letter-spacing: 0px;
 }
 
 @media (max-width: 480px) {
-  .authHeader {
-    padding: 15px;
-  }
+    .authHeader {
+        padding: 15px;
+    }
 
-  .title {
-    font-size: 16px;
-  }
+    .title {
+        font-size: 16px;
+    }
 }

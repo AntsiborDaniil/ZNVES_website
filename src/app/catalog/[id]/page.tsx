@@ -7,9 +7,9 @@ import {
 } from "../../../data/products";
 
 type ProductPageProps = {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 };
 
 export const dynamicParams = false;
@@ -22,8 +22,9 @@ export const generateStaticParams = () => {
     }));
 };
 
-const ProductPage = ({ params }: ProductPageProps) => {
-    const productId = Number(params.id);
+const ProductPage = async ({ params }: ProductPageProps) => {
+    const { id } = await params;
+    const productId = Number(id);
 
     if (Number.isNaN(productId)) {
         notFound();

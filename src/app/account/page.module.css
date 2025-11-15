@@ -1,0 +1,387 @@
+.accountPage {
+    min-height: 100vh;
+    background-color: #f2f0ec;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 60px 20px 100px;
+}
+
+.wrapper {
+    width: 100%;
+    max-width: 1094px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.tabs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 82px;
+    font-size: 16px;
+    color: #7a7a79;
+}
+
+.tabs span {
+    color: #525252;
+}
+
+.tabButton {
+    font-weight: 600;
+    font-style: SemiBold;
+    font-size: 26px;
+    line-height: 32px;
+    letter-spacing: 0%;
+
+    background: none;
+    border: none;
+    color: #525252ad;
+    cursor: pointer;
+}
+
+.tabButtonActive {
+    color: #525252;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-style: 2px solid;
+    text-decoration-color: #525252;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5.5px;
+}
+
+.tabsDivider {
+    color: #bcb4a5;
+}
+
+.card {
+    background-color: #0000000d;
+    border-radius: 28px;
+    padding: 40px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.noticeCard {
+    background-color: #dcd8d0;
+    border-radius: 18px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.noticeCardSuccess {
+    background-color: #dfeee7;
+}
+
+.noticeCardError {
+    background-color: #f4dfde;
+}
+
+.noticeContent {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.noticeTitle {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #525252;
+}
+
+.noticeText {
+    margin: 0;
+    font-size: 14px;
+    color: #7a7a79;
+}
+
+.sectionHeading {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 32px;
+    letter-spacing: 0%;
+
+    color: #525252;
+}
+
+.sectionDescription {
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0%;
+
+    max-width: 640px;
+
+    color: #525252;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.infoPanel {
+    margin-top: 20px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.fieldRow {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.fieldHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.fieldLabel {
+    font-size: 13px;
+    font-weight: 500;
+    color: #7a7a79;
+}
+
+.editButton {
+    background: none;
+    border: none;
+    color: #0a5840;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.editButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.inputWrapper {
+    position: relative;
+    width: 100%;
+    max-width: 636px;
+}
+
+.input {
+    width: 100%;
+    height: 52px;
+    border-radius: 9px;
+    border: none;
+    background: #ffffff;
+    padding: 0 72px 0 18px;
+    font-size: 15px;
+    color: #525252;
+}
+
+.inputReadOnly {
+    background-color: #f4f1ea;
+    color: #9a978f;
+    border-color: #dad3c3;
+    cursor: not-allowed;
+}
+
+.inputWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.editInlineButton {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #858892c2;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.editInlineButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #0a5840;
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.primaryButton {
+    background-color: #525252ad;
+    color: #f2f0ec;
+    width: 185px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 3px;
+    padding-top: 10px;
+    padding-right: 14px;
+    padding-bottom: 10px;
+    padding-left: 14px;
+
+    font-weight: 600;
+    font-style: SemiBold;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0%;
+    text-wrap: nowrap;
+
+    border: none;
+
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    margin-bottom: 26.5px;
+}
+
+.primaryButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.secondaryButton {
+    padding: 10px 20px;
+    height: 40px;
+    border: 1px solid #525252;
+    color: #525252;
+    background: transparent;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.passwordHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.passwordForm {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.passwordField {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.passwordLabel {
+    font-size: 13px;
+    color: #7a7a79;
+}
+
+.passwordInputWrapper {
+    position: relative;
+}
+
+.passwordInput {
+    width: 100%;
+    height: 50px;
+    border-radius: 8px;
+    border: 1px solid #cec9be;
+    background: #ffffff;
+    padding: 0 46px 0 18px;
+    font-size: 15px;
+    color: #525252;
+}
+
+.passwordInput:focus {
+    outline: none;
+    border-color: #0a5840;
+}
+
+.togglePassword {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.passwordMessage {
+    font-size: 13px;
+    margin: 0;
+}
+
+.passwordMessageSuccess {
+    color: #0a5840;
+}
+
+.passwordMessageError {
+    color: #c93c3c;
+}
+
+.linkButton {
+    background: none;
+    border: none;
+    color: #525252;
+
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 28px;
+    letter-spacing: 0%;
+
+    cursor: pointer;
+    padding: 0;
+}
+
+@media (max-width: 768px) {
+    .card {
+        padding: 28px 20px;
+    }
+
+    .noticeCard {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .infoPanel {
+        padding: 18px 20px;
+    }
+
+    .passwordHeader {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

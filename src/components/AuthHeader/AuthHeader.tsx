@@ -5,80 +5,92 @@ import { useEffect, useState } from "react";
 import styles from "./AuthHeader.module.css";
 
 type AuthHeaderProps = {
-  title: string;
+    title: string;
+    theme?: "default" | "transparent";
 };
 
-const AuthHeader = ({ title }: AuthHeaderProps) => {
-  const router = useRouter();
-  const [isMounted, setIsMounted] = useState(false);
+const PREVIOUS_PATH_KEY = "znves:previousPath";
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+const AuthHeader = ({ title, theme = "default" }: AuthHeaderProps) => {
+    const router = useRouter();
+    const [isMounted, setIsMounted] = useState(false);
+    const [previousRoute, setPreviousRoute] = useState<string | null>(null);
 
-  const handleBack = () => {
-    if (!isMounted) {
-      router.push("/");
-      return;
-    }
+    useEffect(() => {
+        setIsMounted(true);
 
-    // Используем router.back() - Next.js безопасно обработает это
-    router.back();
-  };
+        if (typeof window === "undefined") {
+            return;
+        }
 
-  const handleClose = () => {
-    router.push("/");
-  };
+        const storedPreviousPath = sessionStorage.getItem(PREVIOUS_PATH_KEY);
 
-  return (
-    <header className={styles.authHeader}>
-      <button
-        className={styles.backButton}
-        onClick={handleBack}
-        aria-label="Назад"
-        type="button"
-      >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+        if (
+            storedPreviousPath &&
+            storedPreviousPath !== window.location.pathname
+        ) {
+            setPreviousRoute(storedPreviousPath);
+        }
+    }, []);
+
+    const handleBack = () => {
+        if (!isMounted) {
+            router.push("/");
+            return;
+        }
+
+        if (previousRoute) {
+            router.push(previousRoute);
+            return;
+        }
+
+        if (typeof window !== "undefined" && window.history.length > 1) {
+            router.back();
+            return;
+        }
+
+        router.push("/");
+    };
+
+    const handleClose = () => {
+        router.push("/");
+    };
+
+    return (
+        <header
+            className={`${styles.authHeader} ${
+                theme === "transparent" ? styles.transparent : ""
+            }`}
         >
-          <path
-            d="M15 18L9 12L15 6"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </button>
-      <h1 className={styles.title}>{title}</h1>
-      <button
-        className={styles.closeButton}
-        onClick={handleClose}
-        aria-label="Закрыть"
-        type="button"
-      >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M18 6L6 18M6 6L18 18"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </button>
-    </header>
-  );
+            <button
+                className={styles.backButton}
+                onClick={handleBack}
+                aria-label="Назад"
+                type="button"
+            >
+                <img
+                    src="/images/login/arrow-back.png"
+                    alt="Назад"
+                    width={57}
+                    height={57}
+                />
+            </button>
+            <h1 className={styles.title}>{title}</h1>
+            <button
+                className={styles.closeButton}
+                onClick={handleClose}
+                aria-label="Закрыть"
+                type="button"
+            >
+                <img
+                    src="/images/login/cancel-btn.png"
+                    alt="Закрыть"
+                    width={57}
+                    height={57}
+                />
+            </button>
+        </header>
+    );
 };
 
 export default AuthHeader;
