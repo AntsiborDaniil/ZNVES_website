@@ -25,6 +25,7 @@ const Header = ({ variant = "transparent" }: HeaderProps) => {
             "/new-in",
             "/privacy",
             "/public-offer",
+            "/cart",
         ];
 
         routesToPrefetch.forEach((route) => {

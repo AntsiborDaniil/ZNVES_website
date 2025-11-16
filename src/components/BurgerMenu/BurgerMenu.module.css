@@ -60,92 +60,162 @@
     position: fixed;
     inset: 0 auto 0 0;
     width: min(360px, 80vw);
-    padding: 48px 36px;
-    background: radial-gradient(
-            circle at top,
-            rgba(255, 247, 223, 0.25),
-            rgba(255, 247, 223, 0)
-        ),
-        rgba(10, 31, 23, 0.95);
+    padding: 0;
+    background-color: #1f4c38;
     transform: translateX(-100%);
     transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
     z-index: 1001;
     display: flex;
     flex-direction: column;
-    gap: 32px;
     box-shadow: 8px 0 24px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
 }
 
 .menuOpen {
     transform: translateX(0);
 }
 
-.menuHeader {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    text-transform: uppercase;
-    letter-spacing: 0.3em;
-    color: rgba(255, 247, 223, 0.7);
-    font-size: 14px;
+.closeButton {
+    background: none;
+    border: none;
+    color: #f2f0ec;
+    font-size: 32px;
+    cursor: pointer;
+    padding: 20px 24px;
+    align-self: flex-start;
+    line-height: 1;
+    transition: color 0.2s ease;
 }
 
-.menuList {
-    list-style: none;
+.closeButton:hover {
+    color: #ffffff;
+}
+
+.menuContent {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    padding: 0 24px 24px;
+    gap: 32px;
+}
+
+.menuSection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.menuHeader {
+    text-decoration: none;
+    color: #f2f0ec;
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.menuHeaderButton {
+    cursor: pointer;
+}
+
+.menuHeader:hover,
+.menuHeader:focus-visible {
+    color: #ffffff;
+}
+
+.menuHeaderActive {
+    color: #ffffff;
+}
+
+.catalogSubmenu {
+    list-style: none;
     padding: 0;
     margin: 0;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-.menuItem {
-    border-bottom: 1px solid rgba(255, 247, 223, 0.08);
-    padding-bottom: 12px;
+.catalogItem {
+    padding: 0;
 }
 
-.menuItem:last-of-type {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.menuLink {
+.catalogLink {
     text-decoration: none;
-    color: #fff7df;
-    font-size: 20px;
+    color: #f2f0ec;
+    font-size: 16px;
+    font-weight: 400;
+    text-transform: none;
+    display: block;
+    padding: 4px 0;
+    transition: color 0.2s ease;
+}
+
+.catalogLink:hover,
+.catalogLink:focus-visible {
+    color: #ffffff;
+}
+
+.catalogLinkActive {
+    color: #ffffff;
     font-weight: 500;
-    letter-spacing: 0.08em;
+}
+
+.menuItemWithIcon {
+    text-decoration: none;
+    color: #f2f0ec;
+    font-size: 16px;
+    font-weight: 400;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    transition: transform 0.3s ease, color 0.3s ease;
+    gap: 12px;
+    padding: 8px 0;
+    transition: color 0.2s ease;
 }
 
-.menuLink:hover,
-.menuLink:focus-visible {
-    color: #f0d9a8;
-    transform: translateX(6px);
+.menuItemWithIcon:hover,
+.menuItemWithIcon:focus-visible {
+    color: #ffffff;
 }
 
-.menuLink:focus-visible {
-    outline: 2px solid #f0d9a8;
-    outline-offset: 6px;
+.menuItemActive {
+    color: #ffffff;
 }
 
-.menuLinkActive {
-    color: #f6dfb6;
+.menuIcon {
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
 }
 
-.menuLinkChevron {
-    font-size: 22px;
-    transition: transform 0.3s ease;
+.socialSection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 32px;
 }
 
-.menuLink:hover .menuLinkChevron,
-.menuLink:focus-visible .menuLinkChevron {
-    transform: translateX(4px);
+.socialLink {
+    text-decoration: none;
+    color: #f2f0ec;
+    font-size: 16px;
+    font-weight: 400;
+    text-transform: none;
+    padding: 4px 0;
+    transition: color 0.2s ease;
+}
+
+.socialLink:hover,
+.socialLink:focus-visible {
+    color: #ffffff;
 }
 
 @media (max-width: 480px) {
@@ -156,10 +226,25 @@
 
     .menu {
         width: min(320px, 85vw);
-        padding: 36px 26px;
     }
 
-    .menuLink {
+    .menuContent {
+        padding: 0 20px 20px;
+        gap: 24px;
+    }
+
+    .closeButton {
+        padding: 16px 20px;
+        font-size: 28px;
+    }
+
+    .menuHeader {
         font-size: 18px;
+    }
+
+    .catalogLink,
+    .menuItemWithIcon,
+    .socialLink {
+        font-size: 14px;
     }
 }

@@ -9,6 +9,9 @@ import {
     useState,
     type PointerEvent as ReactPointerEvent,
 } from "react";
+import { useCart } from "../../contexts/CartContext";
+import { useToast } from "../ui/ToastProvider/ToastProvider";
+import { getProductById } from "../../data/products";
 import styles from "./ProductCard.module.css";
 
 type ProductCardProps = {
@@ -16,9 +19,20 @@ type ProductCardProps = {
     price: string;
     images: string[];
     isNew: boolean;
+    productId?: number;
+    showAddToCart?: boolean;
 };
 
-const ProductCard = ({ title, price, images, isNew }: ProductCardProps) => {
+const ProductCard = ({
+    title,
+    price,
+    images,
+    isNew,
+    productId,
+    showAddToCart = true,
+}: ProductCardProps) => {
+    const { addItem } = useCart();
+    const { showToast } = useToast();
     const imageList = useMemo(() => {
         if (images.length === 0) {
             return ["/images/catalogs/placeholder.png"];
@@ -81,6 +95,42 @@ const ProductCard = ({ title, price, images, isNew }: ProductCardProps) => {
         setCurrentIndex(0);
     };
 
+    const handleAddToCart = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!productId) {
+            return;
+        }
+
+        const product = getProductById(productId);
+        if (!product) {
+            return;
+        }
+
+        const catalogProduct = {
+            id: product.id,
+            title: product.title,
+            price: product.price,
+            priceValue: product.priceValue,
+            images: product.images,
+            isNew: product.isNew,
+            category: product.category,
+            color: product.color,
+            size: product.size,
+            sortOrder: product.sortOrder,
+        };
+
+        addItem(
+            catalogProduct,
+            product.defaultSize,
+            product.availableColors[0]?.value || product.color,
+            1
+        );
+
+        showToast("Товар добавлен в корзину");
+    };
+
     return (
         <div className={styles.productCard}>
             <div className={styles.imageWrapper}>
@@ -119,8 +169,20 @@ const ProductCard = ({ title, price, images, isNew }: ProductCardProps) => {
                     {isNew && <div className={styles.newBadge}>new</div>}
                 </div>
             </div>
-            <h1 className={styles.productTitle}>{title}</h1>
-            <p className={styles.productPrice}>{price}</p>
+            <div className={styles.productInfo}>
+                <h1 className={styles.productTitle}>{title}</h1>
+                <p className={styles.productPrice}>{price}</p>
+                {productId && showAddToCart && (
+                    <button
+                        type="button"
+                        className={styles.addToCartButton}
+                        onClick={handleAddToCart}
+                        aria-label="Добавить в корзину"
+                    >
+                        Добавить в корзину
+                    </button>
+                )}
+            </div>
         </div>
     );
 };

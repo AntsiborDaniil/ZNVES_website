@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import NavigationTracker from "../components/NavigationTracker/NavigationTracker";
+import { CartProvider } from "../contexts/CartContext";
+import { ToastProvider } from "../components/ui/ToastProvider/ToastProvider";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -30,8 +32,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <body
                 className={`${inter.variable} ${montserrat.variable} ${plusJakarta.variable}`}
             >
-                <NavigationTracker />
-                {children}
+                <CartProvider>
+                    <ToastProvider>
+                        <NavigationTracker />
+                        {children}
+                    </ToastProvider>
+                </CartProvider>
             </body>
         </html>
     );
