@@ -1,12 +1,12 @@
 "use client";
 
 import {
-    createContext,
-    useContext,
-    useState,
-    useCallback,
-    useEffect,
-    type ReactNode,
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  type ReactNode,
 } from "react";
 import type { CartItem, CartContextType } from "../types/cart";
 import type { CatalogProduct } from "../types/products";
@@ -16,145 +16,157 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 const CART_STORAGE_KEY = "znves:cart";
 
 const getCartFromStorage = (): CartItem[] => {
-    if (typeof window === "undefined") {
-        return [];
-    }
-    try {
-        const stored = localStorage.getItem(CART_STORAGE_KEY);
-        return stored ? JSON.parse(stored) : [];
-    } catch {
-        return [];
-    }
+  if (typeof window === "undefined") {
+    return [];
+  }
+  try {
+    const stored = localStorage.getItem(CART_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
 };
 
 const saveCartToStorage = (items: CartItem[]) => {
-    if (typeof window === "undefined") {
-        return;
-    }
-    try {
-        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
-    } catch {
-        // Ignore storage errors
-    }
+  if (typeof window === "undefined") {
+    return;
+  }
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  } catch {
+    // Ignore storage errors
+  }
 };
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-    const [items, setItems] = useState<CartItem[]>(getCartFromStorage);
+  // Инициализируем с пустым массивом для SSR совместимости
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-    useEffect(() => {
-        saveCartToStorage(items);
-    }, [items]);
+  // Загружаем данные из localStorage только после монтирования на клиенте
+  useEffect(() => {
+    const storedItems = getCartFromStorage();
+    setItems(storedItems);
+    setIsHydrated(true);
+  }, []);
 
-    const addItem = useCallback(
-        (
-            product: CatalogProduct,
-            size: string,
-            color: string,
-            quantity: number = 1
-        ) => {
-            setItems((prevItems) => {
-                const existingIndex = prevItems.findIndex(
-                    (item) =>
-                        item.productId === product.id &&
-                        item.size === size &&
-                        item.color === color
-                );
+  // Сохраняем в localStorage только после гидратации
+  useEffect(() => {
+    if (isHydrated) {
+      saveCartToStorage(items);
+    }
+  }, [items, isHydrated]);
 
-                if (existingIndex >= 0) {
-                    const updated = [...prevItems];
-                    updated[existingIndex] = {
-                        ...updated[existingIndex],
-                        quantity: updated[existingIndex].quantity + quantity,
-                    };
-                    return updated;
-                }
+  const addItem = useCallback(
+    (
+      product: CatalogProduct,
+      size: string,
+      color: string,
+      quantity: number = 1
+    ) => {
+      setItems((prevItems) => {
+        const existingIndex = prevItems.findIndex(
+          (item) =>
+            item.productId === product.id &&
+            item.size === size &&
+            item.color === color
+        );
 
-                return [
-                    ...prevItems,
-                    {
-                        productId: product.id,
-                        size,
-                        color,
-                        quantity,
-                        product,
-                    },
-                ];
-            });
-        },
-        []
-    );
+        if (existingIndex >= 0) {
+          const updated = [...prevItems];
+          updated[existingIndex] = {
+            ...updated[existingIndex],
+            quantity: updated[existingIndex].quantity + quantity,
+          };
+          return updated;
+        }
 
-    const removeItem = useCallback(
-        (productId: number, size: string, color: string) => {
-            setItems((prevItems) =>
-                prevItems.filter(
-                    (item) =>
-                        !(
-                            item.productId === productId &&
-                            item.size === size &&
-                            item.color === color
-                        )
-                )
-            );
-        },
-        []
-    );
+        return [
+          ...prevItems,
+          {
+            productId: product.id,
+            size,
+            color,
+            quantity,
+            product,
+          },
+        ];
+      });
+    },
+    []
+  );
 
-    const updateQuantity = useCallback(
-        (productId: number, size: string, color: string, quantity: number) => {
-            if (quantity <= 0) {
-                removeItem(productId, size, color);
-                return;
-            }
+  const removeItem = useCallback(
+    (productId: number, size: string, color: string) => {
+      setItems((prevItems) =>
+        prevItems.filter(
+          (item) =>
+            !(
+              item.productId === productId &&
+              item.size === size &&
+              item.color === color
+            )
+        )
+      );
+    },
+    []
+  );
 
-            setItems((prevItems) =>
-                prevItems.map((item) =>
-                    item.productId === productId &&
-                    item.size === size &&
-                    item.color === color
-                        ? { ...item, quantity }
-                        : item
-                )
-            );
-        },
-        [removeItem]
-    );
+  const updateQuantity = useCallback(
+    (productId: number, size: string, color: string, quantity: number) => {
+      if (quantity <= 0) {
+        removeItem(productId, size, color);
+        return;
+      }
 
-    const clearCart = useCallback(() => {
-        setItems([]);
-    }, []);
+      setItems((prevItems) =>
+        prevItems.map((item) =>
+          item.productId === productId &&
+          item.size === size &&
+          item.color === color
+            ? { ...item, quantity }
+            : item
+        )
+      );
+    },
+    [removeItem]
+  );
 
-    const getTotalPrice = useCallback(() => {
-        return items.reduce((total, item) => {
-            return total + item.product.priceValue * item.quantity;
-        }, 0);
-    }, [items]);
+  const clearCart = useCallback(() => {
+    setItems([]);
+  }, []);
 
-    const getTotalItems = useCallback(() => {
-        return items.reduce((total, item) => total + item.quantity, 0);
-    }, [items]);
+  const getTotalPrice = useCallback(() => {
+    return items.reduce((total, item) => {
+      return total + item.product.priceValue * item.quantity;
+    }, 0);
+  }, [items]);
 
-    return (
-        <CartContext.Provider
-            value={{
-                items,
-                addItem,
-                removeItem,
-                updateQuantity,
-                clearCart,
-                getTotalPrice,
-                getTotalItems,
-            }}
-        >
-            {children}
-        </CartContext.Provider>
-    );
+  const getTotalItems = useCallback(() => {
+    return items.reduce((total, item) => total + item.quantity, 0);
+  }, [items]);
+
+  return (
+    <CartContext.Provider
+      value={{
+        items,
+        addItem,
+        removeItem,
+        updateQuantity,
+        clearCart,
+        getTotalPrice,
+        getTotalItems,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 };
 
 export const useCart = () => {
-    const context = useContext(CartContext);
-    if (context === undefined) {
-        throw new Error("useCart must be used within a CartProvider");
-    }
-    return context;
+  const context = useContext(CartContext);
+  if (context === undefined) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
 };
