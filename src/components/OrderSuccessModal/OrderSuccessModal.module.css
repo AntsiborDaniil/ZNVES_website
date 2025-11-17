@@ -1,0 +1,133 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+
+.modalContent {
+  background-color: #f2f0ec;
+  border-radius: 3px;
+  padding: 40px 32px;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  border: 1px solid #bcb4a5;
+}
+
+.closeButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+.closeButton:hover {
+  opacity: 0.7;
+}
+
+.modalTitle {
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 28px;
+  color: #525252;
+  text-align: center;
+  margin: 0 0 24px 0;
+}
+
+.orderNumber {
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 38px;
+  color: #525252;
+  text-align: center;
+  margin: 0 0 16px 0;
+}
+
+.modalText {
+  font-size: 16px;
+  line-height: 22px;
+  color: #7a7a79;
+  text-align: center;
+  margin: 0 0 32px 0;
+}
+
+.modalButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.primaryButton {
+  background-color: #1f4c38;
+  color: #f2f0ec;
+  border: none;
+  width: 100%;
+  height: 58px;
+  border-radius: 3px;
+  padding: 18px 20px;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.primaryButton:hover {
+  background-color: #153028;
+}
+
+.secondaryButton {
+  background-color: transparent;
+  color: #1f4c38;
+  border: 1.5px solid #1f4c38;
+  width: 100%;
+  height: 58px;
+  border-radius: 3px;
+  padding: 18px 20px;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  text-align: center;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.secondaryButton:hover {
+  background-color: #1f4c38;
+  color: #f2f0ec;
+}
+
+@media (max-width: 768px) {
+  .modalContent {
+    padding: 32px 24px;
+  }
+
+  .modalTitle {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  .orderNumber {
+    font-size: 28px;
+    line-height: 32px;
+  }
+}

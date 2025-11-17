@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useCart } from "../../contexts/CartContext";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
@@ -8,10 +9,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { getProductById } from "../../data/products";
 import Map from "../../components/Map/Map";
+import OrderSuccessModal from "../../components/OrderSuccessModal/OrderSuccessModal";
 import styles from "./page.module.css";
 
 const CheckoutPage = () => {
-  const { items, getTotalPrice, updateQuantity, removeItem } = useCart();
+  const router = useRouter();
+  const { items, getTotalPrice, updateQuantity, removeItem, clearCart } =
+    useCart();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -26,6 +30,8 @@ const CheckoutPage = () => {
     agreeToOffer: false,
     agreeToPrivacy: false,
   });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [orderNumber, setOrderNumber] = useState("");
 
   // Цены доставки
   const deliveryPrices = {
@@ -76,7 +82,44 @@ const CheckoutPage = () => {
     }));
   };
 
-  if (items.length === 0) {
+  // Генерация номера заказа
+  const generateOrderNumber = () => {
+    return Math.floor(100000000 + Math.random() * 900000000).toString();
+  };
+
+  // Очищаем корзину после показа модалки
+  useEffect(() => {
+    if (showSuccessModal && items.length > 0) {
+      clearCart();
+    }
+  }, [showSuccessModal, items.length, clearCart]);
+
+  // Обработка оформления заказа
+  const handleSubmitOrder = () => {
+    if (!formData.agreeToOffer || !formData.agreeToPrivacy) {
+      return;
+    }
+
+    // Генерируем номер заказа
+    const newOrderNumber = generateOrderNumber();
+    setOrderNumber(newOrderNumber);
+
+    // Показываем модалку
+    setShowSuccessModal(true);
+  };
+
+  const handleGoToAccount = () => {
+    setShowSuccessModal(false);
+    router.push("/account");
+  };
+
+  const handleCloseModal = () => {
+    setShowSuccessModal(false);
+    router.push("/catalog");
+  };
+
+  // Показываем пустую корзину только если модалка не открыта
+  if (items.length === 0 && !showSuccessModal) {
     return (
       <div className={styles.checkoutPage}>
         <Header variant="green" />
@@ -442,6 +485,7 @@ const CheckoutPage = () => {
                 type="button"
                 className={`${styles.submitButton} ${styles.submitButtonRight}`}
                 disabled={!formData.agreeToOffer || !formData.agreeToPrivacy}
+                onClick={handleSubmitOrder}
               >
                 Оформить заказ
               </button>
@@ -482,6 +526,13 @@ const CheckoutPage = () => {
         </div>
       </main>
       <Footer />
+      {showSuccessModal && (
+        <OrderSuccessModal
+          orderNumber={orderNumber}
+          onClose={handleCloseModal}
+          onGoToAccount={handleGoToAccount}
+        />
+      )}
     </div>
   );
 };

@@ -56,104 +56,130 @@ const Map = ({ address, city, street, house, onAddressSelect }: MapProps) => {
   useEffect(() => {
     if (!isMounted || !mapRef.current || mapInstanceRef.current) return;
 
+    let isComponentMounted = true;
+
     // Динамический импорт Leaflet только на клиенте
     const initMap = async () => {
-      const L = (await import("leaflet")).default;
-      await import("leaflet/dist/leaflet.css");
+      try {
+        const L = (await import("leaflet")).default;
+        await import("leaflet/dist/leaflet.css");
 
-      // Инициализация карты (центр по умолчанию - Москва)
-      // Отключаем элементы управления и атрибуцию
-      const map = L.map(mapRef.current, {
-        zoomControl: false,
-        attributionControl: false,
-      }).setView([55.7558, 37.6173], 13);
+        if (!isComponentMounted || !mapRef.current) return;
 
-      // Добавляем тайлы OpenStreetMap без атрибуции
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "",
-        maxZoom: 19,
-      }).addTo(map);
+        // Инициализация карты (центр по умолчанию - Москва)
+        // Отключаем элементы управления и атрибуцию
+        const map = L.map(mapRef.current, {
+          zoomControl: false,
+          attributionControl: false,
+        }).setView([55.7558, 37.6173], 13);
 
-      // Обработчик клика на карту для выбора адреса
-      map.on("click", async (e: any) => {
-        const { lat, lng } = e.latlng;
+        // Добавляем тайлы OpenStreetMap без атрибуции
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "",
+          maxZoom: 19,
+        }).addTo(map);
 
-        // Удаляем предыдущие маркеры (от клика и от формы)
-        if (clickMarkerRef.current) {
-          map.removeLayer(clickMarkerRef.current);
-        }
-        if (markerRef.current) {
-          map.removeLayer(markerRef.current);
-          markerRef.current = null;
-        }
+        // Обработчик клика на карту для выбора адреса
+        map.on("click", async (e: any) => {
+          const { lat, lng } = e.latlng;
 
-        // Создаем новый маркер на месте клика
-        const customIcon = createCustomIcon(L);
-        const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
-        clickMarkerRef.current = marker;
+          // Удаляем предыдущие маркеры (от клика и от формы)
+          if (clickMarkerRef.current) {
+            map.removeLayer(clickMarkerRef.current);
+          }
+          if (markerRef.current) {
+            map.removeLayer(markerRef.current);
+            markerRef.current = null;
+          }
 
-        // Обратное геокодирование для получения адреса
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=ru`,
-            {
-              headers: {
-                "User-Agent": "ZNVES Website",
-              },
+          // Создаем новый маркер на месте клика
+          const customIcon = createCustomIcon(L);
+          const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+          clickMarkerRef.current = marker;
+
+          // Обратное геокодирование для получения адреса
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 секунд таймаут
+
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=ru`,
+              {
+                headers: {
+                  "User-Agent": "ZNVES Website",
+                },
+                signal: controller.signal,
+              }
+            );
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
             }
-          );
 
-          const data = await response.json();
+            const data = await response.json();
 
-          if (data && data.address) {
-            const addr = data.address;
+            if (data && data.address) {
+              const addr = data.address;
 
-            // Извлекаем данные адреса
-            const addressData: AddressData = {
-              city:
-                addr.city ||
-                addr.town ||
-                addr.village ||
-                addr.municipality ||
-                "",
-              street: addr.road || addr.street || "",
-              house: addr.house_number || "",
-              fullAddress: data.display_name || "",
-            };
+              // Извлекаем данные адреса
+              const addressData: AddressData = {
+                city:
+                  addr.city ||
+                  addr.town ||
+                  addr.village ||
+                  addr.municipality ||
+                  "",
+                street: addr.road || addr.street || "",
+                house: addr.house_number || "",
+                fullAddress: data.display_name || "",
+              };
 
-            // Формируем строку адреса для popup
-            const addressString =
-              [addressData.street, addressData.house, addressData.city]
-                .filter(Boolean)
-                .join(", ") ||
-              data.display_name ||
-              `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+              // Формируем строку адреса для popup
+              const addressString =
+                [addressData.street, addressData.house, addressData.city]
+                  .filter(Boolean)
+                  .join(", ") ||
+                data.display_name ||
+                `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 
-            marker.bindPopup(addressString).openPopup();
+              marker.bindPopup(addressString).openPopup();
 
-            // Вызываем callback для заполнения формы
-            if (onAddressSelect) {
-              onAddressSelect(addressData);
+              // Вызываем callback для заполнения формы
+              if (onAddressSelect) {
+                onAddressSelect(addressData);
+              }
+            } else {
+              const coordsString = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+              marker.bindPopup(coordsString).openPopup();
             }
-          } else {
+          } catch (error) {
+            // Игнорируем ошибки геокодирования, показываем координаты
             const coordsString = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
             marker.bindPopup(coordsString).openPopup();
           }
-        } catch (error) {
-          console.error("Ошибка обратного геокодирования:", error);
-          const coordsString = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-          marker.bindPopup(coordsString).openPopup();
-        }
-      });
+        });
 
-      mapInstanceRef.current = map;
+        mapInstanceRef.current = map;
+      } catch (error) {
+        // Игнорируем ошибки инициализации карты
+        if (process.env.NODE_ENV === "development") {
+          console.error("Ошибка инициализации карты:", error);
+        }
+      }
     };
 
     initMap();
 
     return () => {
+      isComponentMounted = false;
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
+        try {
+          mapInstanceRef.current.remove();
+        } catch (error) {
+          // Игнорируем ошибки при удалении карты
+        }
         mapInstanceRef.current = null;
       }
     };
@@ -179,6 +205,9 @@ const Map = ({ address, city, street, house, onAddressSelect }: MapProps) => {
       }
 
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 секунд таймаут
+
         const response = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
             addressString
@@ -187,8 +216,15 @@ const Map = ({ address, city, street, house, onAddressSelect }: MapProps) => {
             headers: {
               "User-Agent": "ZNVES Website",
             },
+            signal: controller.signal,
           }
         );
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
         const data = await response.json();
 
@@ -221,7 +257,10 @@ const Map = ({ address, city, street, house, onAddressSelect }: MapProps) => {
           map.setView(coordinates, 15);
         }
       } catch (error) {
-        console.error("Ошибка геокодирования:", error);
+        // Игнорируем ошибки геокодирования
+        if (process.env.NODE_ENV === "development") {
+          console.error("Ошибка геокодирования:", error);
+        }
       }
     };
 
