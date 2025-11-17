@@ -11,7 +11,7 @@ import Map from "../../components/Map/Map";
 import styles from "./page.module.css";
 
 const CheckoutPage = () => {
-  const { items, getTotalPrice } = useCart();
+  const { items, getTotalPrice, updateQuantity, removeItem } = useCart();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -21,10 +21,26 @@ const CheckoutPage = () => {
     street: "",
     house: "",
     apartment: "",
-    postalCode: "",
-    deliveryMethod: "courier",
+    deliveryMethod: "cdek",
     paymentMethod: "card",
+    agreeToOffer: false,
+    agreeToPrivacy: false,
   });
+
+  // Цены доставки
+  const deliveryPrices = {
+    cdek: 300,
+    yandex: 800,
+  };
+
+  // Расчет итоговой суммы
+  const calculateTotal = () => {
+    const itemsTotal = getTotalPrice();
+    const deliveryPrice =
+      deliveryPrices[formData.deliveryMethod as keyof typeof deliveryPrices] ||
+      0;
+    return itemsTotal + deliveryPrice;
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ru-RU", {
@@ -38,10 +54,11 @@ const CheckoutPage = () => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -73,7 +90,7 @@ const CheckoutPage = () => {
               Перейти в каталог
             </Link>
           </div>
-        </main>ё
+        </main>
         <Footer />
       </div>
     );
@@ -135,15 +152,15 @@ const CheckoutPage = () => {
               <div className={styles.section}>
                 <h2 className={styles.sectionTitle}>Адрес доставки</h2>
                 <div className={styles.delivery}>
-                  <input
-                    type="text"
-                    name="city"
-                    placeholder="Город"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    className={styles.input}
-                  />
-                  <div className={styles.addressRow}>
+                  <div className={styles.firstInputs}>
+                    <input
+                      type="text"
+                      name="city"
+                      placeholder="Город"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
                     <input
                       type="text"
                       name="street"
@@ -152,6 +169,8 @@ const CheckoutPage = () => {
                       onChange={handleInputChange}
                       className={styles.input}
                     />
+                  </div>
+                  <div className={styles.infoInputs}>
                     <input
                       type="text"
                       name="house"
@@ -159,10 +178,7 @@ const CheckoutPage = () => {
                       value={formData.house}
                       onChange={handleInputChange}
                       className={styles.input}
-                      style={{ width: "120px" }}
                     />
-                  </div>
-                  <div className={styles.addressRow}>
                     <input
                       type="text"
                       name="apartment"
@@ -170,16 +186,6 @@ const CheckoutPage = () => {
                       value={formData.apartment}
                       onChange={handleInputChange}
                       className={styles.input}
-                      style={{ width: "120px" }}
-                    />
-                    <input
-                      type="text"
-                      name="postalCode"
-                      placeholder="Индекс"
-                      value={formData.postalCode}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                      style={{ width: "120px" }}
                     />
                   </div>
                 </div>
@@ -192,23 +198,25 @@ const CheckoutPage = () => {
                     <input
                       type="radio"
                       name="deliveryMethod"
-                      value="courier"
-                      checked={formData.deliveryMethod === "courier"}
+                      value="cdek"
+                      checked={formData.deliveryMethod === "cdek"}
                       onChange={handleInputChange}
                       className={styles.radio}
                     />
-                    <span>Курьером</span>
+                    <span>СДЕК - {formatPrice(deliveryPrices.cdek)}</span>
                   </label>
                   <label className={styles.radioLabel}>
                     <input
                       type="radio"
                       name="deliveryMethod"
-                      value="pickup"
-                      checked={formData.deliveryMethod === "pickup"}
+                      value="yandex"
+                      checked={formData.deliveryMethod === "yandex"}
                       onChange={handleInputChange}
                       className={styles.radio}
                     />
-                    <span>Самовывоз</span>
+                    <span>
+                      Доставка Яндекс - {formatPrice(deliveryPrices.yandex)}
+                    </span>
                   </label>
                 </div>
               </div>
@@ -290,16 +298,39 @@ const CheckoutPage = () => {
                     />
                     <span>Наличными при получении</span>
                   </label>
+                  <label className={styles.radioLabel}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="online"
+                      checked={formData.paymentMethod === "online"}
+                      onChange={handleInputChange}
+                      className={styles.radio}
+                    />
+                    <span>Онлайн оплата</span>
+                  </label>
+                  <label className={styles.radioLabel}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="installment"
+                      checked={formData.paymentMethod === "installment"}
+                      onChange={handleInputChange}
+                      className={styles.radio}
+                    />
+                    <span>Рассрочка</span>
+                  </label>
                 </div>
               </div>
-
-              <button type="button" className={styles.submitButton}>
-                Оформить заказ
-              </button>
             </div>
 
             <div className={styles.rightColumn}>
-              <h2 className={styles.orderTitle}>Ваш заказ</h2>
+              <div className={styles.orderHeader}>
+                <h2 className={styles.orderTitle}>Ваши товары</h2>
+                <Link href="/cart" className={styles.editLink}>
+                  Изменить
+                </Link>
+              </div>
               <div className={styles.orderItems}>
                 {items.map((item, index) => {
                   const fullProduct = getProductById(item.productId);
@@ -326,16 +357,57 @@ const CheckoutPage = () => {
                         />
                       </div>
                       <div className={styles.orderItemInfo}>
+                        <div className={styles.orderItemCategory}>
+                          {fullProduct?.category || item.product.category || ""}
+                        </div>
                         <h3 className={styles.orderItemTitle}>
                           {item.product.title}
                         </h3>
                         <div className={styles.orderItemDetails}>
-                          <span>Цвет: {colorLabel.toUpperCase()}</span>
-                          <span>Размер: {item.size.toUpperCase()}</span>
-                          <span>Количество: {item.quantity}</span>
+                          <span>Цвет: {colorLabel}</span>
+                          <span>Размер: {item.size}</span>
                         </div>
-                        <div className={styles.orderItemPrice}>
-                          {formatPrice(item.product.priceValue * item.quantity)}
+                        <div className={styles.orderItemControls}>
+                          <div className={styles.quantityControls}>
+                            <button
+                              type="button"
+                              className={styles.quantityButton}
+                              onClick={() =>
+                                updateQuantity(
+                                  item.productId,
+                                  item.size,
+                                  item.color,
+                                  item.quantity - 1
+                                )
+                              }
+                              aria-label="Уменьшить количество"
+                            >
+                              −
+                            </button>
+                            <span className={styles.quantityValue}>
+                              {item.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              className={styles.quantityButton}
+                              onClick={() =>
+                                updateQuantity(
+                                  item.productId,
+                                  item.size,
+                                  item.color,
+                                  item.quantity + 1
+                                )
+                              }
+                              aria-label="Увеличить количество"
+                            >
+                              +
+                            </button>
+                          </div>
+                          <div className={styles.orderItemPrice}>
+                            {formatPrice(
+                              item.product.priceValue * item.quantity
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -344,11 +416,66 @@ const CheckoutPage = () => {
               </div>
               <div className={styles.orderSummary}>
                 <div className={styles.summaryRow}>
-                  <span className={styles.summaryLabel}>Итого</span>
-                  <span className={styles.summaryTotal}>
+                  <span className={styles.summaryLabel}>Доставка:</span>
+                  <span className={styles.summaryValue}>
+                    {formatPrice(
+                      deliveryPrices[
+                        formData.deliveryMethod as keyof typeof deliveryPrices
+                      ] || 0
+                    )}
+                  </span>
+                </div>
+                <div className={styles.summaryRow}>
+                  <span className={styles.summaryLabel}>Товаров на:</span>
+                  <span className={styles.summaryValue}>
                     {formatPrice(getTotalPrice())}
                   </span>
                 </div>
+                <div className={styles.summaryRowTotal}>
+                  <span className={styles.summaryLabelTotal}>Итого</span>
+                  <span className={styles.summaryTotal}>
+                    {formatPrice(calculateTotal())}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                className={`${styles.submitButton} ${styles.submitButtonRight}`}
+                disabled={!formData.agreeToOffer || !formData.agreeToPrivacy}
+              >
+                Оформить заказ
+              </button>
+              <div className={styles.checkboxes}>
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    name="agreeToOffer"
+                    checked={formData.agreeToOffer}
+                    onChange={handleInputChange}
+                    className={styles.checkbox}
+                  />
+                  <span>
+                    Я соглашаюсь с{" "}
+                    <Link href="/public-offer" className={styles.checkboxLink}>
+                      условиями публичной оферты
+                    </Link>
+                  </span>
+                </label>
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    name="agreeToPrivacy"
+                    checked={formData.agreeToPrivacy}
+                    onChange={handleInputChange}
+                    className={styles.checkbox}
+                  />
+                  <span>
+                    Я принимаю{" "}
+                    <Link href="/privacy" className={styles.checkboxLink}>
+                      политику конфиденциальности
+                    </Link>
+                  </span>
+                </label>
               </div>
             </div>
           </div>

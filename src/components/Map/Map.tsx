@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useMemo } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import { useEffect, useRef, useMemo, useState } from "react";
 
 type AddressData = {
   city?: string;
@@ -20,7 +18,7 @@ type MapProps = {
 };
 
 // Создаем кастомную иконку маркера (SVG) без флагов
-const createCustomIcon = () => {
+const createCustomIcon = (L: any) => {
   return L.divIcon({
     className: "custom-marker",
     html: `
@@ -37,9 +35,10 @@ const createCustomIcon = () => {
 
 const Map = ({ address, city, street, house, onAddressSelect }: MapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<L.Map | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
-  const clickMarkerRef = useRef<L.Marker | null>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const markerRef = useRef<any>(null);
+  const clickMarkerRef = useRef<any>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   // Формируем адрес для поиска
   const searchQuery = useMemo(() => {
@@ -48,102 +47,121 @@ const Map = ({ address, city, street, house, onAddressSelect }: MapProps) => {
     );
   }, [address, city, street, house]);
 
+  // Убеждаемся, что компонент смонтирован на клиенте
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   // Инициализация карты
   useEffect(() => {
-    if (!mapRef.current || mapInstanceRef.current) return;
+    if (!isMounted || !mapRef.current || mapInstanceRef.current) return;
 
-    // Инициализация карты (центр по умолчанию - Москва)
-    // Отключаем элементы управления и атрибуцию
-    const map = L.map(mapRef.current, {
-      zoomControl: false,
-      attributionControl: false,
-    }).setView([55.7558, 37.6173], 13);
+    // Динамический импорт Leaflet только на клиенте
+    const initMap = async () => {
+      const L = (await import("leaflet")).default;
+      await import("leaflet/dist/leaflet.css");
 
-    // Добавляем тайлы OpenStreetMap без атрибуции
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "",
-      maxZoom: 19,
-    }).addTo(map);
+      // Инициализация карты (центр по умолчанию - Москва)
+      // Отключаем элементы управления и атрибуцию
+      const map = L.map(mapRef.current, {
+        zoomControl: false,
+        attributionControl: false,
+      }).setView([55.7558, 37.6173], 13);
 
-    // Обработчик клика на карту для выбора адреса
-    map.on("click", async (e: L.LeafletMouseEvent) => {
-      const { lat, lng } = e.latlng;
+      // Добавляем тайлы OpenStreetMap без атрибуции
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "",
+        maxZoom: 19,
+      }).addTo(map);
 
-      // Удаляем предыдущие маркеры (от клика и от формы)
-      if (clickMarkerRef.current) {
-        map.removeLayer(clickMarkerRef.current);
-      }
-      if (markerRef.current) {
-        map.removeLayer(markerRef.current);
-        markerRef.current = null;
-      }
+      // Обработчик клика на карту для выбора адреса
+      map.on("click", async (e: any) => {
+        const { lat, lng } = e.latlng;
 
-      // Создаем новый маркер на месте клика
-      const customIcon = createCustomIcon();
-      const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
-      clickMarkerRef.current = marker;
+        // Удаляем предыдущие маркеры (от клика и от формы)
+        if (clickMarkerRef.current) {
+          map.removeLayer(clickMarkerRef.current);
+        }
+        if (markerRef.current) {
+          map.removeLayer(markerRef.current);
+          markerRef.current = null;
+        }
 
-      // Обратное геокодирование для получения адреса
-      try {
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=ru`,
-          {
-            headers: {
-              "User-Agent": "ZNVES Website",
-            },
+        // Создаем новый маркер на месте клика
+        const customIcon = createCustomIcon(L);
+        const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+        clickMarkerRef.current = marker;
+
+        // Обратное геокодирование для получения адреса
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=ru`,
+            {
+              headers: {
+                "User-Agent": "ZNVES Website",
+              },
+            }
+          );
+
+          const data = await response.json();
+
+          if (data && data.address) {
+            const addr = data.address;
+
+            // Извлекаем данные адреса
+            const addressData: AddressData = {
+              city:
+                addr.city ||
+                addr.town ||
+                addr.village ||
+                addr.municipality ||
+                "",
+              street: addr.road || addr.street || "",
+              house: addr.house_number || "",
+              fullAddress: data.display_name || "",
+            };
+
+            // Формируем строку адреса для popup
+            const addressString =
+              [addressData.street, addressData.house, addressData.city]
+                .filter(Boolean)
+                .join(", ") ||
+              data.display_name ||
+              `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+            marker.bindPopup(addressString).openPopup();
+
+            // Вызываем callback для заполнения формы
+            if (onAddressSelect) {
+              onAddressSelect(addressData);
+            }
+          } else {
+            const coordsString = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            marker.bindPopup(coordsString).openPopup();
           }
-        );
-
-        const data = await response.json();
-
-        if (data && data.address) {
-          const addr = data.address;
-
-          // Извлекаем данные адреса
-          const addressData: AddressData = {
-            city:
-              addr.city || addr.town || addr.village || addr.municipality || "",
-            street: addr.road || addr.street || "",
-            house: addr.house_number || "",
-            fullAddress: data.display_name || "",
-          };
-
-          // Формируем строку адреса для popup
-          const addressString =
-            [addressData.street, addressData.house, addressData.city]
-              .filter(Boolean)
-              .join(", ") ||
-            data.display_name ||
-            `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-
-          marker.bindPopup(addressString).openPopup();
-
-          // Вызываем callback для заполнения формы
-          if (onAddressSelect) {
-            onAddressSelect(addressData);
-          }
-        } else {
+        } catch (error) {
+          console.error("Ошибка обратного геокодирования:", error);
           const coordsString = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
           marker.bindPopup(coordsString).openPopup();
         }
-      } catch (error) {
-        console.error("Ошибка обратного геокодирования:", error);
-        const coordsString = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-        marker.bindPopup(coordsString).openPopup();
-      }
-    });
+      });
 
-    mapInstanceRef.current = map;
+      mapInstanceRef.current = map;
+    };
+
+    initMap();
 
     return () => {
-      map.remove();
-      mapInstanceRef.current = null;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
     };
-  }, []);
+  }, [isMounted, onAddressSelect]);
 
   // Геокодирование адреса
   useEffect(() => {
-    if (!mapInstanceRef.current) return;
+    if (!isMounted || !mapInstanceRef.current) return;
 
     const map = mapInstanceRef.current;
 
@@ -175,6 +193,9 @@ const Map = ({ address, city, street, house, onAddressSelect }: MapProps) => {
         const data = await response.json();
 
         if (data && data.length > 0) {
+          // Динамически импортируем Leaflet для использования L
+          const L = (await import("leaflet")).default;
+
           const { lat, lon } = data[0];
           const coordinates: [number, number] = [
             parseFloat(lat),
@@ -191,7 +212,7 @@ const Map = ({ address, city, street, house, onAddressSelect }: MapProps) => {
           }
 
           // Добавляем новый маркер с кастомной иконкой
-          const customIcon = createCustomIcon();
+          const customIcon = createCustomIcon(L);
           const marker = L.marker(coordinates, { icon: customIcon }).addTo(map);
           marker.bindPopup(addressString).openPopup();
           markerRef.current = marker;
@@ -210,7 +231,7 @@ const Map = ({ address, city, street, house, onAddressSelect }: MapProps) => {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
+  }, [isMounted, searchQuery]);
 
   return (
     <div
