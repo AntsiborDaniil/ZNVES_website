@@ -32,6 +32,11 @@ const CheckoutPage = () => {
     });
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [orderNumber, setOrderNumber] = useState("");
+    const [mapAddress, setMapAddress] = useState({
+        city: "",
+        street: "",
+        house: "",
+    });
 
     // Цены доставки
     const deliveryPrices = {
@@ -75,12 +80,17 @@ const CheckoutPage = () => {
         house?: string;
         fullAddress?: string;
     }) => {
+        const newAddress = {
+            city: addressData.city || "",
+            street: addressData.street || "",
+            house: addressData.house || "",
+        };
         setFormData((prev) => ({
             ...prev,
-            city: addressData.city || prev.city,
-            street: addressData.street || prev.street,
-            house: addressData.house || prev.house,
+            ...newAddress,
         }));
+        // Обновляем адрес карты сразу при клике (без debounce)
+        setMapAddress(newAddress);
     };
 
     // Генерация номера заказа
@@ -94,6 +104,19 @@ const CheckoutPage = () => {
             clearCart();
         }
     }, [showSuccessModal, items.length, clearCart]);
+
+    // Debounce для обновления адреса карты (чтобы карта не перезагружалась при каждом вводе)
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setMapAddress({
+                city: formData.city,
+                street: formData.street,
+                house: formData.house,
+            });
+        }, 1000); // Ждем 1 секунду после последнего изменения
+
+        return () => clearTimeout(timeoutId);
+    }, [formData.city, formData.street, formData.house]);
 
     // Обработка оформления заказа
     const handleSubmitOrder = () => {
@@ -470,9 +493,9 @@ const CheckoutPage = () => {
                                 </div>
                                 <div className={styles.mapContainer}>
                                     <Map
-                                        city={formData.city}
-                                        street={formData.street}
-                                        house={formData.house}
+                                        city={mapAddress.city}
+                                        street={mapAddress.street}
+                                        house={mapAddress.house}
                                         onAddressSelect={handleAddressSelect}
                                     />
                                 </div>
@@ -576,259 +599,285 @@ const CheckoutPage = () => {
                                 </Link>
                             </div>
                             <div className={styles.rightColumn}>
-                                <div className={styles.orderItems}>
-                                    {items.map((item, index) => {
-                                        const fullProduct = getProductById(
-                                            item.productId
-                                        );
-                                        const colorLabel =
-                                            fullProduct?.availableColors.find(
-                                                (c) => c.value === item.color
-                                            )?.label || item.color;
+                                <div className={styles.orderItemsBlock}>
+                                    <div className={styles.orderItems}>
+                                        {items.map((item, index) => {
+                                            const fullProduct = getProductById(
+                                                item.productId
+                                            );
+                                            const colorLabel =
+                                                fullProduct?.availableColors.find(
+                                                    (c) =>
+                                                        c.value === item.color
+                                                )?.label || item.color;
 
-                                        return (
-                                            <div
-                                                key={`${item.productId}-${item.size}-${item.color}-${index}`}
-                                                className={styles.orderItem}
-                                            >
+                                            return (
                                                 <div
-                                                    className={
-                                                        styles.orderItemImage
-                                                    }
-                                                >
-                                                    <Image
-                                                        src={
-                                                            item.product
-                                                                .images[0] ||
-                                                            "/images/catalogs/placeholder.png"
-                                                        }
-                                                        alt={item.product.title}
-                                                        fill
-                                                        className={
-                                                            styles.orderImage
-                                                        }
-                                                        sizes="120px"
-                                                    />
-                                                </div>
-                                                <div
-                                                    className={
-                                                        styles.orderItemInfo
-                                                    }
+                                                    key={`${item.productId}-${item.size}-${item.color}-${index}`}
+                                                    className={styles.orderItem}
                                                 >
                                                     <div
                                                         className={
-                                                            styles.orderItemCategory
+                                                            styles.orderItemImage
                                                         }
                                                     >
-                                                        {fullProduct?.category ||
-                                                            item.product
-                                                                .category ||
-                                                            ""}
-                                                    </div>
-                                                    <h3
-                                                        className={
-                                                            styles.orderItemTitle
-                                                        }
-                                                    >
-                                                        {item.product.title}
-                                                    </h3>
-                                                    <div
-                                                        className={
-                                                            styles.orderItemDetails
-                                                        }
-                                                    >
-                                                        <div
-                                                            className={
-                                                                styles.orderItemDetailRow
-                                                            }
-                                                        >
-                                                            <span
-                                                                className={
-                                                                    styles.orderItemDetailLabel
-                                                                }
-                                                            >
-                                                                Цвет
-                                                            </span>
-                                                            <span
-                                                                className={
-                                                                    styles.orderItemDetailValue
-                                                                }
-                                                            >
-                                                                {colorLabel}
-                                                            </span>
-                                                        </div>
-                                                        <div
-                                                            className={
-                                                                styles.orderItemDetailRow
-                                                            }
-                                                        >
-                                                            <span
-                                                                className={
-                                                                    styles.orderItemDetailLabel
-                                                                }
-                                                            >
-                                                                Размер
-                                                            </span>
-                                                            <span
-                                                                className={
-                                                                    styles.orderItemDetailValue
-                                                                }
-                                                            >
-                                                                {item.size}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div
-                                                        className={
-                                                            styles.orderItemBottom
-                                                        }
-                                                    >
-                                                        <div
-                                                            className={
-                                                                styles.quantityControls
-                                                            }
-                                                        >
-                                                            <button
-                                                                type="button"
-                                                                className={
-                                                                    styles.quantityButton
-                                                                }
-                                                                onClick={() =>
-                                                                    updateQuantity(
-                                                                        item.productId,
-                                                                        item.size,
-                                                                        item.color,
-                                                                        item.quantity -
-                                                                            1
-                                                                    )
-                                                                }
-                                                                aria-label="Уменьшить количество"
-                                                            >
-                                                                −
-                                                            </button>
-                                                            <span
-                                                                className={
-                                                                    styles.quantityValue
-                                                                }
-                                                            >
-                                                                {item.quantity}
-                                                            </span>
-                                                            <button
-                                                                type="button"
-                                                                className={
-                                                                    styles.quantityButton
-                                                                }
-                                                                onClick={() =>
-                                                                    updateQuantity(
-                                                                        item.productId,
-                                                                        item.size,
-                                                                        item.color,
-                                                                        item.quantity +
-                                                                            1
-                                                                    )
-                                                                }
-                                                                aria-label="Увеличить количество"
-                                                            >
-                                                                +
-                                                            </button>
-                                                        </div>
-                                                        <div
-                                                            className={
-                                                                styles.orderItemPrice
-                                                            }
-                                                        >
-                                                            {formatPrice(
+                                                        <Image
+                                                            src={
                                                                 item.product
-                                                                    .priceValue *
-                                                                    item.quantity
-                                                            )}
+                                                                    .images[0] ||
+                                                                "/images/catalogs/placeholder.png"
+                                                            }
+                                                            alt={
+                                                                item.product
+                                                                    .title
+                                                            }
+                                                            fill
+                                                            className={
+                                                                styles.orderImage
+                                                            }
+                                                            sizes="120px"
+                                                        />
+                                                    </div>
+                                                    <div
+                                                        className={
+                                                            styles.orderItemInfo
+                                                        }
+                                                    >
+                                                        <div
+                                                            className={
+                                                                styles.orderItemCategory
+                                                            }
+                                                        >
+                                                            {fullProduct?.category ||
+                                                                item.product
+                                                                    .category ||
+                                                                ""}
+                                                        </div>
+                                                        <h3
+                                                            className={
+                                                                styles.orderItemTitle
+                                                            }
+                                                        >
+                                                            {item.product.title}
+                                                        </h3>
+                                                        <div
+                                                            className={
+                                                                styles.orderItemDetailsRow
+                                                            }
+                                                        >
+                                                            <div
+                                                                className={
+                                                                    styles.orderItemDetailColumn
+                                                                }
+                                                            >
+                                                                <span
+                                                                    className={
+                                                                        styles.orderItemDetailLabel
+                                                                    }
+                                                                >
+                                                                    Цвет
+                                                                </span>
+                                                                <span
+                                                                    className={
+                                                                        styles.orderItemDetailValue
+                                                                    }
+                                                                >
+                                                                    {colorLabel}
+                                                                </span>
+                                                            </div>
+                                                            <div
+                                                                className={
+                                                                    styles.orderItemDetailColumn
+                                                                }
+                                                            >
+                                                                <span
+                                                                    className={
+                                                                        styles.orderItemDetailLabel
+                                                                    }
+                                                                >
+                                                                    Размер
+                                                                </span>
+                                                                <span
+                                                                    className={`${styles.orderItemDetailValue} ${styles.orderItemSizeValue}`}
+                                                                >
+                                                                    {item.size}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            className={
+                                                                styles.orderItemBottom
+                                                            }
+                                                        >
+                                                            <div
+                                                                className={
+                                                                    styles.quantityControls
+                                                                }
+                                                            >
+                                                                <button
+                                                                    type="button"
+                                                                    className={
+                                                                        styles.quantityButton
+                                                                    }
+                                                                    onClick={() =>
+                                                                        updateQuantity(
+                                                                            item.productId,
+                                                                            item.size,
+                                                                            item.color,
+                                                                            item.quantity -
+                                                                                1
+                                                                        )
+                                                                    }
+                                                                    aria-label="Уменьшить количество"
+                                                                >
+                                                                    −
+                                                                </button>
+                                                                <span
+                                                                    className={
+                                                                        styles.quantityValue
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        item.quantity
+                                                                    }
+                                                                </span>
+                                                                <button
+                                                                    type="button"
+                                                                    className={
+                                                                        styles.quantityButton
+                                                                    }
+                                                                    onClick={() =>
+                                                                        updateQuantity(
+                                                                            item.productId,
+                                                                            item.size,
+                                                                            item.color,
+                                                                            item.quantity +
+                                                                                1
+                                                                        )
+                                                                    }
+                                                                    aria-label="Увеличить количество"
+                                                                >
+                                                                    +
+                                                                </button>
+                                                            </div>
+                                                            <div
+                                                                className={
+                                                                    styles.orderItemPrice
+                                                                }
+                                                            >
+                                                                {formatPrice(
+                                                                    item.product
+                                                                        .priceValue *
+                                                                        item.quantity
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                                <div className={styles.orderSummary}>
-                                    <div className={styles.summaryRow}>
-                                        <span className={styles.summaryLabel}>
-                                            Доставка:
-                                        </span>
-                                        <span className={styles.summaryValue}>
-                                            {formatPrice(
-                                                deliveryPrices[
-                                                    formData.deliveryMethod as keyof typeof deliveryPrices
-                                                ] || 0
-                                            )}
-                                        </span>
-                                    </div>
-                                    <div className={styles.summaryRow}>
-                                        <span className={styles.summaryLabel}>
-                                            Товаров на:
-                                        </span>
-                                        <span className={styles.summaryValue}>
-                                            {formatPrice(getTotalPrice())}
-                                        </span>
-                                    </div>
-                                    <div className={styles.summaryRowTotal}>
-                                        <span
-                                            className={styles.summaryLabelTotal}
-                                        >
-                                            Итого
-                                        </span>
-                                        <span className={styles.summaryTotal}>
-                                            {formatPrice(calculateTotal())}
-                                        </span>
+                                            );
+                                        })}
                                     </div>
                                 </div>
-                                <button
-                                    type="button"
-                                    className={`${styles.submitButton} ${styles.submitButtonRight}`}
-                                    disabled={
-                                        !formData.agreeToOffer ||
-                                        !formData.agreeToPrivacy
-                                    }
-                                    onClick={handleSubmitOrder}
-                                >
-                                    Оформить заказ
-                                </button>
-                                <div className={styles.checkboxes}>
-                                    <label className={styles.checkboxLabel}>
-                                        <input
-                                            type="checkbox"
-                                            name="agreeToOffer"
-                                            checked={formData.agreeToOffer}
-                                            onChange={handleInputChange}
-                                            className={styles.checkbox}
-                                        />
-                                        <span>
-                                            Я соглашаюсь с{" "}
-                                            <Link
-                                                href="/public-offer"
-                                                className={styles.checkboxLink}
+                                <div className={styles.orderSummaryBlock}>
+                                    <div className={styles.orderSummary}>
+                                        <div className={styles.summaryRow}>
+                                            <span
+                                                className={styles.summaryLabel}
                                             >
-                                                условиями публичной оферты
-                                            </Link>
-                                        </span>
-                                    </label>
-                                    <label className={styles.checkboxLabel}>
-                                        <input
-                                            type="checkbox"
-                                            name="agreeToPrivacy"
-                                            checked={formData.agreeToPrivacy}
-                                            onChange={handleInputChange}
-                                            className={styles.checkbox}
-                                        />
-                                        <span>
-                                            Я принимаю{" "}
-                                            <Link
-                                                href="/privacy"
-                                                className={styles.checkboxLink}
+                                                Доставка:
+                                            </span>
+                                            <span
+                                                className={styles.summaryValue}
                                             >
-                                                политику конфиденциальности
-                                            </Link>
-                                        </span>
-                                    </label>
+                                                {formatPrice(
+                                                    deliveryPrices[
+                                                        formData.deliveryMethod as keyof typeof deliveryPrices
+                                                    ] || 0
+                                                )}
+                                            </span>
+                                        </div>
+                                        <div className={styles.summaryRow}>
+                                            <span
+                                                className={styles.summaryLabel}
+                                            >
+                                                Товаров на:
+                                            </span>
+                                            <span
+                                                className={styles.summaryValue}
+                                            >
+                                                {formatPrice(getTotalPrice())}
+                                            </span>
+                                        </div>
+                                        <div className={styles.summaryRowTotal}>
+                                            <span
+                                                className={
+                                                    styles.summaryLabelTotal
+                                                }
+                                            >
+                                                Итого
+                                            </span>
+                                            <span
+                                                className={styles.summaryTotal}
+                                            >
+                                                {formatPrice(calculateTotal())}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className={`${styles.submitButton} ${styles.submitButtonRight}`}
+                                        disabled={
+                                            !formData.agreeToOffer ||
+                                            !formData.agreeToPrivacy
+                                        }
+                                        onClick={handleSubmitOrder}
+                                    >
+                                        Оформить заказ
+                                    </button>
+                                    <div className={styles.checkboxes}>
+                                        <label className={styles.checkboxLabel}>
+                                            <input
+                                                type="checkbox"
+                                                name="agreeToOffer"
+                                                checked={formData.agreeToOffer}
+                                                onChange={handleInputChange}
+                                                className={styles.checkbox}
+                                            />
+                                            <span>
+                                                Я соглашаюсь с условиями{" "}
+                                                <Link
+                                                    href="/public-offer"
+                                                    className={
+                                                        styles.checkboxLink
+                                                    }
+                                                >
+                                                    публичной оферты
+                                                </Link>
+                                            </span>
+                                        </label>
+                                        <label className={styles.checkboxLabel}>
+                                            <input
+                                                type="checkbox"
+                                                name="agreeToPrivacy"
+                                                checked={
+                                                    formData.agreeToPrivacy
+                                                }
+                                                onChange={handleInputChange}
+                                                className={styles.checkbox}
+                                            />
+                                            <span>
+                                                Я принимаю{" "}
+                                                <Link
+                                                    href="/privacy"
+                                                    className={
+                                                        styles.checkboxLink
+                                                    }
+                                                >
+                                                    политику конфиденциальности
+                                                </Link>
+                                            </span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
