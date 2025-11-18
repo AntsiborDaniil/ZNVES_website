@@ -51,7 +51,7 @@
 }
 
 .rightColumn {
-  width: 400px;
+  width: 544px;
   flex-shrink: 0;
   background-color: #f8f8f8;
   border-radius: 3px;
@@ -106,7 +106,7 @@
 .input {
   flex: 1;
   padding: 12px 16px;
-  border: 1.5px solid #525252;
+  border: 0.6px solid #525252;
   border-radius: 3px;
   background-color: #f8f8f8;
   font-size: 16px;
@@ -125,7 +125,15 @@
   color: #7a7a79;
 }
 
-.deliveryOptions,
+.deliveryOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 0.8px solid #525252;
+  border-bottom: 0.8px solid #525252;
+  padding: 16px 0;
+}
+
 .paymentOptions {
   display: flex;
   flex-direction: column;
@@ -140,6 +148,40 @@
   color: #525252;
   cursor: pointer;
   user-select: none;
+  padding: 8px 0;
+}
+
+.deliveryOptionContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  gap: 16px;
+}
+
+.deliveryOptionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.deliveryOptionName {
+  font-size: 16px;
+  color: #525252;
+  font-weight: 400;
+}
+
+.deliveryOptionTime {
+  font-size: 14px;
+  color: #7a7a79;
+  font-weight: 400;
+}
+
+.deliveryOptionPrice {
+  font-size: 16px;
+  color: #525252;
+  font-weight: 400;
+  white-space: nowrap;
 }
 
 .radio {
@@ -215,7 +257,7 @@
 .mapSearchInput {
   width: 100%;
   padding: 12px 16px;
-  border: 1.5px solid #525252;
+  border: 0.6px solid #525252;
   border-radius: 3px;
   background-color: #f8f8f8;
   font-size: 16px;
@@ -349,17 +391,26 @@
 
 .orderTitle {
   font-weight: 400;
-  font-size: 30px;
+  font-size: 40px;
   line-height: 32.94px;
   letter-spacing: 0px;
+
   color: #525252;
   margin: 0;
 }
 
 .editLink {
-  font-size: 16px;
-  color: #525252;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 20px;
+  line-height: 18.89px;
+  letter-spacing: 0px;
   text-decoration: underline;
+  text-decoration-style: solid;
+  text-decoration-offset: 0%;
+  text-decoration-thickness: 0%;
+  text-decoration-skip-ink: auto;
+  color: #525252;
   transition: color 0.2s ease;
 }
 
@@ -378,11 +429,9 @@
   display: flex;
   gap: 16px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #bcb4a5;
 }
 
 .orderItem:last-child {
-  border-bottom: none;
   padding-bottom: 0;
 }
 
@@ -415,8 +464,12 @@
 
 .orderItemTitle {
   font-weight: 400;
-  font-size: 18px;
-  line-height: 22px;
+  font-style: Regular;
+  font-size: 25px;
+  line-height: 22.35px;
+  letter-spacing: 0px;
+  text-transform: uppercase;
+
   color: #525252;
   margin: 0;
 }
@@ -424,16 +477,33 @@
 .orderItemDetails {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 14px;
-  color: #7a7a79;
+  gap: 8px;
+  margin-top: 8px;
 }
 
-.orderItemControls {
+.orderItemDetailRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.orderItemDetailLabel {
+  font-size: 14px;
+  color: #7a7a79;
+  font-weight: 400;
+}
+
+.orderItemDetailValue {
+  font-size: 16px;
+  color: #525252;
+  font-weight: 400;
+}
+
+.orderItemBottom {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-top: 8px;
+  align-items: flex-end;
+  margin-top: 16px;
 }
 
 .orderItemPrice {
@@ -444,7 +514,7 @@
 
 .orderSummary {
   padding-top: 20px;
-  border-top: 1px solid #bcb4a5;
+  border-top: 1px solid #ddd9d0;
 }
 
 .summaryRow {
@@ -464,7 +534,6 @@
   align-items: center;
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid #bcb4a5;
 }
 
 .summaryLabel {
