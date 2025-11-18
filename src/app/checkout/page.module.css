@@ -151,6 +151,15 @@
   padding: 8px 0;
 }
 
+.paymentIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
 .deliveryOptionContent {
   display: flex;
   justify-content: space-between;

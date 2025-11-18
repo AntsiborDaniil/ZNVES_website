@@ -350,7 +350,7 @@ const CheckoutPage = () => {
                       onChange={handleInputChange}
                       className={styles.radio}
                     />
-                    <span>Банковская карта</span>
+                    <span>Оплата банковской картой</span>
                   </label>
                   <label className={styles.radioLabel}>
                     <input
@@ -361,7 +361,15 @@ const CheckoutPage = () => {
                       onChange={handleInputChange}
                       className={styles.radio}
                     />
-                    <span>Наличными при получении</span>
+                    <div className={styles.paymentIcon}>
+                      <Image
+                        src="/images/checkout/sbp.png"
+                        alt="СПБ"
+                        width={19}
+                        height={19}
+                      />
+                    </div>
+                    <span>Оплата по СПБ </span>
                   </label>
                   <label className={styles.radioLabel}>
                     <input
@@ -372,7 +380,15 @@ const CheckoutPage = () => {
                       onChange={handleInputChange}
                       className={styles.radio}
                     />
-                    <span>Онлайн оплата</span>
+                    <div className={styles.paymentIcon}>
+                      <Image
+                        src="/images/checkout/dolya.png"
+                        alt="Долями"
+                        width={19}
+                        height={19}
+                      />
+                    </div>
+                    <span>Долями</span>
                   </label>
                   <label className={styles.radioLabel}>
                     <input
@@ -383,7 +399,15 @@ const CheckoutPage = () => {
                       onChange={handleInputChange}
                       className={styles.radio}
                     />
-                    <span>Рассрочка</span>
+                    <div className={styles.paymentIcon}>
+                      <Image
+                        src="/images/checkout/y.png"
+                        alt="Яндекс Pay"
+                        width={19}
+                        height={19}
+                      />
+                    </div>
+                    <span>Яндекс Pay</span>
                   </label>
                 </div>
               </div>
