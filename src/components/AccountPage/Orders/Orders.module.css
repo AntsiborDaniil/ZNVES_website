@@ -1,0 +1,23 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionHeading {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: 0%;
+  color: #525252;
+}
+
+.sectionDescription {
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0%;
+  max-width: 640px;
+  color: #525252;
+}

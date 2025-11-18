@@ -1,128 +1,7 @@
-.accountPage {
-  min-height: 100vh;
-  background-color: #f2f0ec;
+.panel {
   display: flex;
   flex-direction: column;
-}
-
-.main {
-  flex: 1;
-  display: flex;
-  padding: 60px 20px 100px 47px;
-}
-
-.wrapper {
-  width: 1094px;
-  display: flex;
-  flex-direction: row;
-  gap: 40px;
-  align-items: flex-start;
-}
-
-.aside {
-  flex-shrink: 0;
-  width: 240px;
-  margin-right: 137px;
-}
-
-.asideTitle {
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 32px;
-  color: #525252;
-  margin: 0 0 20px 0;
-}
-
-.nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  background-color: #0000000d;
-  border-radius: 28px;
-  padding: 20px 0;
-}
-
-.navButton {
-  width: 100%;
-  padding: 16px 24px;
-  background: none;
-  border: none;
-  text-align: left;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-  color: #525252ad;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.navButton:hover {
-  color: #525252;
-  background-color: rgba(0, 0, 0, 0.03);
-}
-
-.navButtonActive {
-  color: #525252;
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-.navButtonActive::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background-color: #525252;
-  border-radius: 0 2px 2px 0;
-}
-
-.card {
-  flex: 1;
-  background-color: #0000000d;
-  border-radius: 28px;
-  padding: 40px 48px;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-}
-
-.noticeCard {
-  background-color: #dcd8d0;
-  border-radius: 18px;
-  padding: 18px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-}
-
-.noticeCardSuccess {
-  background-color: #dfeee7;
-}
-
-.noticeCardError {
-  background-color: #f4dfde;
-}
-
-.noticeContent {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.noticeTitle {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-  color: #525252;
-}
-
-.noticeText {
-  margin: 0;
-  font-size: 14px;
-  color: #7a7a79;
+  gap: 8px;
 }
 
 .sectionHeading {
@@ -130,7 +9,6 @@
   font-size: 24px;
   line-height: 32px;
   letter-spacing: 0%;
-
   color: #525252;
 }
 
@@ -140,16 +18,8 @@
   font-size: 14px;
   line-height: 20px;
   letter-spacing: 0%;
-
   max-width: 640px;
-
   color: #525252;
-}
-
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
 .infoPanel {
@@ -166,32 +36,10 @@
   gap: 6px;
 }
 
-.fieldHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
 .fieldLabel {
   font-size: 13px;
   font-weight: 500;
   color: #7a7a79;
-}
-
-.editButton {
-  background: none;
-  border: none;
-  color: #0a5840;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-}
-
-.editButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .inputWrapper {
@@ -216,11 +64,6 @@
   color: #9a978f;
   border-color: #dad3c3;
   cursor: not-allowed;
-}
-
-.inputWrapper {
-  position: relative;
-  width: 100%;
 }
 
 .editInlineButton {
@@ -251,35 +94,30 @@
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
 .primaryButton {
   background-color: #525252ad;
   color: #f2f0ec;
   width: 185px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 3px;
   padding-top: 10px;
   padding-right: 14px;
   padding-bottom: 10px;
   padding-left: 14px;
-
   font-weight: 600;
   font-style: SemiBold;
   font-size: 14px;
   line-height: 20px;
   letter-spacing: 0%;
   text-wrap: nowrap;
-
   border: none;
-
   cursor: pointer;
   transition: all 0.3s ease-in-out;
-  margin-bottom: 26.5px;
 }
 
 .primaryButton:disabled {
@@ -310,6 +148,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  margin-top: 20px;
 }
 
 .passwordField {
@@ -374,46 +213,16 @@
   background: none;
   border: none;
   color: #525252;
-
   font-weight: 600;
   font-size: 14px;
   line-height: 28px;
   letter-spacing: 0%;
-
   cursor: pointer;
   padding: 0;
+  margin-top: 20px;
 }
 
 @media (max-width: 768px) {
-  .wrapper {
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  .aside {
-    width: 100%;
-  }
-
-  .nav {
-    flex-direction: row;
-    overflow-x: auto;
-    padding: 12px 16px;
-  }
-
-  .navButton {
-    white-space: nowrap;
-    padding: 12px 20px;
-  }
-
-  .card {
-    padding: 28px 20px;
-  }
-
-  .noticeCard {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   .infoPanel {
     padding: 18px 20px;
   }
