@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useId, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import styles from "./BurgerMenu.module.css";
+import { useKeyboardEvent } from "../../hooks/useKeyboardEvent";
 
 type BurgerMenuProps = {
     isOpen: boolean;
@@ -46,23 +47,15 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
         }
     }, [isOpen, onToggle]);
 
-    useEffect(() => {
-        if (!isOpen) {
-            return;
-        }
-
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === "Escape") {
+    useKeyboardEvent(
+        "Escape",
+        useCallback(() => {
+            if (isOpen) {
                 onToggle();
             }
-        };
-
-        window.addEventListener("keydown", handleKeyDown);
-
-        return () => {
-            window.removeEventListener("keydown", handleKeyDown);
-        };
-    }, [isOpen, onToggle]);
+        }, [isOpen, onToggle]),
+        isOpen
+    );
 
     useEffect(() => {
         if (!isOpen) {

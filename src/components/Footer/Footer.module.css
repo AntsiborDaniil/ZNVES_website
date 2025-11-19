@@ -1,352 +1,598 @@
 .footer {
-  background-color: #0a5840;
-  color: #f6f1da;
-  padding: 83px 53px 29px 59px;
-  margin-top: auto;
-  font-family: "Roboto", sans-serif;
+    background-color: #0a5840;
+    color: #f6f1da;
+    padding: 83px 53px 29px 59px;
+    margin-top: auto;
+    font-family: "Roboto", sans-serif;
 }
 
 .footerContent {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 
 .footerColumn {
-  display: flex;
-  gap: 64px;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 64px;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
 }
 
 .leftPart {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
 }
 
 .rightSide {
-  display: flex;
-  gap: 88px;
-  flex-wrap: wrap;
-  justify-content: space-between;
+    display: flex;
+    gap: 88px;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 .navColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 180px;
 }
 
 .logo {
-  width: 187px;
-  height: auto;
+    width: 187px;
+    height: auto;
 }
 
 .subscriptionTitle {
-  color: #f2f0ec;
-  font-family: var(--font-inter), sans-serif;
+    color: #f2f0ec;
+    font-family: var(--font-inter), sans-serif;
 
-  margin-top: 80px;
-  margin-bottom: 40px;
+    margin-top: 80px;
+    margin-bottom: 40px;
 
-  max-width: 538px;
+    max-width: 538px;
 
-  font-weight: 500;
-  font-style: Medium;
-  font-size: 25px;
-  line-height: 145%;
-  letter-spacing: 0%;
-  vertical-align: middle;
+    font-weight: 500;
+    font-style: Medium;
+    font-size: 25px;
+    line-height: 145%;
+    letter-spacing: 0%;
+    vertical-align: middle;
 }
 
 .newsletter {
-  display: flex;
-  gap: 20px;
-  max-width: 720px;
+    display: flex;
+    gap: 20px;
+    max-width: 720px;
 }
 
 .newsletterInput {
-  flex: 1;
-  min-width: 508px;
-  padding: 12px 0;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid #fff5d991;
-  color: #f6f1da;
-  font-size: 24px;
-  outline: none;
+    flex: 1;
+    min-width: 508px;
+    padding: 12px 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #fff5d991;
+    color: #f6f1da;
+    font-size: 24px;
+    outline: none;
 }
 
 .newsletterInput::placeholder {
-  color: rgba(246, 241, 218, 0.6);
+    color: rgba(246, 241, 218, 0.6);
 }
 
 .newsletterButton {
-  padding: 21px 51px;
-  background-color: #f2f0ec;
-  color: #525252;
-  border: 1px solid #fff5d9;
-  border-radius: 3px;
+    padding: 21px 51px;
+    background-color: #f2f0ec;
+    color: #525252;
+    border: 1px solid #fff5d9;
+    border-radius: 3px;
 
-  font-family: var(--font-inter), sans-serif;
-  font-weight: 600;
-  font-size: 20px;
-  line-height: 100%;
-  letter-spacing: 0%;
-  text-align: center;
-  vertical-align: middle;
+    font-family: var(--font-inter), sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    text-align: center;
+    vertical-align: middle;
 
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
 .newsletterButton:hover {
-  background-color: transparent;
-  color: #f2f0ec;
-  border: 1.5px solid #f2f0ec;
+    background-color: transparent;
+    color: #f2f0ec;
+    border: 1.5px solid #f2f0ec;
 }
 
 .consentSection {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 32px;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 56px;
-  margin-bottom: 46px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 56px;
+    margin-bottom: 46px;
 }
 
 .privacyText {
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 16.5px;
-  letter-spacing: 0%;
-  vertical-align: middle;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 16.5px;
+    letter-spacing: 0%;
+    vertical-align: middle;
 
-  color: #f2f0ecb8;
-  max-width: 511.7003479003906px;
-  margin: 0;
+    color: #f2f0ecb8;
+    max-width: 511.7003479003906px;
+    margin: 0;
 }
 
 .privacyLink {
-  color: #f2f0ecb8;
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 16.5px;
-  letter-spacing: 0%;
-  vertical-align: middle;
-  text-decoration: underline;
+    color: #f2f0ecb8;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 16.5px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    text-decoration: underline;
 }
 
 .columnTitle {
-  font-weight: 500;
-  font-style: Medium;
-  font-size: 28px;
-  line-height: 20.27px;
-  letter-spacing: 0px;
+    font-weight: 500;
+    font-style: Medium;
+    font-size: 28px;
+    line-height: 20.27px;
+    letter-spacing: 0px;
 
-  text-transform: uppercase;
+    text-transform: uppercase;
 
-  color: #fff5d9;
+    color: #fff5d9;
 }
 
 .footerLinks {
-  color: #fff5d991;
-  list-style: none;
-  text-wrap: nowrap;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 0;
-  margin: 0;
-  font-weight: 200;
-  font-family: var(--font-inter), sans-serif;
+    color: #fff5d991;
+    list-style: none;
+    text-wrap: nowrap;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0;
+    margin: 0;
+    font-weight: 200;
+    font-family: var(--font-inter), sans-serif;
 }
 
 .footerLinks li {
-  font-weight: 200;
+    font-weight: 200;
 }
 
 .footerLinks a {
-  color: #fff5d991;
-  font-weight: 200;
-  font-style: Light;
-  font-size: 24px;
-  line-height: 18.2px;
-  letter-spacing: 0px;
+    color: #fff5d991;
+    font-weight: 200;
+    font-style: Light;
+    font-size: 24px;
+    line-height: 18.2px;
+    letter-spacing: 0px;
 
-  text-decoration: none;
+    text-decoration: none;
 
-  transition: color 0.2s ease;
+    transition: color 0.2s ease;
 }
 
 .footerLinks a:hover {
-  color: #ffffff;
+    color: #ffffff;
 }
 
 .catalogColumns {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(120px, 1fr));
-  gap: 12px 40px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    gap: 12px 40px;
 }
 
 .underlinedLink {
-  text-decoration: none !important;
-  border-bottom: 2px solid #fff5d991;
-  padding-bottom: 6px;
-  display: inline-block;
-  transition: border-color 0.2s ease;
+    text-decoration: none !important;
+    border-bottom: 2px solid #fff5d991;
+    padding-bottom: 6px;
+    display: inline-block;
+    transition: border-color 0.2s ease;
 }
 
 .underlinedLink:hover {
-  border-color: #ffffff;
+    border-color: #ffffff;
 }
 
 .legalLinks {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  color: #f2f0ecb8;
-  font-family: var(--font-montserrat);
-  font-size: 15px;
-  line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #f2f0ecb8;
+    font-family: var(--font-montserrat);
+    font-size: 15px;
+    line-height: 1.6;
 }
 
 .legalLink {
-  color: inherit;
-  text-decoration: none;
-  transition: color 0.2s ease;
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
 .legalLink:hover {
-  color: #f2f0ec;
+    color: #f2f0ec;
 }
 
 .metaNote {
-  display: flex;
-  justify-content: space-between;
-  border-top: 1px solid #f2f0ec70;
-  padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #f2f0ec70;
+    padding-top: 20px;
 
-  color: #f2f0ecb2;
+    color: #f2f0ecb2;
 
-  opacity: 0.7;
+    opacity: 0.7;
 
-  font-weight: 400;
-  font-style: Regular;
-  font-size: 13px;
-  line-height: 100%;
-  letter-spacing: 0%;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 13px;
+    line-height: 100%;
+    letter-spacing: 0%;
 }
 
 .metaNote span {
-  color: #fff5d9b2;
+    color: #fff5d9b2;
 }
 
 .metaPrimary {
-  color: #f2f0ecb2;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+    color: #f2f0ecb2;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .studioNote {
-  font-weight: 400;
-  font-size: 13px;
-  line-height: 130%;
-  letter-spacing: 0.02em;
-  color: #f2f0eccf;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 130%;
+    letter-spacing: 0.02em;
+    color: #f2f0eccf;
 }
 
 @media (max-width: 1024px) {
-  .footer {
-    padding: 50px 40px 30px;
-  }
+    .footer {
+        padding: 50px 40px 30px;
+    }
 
-  .footerContent {
-    gap: 48px;
-  }
+    .footerContent {
+        gap: 48px;
+    }
 
-  .rightSide {
-    gap: 36px;
-  }
+    .rightSide {
+        gap: 36px;
+    }
 }
 
 @media (max-width: 768px) {
-  .footer {
-    padding: 50px 24px 30px;
-  }
+    .footer {
+        padding: 50px 24px 30px;
+    }
 
-  .footerContent {
-    flex-direction: column;
-    gap: 32px;
-  }
+    .footerContent {
+        flex-direction: column;
+        gap: 32px;
+    }
 
-  .footerColumn,
-  .rightSide {
-    flex-direction: column;
-    width: 100%;
-    gap: 28px;
-  }
+    .footerColumn,
+    .rightSide {
+        flex-direction: column;
+        width: 100%;
+        gap: 28px;
+    }
 
-  .leftPart,
-  .navColumn {
-    max-width: none;
-  }
+    .leftPart,
+    .navColumn {
+        max-width: none;
+    }
 
-  .newsletter {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
+    .newsletter {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
 
-  .catalogColumns {
-    grid-template-columns: repeat(2, minmax(140px, 1fr));
-    gap: 16px 24px;
-  }
+    .catalogColumns {
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
+        gap: 16px 24px;
+    }
 
-  .newsletterInput {
-    width: 100%;
-    min-width: unset;
-  }
+    .newsletterInput {
+        width: 100%;
+        min-width: unset;
+    }
 
-  .newsletterButton {
-    width: 100%;
-  }
+    .newsletterButton {
+        width: 100%;
+    }
 
-  .consentSection {
-    flex-direction: column;
-    gap: 16px;
-    margin-top: 32px;
-    margin-bottom: 32px;
-  }
+    .consentSection {
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 32px;
+        margin-bottom: 32px;
+    }
+}
+
+/* Mobile footer - hidden by default on desktop */
+.mobileFooter {
+    display: none;
+}
+
+/* Ensure desktop footer is visible on large screens */
+@media (min-width: 1920px) {
+    .footerContent {
+        display: flex;
+    }
+
+    .mobileFooter {
+        display: none;
+    }
+}
+
+/* Medium screens - keep desktop layout */
+@media (min-width: 768px) and (max-width: 1919px) {
+    .footerContent {
+        display: flex;
+    }
+
+    .mobileFooter {
+        display: none;
+    }
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+    .footer {
+        padding: 40px 24px 29px;
+    }
+
+    /* Hide desktop footer content */
+    .footerContent {
+        display: none !important;
+    }
+
+    /* Show mobile footer */
+    .mobileFooter {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .mobileLogoSection {
+        display: flex;
+        flex-direction: column;
+        gap: 23px;
+    }
+
+    .mobileLogo {
+        width: 125px;
+        height: auto;
+    }
+
+    .mobileSubscriptionTitle {
+        color: #f2f0ec;
+        font-family: var(--font-inter), sans-serif;
+        font-weight: 500;
+        font-style: Medium;
+        font-size: 16px;
+        line-height: 145%;
+        letter-spacing: 0%;
+        vertical-align: middle;
+        margin: 0;
+    }
+
+    .mobileNewsletter {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .mobileNewsletterInput {
+        width: 100%;
+        padding: 12px 0;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #fff5d991;
+        color: #f6f1da;
+        font-size: 16px;
+        outline: none;
+    }
+
+    .mobileNewsletterInput::placeholder {
+        color: rgba(246, 241, 218, 0.6);
+    }
+
+    .mobileNewsletterButton {
+        padding: 12px 24px;
+        background-color: #f2f0ec;
+        color: #525252;
+        border: 1px solid #fff5d9;
+        border-radius: 3px;
+        font-family: var(--font-inter), sans-serif;
+        font-weight: 600;
+        width: 100%;
+        font-size: 16px;
+        line-height: 100%;
+        letter-spacing: 0%;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        align-self: flex-start;
+    }
+
+    .mobileNewsletterButton:hover {
+        background-color: transparent;
+        color: #f2f0ec;
+        border: 1.5px solid #f2f0ec;
+    }
+
+    .mobilePrivacyText {
+        font-weight: 300;
+        font-size: 10.59px;
+        line-height: 11.04px;
+        letter-spacing: 0%;
+        vertical-align: middle;
+        color: #f2f0ecb8;
+        margin: 0;
+    }
+
+    .mobilePrivacyLink {
+        color: #f2f0ecb8;
+        font-weight: 300;
+        font-size: 10.59px;
+        line-height: 11.04px;
+        letter-spacing: 0%;
+        vertical-align: middle;
+        text-decoration: underline;
+    }
+
+    .mobileNavSection {
+        display: flex;
+        flex-direction: column;
+        margin-top: 20px;
+        gap: 0;
+    }
+
+    .mobileNavItem {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mobileNavHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: none;
+        border: none;
+        color: #fff5d9;
+        font-weight: 400;
+        font-size: 14px;
+        letter-spacing: 0%;
+        vertical-align: middle;
+        text-transform: uppercase;
+        text-align: left;
+        cursor: pointer;
+        padding: 12px 0;
+        width: 100%;
+        transition: color 0.2s ease;
+    }
+
+    .mobileNavHeader:hover {
+        color: #ffffff;
+    }
+
+    .plusIcon {
+        font-size: 18px;
+        font-weight: 300;
+        line-height: 1;
+    }
+
+    .mobileNavLinks {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        margin-left: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow: hidden;
+        animation: slideDown 0.3s ease-out forwards;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            max-height: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            max-height: 500px;
+            transform: translateY(0);
+        }
+    }
+
+    .mobileNavLinks li {
+        padding: 0;
+    }
+
+    .mobileNavLinks a {
+        color: #fff5d991;
+        font-weight: 300;
+        font-style: Light;
+        font-size: 13px;
+        line-height: 18.2px;
+        letter-spacing: 0px;
+        text-decoration: none;
+        display: block;
+        padding: 4px 0;
+        transition: color 0.2s ease;
+    }
+
+    .mobileNavLinks a:hover {
+        color: #ffffff;
+    }
+
+    .mobileUnderlinedLink {
+        text-decoration: none !important;
+        border-bottom: 2px solid #fff5d991;
+        padding-bottom: 6px;
+        display: inline-block;
+        transition: border-color 0.2s ease;
+    }
+
+    .mobileUnderlinedLink:hover {
+        border-color: #ffffff;
+    }
+
+    .mobileLegalLinks {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 20px;
+        color: #f2f0ecb8;
+        font-family: var(--font-montserrat);
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .mobileLegalLink {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .mobileLegalLink:hover {
+        color: #f2f0ec;
+    }
+
+    .metaNote {
+        font-size: 11px;
+        padding-top: 16px;
+        margin-top: 20px;
+    }
+
+    .metaNote span {
+        font-size: 11px;
+    }
 }
 
 @media (max-width: 480px) {
-  .footer {
-    padding: 40px 16px 24px;
-  }
-
-  .subscriptionTitle {
-    font-size: 16px;
-  }
-
-  .columnTitle {
-    font-size: 15px;
-  }
-
-  .footerLinks a {
-    font-size: 14px;
-  }
-
-  .legalLinks {
-    font-size: 11px;
-  }
-
-  .catalogColumns {
-    grid-template-columns: 1fr;
-  }
+    .footer {
+        padding: 40px 16px 24px;
+    }
 }

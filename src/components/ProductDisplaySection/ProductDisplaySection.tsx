@@ -24,6 +24,7 @@ import { FreeMode } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import type { Swiper as SwiperInstance } from "swiper";
+import { useWindowSize } from "../../hooks/useWindowSize";
 
 type ActiveArrow = "prev" | "next" | null;
 
@@ -48,33 +49,33 @@ const ProductDisplaySection = ({
     const [activeArrow, setActiveArrow] = useState<ActiveArrow>(null);
     const [maxVisible, setMaxVisible] = useState(4);
     const [spaceBetween, setSpaceBetween] = useState(30);
+    const [isMobile, setIsMobile] = useState(false);
     const router = useRouter();
     const hasPrefetchedProductsRef = useRef(false);
     const hasPrefetchedShopNowRef = useRef(false);
+    const { width } = useWindowSize();
 
     useEffect(() => {
-        const updateMaxVisible = () => {
-            const width = window.innerWidth;
+        if (width === 0) return;
 
-            if (width <= 480) {
-                setMaxVisible(1);
-                setSpaceBetween(12);
-            } else if (width <= 768) {
-                setMaxVisible(2);
-                setSpaceBetween(10);
-            } else if (width <= 1200) {
-                setMaxVisible(3);
-                setSpaceBetween(10);
-            } else {
-                setMaxVisible(4);
-                setSpaceBetween(10);
-            }
-        };
-
-        updateMaxVisible();
-        window.addEventListener("resize", updateMaxVisible);
-        return () => window.removeEventListener("resize", updateMaxVisible);
-    }, []);
+        if (width <= 480) {
+            setMaxVisible(1);
+            setSpaceBetween(0);
+            setIsMobile(true);
+        } else if (width <= 768) {
+            setMaxVisible(2);
+            setSpaceBetween(10);
+            setIsMobile(false);
+        } else if (width <= 1200) {
+            setMaxVisible(3);
+            setSpaceBetween(10);
+            setIsMobile(false);
+        } else {
+            setMaxVisible(4);
+            setSpaceBetween(10);
+            setIsMobile(false);
+        }
+    }, [width]);
 
     const products = useMemo<CatalogProduct[]>(() => {
         return title === "NEW IN"
@@ -228,7 +229,9 @@ const ProductDisplaySection = ({
                         },
                         spaceBetween,
                         slidesPerView: maxVisible,
+                        slidesPerGroup: 1,
                         loop: products.length > maxVisible,
+                        centeredSlides: isMobile,
                         speed: 600,
                         watchSlidesProgress: true,
                         onSwiper: handleSwiper,
@@ -263,6 +266,60 @@ const ProductDisplaySection = ({
                     ))
                 )}
             </div>
+            {canNavigate && (
+                <div className={styles.arrowsBottom}>
+                    <button
+                        className={`${styles.arrowButton} ${
+                            activeArrow === "prev"
+                                ? styles.arrowButtonActive
+                                : styles.arrowButtonInactive
+                        }`}
+                        onClick={handlePrev}
+                        aria-label="Previous"
+                        type="button"
+                    >
+                        <svg
+                            width="35"
+                            height="30"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            stroke="currentColor"
+                            className={
+                                activeArrow === "prev"
+                                    ? styles.arrowSvgActive
+                                    : styles.arrowSvgInactive
+                            }
+                        >
+                            <path d="M12 15l-5-5 5-5" />
+                        </svg>
+                    </button>
+                    <button
+                        className={`${styles.arrowButton} ${
+                            activeArrow === "next"
+                                ? styles.arrowButtonActive
+                                : styles.arrowButtonInactive
+                        }`}
+                        onClick={handleNext}
+                        aria-label="Next"
+                        type="button"
+                    >
+                        <svg
+                            width="35"
+                            height="30"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            stroke="currentColor"
+                            className={
+                                activeArrow === "next"
+                                    ? styles.arrowSvgActive
+                                    : styles.arrowSvgInactive
+                            }
+                        >
+                            <path d="M8 15l5-5-5-5" />
+                        </svg>
+                    </button>
+                </div>
+            )}
         </section>
     );
 };

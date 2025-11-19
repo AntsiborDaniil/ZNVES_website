@@ -21,7 +21,6 @@
 
 @media (max-width: 480px) {
     .accountImage {
-        width: 28px;
-        height: 28px;
+        display: none;
     }
 }

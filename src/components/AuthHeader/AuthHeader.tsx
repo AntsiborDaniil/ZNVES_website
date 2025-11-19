@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./AuthHeader.module.css";
 
@@ -13,6 +13,7 @@ const PREVIOUS_PATH_KEY = "znves:previousPath";
 
 const AuthHeader = ({ title, theme = "default" }: AuthHeaderProps) => {
     const router = useRouter();
+    const pathname = usePathname();
     const [isMounted, setIsMounted] = useState(false);
     const [previousRoute, setPreviousRoute] = useState<string | null>(null);
 
@@ -25,13 +26,10 @@ const AuthHeader = ({ title, theme = "default" }: AuthHeaderProps) => {
 
         const storedPreviousPath = sessionStorage.getItem(PREVIOUS_PATH_KEY);
 
-        if (
-            storedPreviousPath &&
-            storedPreviousPath !== window.location.pathname
-        ) {
+        if (storedPreviousPath && storedPreviousPath !== pathname) {
             setPreviousRoute(storedPreviousPath);
         }
-    }, []);
+    }, [pathname]);
 
     const handleBack = () => {
         if (!isMounted) {
@@ -44,12 +42,8 @@ const AuthHeader = ({ title, theme = "default" }: AuthHeaderProps) => {
             return;
         }
 
-        if (typeof window !== "undefined" && window.history.length > 1) {
-            router.back();
-            return;
-        }
-
-        router.push("/");
+        // В Next.js всегда можно использовать router.back()
+        router.back();
     };
 
     const handleClose = () => {

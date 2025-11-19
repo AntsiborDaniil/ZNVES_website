@@ -20,6 +20,7 @@ import ProductDisplaySection from "../ProductDisplaySection/ProductDisplaySectio
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css";
+import { useWindowSize } from "../../hooks/useWindowSize";
 
 type ProductPageViewProps = {
     product: ProductDetail;
@@ -98,18 +99,11 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
         });
     }, [openSection, product.sections]);
 
+    const { width } = useWindowSize();
+
     useEffect(() => {
         adjustSectionHeights();
-    }, [adjustSectionHeights]);
-
-    useEffect(() => {
-        const handleResize = () => {
-            adjustSectionHeights();
-        };
-
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, [adjustSectionHeights]);
+    }, [adjustSectionHeights, width]);
 
     const colorOptions = useMemo(
         () => product.availableColors,

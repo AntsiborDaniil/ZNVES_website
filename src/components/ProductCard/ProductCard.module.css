@@ -153,29 +153,38 @@
     }
 }
 
+/* На мобильных в слайдере карточки остаются полного размера как на десктопе */
 @media (max-width: 480px) {
+    .productCard {
+        width: 100%;
+        max-width: none;
+    }
+
     .imageContainer {
         margin-bottom: 10px;
     }
 
     .imageWrapper {
-        padding: 48px 18px;
+        padding: 82px 33px;
     }
 
     .newBadge {
-        top: 12px;
-        right: 12px;
-        padding: 4px 8px;
-        font-size: 14px;
-        line-height: 14px;
+        top: -44px;
+        right: 0px;
+        padding: 7px 14px;
+        font-size: 22.29px;
+        line-height: 22.29px;
     }
 
     .productTitle {
-        font-size: 22px;
+        font-weight: 400;
+        font-size: 30px;
+        line-height: 35.9px;
     }
 
     .productPrice {
-        font-size: 18px;
-        line-height: 22px;
+        font-weight: 400;
+        font-size: 26px;
+        line-height: 35.9px;
     }
 }
