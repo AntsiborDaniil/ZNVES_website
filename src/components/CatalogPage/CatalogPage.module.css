@@ -573,15 +573,14 @@
 
     .filters {
         padding: 20px;
-        gap: 20px;
-    }
-
-    .filters {
         gap: 14px;
+        flex-direction: row;
+        flex-wrap: wrap;
     }
 
     .filterDropdown {
-        flex: 1 1 100%;
+        flex: 1 1 calc(33.333% - 10px);
+        min-width: 0;
     }
 
     .filterButton {
@@ -590,7 +589,16 @@
     }
 
     .filterMenu {
+        position: absolute;
+        top: calc(100% + 12px);
+        left: 0;
         width: 100%;
+        transform: translateY(-10px);
+        z-index: 10002;
+    }
+
+    .filterDropdownOpen .filterMenu {
+        transform: translateY(0);
     }
 
     .filterLabel {
@@ -599,6 +607,11 @@
 
     .filterValue {
         font-size: 16px;
+    }
+
+    .filterOption {
+        padding: 8px 16px;
+        font-size: 14px;
     }
 
     .productsGrid {
@@ -663,15 +676,37 @@
 
     .filters {
         padding: 16px;
-        gap: 16px;
+        gap: 12px;
+        flex-direction: row;
+        flex-wrap: wrap;
     }
 
-    .filters {
-        gap: 12px;
+    .filterDropdown {
+        flex: 1 1 calc(33.333% - 8px);
+        min-width: 0;
     }
 
     .filterButton {
+        width: 100%;
         padding-right: 28px;
+    }
+
+    .filterMenu {
+        position: absolute;
+        top: calc(100% + 12px);
+        left: 0;
+        width: 100%;
+        transform: translateY(-10px);
+        z-index: 10002;
+    }
+
+    .filterDropdownOpen .filterMenu {
+        transform: translateY(0);
+    }
+
+    .filterOption {
+        padding: 6px 14px;
+        font-size: 13px;
     }
 
     .catalogCardImageWrapper {
