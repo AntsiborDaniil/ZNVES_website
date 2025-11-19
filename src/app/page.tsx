@@ -9,12 +9,14 @@ export default function HomePage() {
         <div className={styles.app}>
             <Header />
             <HeroSection />
-            <ProductDisplaySection title="NEW IN" showShopNow />
-            <ProductDisplaySection
-                id="catalog-section"
-                title="CATALOG"
-                showShopNow
-            />
+            <div className={styles.productDisplaySections}>
+                <ProductDisplaySection title="NEW IN" showShopNow />
+                <ProductDisplaySection
+                    id="catalog-section"
+                    title="CATALOG"
+                    showShopNow
+                />
+            </div>
             <Footer />
         </div>
     );

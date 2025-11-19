@@ -72,13 +72,15 @@
 }
 
 .productTitle {
-    font-weight: 300;
-    font-size: 38px;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 35.9px;
     letter-spacing: 0px;
     text-transform: uppercase;
     color: #525252;
     transition: color 0.25s ease;
     margin: 0;
+    margin-top: 11px;
 }
 
 .productCard:hover .productTitle,
@@ -88,9 +90,9 @@
 
 .productPrice {
     color: #525252;
-    font-weight: 500;
-    font-size: 26.38px;
-    line-height: 31.56px;
+    font-weight: 400;
+    font-size: 26px;
+    line-height: 35.9px;
     letter-spacing: 0px;
     transition: color 0.25s ease;
     margin: 0;

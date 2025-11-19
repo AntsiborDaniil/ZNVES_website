@@ -61,13 +61,13 @@ const ProductDisplaySection = ({
                 setSpaceBetween(12);
             } else if (width <= 768) {
                 setMaxVisible(2);
-                setSpaceBetween(16);
+                setSpaceBetween(10);
             } else if (width <= 1200) {
                 setMaxVisible(3);
-                setSpaceBetween(20);
+                setSpaceBetween(10);
             } else {
                 setMaxVisible(4);
-                setSpaceBetween(30);
+                setSpaceBetween(10);
             }
         };
 
@@ -171,8 +171,8 @@ const ProductDisplaySection = ({
                                 type="button"
                             >
                                 <svg
-                                    width="45"
-                                    height="40"
+                                    width="35"
+                                    height="30"
                                     viewBox="0 0 20 20"
                                     fill="none"
                                     stroke="currentColor"
@@ -196,8 +196,8 @@ const ProductDisplaySection = ({
                                 type="button"
                             >
                                 <svg
-                                    width="45"
-                                    height="45"
+                                    width="35"
+                                    height="30"
                                     viewBox="0 0 20 20"
                                     fill="none"
                                     stroke="currentColor"
