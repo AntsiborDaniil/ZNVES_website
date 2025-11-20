@@ -1,17 +1,40 @@
-import CatalogPage from "../../components/CatalogPage/CatalogPage";
-import {
-    catalogProducts as catalogProductsData,
-    newInProducts as newInProductsData,
-    toCatalogProduct,
-} from "../../data/products";
+import { Suspense } from "react";
+import CatalogPageClient from "../../components/CatalogPage/CatalogPageClient";
+import { fetchCatalogServer } from "../../services/catalogService.server";
 
-const Catalog = () => {
-    const allProducts = [
-        ...catalogProductsData.map(toCatalogProduct),
-        ...newInProductsData.map(toCatalogProduct),
-    ];
+// Server Component - загружает данные на сервере
+async function CatalogContent({ category }: { category: string | null }) {
+  const params: { category?: string } = {};
+  if (category && category !== "All" && category.toLowerCase() !== "all") {
+    params.category = category;
+  }
 
-    return <CatalogPage title="CATALOG" products={allProducts} />;
-};
+  let products;
+  try {
+    products = await fetchCatalogServer(params);
+  } catch (error) {
+    console.error("Error loading catalog products:", error);
+    products = [];
+  }
 
-export default Catalog;
+  return <CatalogPageClient title="CATALOG" initialProducts={products} />;
+}
+
+export default async function Catalog({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const category = resolvedSearchParams?.category || null;
+
+  return (
+    <Suspense
+      fallback={
+        <div style={{ padding: "2rem", textAlign: "center" }}>Загрузка...</div>
+      }
+    >
+      <CatalogContent category={category} />
+    </Suspense>
+  );
+}

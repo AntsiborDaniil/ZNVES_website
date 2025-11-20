@@ -1,5 +1,11 @@
 const isDev = process.env.NODE_ENV !== "production";
 
+// Получаем API URL из переменной окружения
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://158.160.115.103:8000";
+// Извлекаем домен из URL для CSP
+const apiDomain = apiBaseUrl.replace(/^https?:\/\//, "").split("/")[0];
+
 const cspDirectives = {
   "default-src": ["'self'"],
   "script-src": ["'self'"],
@@ -13,6 +19,7 @@ const cspDirectives = {
     "https://*.tile.openstreetmap.org",
     "https://*.2gis.com",
     "https://widgets.2gis.com",
+    apiBaseUrl, // API для изображений
   ],
   "font-src": ["'self'", "data:"],
   "connect-src": [
@@ -22,6 +29,7 @@ const cspDirectives = {
     "https://nominatim.openstreetmap.org",
     "https://*.2gis.com",
     "https://widgets.2gis.com",
+    apiBaseUrl, // API для запросов
   ],
   "frame-src": [
     "'self'",
@@ -69,6 +77,14 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     qualities: [75, 80, 85, 90, 95, 100],
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "158.160.115.103",
+        port: "8000",
+        pathname: "/media/**",
+      },
+    ],
   },
   async headers() {
     return [
