@@ -136,3 +136,18 @@ export async function fetchCatalogServer(
     throw error;
   }
 }
+
+// Функция для получения продукта по ID из API
+export async function fetchProductByIdServer(
+  id: number
+): Promise<CatalogProduct | null> {
+  try {
+    // Получаем все продукты и ищем нужный по ID
+    const allProducts = await fetchCatalogServer({});
+    const product = allProducts.find((p) => p.id === id);
+    return product || null;
+  } catch (error) {
+    console.error("Error fetching product by id on server:", error);
+    return null;
+  }
+}

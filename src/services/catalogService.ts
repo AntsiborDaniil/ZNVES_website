@@ -228,8 +228,9 @@ export const fetchCatalog = async (
   // Создаем новый запрос
   const requestPromise = (async () => {
     try {
-      // Используем Next.js API route как прокси для обхода CORS
-      const url = new URL("/api/catalog", window.location.origin);
+      // Обращаемся напрямую к бэкенду
+      const apiBaseUrl = getApiBaseUrl();
+      const url = new URL(`${apiBaseUrl}/api/catalog/`);
 
       if (params.category) {
         url.searchParams.append("category", params.category);
