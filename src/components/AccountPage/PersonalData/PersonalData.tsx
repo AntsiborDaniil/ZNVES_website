@@ -232,26 +232,7 @@ const PersonalData = () => {
         </section>
 
         <section className={styles.panel}>
-          {hasUnsavedChanges && (
-            <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.primaryButton}
-                onClick={handleSaveChanges}
-                disabled={isSaving}
-              >
-                {isSaving ? "Сохранение..." : "Сохранить изменения"}
-              </button>
-              <button
-                type="button"
-                className={styles.secondaryButton}
-                onClick={handleResetProfile}
-              >
-                Отмена
-              </button>
-            </div>
-          )}
-          <h2 className={styles.sectionHeading}>Личные данные</h2>
+          <h2 className={styles.subsectionHeading}>Личные данные</h2>
           <div className={styles.infoPanel}>
             <div className={styles.fieldsGrid}>
               {profileFields.map((field) => (
@@ -277,11 +258,48 @@ const PersonalData = () => {
               ))}
             </div>
           </div>
+          {hasUnsavedChanges && (
+            <div className={styles.actions}>
+              <button
+                type="button"
+                className={styles.primaryButton}
+                onClick={handleSaveChanges}
+                disabled={isSaving}
+              >
+                {isSaving ? "Сохранение..." : "Сохранить изменения"}
+              </button>
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={handleResetProfile}
+              >
+                Отмена
+              </button>
+            </div>
+          )}
         </section>
       </div>
 
       <section className={styles.passwordPanel}>
-        <h2 className={styles.sectionHeading}>Изменить пароль</h2>
+        <h2 className={styles.subsectionHeading}>Изменить пароль</h2>
+        <form
+          className={styles.passwordForm}
+          onSubmit={(event) => {
+            event.preventDefault();
+            handlePasswordSubmit();
+          }}
+        >
+          {renderPasswordInput(
+            "Новый пароль",
+            "newPassword",
+            "Введите ваш новый пароль*"
+          )}
+          {renderPasswordInput(
+            "Повторите пароль",
+            "confirmPassword",
+            "Введите пароль*"
+          )}
+        </form>
         {hasPasswordChanges && (
           <div className={styles.actions}>
             <button
@@ -301,24 +319,6 @@ const PersonalData = () => {
             </button>
           </div>
         )}
-        <form
-          className={styles.passwordForm}
-          onSubmit={(event) => {
-            event.preventDefault();
-            handlePasswordSubmit();
-          }}
-        >
-          {renderPasswordInput(
-            "Новый пароль",
-            "newPassword",
-            "Введите ваш новый пароль*"
-          )}
-          {renderPasswordInput(
-            "Повторите пароль",
-            "confirmPassword",
-            "Введите пароль*"
-          )}
-        </form>
         {passwordStatus && (
           <p
             className={`${styles.passwordMessage} ${
