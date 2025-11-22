@@ -13,26 +13,22 @@ const defaultProfileData = {
   lastName: "Смирнов",
   email: "abvdf@gmail.com",
   phone: "+7 (977) 721-04-52",
-  nickname: "@abvd",
 };
 
 type ProfileFieldKey = keyof typeof defaultProfileData;
 
-const profileFields: Array<{ key: ProfileFieldKey; label: string }> = [
-  { key: "firstName", label: "Имя" },
-  { key: "lastName", label: "Фамилия" },
-  { key: "email", label: "Почта" },
-  { key: "phone", label: "Номер телефона" },
-  { key: "nickname", label: "Ник" },
+const profileFields: Array<{
+  key: ProfileFieldKey;
+  label: string;
+  placeholder: string;
+}> = [
+  { key: "firstName", label: "Имя", placeholder: "Введите ваше имя*" },
+  { key: "lastName", label: "Фамилия", placeholder: "Введите вашу фамилию*" },
+  { key: "email", label: "Email", placeholder: "Введите ваш email*" },
+  { key: "phone", label: "Номер", placeholder: "Введите ваш номер телефона*" },
 ];
 
-const createEditableFieldsState = (): Record<ProfileFieldKey, boolean> =>
-  profileFields.reduce((acc, field) => {
-    acc[field.key] = false;
-    return acc;
-  }, {} as Record<ProfileFieldKey, boolean>);
-
-type PasswordFieldKey = "currentPassword" | "newPassword" | "confirmPassword";
+type PasswordFieldKey = "newPassword" | "confirmPassword";
 
 const PersonalData = () => {
   const [profileData, setProfileData] = useState({ ...defaultProfileData });
@@ -43,16 +39,14 @@ const PersonalData = () => {
     message: string;
   } | null>(null);
 
-  const [isPasswordEditing, setIsPasswordEditing] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
+  const [hasPasswordChanges, setHasPasswordChanges] = useState(false);
   const [passwordVisibility, setPasswordVisibility] = useState<
     Record<PasswordFieldKey, boolean>
   >({
-    currentPassword: false,
     newPassword: false,
     confirmPassword: false,
   });
@@ -73,17 +67,6 @@ const PersonalData = () => {
       setSaveStatus(null);
     };
 
-  const [editableFields, setEditableFields] = useState<
-    Record<ProfileFieldKey, boolean>
-  >(createEditableFieldsState);
-
-  const handleFieldToggle = (field: ProfileFieldKey) => {
-    setEditableFields((prev) => ({
-      ...prev,
-      [field]: !prev[field],
-    }));
-  };
-
   const handleSaveChanges = async () => {
     if (!hasUnsavedChanges) return;
 
@@ -97,7 +80,6 @@ const PersonalData = () => {
         type: "success",
         message: "Изменения сохранены",
       });
-      setEditableFields(createEditableFieldsState());
     } catch (error) {
       setSaveStatus({
         type: "error",
@@ -115,7 +97,6 @@ const PersonalData = () => {
     setProfileData({ ...defaultProfileData });
     setHasUnsavedChanges(false);
     setSaveStatus(null);
-    setEditableFields(createEditableFieldsState());
   };
 
   const togglePasswordVisibility = (field: PasswordFieldKey) => {
@@ -129,6 +110,7 @@ const PersonalData = () => {
         ...prev,
         [field]: event.target.value,
       }));
+      setHasPasswordChanges(true);
       setPasswordStatus(null);
     };
 
@@ -145,17 +127,20 @@ const PersonalData = () => {
     setPasswordStatus(null);
 
     try {
-      await updatePassword(passwordForm);
+      await updatePassword({
+        currentPassword: "",
+        newPassword: passwordForm.newPassword,
+        confirmPassword: passwordForm.confirmPassword,
+      });
       setPasswordStatus({
         type: "success",
         message: "Пароль успешно обновлён",
       });
       setPasswordForm({
-        currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
-      setIsPasswordEditing(false);
+      setHasPasswordChanges(false);
     } catch (error) {
       setPasswordStatus({
         type: "error",
@@ -169,22 +154,25 @@ const PersonalData = () => {
 
   const handlePasswordCancel = () => {
     setPasswordForm({
-      currentPassword: "",
       newPassword: "",
       confirmPassword: "",
     });
+    setHasPasswordChanges(false);
     setPasswordStatus(null);
-    setIsPasswordEditing(false);
   };
 
-  const renderPasswordInput = (label: string, field: PasswordFieldKey) => (
+  const renderPasswordInput = (
+    label: string,
+    field: PasswordFieldKey,
+    placeholder: string
+  ) => (
     <div className={styles.passwordField}>
       <label className={styles.passwordLabel}>{label}</label>
       <div className={styles.passwordInputWrapper}>
         <input
           className={styles.passwordInput}
           type={passwordVisibility[field] ? "text" : "password"}
-          placeholder="Введите пароль"
+          placeholder={placeholder}
           value={passwordForm[field]}
           onChange={handlePasswordChange(field)}
         />
@@ -234,130 +222,113 @@ const PersonalData = () => {
 
   return (
     <>
-      <section className={styles.panel}>
-        <h1 className={styles.sectionHeading}>Настройки</h1>
-        <p className={styles.sectionDescription}>
-          В данном разделе предоставляются возможности для настройки имени,
-          изменения пароля и других параметров.
-        </p>
-      </section>
+      <div className={styles.container}>
+        <section className={styles.panel}>
+          <h1 className={styles.sectionHeading}>Настройки</h1>
+          <p className={styles.sectionDescription}>
+            В данном разделе предоставляются возможности для настройки имени,
+            изменения пароля и других параметров.
+          </p>
+        </section>
 
-      <section className={styles.panel}>
-        {hasUnsavedChanges && (
+        <section className={styles.panel}>
+          {hasUnsavedChanges && (
+            <div className={styles.actions}>
+              <button
+                type="button"
+                className={styles.primaryButton}
+                onClick={handleSaveChanges}
+                disabled={isSaving}
+              >
+                {isSaving ? "Сохранение..." : "Сохранить изменения"}
+              </button>
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={handleResetProfile}
+              >
+                Отмена
+              </button>
+            </div>
+          )}
+          <h2 className={styles.sectionHeading}>Личные данные</h2>
+          <div className={styles.infoPanel}>
+            <div className={styles.fieldsGrid}>
+              {profileFields.map((field) => (
+                <div className={styles.fieldRow} key={field.key}>
+                  <label
+                    className={styles.fieldLabel}
+                    htmlFor={`profile-${field.key}`}
+                  >
+                    {field.label}
+                  </label>
+
+                  <div className={styles.inputWrapper}>
+                    <input
+                      id={`profile-${field.key}`}
+                      className={styles.input}
+                      type="text"
+                      value={profileData[field.key]}
+                      onChange={handleProfileChange(field.key)}
+                      placeholder={field.placeholder}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section className={styles.passwordPanel}>
+        <h2 className={styles.sectionHeading}>Изменить пароль</h2>
+        {hasPasswordChanges && (
           <div className={styles.actions}>
             <button
               type="button"
               className={styles.primaryButton}
-              onClick={handleSaveChanges}
-              disabled={isSaving}
+              onClick={handlePasswordSubmit}
+              disabled={isPasswordSubmitting}
             >
-              {isSaving ? "Сохранение..." : "Сохранить изменения"}
+              {isPasswordSubmitting ? "Сохранение..." : "Сохранить изменения"}
             </button>
             <button
               type="button"
               className={styles.secondaryButton}
-              onClick={handleResetProfile}
+              onClick={handlePasswordCancel}
             >
               Отмена
             </button>
           </div>
         )}
-        <h2 className={styles.sectionHeading}>Личные данные</h2>
-        <div className={styles.infoPanel}>
-          {profileFields.map((field) => (
-            <div className={styles.fieldRow} key={field.key}>
-              <label
-                className={styles.fieldLabel}
-                htmlFor={`profile-${field.key}`}
-              >
-                {field.label}
-              </label>
-
-              <div className={styles.inputWrapper}>
-                <input
-                  id={`profile-${field.key}`}
-                  className={`${styles.input} ${
-                    !editableFields[field.key] ? styles.inputReadOnly : ""
-                  }`}
-                  type="text"
-                  value={profileData[field.key]}
-                  readOnly={!editableFields[field.key]}
-                  onChange={
-                    editableFields[field.key]
-                      ? handleProfileChange(field.key)
-                      : undefined
-                  }
-                />
-                <button
-                  type="button"
-                  className={styles.editInlineButton}
-                  onClick={() => handleFieldToggle(field.key)}
-                >
-                  {editableFields[field.key] ? "Готово" : "Изменить"}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.panel}>
-        <div className={styles.passwordHeader}>
-          <div>
-            <h2 className={styles.sectionHeading}>Изменить пароль</h2>
-          </div>
-        </div>
-
-        {isPasswordEditing ? (
-          <>
-            <form
-              className={styles.passwordForm}
-              onSubmit={(event) => {
-                event.preventDefault();
-                handlePasswordSubmit();
-              }}
-            >
-              {renderPasswordInput("Старый пароль", "currentPassword")}
-              {renderPasswordInput("Новый пароль", "newPassword")}
-              {renderPasswordInput("Повторите пароль", "confirmPassword")}
-            </form>
-            {passwordStatus && (
-              <p
-                className={`${styles.passwordMessage} ${
-                  passwordStatus.type === "success"
-                    ? styles.passwordMessageSuccess
-                    : styles.passwordMessageError
-                }`}
-              >
-                {passwordStatus.message}
-              </p>
-            )}
-            <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.primaryButton}
-                onClick={handlePasswordSubmit}
-                disabled={isPasswordSubmitting}
-              >
-                {isPasswordSubmitting ? "Сохранение..." : "Сохранить изменения"}
-              </button>
-              <button
-                type="button"
-                className={styles.secondaryButton}
-                onClick={handlePasswordCancel}
-              >
-                Отмена
-              </button>
-            </div>
-          </>
-        ) : (
-          <button
-            type="button"
-            className={styles.linkButton}
-            onClick={() => setIsPasswordEditing(true)}
+        <form
+          className={styles.passwordForm}
+          onSubmit={(event) => {
+            event.preventDefault();
+            handlePasswordSubmit();
+          }}
+        >
+          {renderPasswordInput(
+            "Новый пароль",
+            "newPassword",
+            "Введите ваш новый пароль*"
+          )}
+          {renderPasswordInput(
+            "Повторите пароль",
+            "confirmPassword",
+            "Введите пароль*"
+          )}
+        </form>
+        {passwordStatus && (
+          <p
+            className={`${styles.passwordMessage} ${
+              passwordStatus.type === "success"
+                ? styles.passwordMessageSuccess
+                : styles.passwordMessageError
+            }`}
           >
-            Изменить пароль
-          </button>
+            {passwordStatus.message}
+          </p>
         )}
       </section>
     </>

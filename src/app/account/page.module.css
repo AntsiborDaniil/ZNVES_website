@@ -9,14 +9,7 @@
   flex: 1;
   display: flex;
   padding: 60px 20px 100px 47px;
-}
-
-.wrapper {
-  width: 1094px;
-  display: flex;
-  flex-direction: row;
-  gap: 40px;
-  align-items: flex-start;
+  justify-content: space-between;
 }
 
 .aside {
@@ -37,7 +30,7 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  background-color: #0000000d;
+  background-color: #ffffff;
   border-radius: 28px;
   padding: 20px 0;
 }
@@ -80,7 +73,6 @@
 
 .card {
   flex: 1;
-  background-color: #0000000d;
   border-radius: 28px;
   padding: 40px 48px;
   display: flex;
