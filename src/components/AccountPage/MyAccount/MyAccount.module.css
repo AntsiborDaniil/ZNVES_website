@@ -1,23 +1,147 @@
-.panel {
+.container {
   display: flex;
   flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background-color: #f8f8f8;
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.card:active {
+  transform: translateY(0);
+}
+
+.cardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardHeader {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: #7a7a79;
+}
+
+.cardTitle {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 24px;
+  color: #525252;
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardInfoItem {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #525252;
+}
+
+.orderDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.orderNumber {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #525252;
+}
+
+.orderStatus {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: #c93c3c;
+}
+
+.orderState {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #525252;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.orderState span {
+  margin-right: 4px;
+}
+
+.orderState u {
+  text-decoration: underline;
+}
+
+.cardRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.orderThumbnails {
+  display: flex;
   gap: 8px;
 }
 
-.sectionHeading {
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 32px;
-  letter-spacing: 0%;
-  color: #525252;
+.thumbnail {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff;
+  flex-shrink: 0;
 }
 
-.sectionDescription {
-  font-weight: 400;
-  font-style: Regular;
-  font-size: 14px;
-  line-height: 20px;
-  letter-spacing: 0%;
-  max-width: 640px;
-  color: #525252;
+.thumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardArrow {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cardRight {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .orderThumbnails {
+    flex: 1;
+  }
 }

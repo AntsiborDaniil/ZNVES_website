@@ -50,7 +50,11 @@ const AccountPage = () => {
         </div>
 
         <article className={styles.card}>
-          {activeTab === "account" && <MyAccount />}
+          {activeTab === "account" && (
+            <MyAccount
+              onNavigate={(tab: "profile" | "orders") => setActiveTab(tab)}
+            />
+          )}
           {activeTab === "profile" && <PersonalData />}
           {activeTab === "orders" && <Orders />}
         </article>
