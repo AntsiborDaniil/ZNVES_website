@@ -1,147 +1,189 @@
 .container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .card {
-  background-color: #f8f8f8;
-  border-radius: 18px;
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    background-color: #f8f8f8;
+    border-radius: 18px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .card:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 .card:active {
-  transform: translateY(0);
+    transform: translateY(0);
 }
 
 .cardContent {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
 }
 
 .cardHeader {
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
-  color: #7a7a79;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 28px;
+    letter-spacing: 0%;
+    margin-bottom: 10px;
+
+    color: #525252;
 }
 
 .cardTitle {
-  font-weight: 600;
-  font-size: 18px;
-  line-height: 24px;
-  color: #525252;
+    font-weight: 600;
+    font-size: 25px;
+    line-height: 28px;
+    letter-spacing: 0%;
+
+    color: #525252;
 }
 
 .cardInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .cardInfoItem {
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-  color: #525252;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: 0%;
+
+    color: #525252;
 }
 
-.orderDetails {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.orderDetailsContainer {
+    display: flex;
+    gap: 190px;
 }
 
-.orderNumber {
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-  color: #525252;
+.orderDetailsLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.orderDetailsTop {
+    display: flex;
+    align-items: center;
+    gap: 23px;
+}
+
+.orderDetailsBottom {
+    display: flex;
+    align-items: center;
 }
 
 .orderStatus {
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
-  color: #c93c3c;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0%;
+
+    color: #d12a15;
+}
+
+.orderStateText {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0%;
+    color: #262626;
 }
 
 .orderState {
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-  color: #525252;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: #525252;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .orderState span {
-  margin-right: 4px;
+    margin-right: 4px;
 }
 
 .orderState u {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
-.cardRight {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+.orderDetailsRight {
+    display: flex;
+    align-items: center;
 }
 
 .orderThumbnails {
-  display: flex;
-  gap: 8px;
+    display: flex;
+    gap: 8px;
 }
 
 .thumbnail {
-  width: 60px;
-  height: 60px;
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: #ffffff;
-  flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #ffffff;
+    flex-shrink: 0;
 }
 
 .thumbnailImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumbnailImageArrow {
+    width: 41px;
+    height: 39px;
+}
+
+.cardContentInner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .cardArrow {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 @media (max-width: 768px) {
-  .card {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+    .card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
-  .cardRight {
-    width: 100%;
-    justify-content: space-between;
-  }
+    .orderDetailsContainer {
+        flex-direction: column;
+        gap: 20px;
+    }
 
-  .orderThumbnails {
-    flex: 1;
-  }
+    .orderDetailsRight {
+        width: 100%;
+    }
+
+    .orderThumbnails {
+        flex: 1;
+    }
 }
