@@ -38,6 +38,11 @@
 .logoLink {
     display: inline-flex;
     align-items: center;
+    transition: opacity 0.2s ease;
+}
+
+.logoLink:hover {
+    opacity: 0.7;
 }
 
 .rightIcons {
