@@ -36,9 +36,6 @@ const Footer = () => {
                                     <a href="#znves-club">Znves club</a>
                                 </li>
                                 <li>
-                                    <a href="#gift-card">Gift card</a>
-                                </li>
-                                <li>
                                     <a href="#account">Личный кабинет</a>
                                 </li>
                                 <li>
@@ -200,9 +197,6 @@ const Footer = () => {
                             <ul className={styles.mobileNavLinks}>
                                 <li>
                                     <a href="#znves-club">Znves club</a>
-                                </li>
-                                <li>
-                                    <a href="#gift-card">Gift card</a>
                                 </li>
                                 <li>
                                     <a href="#account">Личный кабинет</a>

@@ -14,7 +14,6 @@
 
 .footerColumn {
     display: flex;
-    gap: 64px;
     justify-content: space-between;
     align-items: flex-start;
     flex-wrap: wrap;
@@ -37,7 +36,6 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    min-width: 180px;
 }
 
 .logo {
@@ -352,6 +350,126 @@
     }
 }
 
+/* 1440px - same structure, smaller text */
+@media (min-width: 1440px) and (max-width: 1919px) {
+    .footer {
+        padding-right: 44px;
+    }
+
+    .logo {
+        width: 92.78225708007812px;
+        height: 44.25px;
+    }
+
+    .subscriptionTitle {
+        font-size: 18.75px;
+        margin-top: 20px;
+        margin-bottom: 68px;
+    }
+
+    .consentSection {
+        margin-top: 15px;
+    }
+
+    .footerLinks {
+        gap: 2px;
+    }
+
+    .rightSide {
+        gap: 0;
+    }
+
+    .navColumn:nth-child(1) {
+        margin-right: 70px;
+    }
+
+    .navColumn:nth-child(2) {
+        margin-right: 41px;
+    }
+
+    .navColumn:nth-child(3) {
+        width: 96px;
+    }
+
+    .columnTitle {
+        font-weight: 500;
+        font-size: 21px;
+        line-height: 15.21px;
+        letter-spacing: 0px;
+    }
+
+    .footerLinks a {
+        font-weight: 300;
+        font-size: 18px;
+        line-height: 13.65px;
+        letter-spacing: 0px;
+    }
+
+    .newsletterInput {
+        width: 381px;
+        height: 37.5px;
+        padding-top: 11.62px;
+        padding-bottom: 12.37px;
+        border-bottom-width: 0.75px;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 18px;
+        line-height: 100%;
+        letter-spacing: 0%;
+        vertical-align: middle;
+        min-width: unset;
+    }
+
+    .newsletterButton {
+        width: 176.99998474121094px;
+        height: 48.749996185302734px;
+        opacity: 1;
+        border-radius: 3px;
+        padding: 11.25px 7.5px;
+        gap: 7.5px;
+        font-weight: 600;
+        font-size: 15px;
+    }
+
+    .privacyText {
+        font-weight: 500;
+        font-size: 11.25px;
+        line-height: 12.37px;
+        letter-spacing: 0%;
+        vertical-align: middle;
+    }
+
+    .privacyLink {
+        font-weight: 500;
+        font-size: 11.25px;
+        line-height: 12.37px;
+        letter-spacing: 0%;
+        vertical-align: middle;
+    }
+
+    .legalLink {
+        font-size: 11.25px;
+    }
+
+    .metaNote {
+        font-family: Roboto;
+        font-weight: 300;
+        font-style: Light;
+        font-size: 9.75px;
+        line-height: 117%;
+        letter-spacing: 7%;
+    }
+
+    .metaNote span {
+        font-family: Roboto;
+        font-weight: 300;
+        font-style: Light;
+        font-size: 9.75px;
+        line-height: 117%;
+        letter-spacing: 7%;
+    }
+}
+
 /* Mobile styles */
 @media (max-width: 767px) {
     .footer {
@@ -464,7 +582,7 @@
         display: flex;
         flex-direction: column;
         margin-top: 20px;
-        gap: 0;
+        gap: 12px;
     }
 
     .mobileNavItem {
@@ -486,7 +604,6 @@
         text-transform: uppercase;
         text-align: left;
         cursor: pointer;
-        padding: 12px 0;
         width: 100%;
         transition: color 0.2s ease;
     }
@@ -502,13 +619,13 @@
     }
 
     .mobileNavLinks {
+        padding: 12px 0px;
         list-style: none;
-        padding: 0;
         margin: 0;
         margin-left: 0;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 4px;
         overflow: hidden;
         animation: slideDown 0.3s ease-out forwards;
     }
@@ -552,6 +669,7 @@
         border-bottom: 2px solid #fff5d991;
         padding-bottom: 6px;
         display: inline-block;
+        width: fit-content;
         transition: border-color 0.2s ease;
     }
 
@@ -581,13 +699,31 @@
     }
 
     .metaNote {
-        font-size: 11px;
+        font-family: Roboto;
+        font-weight: 300;
+        font-style: Light;
+        font-size: 6.19px;
+        line-height: 117%;
+        letter-spacing: 7%;
         padding-top: 16px;
         margin-top: 20px;
     }
 
     .metaNote span {
-        font-size: 11px;
+        font-family: Roboto;
+        font-weight: 300;
+        font-style: Light;
+        font-size: 6.19px;
+        line-height: 117%;
+        letter-spacing: 7%;
+    }
+
+    .metaNote > span {
+        max-width: 140px;
+    }
+
+    .metaPrimary span {
+        font-size: 7.08px;
     }
 }
 
