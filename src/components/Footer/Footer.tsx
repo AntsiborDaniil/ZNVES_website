@@ -33,9 +33,6 @@ const Footer = () => {
                             <h3 className={styles.columnTitle}>MENU</h3>
                             <ul className={styles.footerLinks}>
                                 <li>
-                                    <a href="#znves-club">Znves club</a>
-                                </li>
-                                <li>
                                     <a href="#account">Личный кабинет</a>
                                 </li>
                                 <li>
@@ -195,9 +192,6 @@ const Footer = () => {
                         </button>
                         {isMenuOpen && (
                             <ul className={styles.mobileNavLinks}>
-                                <li>
-                                    <a href="#znves-club">Znves club</a>
-                                </li>
                                 <li>
                                     <a href="#account">Личный кабинет</a>
                                 </li>
