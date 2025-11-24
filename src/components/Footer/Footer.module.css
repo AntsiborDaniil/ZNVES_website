@@ -411,8 +411,8 @@
     }
 
     .catalogColumns {
-        grid-template-columns: 1fr;
-        gap: 10px;
+        grid-template-columns: repeat(2, minmax(50px, 1fr));
+        gap: 12px 24px;
     }
 
     .newsletter {
