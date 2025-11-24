@@ -351,7 +351,7 @@
 }
 
 /* 1440px - same structure, smaller text */
-@media (min-width: 1440px) and (max-width: 1919px) {
+@media (min-width: 1440px) and (max-width: 1799px) {
     .footer {
         padding-right: 44px;
     }
