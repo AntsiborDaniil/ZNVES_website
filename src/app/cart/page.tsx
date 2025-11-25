@@ -91,17 +91,22 @@ const CartPage = () => {
                         {item.product.title}
                       </Link>
                       <div className={styles.itemDetails}>
-                        <span className={styles.itemDetail}>
+                        <div className={styles.detailsContainer}>
+                          <div className={styles.spanContainer}>
+                            <span className={styles.itemLabel}>Цвет</span>
+                            <span className={styles.itemDetail}>
+                              {colorLabel}
+                            </span>
+                          </div>
+                          <div className={styles.spanContainer}>
+                            <span className={styles.itemLabel}>Размер</span>
+                            <span className={styles.itemDetail}>
+                              {item.size.toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+                        <span className={styles.itemLabel}>
                           Артикул: {fullProduct?.sku || item.productId}
-                        </span>
-                        <span className={styles.itemDetail}>
-                          ЦВЕТ: {colorLabel.toUpperCase()}
-                        </span>
-                        <span className={styles.itemDetail}>
-                          РАЗМЕР: {item.size.toUpperCase()}
-                        </span>
-                        <span className={styles.itemDetail}>
-                          Количество: {item.quantity}
                         </span>
                       </div>
                     </div>

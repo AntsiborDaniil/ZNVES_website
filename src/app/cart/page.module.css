@@ -1,463 +1,495 @@
 .cartPage {
-    min-height: 100vh;
-    margin-top: 104px;
-    background-color: #f2f0ec;
-    display: flex;
-    flex-direction: column;
+  min-height: 100vh;
+  margin-top: 100px;
+  background-color: #f2f0ec;
+  display: flex;
+  flex-direction: column;
 }
 
 .main {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    padding: 60px 20px 100px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 60px 141px 100px;
 }
 
 .wrapper {
-    width: 100%;
-    max-width: 1200px;
-    display: flex;
-    flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
 }
 
 .backLink {
-    color: #525252c9;
+  color: #525252c9;
 
-    font-weight: 400;
-    font-size: 25px;
-    line-height: 32.94px;
-    letter-spacing: 0px;
+  font-weight: 400;
+  font-size: 25px;
+  line-height: 32.94px;
+  letter-spacing: 0px;
 
-    text-decoration: none;
-    transition: color 0.2s ease;
-    align-self: flex-start;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  align-self: flex-start;
 
-    margin-bottom: 50px;
+  margin-bottom: 50px;
 }
 
 .backLink:hover {
-    color: #1f1f1f;
-    text-decoration: underline;
+  color: #1f1f1f;
+  text-decoration: underline;
 }
 
 .title {
-    font-weight: 400;
-    font-size: 40px;
-    line-height: 32.94px;
-    letter-spacing: 0px;
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 32.94px;
+  letter-spacing: 0px;
 
-    color: #525252;
-    margin-bottom: 60px;
+  color: #525252;
+  margin-bottom: 60px;
 }
 
 .content {
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 40px;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 40px;
 }
 
 .itemsList {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .priceAndCancel {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 35px;
-    margin-bottom: 83px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 35px;
+  margin-bottom: 83px;
 }
 
 .cancelButton {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    cursor: pointer;
-    width: 24px;
-    height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
 }
 .cartItem {
-    background-color: #f8f8f8;
-    border-radius: 3px;
-    padding: 48px;
-    display: flex;
-    gap: 24px;
-    align-items: center;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+  padding: 48px;
+  display: flex;
+  gap: 24px;
+  align-items: center;
 }
 
 .itemImageLink {
-    flex-shrink: 0;
-    display: block;
+  flex-shrink: 0;
+  display: block;
 }
 
 .itemImageWrapper {
-    position: relative;
-    width: 150px;
-    height: 150px;
-    border-radius: 12px;
-    overflow: hidden;
-    flex-shrink: 0;
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .itemImage {
-    object-fit: cover;
+  object-fit: cover;
 }
 
 .itemInfo {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .itemTitle {
-    font-weight: 400;
-    font-size: 30px;
-    line-height: 27.51px;
-    letter-spacing: 0px;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 27.51px;
+  letter-spacing: 0px;
 
-    color: #525252;
-    text-decoration: none;
-    transition: color 0.2s ease;
-    margin-bottom: 8px;
+  color: #525252;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  margin-bottom: 8px;
 }
 
 .itemTitle:hover {
-    color: #1f1f1f;
+  color: #1f1f1f;
 }
 
 .itemDetails {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.detailsContainer {
+  display: flex;
+  gap: 28px;
+  margin-bottom: 24px;
+}
+
+.spanContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.itemLabel {
+  color: #a7a7a7;
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16.18px;
+  letter-spacing: 0%;
+  vertical-align: middle;
 }
 
 .itemDetail {
-    font-size: 16px;
-    color: #525252;
-    font-weight: 400;
+  font-size: 16px;
+  color: #525252;
+  font-weight: 500;
 }
 
 .quantityControls {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background-color: #0000000d;
-    border-radius: 8px;
-    padding: 8px 16px;
-    width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background-color: #0000000d;
+  border-radius: 8px;
+  padding: 8px 16px;
+  width: fit-content;
 }
 
 .quantityButton {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #525252;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s ease;
-    line-height: 1;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #525252;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  line-height: 1;
 }
 
 .quantityButton:hover {
-    color: #1f1f1f;
+  color: #1f1f1f;
 }
 
 .quantityValue {
-    font-size: 18px;
-    font-weight: 500;
-    color: #525252;
-    min-width: 40px;
-    text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  color: #525252;
+  min-width: 40px;
+  text-align: center;
 }
 
 .itemPriceSection {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    height: 100%;
-    gap: 12px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  height: 100%;
+  gap: 12px;
 }
 
 .itemPriceValue {
-    font-weight: 500;
-    font-size: 30px;
-    line-height: 32.79px;
-    letter-spacing: 0px;
+  font-weight: 500;
+  font-size: 30px;
+  line-height: 32.79px;
+  letter-spacing: 0px;
 
-    color: #525252;
+  color: #525252;
 }
 
 .removeButton {
-    background: none;
-    border: none;
-    font-size: 28px;
-    color: #525252;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s ease;
-    line-height: 1;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #525252;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  line-height: 1;
 }
 
 .removeButton:hover {
-    color: #1f1f1f;
+  color: #1f1f1f;
 }
 
 .summary {
-    background-color: #f8f8f8;
-    border-radius: 3px;
-    padding: 26px 20px;
-    display: flex;
-    flex-direction: column;
-    height: fit-content;
-    position: sticky;
-    top: 120px;
-    align-self: flex-start;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+  padding: 26px 20px;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  position: sticky;
+  top: 120px;
+  align-self: flex-start;
 }
 
 .summaryRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .summaryLabel {
-    color: #525252;
+  color: #525252;
 
-    font-weight: 400;
-    font-size: 30px;
-    line-height: 18.89px;
-    letter-spacing: 0px;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 18.89px;
+  letter-spacing: 0px;
 }
 
 .summaryTotal {
-    font-weight: 600;
-    font-size: 32px;
-    line-height: 38px;
-    color: #525252;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 38px;
+  color: #525252;
 }
 
 .promoSection {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .promoLabel {
-    font-size: 16px;
-    color: #525252;
-    font-weight: 400;
+  font-size: 16px;
+  color: #525252;
+  font-weight: 400;
 }
 
 .promoInput {
-    width: 100%;
-    padding: 8px 12px 8px 0px;
-    border: none;
-    border-bottom: 1px solid #bcb4a5;
-    background-color: transparent;
-    font-size: 16px;
-    color: #525252;
-    font-family: inherit;
-    margin-top: 50px;
-    margin-bottom: 32px;
+  width: 100%;
+  padding: 8px 12px 8px 0px;
+  border: none;
+  border-bottom: 1px solid #bcb4a5;
+  background-color: transparent;
+  font-size: 16px;
+  color: #525252;
+  font-family: inherit;
+  margin-top: 50px;
+  margin-bottom: 32px;
 }
 
 .promoInput:focus {
-    outline: none;
-    border-color: #525252;
+  outline: none;
+  border-color: #525252;
 }
 
 .promoInput::placeholder {
-    color: #7a7a79;
+  color: #7a7a79;
 }
 
 .checkoutButton {
-    background-color: #525252;
-    color: #f2f0ec;
-    border: none;
-    width: 100%;
-    height: 58px;
+  background-color: #525252;
+  color: #f2f0ec;
+  border: none;
+  width: 100%;
+  height: 58px;
 
-    border-radius: 3px;
-    padding-top: 18.27px;
-    padding-right: 20.27px;
-    padding-bottom: 18.27px;
-    padding-left: 20.27px;
+  border-radius: 3px;
+  padding-top: 18.27px;
+  padding-right: 20.27px;
+  padding-bottom: 18.27px;
+  padding-left: 20.27px;
 
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 100%;
-    letter-spacing: 0%;
-    text-align: center;
-    vertical-align: middle;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  text-align: center;
+  vertical-align: middle;
 
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .checkoutButton:hover {
-    background-color: #1f1f1f;
+  background-color: #1f1f1f;
 }
 
 .emptyCart {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 24px;
-    padding: 80px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 24px;
+  padding: 80px 20px;
 }
 
 .emptyTitle {
-    font-weight: 600;
-    font-size: 48px;
-    line-height: 58px;
-    color: #525252;
-    margin: 0;
+  font-weight: 600;
+  font-size: 48px;
+  line-height: 58px;
+  color: #525252;
+  margin: 0;
 }
 
 .emptyText {
-    font-size: 20px;
-    color: #7a7a79;
-    margin: 0;
+  font-size: 20px;
+  color: #7a7a79;
+  margin: 0;
 }
 
 .shopButton {
-    display: inline-block;
-    background-color: #525252;
-    color: #f2f0ec;
-    text-decoration: none;
-    border-radius: 12px;
-    padding: 18px 32px;
-    font-size: 20px;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
-    margin-top: 8px;
+  display: inline-block;
+  background-color: #525252;
+  color: #f2f0ec;
+  text-decoration: none;
+  border-radius: 12px;
+  padding: 18px 32px;
+  font-size: 20px;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+  margin-top: 8px;
 }
 
 .shopButton:hover {
-    background-color: #1f1f1f;
+  background-color: #1f1f1f;
 }
 
-@media (max-width: 1024px) {
-    .content {
-        grid-template-columns: 1fr;
-    }
+@media (max-width: 1300px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
 
-    .summary {
-        position: static;
-    }
+  .summary {
+    position: static;
+  }
 }
 
-@media (max-width: 768px) {
-    .title {
-        font-size: 36px;
-        line-height: 44px;
-    }
+@media (max-width: 1000px) {
+  .cartPage {
+    margin-top: 68px;
+  }
 
-    .cartItem {
-        flex-direction: row;
-        padding: 20px;
-        gap: 16px;
-    }
+  .title {
+    font-size: 36px;
+    line-height: 44px;
+  }
 
-    .itemImageWrapper {
-        width: 120px;
-        height: 120px;
-    }
+  .cartItem {
+    background-color: transparent;
+    flex-direction: row;
+    padding: 20px;
+    gap: 16px;
+  }
 
-    .itemTitle {
-        font-size: 20px;
-        line-height: 26px;
-    }
+  .itemImageWrapper {
+    width: 120px;
+    height: 120px;
+  }
 
-    .itemDetail {
-        font-size: 14px;
-    }
+  .itemTitle {
+    font-size: 20px;
+    line-height: 26px;
+  }
 
-    .itemPriceSection {
-        align-items: flex-end;
-    }
+  .itemDetail {
+    font-size: 14px;
+  }
 
-    .itemPriceValue {
-        font-size: 20px;
-        line-height: 26px;
-    }
+  .itemPriceSection {
+    align-items: flex-end;
+  }
 
-    .emptyTitle {
-        font-size: 36px;
-        line-height: 44px;
-    }
+  .itemPriceValue {
+    font-size: 20px;
+    line-height: 26px;
+  }
 
-    .emptyText {
-        font-size: 18px;
-    }
+  .emptyTitle {
+    font-size: 36px;
+    line-height: 44px;
+  }
+
+  .emptyText {
+    font-size: 18px;
+  }
 }
 
 @media (max-width: 480px) {
-    .main {
-        padding: 40px 16px 80px;
-    }
+  .cartPage {
+    margin-top: 57px;
+  }
 
-    .title {
-        font-size: 28px;
-        line-height: 34px;
-    }
+  .main {
+    padding: 40px 16px 80px;
+  }
 
-    .cartItem {
-        flex-direction: column;
-        padding: 16px;
-    }
+  .title {
+    font-size: 28px;
+    line-height: 34px;
+  }
 
-    .itemImageWrapper {
-        width: 100%;
-        height: 250px;
-    }
+  .cartItem {
+    background-color: transparent;
+    flex-direction: column;
+    padding: 16px;
+  }
 
-    .itemTitle {
-        font-size: 18px;
-        line-height: 24px;
-    }
+  .itemImageWrapper {
+    width: 100%;
+    height: 250px;
+  }
 
-    .itemDetail {
-        font-size: 14px;
-    }
+  .itemTitle {
+    font-size: 18px;
+    line-height: 24px;
+  }
 
-    .itemPriceSection {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-    }
+  .itemDetail {
+    font-size: 14px;
+  }
 
-    .itemPriceValue {
-        font-size: 20px;
-        line-height: 26px;
-    }
+  .itemPriceSection {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
 
-    .summary {
-        padding: 24px;
-    }
+  .itemPriceValue {
+    font-size: 20px;
+    line-height: 26px;
+  }
 
-    .summaryTotal {
-        font-size: 28px;
-        line-height: 34px;
-    }
+  .summary {
+    padding: 24px;
+  }
+
+  .summaryTotal {
+    font-size: 28px;
+    line-height: 34px;
+  }
 }
