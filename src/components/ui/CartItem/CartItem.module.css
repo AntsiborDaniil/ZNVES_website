@@ -13,6 +13,11 @@
     outline: none;
     padding: 0;
     cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.cancelButtonMobile:hover {
+    opacity: 0.7;
 }
 
 .cancelButton {
@@ -21,6 +26,11 @@
     outline: none;
     padding: 0;
     cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.cancelButton:hover {
+    opacity: 0.7;
 }
 
 .cartItemImage {
