@@ -8,6 +8,9 @@ const cspDirectives = {
     "https://yastatic.net",
     "https://core-renderer-tiles.maps.yandex.net",
     "https://*.maps.yandex.net",
+    // Yandex Maps требует unsafe-inline и unsafe-eval для работы
+    "'unsafe-inline'",
+    "'unsafe-eval'",
   ],
   "style-src": ["'self'", "'unsafe-inline'"],
   "img-src": [
@@ -43,10 +46,6 @@ const cspDirectives = {
   ],
   "frame-ancestors": ["'self'"],
 };
-
-if (isDev) {
-  cspDirectives["script-src"].push("'unsafe-inline'", "'unsafe-eval'");
-}
 
 const cspHeader = Object.entries(cspDirectives)
   .map(([directive, values]) => `${directive} ${values.join(" ")}`)
