@@ -260,53 +260,22 @@
 .mapContainer {
     width: 100%;
     border-radius: 3px;
-    overflow: hidden;
+    overflow: visible;
     border: 1.5px solid #525252;
     position: relative;
     z-index: 1;
 }
 
-.mapContainer :global(.leaflet-container) {
-    width: 100%;
-    height: 400px;
+.mapContainer :global([class*="ymaps"]) {
     border-radius: 3px;
-    z-index: 1;
-    cursor: pointer;
 }
 
-.mapContainer :global(.leaflet-container.leaflet-touch-drag) {
-    cursor: grab;
+.mapContainer :global(.ymaps-2-1-79-map) {
+    border-radius: 3px;
 }
 
-.mapContainer
-    :global(.leaflet-container.leaflet-touch-drag.leaflet-drag-tracking) {
-    cursor: grabbing;
-}
-
-.mapContainer :global(.custom-marker) {
-    background: transparent;
-    border: none;
-}
-
-.mapContainer :global(.custom-marker svg) {
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-/* Скрываем атрибуцию и элементы управления Leaflet */
-.mapContainer :global(.leaflet-control-attribution) {
-    display: none !important;
-}
-
-.mapContainer :global(.leaflet-control-zoom) {
-    display: none !important;
-}
-
-.mapContainer :global(.leaflet-bottom) {
-    display: none !important;
-}
-
-.mapContainer :global(.leaflet-right) {
-    display: none !important;
+.mapContainer :global(.ymaps-2-1-79-controls__control) {
+    border-radius: 3px;
 }
 
 .map {
@@ -318,6 +287,8 @@
 .mapSearchContainer {
     margin-bottom: 20px;
     width: 100%;
+    position: relative;
+    z-index: 2;
 }
 
 .mapSearchInput {

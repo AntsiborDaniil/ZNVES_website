@@ -2,13 +2,21 @@ const isDev = process.env.NODE_ENV !== "production";
 
 const cspDirectives = {
   "default-src": ["'self'"],
-  "script-src": ["'self'"],
+  "script-src": [
+    "'self'",
+    "https://api-maps.yandex.ru",
+    "https://yastatic.net",
+    "https://core-renderer-tiles.maps.yandex.net",
+    "https://*.maps.yandex.net",
+  ],
   "style-src": ["'self'", "'unsafe-inline'"],
   "img-src": [
     "'self'",
     "data:",
     "https://*.yandex.ru",
+    "https://yandex.ru",
     "https://*.yandex.net",
+    "https://yastatic.net",
     "https://unpkg.com",
     "https://*.tile.openstreetmap.org",
     "https://*.2gis.com",
@@ -19,6 +27,9 @@ const cspDirectives = {
     "'self'",
     "https://*.yandex.ru",
     "https://*.yandex.net",
+    "https://api-maps.yandex.ru",
+    "https://suggest-maps.yandex.ru",
+    "https://yastatic.net",
     "https://nominatim.openstreetmap.org",
     "https://*.2gis.com",
     "https://widgets.2gis.com",
