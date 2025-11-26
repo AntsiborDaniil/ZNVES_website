@@ -25,6 +25,7 @@
 
 .cartItemImage {
     margin-right: 26px;
+    object-fit: contain;
 }
 
 .cartItemInfo {
