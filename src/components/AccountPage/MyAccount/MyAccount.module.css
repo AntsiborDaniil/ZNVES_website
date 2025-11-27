@@ -7,6 +7,7 @@
 .card {
     background-color: #f8f8f8;
     border-radius: 18px;
+    max-width: 1094px;
     padding: 24px;
     display: flex;
     align-items: center;
@@ -147,7 +148,7 @@
 .thumbnailImage {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .thumbnailImageArrow {
@@ -166,6 +167,43 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+@media (max-width: 1440px) {
+    .cardHeader {
+        font-size: 16px;
+        line-height: 21.32px;
+    }
+
+    .cardTitle {
+        font-size: 20px;
+        line-height: 21.32px;
+    }
+
+    .cardInfoItem {
+        font-size: 12.18px;
+        line-height: 15.23px;
+    }
+
+    .orderStatus {
+        font-size: 12.18px;
+        line-height: 21.32px;
+    }
+
+    .orderStateText {
+        font-size: 12.18px;
+        line-height: 21.32px;
+    }
+
+    .thumbnailImage {
+        width: 51.77696228027344px;
+        height: 69.30774688720703px;
+    }
+
+    .thumbnailImageArrow {
+        width: 31.21px;
+        height: 29.25px;    
+    }
 }
 
 @media (max-width: 768px) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import AuthHeader from "../../components/AuthHeader/AuthHeader";
+import Header from "../../components/Header/Header";
 import PersonalData from "../../components/AccountPage/PersonalData/PersonalData";
 import MyAccount from "../../components/AccountPage/MyAccount/MyAccount";
 import Orders from "../../components/AccountPage/Orders/Orders";
@@ -14,39 +14,36 @@ const AccountPage = () => {
 
   return (
     <div className={styles.accountPage}>
-      <AuthHeader title="Личный кабинет" theme="transparent" />
+      <Header variant="green" />
       <main className={styles.main}>
         <div className={styles.aside}>
-          <h2 className={styles.asideTitle}>Личные данные</h2>
-          <nav className={styles.nav}>
-            <button
-              type="button"
-              className={`${styles.navButton} ${
-                activeTab === "account" ? styles.navButtonActive : ""
+          <h2 className={styles.asideTitle}>Личный кабинет</h2>
+          <ul className={styles.navList}>
+            <li
+              className={`${styles.navListItem} ${
+                activeTab === "account" ? styles.navListItemActive : ""
               }`}
               onClick={() => setActiveTab("account")}
             >
               Мой кабинет
-            </button>
-            <button
-              type="button"
-              className={`${styles.navButton} ${
-                activeTab === "profile" ? styles.navButtonActive : ""
+            </li>
+            <li
+              className={`${styles.navListItem} ${
+                activeTab === "profile" ? styles.navListItemActive : ""
               }`}
               onClick={() => setActiveTab("profile")}
             >
               Личные данные
-            </button>
-            <button
-              type="button"
-              className={`${styles.navButton} ${
-                activeTab === "orders" ? styles.navButtonActive : ""
+            </li>
+            <li
+              className={`${styles.navListItem} ${
+                activeTab === "orders" ? styles.navListItemActive : ""
               }`}
               onClick={() => setActiveTab("orders")}
             >
               Заказы
-            </button>
-          </nav>
+            </li>
+          </ul>
         </div>
 
         <article className={styles.card}>

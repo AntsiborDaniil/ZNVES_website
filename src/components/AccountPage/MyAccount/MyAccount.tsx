@@ -55,14 +55,6 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
                         </div>
                     </div>
                 </div>
-                <div className={styles.cardArrow}>
-                    <Image
-                        src="/images/arrow-right.png"
-                        alt="Перейти"
-                        width={24}
-                        height={24}
-                    />
-                </div>
             </div>
 
             <div
@@ -134,14 +126,6 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className={styles.cardArrow}>
-                    <Image
-                        src="/images/arrow-right.png"
-                        alt="Перейти"
-                        width={24}
-                        height={24}
-                    />
                 </div>
             </div>
         </div>

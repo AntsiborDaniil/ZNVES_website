@@ -1,5 +1,6 @@
 .accountPage {
   min-height: 100vh;
+  margin-top: 104px;
   background-color: #f2f0ec;
   display: flex;
   flex-direction: column;
@@ -8,73 +9,56 @@
 .main {
   flex: 1;
   display: flex;
-  padding: 60px 20px 100px 47px;
+  padding: 60px 20px 100px 0;
   justify-content: space-between;
 }
 
 .aside {
   flex-shrink: 0;
-  width: 240px;
   margin-right: 137px;
+  padding-left: 47px;
 }
 
 .asideTitle {
   font-weight: 600;
-  font-size: 24px;
-  line-height: 32px;
+  font-size: 30px;
+  line-height: 32.94px;
   color: #525252;
-  margin: 0 0 20px 0;
+  margin: 0 0 47px 0;
 }
 
-.nav {
+.navList {
+  list-style: disc;
+  padding-left: 20px;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 0;
-  background-color: #f8f8f8;
-  border-radius: 28px;
-  padding: 20px 0;
 }
 
-.navButton {
-  width: 100%;
-  padding: 16px 24px;
-  background: none;
-  border: none;
-  text-align: left;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-  color: #525252ad;
+.navListItem {
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 32.94px;
+  color: #525252;
   cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
+  transition: color 0.2s ease;
+  padding: 4px 0;
 }
 
-.navButton:hover {
+.navListItem:hover {
+  color: #1f1f1f;
+}
+
+.navListItemActive {
   color: #525252;
-  background-color: rgba(0, 0, 0, 0.03);
-}
-
-.navButtonActive {
-  color: #525252;
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-.navButtonActive::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background-color: #525252;
-  border-radius: 0 2px 2px 0;
+  font-weight: 600;
 }
 
 .card {
   flex: 1;
   border-radius: 28px;
-  padding: 40px 48px;
+  padding: 40px 48px 40px 0px;
   display: flex;
   flex-direction: column;
   gap: 28px;
