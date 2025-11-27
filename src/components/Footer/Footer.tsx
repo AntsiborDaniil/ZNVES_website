@@ -23,7 +23,7 @@ const Footer = () => {
                             className={styles.logo}
                         />
                         <p className={styles.subscriptionTitle}>
-                            Подпишитесь на получение рассылки
+                            Подпишитесь на получение рассылки <br/>
                             рекламно-информационных материалов
                         </p>
                     </div>
