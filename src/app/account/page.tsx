@@ -15,6 +15,37 @@ const AccountPage = () => {
   return (
     <div className={styles.accountPage}>
       <Header variant="green" />
+      <nav className={styles.mobileNav}>
+        <button
+          type="button"
+          className={`${styles.mobileNavItem} ${
+            activeTab === "account" ? styles.mobileNavItemActive : ""
+          }`}
+          onClick={() => setActiveTab("account")}
+        >
+          Мой кабинет
+        </button>
+        <span className={styles.mobileNavSeparator}></span>
+        <button
+          type="button"
+          className={`${styles.mobileNavItem} ${
+            activeTab === "profile" ? styles.mobileNavItemActive : ""
+          }`}
+          onClick={() => setActiveTab("profile")}
+        >
+          Личные данные
+        </button>
+        <span className={styles.mobileNavSeparator}></span>
+        <button
+          type="button"
+          className={`${styles.mobileNavItem} ${
+            activeTab === "orders" ? styles.mobileNavItemActive : ""
+          }`}
+          onClick={() => setActiveTab("orders")}
+        >
+          Заказы
+        </button>
+      </nav>
       <main className={styles.main}>
         <div className={styles.aside}>
           <h2 className={styles.asideTitle}>Личный кабинет</h2>

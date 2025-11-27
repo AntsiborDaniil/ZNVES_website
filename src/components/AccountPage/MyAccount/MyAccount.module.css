@@ -1,227 +1,320 @@
 .container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .card {
-    background-color: #f8f8f8;
-    border-radius: 18px;
-    max-width: 1094px;
-    padding: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  background-color: #f8f8f8;
+  border-radius: 18px;
+  max-width: 1094px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .card:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 .card:active {
-    transform: translateY(0);
+  transform: translateY(0);
 }
 
 .cardContent {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
 }
 
 .cardHeader {
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 28px;
-    letter-spacing: 0%;
-    margin-bottom: 10px;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 28px;
+  letter-spacing: 0%;
+  margin-bottom: 10px;
 
-    color: #525252;
+  color: #525252;
 }
 
 .cardTitle {
-    font-weight: 600;
-    font-size: 25px;
-    line-height: 28px;
-    letter-spacing: 0%;
+  font-weight: 600;
+  font-size: 25px;
+  line-height: 28px;
+  letter-spacing: 0%;
 
-    color: #525252;
+  color: #525252;
 }
 
 .cardInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .cardInfoItem {
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 20px;
-    letter-spacing: 0%;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: 0%;
 
-    color: #525252;
+  color: #525252;
 }
 
 .orderDetailsContainer {
-    display: flex;
-    gap: 190px;
+  display: flex;
+  gap: 190px;
 }
 
 .orderDetailsLeft {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .orderDetailsTop {
-    display: flex;
-    align-items: center;
-    gap: 23px;
+  display: flex;
+  align-items: center;
+  gap: 23px;
 }
 
 .orderDetailsBottom {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .orderStatus {
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 28px;
-    letter-spacing: 0%;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 28px;
+  letter-spacing: 0%;
 
-    color: #d12a15;
+  color: #d12a15;
 }
 
 .orderStateText {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 28px;
-    letter-spacing: 0%;
-    color: #262626;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 28px;
+  letter-spacing: 0%;
+  color: #262626;
 }
 
 .orderState {
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 20px;
-    color: #525252;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #525252;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .orderState span {
-    margin-right: 4px;
+  margin-right: 4px;
 }
 
 .orderState u {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .orderDetailsRight {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .orderThumbnails {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  gap: 8px;
 }
 
 .thumbnail {
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: #ffffff;
-    flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff;
+  flex-shrink: 0;
 }
 
 .thumbnailImage {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .thumbnailImageArrow {
-    width: 41px;
-    height: 39px;
+  width: 41px;
+  height: 39px;
 }
 
 .cardContentInner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .cardArrow {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (max-width: 1440px) {
-    .cardHeader {
-        font-size: 16px;
-        line-height: 21.32px;
-    }
+  .cardHeader {
+    font-size: 16px;
+    line-height: 21.32px;
+  }
 
-    .cardTitle {
-        font-size: 20px;
-        line-height: 21.32px;
-    }
+  .cardTitle {
+    font-size: 20px;
+    line-height: 21.32px;
+  }
 
-    .cardInfoItem {
-        font-size: 12.18px;
-        line-height: 15.23px;
-    }
+  .cardInfoItem {
+    font-size: 12.18px;
+    line-height: 15.23px;
+  }
 
-    .orderStatus {
-        font-size: 12.18px;
-        line-height: 21.32px;
-    }
+  .orderStatus {
+    font-size: 12.18px;
+    line-height: 21.32px;
+  }
 
-    .orderStateText {
-        font-size: 12.18px;
-        line-height: 21.32px;
-    }
+  .orderStateText {
+    font-size: 12.18px;
+    line-height: 21.32px;
+  }
 
-    .thumbnailImage {
-        width: 51.77696228027344px;
-        height: 69.30774688720703px;
-    }
+  .thumbnailImage {
+    width: 51.77696228027344px;
+    height: 69.30774688720703px;
+  }
 
-    .thumbnailImageArrow {
-        width: 31.21px;
-        height: 29.25px;    
-    }
+  .thumbnailImageArrow {
+    width: 31.21px;
+    height: 29.25px;
+  }
 }
 
-@media (max-width: 768px) {
-    .card {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+@media (max-width: 600px) {
+  .orderDetailsContainer {
+    gap: 0px;
+    justify-content: space-between;
+  }
+}
 
-    .orderDetailsContainer {
-        flex-direction: column;
-        gap: 20px;
-    }
+/* @media (max-width: 570px) {
+  .cardHeader {
+    font-size: 15px;
+    line-height: 24px;
+  }
 
-    .orderDetailsRight {
-        width: 100%;
-    }
+  .cardTitle {
+    font-size: 18px;
+    line-height: 24px;
+  }
 
-    .orderThumbnails {
-        flex: 1;
-    }
+  .cardInfoItem {
+    font-size: 12px;
+    line-height: 17px;
+  }
+
+  .orderStatus {
+    font-size: 12px;
+    line-height: 24px;
+  }
+
+  .orderStateText {
+    font-size: 11px;
+    line-height: 19px;
+  }
+
+  .thumbnailImage {
+    width: 45px;
+    height: 60px;
+  }
+
+  .thumbnailImageArrow {
+    width: 24px;
+    height: 22px;
+  }
+} */
+
+@media (max-width: 500px) {
+  .card {
+    padding: 14px 12px 14px 14px;
+  }
+
+  .cardHeader {
+    font-size: 14px;
+    line-height: 28px;
+  }
+
+  .cardTitle {
+    font-size: 16px;
+    line-height: 28px;
+  }
+
+  .cardInfoItem {
+    font-size: 12px;
+    line-height: 20px;
+  }
+
+  .orderStatus {
+    font-size: 12px;
+    line-height: 28px;
+    text-wrap: nowrap;
+  }
+
+  .orderStateText {
+    font-size: 10.06px;
+    line-height: 17.6px;
+    letter-spacing: 0%;
+    text-decoration: underline;
+    text-decoration-style: solid;
+    text-decoration-offset: 25%;
+  }
+
+  .thumbnail {
+    width: 39.82857131958008px;
+    height: 53.31383514404297px;
+  }
+
+  .orderDetailsLeft {
+    gap: 0px;
+  }
+
+  .thumbnailImage {
+    width: 39.82857131958008px;
+    height: 53.31383514404297px;
+    object-fit: cover;
+  }
+
+  .thumbnailImageArrow {
+    width: 17.075220108032227px;
+    height: 16px;
+    margin-top: 6px;
+  }
+
+  .orderThumbnails {
+    gap: 4px;
+  }
+
+  .cardContent {
+    gap: 15px;
+  }
+
+  .cardContentInner {
+    align-items: normal;
+  }
 }
