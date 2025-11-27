@@ -237,6 +237,7 @@
     }
 }
 
+
 @media (max-width: 768px) {
     .cancelButtonMobile {
         display: block;
@@ -264,6 +265,7 @@
     .cartItemImage {
         width: 157px;
         height: 209px;
+        margin-right: 13px;
     }
 
     .cartItemInfoWrapper {
@@ -298,5 +300,16 @@
 
     .quantityControls {
         gap: 6px;
+    }
+}
+
+@media (max-width: 375px) {
+    .cartItemImage {
+        margin-right: 8px;
+    }
+
+    .cartItemPriceText {
+        margin-right: 16px;
+        font-size: 14px;
     }
 }

@@ -1,262 +1,362 @@
 .cart {
-    min-height: 100vh;
-    margin-top: 100px;
-    background-color: #f2f0ec;
-    display: flex;
-    flex-direction: column;
+  min-height: 100vh;
+  margin-top: 100px;
+  background-color: #f2f0ec;
+  display: flex;
+  flex-direction: column;
 }
 
 .main {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    padding: 60px 141px 100px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 60px 141px 100px;
 }
 
 .backLink {
-    color: #525252c9;
-    font-weight: 400;
-    font-size: 25px;
-    line-height: 32.94px;
-    letter-spacing: 0px;
-    text-decoration: none;
-    transition: color 0.2s ease;
-    align-self: flex-start;
-    margin-bottom: 50px;
+  color: #525252c9;
+  font-weight: 400;
+  font-size: 25px;
+  line-height: 32.94px;
+  letter-spacing: 0px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  align-self: flex-start;
+  margin-bottom: 50px;
 }
 
 .backLink:hover {
-    color: #1f1f1f;
-    text-decoration: underline;
+  color: #1f1f1f;
+  text-decoration: underline;
 }
 
 .cartContainer {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .cartTitle {
-    font-weight: 400;
-    font-size: 40px;
-    line-height: 32.94px;
-    letter-spacing: 0px;
-    color: #525252;
-    margin-bottom: 60px;
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 32.94px;
+  letter-spacing: 0px;
+  color: #525252;
+  margin-bottom: 60px;
 }
 
 .mainContentWrapper {
-    width: 100%;
-    margin: 0 auto;
-    display: flex;
-    gap: 40px;
-    align-items: flex-start;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
 }
 
 .cartItemsWrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .summary {
-    width: 457px;
-    flex-shrink: 0;
-    background-color: #f8f8f8;
-    border-radius: 3px;
-    padding: 26px 20px;
-    display: flex;
-    flex-direction: column;
-    height: fit-content;
-    position: sticky;
-    top: 120px;
+  width: 457px;
+  flex-shrink: 0;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+  padding: 26px 20px;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  position: sticky;
+  top: 120px;
 }
 
 .summaryRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .summaryLabel {
-    color: #525252;
-    font-weight: 400;
-    font-size: 30px;
-    line-height: 18.89px;
-    letter-spacing: 0px;
+  color: #525252;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 18.89px;
+  letter-spacing: 0px;
 }
 
 .summaryTotal {
-    font-weight: 600;
-    font-size: 32px;
-    line-height: 38px;
-    color: #525252;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 38px;
+  color: #525252;
 }
 
 .promoSection {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .promoInput {
-    width: 100%;
-    padding: 8px 12px 8px 0px;
-    border: none;
-    border-bottom: 1px solid #525252c2;
-    background-color: transparent;
-    font-size: 16px;
-    color: #525252;
-    font-family: inherit;
-    margin-top: 50px;
-    margin-bottom: 32px;
+  width: 100%;
+  padding: 8px 12px 8px 0px;
+  border: none;
+  border-bottom: 1px solid #525252c2;
+  background-color: transparent;
+  font-size: 16px;
+  color: #525252;
+  font-family: inherit;
+  margin-top: 50px;
+  margin-bottom: 32px;
 }
 
 .promoInput:focus {
-    outline: none;
-    border-color: #525252;
+  outline: none;
+  border-color: #525252;
 }
 
 .promoInput::placeholder {
-    color: #7a7a79;
+  color: #7a7a79;
 }
 
 .checkoutButton {
-    background-color: #525252;
-    color: #f2f0ec;
-    border: none;
-    width: 100%;
-    height: 58px;
-    border-radius: 3px;
-    padding-top: 18.27px;
-    padding-right: 20.27px;
-    padding-bottom: 18.27px;
-    padding-left: 20.27px;
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 100%;
-    letter-spacing: 0%;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+  background-color: #525252;
+  color: #f2f0ec;
+  border: none;
+  width: 100%;
+  height: 58px;
+  border-radius: 3px;
+  padding-top: 18.27px;
+  padding-right: 20.27px;
+  padding-bottom: 18.27px;
+  padding-left: 20.27px;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .checkoutButton:hover {
-    background-color: #1f1f1f;
+  background-color: #1f1f1f;
 }
 
 @media (min-width: 1441px) and (max-width: 1919px) {
-    .main {
-        padding: 60px 100px 100px;
-    }
+  .main {
+    padding: 60px 100px 100px;
+  }
 }
 
 @media (max-width: 1440px) {
-    .summary {
-        width: 342px;
-        padding: 21px 14px 19px 16px;
-    }
+  .summary {
+    width: 342px;
+    padding: 21px 14px 19px 16px;
+  }
 
-    .mainContentWrapper {
-        align-items: normal;
-    }
+  .mainContentWrapper {
+    align-items: normal;
+  }
 
-    .summaryLabel {
-        font-size: 22.45px;
-    }
+  .summaryLabel {
+    font-size: 22.45px;
+  }
 
-    .summaryTotal {
-        font-size: 22.45px;
-    }
+  .summaryTotal {
+    font-size: 22.45px;
+  }
 
-    .promoInput {
-        font-size: 12.33px;
-        margin-top: 40px;
-        margin-bottom: 24px;
-        padding: 4px 16px 6px 0px;
-    }
+  .promoInput {
+    font-size: 12.33px;
+    margin-top: 40px;
+    margin-bottom: 24px;
+    padding: 4px 16px 6px 0px;
+  }
 
-    .checkoutButton {
-        font-size: 15px;
+  .checkoutButton {
+    font-size: 15px;
 
-        height: 43.61750793457031px;
-        border-radius: 3px;
-        border-width: 0.95px;
-        padding-top: 0.95px;
-        padding-right: 15.17px;
-        padding-bottom: 0.95px;
-        padding-left: 15.17px;
-    }
+    height: 43.61750793457031px;
+    border-radius: 3px;
+    border-width: 0.95px;
+    padding-top: 0.95px;
+    padding-right: 15.17px;
+    padding-bottom: 0.95px;
+    padding-left: 15.17px;
+  }
 }
 
 @media (max-width: 1000px) {
-    .cart {
-        margin-top: 68px;
-    }
+  .cart {
+    margin-top: 68px;
+  }
 
-    .cartTitle {
-        font-size: 36px;
-        line-height: 44px;
-    }
+  .cartTitle {
+    font-size: 36px;
+    line-height: 44px;
+  }
 }
 
 @media (max-width: 1300px) {
-    .mainContentWrapper {
-        flex-direction: column;
-    }
+  .mainContentWrapper {
+    flex-direction: column;
+  }
 
-    .summary {
-        width: 100%;
-        position: static;
-    }
+  .summary {
+    width: 100%;
+    position: static;
+  }
 }
 
 @media (max-width: 768px) {
-    .main {
-        padding: 20px 16px 41px 15px;
-    }
+  .main {
+    padding: 20px 16px 41px 15px;
+  }
 
-    .summary {
-        padding: 21px 14px 19px 16px;
-    }
+  .summary {
+    padding: 21px 14px 19px 16px;
+  }
 
-    .mainContentWrapper {
-        align-items: normal;
-    }
+  .mainContentWrapper {
+    align-items: normal;
+  }
 
-    .summaryLabel {
-        font-size: 20px;
-    }
+  .summaryLabel {
+    font-size: 20px;
+  }
 
-    .summaryTotal {
-        font-size: 20px;
-    }
+  .summaryTotal {
+    font-size: 20px;
+  }
 
-    .promoInput {
-        font-size: 13px;
-        margin-top: 33px;
-        margin-bottom: 27px;
-        padding: 4px 16px 6px 0px;
-    }
+  .promoInput {
+    font-size: 13px;
+    margin-top: 33px;
+    margin-bottom: 27px;
+    padding: 4px 16px 6px 0px;
+  }
 
-    .checkoutButton {
-        font-size: 15px;
+  .checkoutButton {
+    font-size: 15px;
 
-        height: 50px;
-        padding-top: 1px;
-        padding-right: 16px;
-        padding-bottom: 1px;
-        padding-left: 16px;
-    }
+    height: 50px;
+    padding-top: 1px;
+    padding-right: 16px;
+    padding-bottom: 1px;
+    padding-left: 16px;
+  }
 
-    .backLink {
-        display: none;
-    }
+  .backLink {
+    display: none;
+  }
 
-    .cartTitle {
-        text-transform: uppercase;
-        margin-bottom: 30px;
-    }
+  .cartTitle {
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    font-size: 25px;
+  }
+}
+
+.emptyCart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 32px;
+  padding: 120px 20px;
+  min-height: 60vh;
+}
+
+.emptyTitle {
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 58px;
+  color: #525252;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.emptyText {
+  font-size: 20px;
+  line-height: 28px;
+  color: #7a7a79;
+  margin: 0;
+  max-width: 500px;
+  font-weight: 400;
+}
+
+.shopButton {
+  display: inline-block;
+  background-color: #525252;
+  color: #f2f0ec;
+  text-decoration: none;
+  border-radius: 3px;
+  padding: 18px 48px;
+  font-size: 18px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(82, 82, 82, 0.1);
+}
+
+.shopButton:hover {
+  border: 1px solid #525252;
+  background-color: transparent;
+  color: #525252;
+}
+
+@media (max-width: 1024px) {
+  .emptyCart {
+    padding: 80px 20px;
+    min-height: 50vh;
+  }
+
+  .emptyTitle {
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 22.36px;
+    letter-spacing: 0px;
+  }
+
+  .emptyText {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .shopButton {
+    padding: 16px 40px;
+    font-size: 16px;
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .emptyCart {
+    padding: 60px 16px;
+    min-height: 40vh;
+    gap: 24px;
+  }
+
+  .emptyTitle {
+    font-size: 28px;
+    line-height: 22.36px;
+  }
+
+  .emptyText {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .shopButton {
+    padding: 14px 32px;
+    font-size: 15px;
+  }
 }
