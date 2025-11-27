@@ -245,12 +245,160 @@
   color: #c93c3c;
 }
 
+@media (max-width: 1440px) {
+  .sectionHeading {
+    font-size: 22px;
+  }
+
+  .sectionDescription {
+    font-size: 12px;
+  }
+
+  .subsectionHeading {
+    font-size: 16px;
+  }
+
+  .fieldLabel {
+    font-size: 12px;
+  }
+
+  .input {
+    font-size: 14px;
+  }
+
+  .input::placeholder {
+    font-size: 14px;
+  }
+
+  .primaryButton {
+    font-size: 12px;
+  }
+
+  .secondaryButton {
+    font-size: 12px;
+  }
+
+  .passwordLabel {
+    font-size: 12px;
+  }
+
+  .passwordInput {
+    font-size: 14px;
+  }
+
+  .passwordInput::placeholder {
+    font-size: 14px;
+  }
+
+  .passwordMessage {
+    font-size: 11px;
+  }
+}
+
 @media (max-width: 768px) {
+  .container {
+    padding: 20px 16px;
+  }
+
+  .passwordPanel {
+    padding: 20px 16px;
+  }
+
+  .sectionHeading {
+    font-size: 19px;
+    line-height: 28px;
+  }
+
+  .sectionDescription {
+    font-size: 11px;
+    line-height: 18px;
+    text-wrap: wrap;
+  }
+
+  .subsectionHeading {
+    font-size: 13px;
+    line-height: 24px;
+  }
+
   .infoPanel {
-    padding: 18px 20px;
+    padding: 18px 16px;
+    gap: 12px;
   }
 
   .fieldsGrid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .fieldRow {
+    gap: 4px;
+  }
+
+  .fieldLabel {
+    font-size: 11px;
+    line-height: 18px;
+  }
+
+  .input {
+    font-size: 13px;
+    line-height: 20px;
+    height: 44px;
+    padding: 0px 12px;
+    max-width: 100%;
+  }
+
+  .input::placeholder {
+    font-size: 13px;
+    line-height: 20px;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .primaryButton {
+    font-size: 11px;
+    width: 100%;
+    padding: 8px 12px;
+  }
+
+  .secondaryButton {
+    font-size: 11px;
+    width: 100%;
+    padding: 8px 12px;
+    height: auto;
+  }
+
+  .passwordForm {
+    gap: 16px;
+    margin-top: 20px;
+    padding: 16px;
+  }
+
+  .passwordField {
+    gap: 4px;
+  }
+
+  .passwordLabel {
+    font-size: 11px;
+    line-height: 18px;
+  }
+
+  .passwordInput {
+    font-size: 13px;
+    line-height: 20px;
+    height: 44px;
+    padding: 0 40px 0 14px;
+  }
+
+  .passwordInput::placeholder {
+    font-size: 13px;
+    line-height: 20px;
+  }
+
+  .passwordMessage {
+    font-size: 10px;
   }
 }

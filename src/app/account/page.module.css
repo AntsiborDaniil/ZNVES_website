@@ -23,7 +23,7 @@
   flex: 0 0 auto;
   background: none;
   border: none;
-  color: #525252;
+  color: #525252C9;
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;
@@ -36,7 +36,7 @@
 }
 
 .mobileNavItem:hover {
-  color: #1f1f1f;
+  color: #525252;
 }
 
 .mobileNavItemActive {
@@ -405,9 +405,15 @@
   padding: 0;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1300px) {
   .accountPage {
     margin-top: 68px;
+    align-items: center;
+    width: 100%;
+  }
+
+  .main {
+    width: 90%;
   }
 
   .mobileNav {
@@ -443,6 +449,16 @@
     .mobileNav {
         margin-top: 20px;
     }
+
+    .main {
+        width: 100%;
+    }
+
+    .accountPage {
+        margin-top: 68px;
+        align-items: normal;
+        width: 100%;
+      }
 
     .mobileNavItem {
         padding: 0px 11px;
