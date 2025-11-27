@@ -164,7 +164,6 @@ const CatalogPageContent = ({ title, products }: CatalogPageContentProps) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Получаем параметры из URL
   const categoryParam = searchParams?.get("category");
   const colorParam = searchParams?.get("color");
   const sizeParam = searchParams?.get("size");
