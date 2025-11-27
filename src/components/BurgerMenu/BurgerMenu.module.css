@@ -5,8 +5,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 31, 23, 0.5);
-  backdrop-filter: blur(6px);
+  background: #00000069;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease;
@@ -303,7 +302,7 @@
 .socialSection {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   margin-top: auto;
   padding-top: 32px;
 }
@@ -317,7 +316,6 @@
   letter-spacing: 0%;
   vertical-align: middle;
   text-transform: none;
-  padding: 4px 0;
   transition: color 0.2s ease;
 }
 
