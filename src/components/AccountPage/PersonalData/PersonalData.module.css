@@ -295,9 +295,13 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .container {
     padding: 20px 16px;
+  }
+
+  .panel {
+    margin-top: 5px;
   }
 
   .passwordPanel {
@@ -316,13 +320,13 @@
   }
 
   .subsectionHeading {
-    font-size: 13px;
-    line-height: 24px;
+    font-size: 14px;
+    line-height: 28px;
   }
 
   .infoPanel {
-    padding: 18px 16px;
     gap: 12px;
+    margin-top: 10px;
   }
 
   .fieldsGrid {
@@ -335,14 +339,15 @@
   }
 
   .fieldLabel {
-    font-size: 11px;
-    line-height: 18px;
+    font-size: 10.99px;
+    line-height: 15.7px;
   }
 
+  .passwordInput,
   .input {
-    font-size: 13px;
-    line-height: 20px;
-    height: 44px;
+    height: 34px;
+    font-size: 12.56px;
+    line-height: 18.83px;
     padding: 0px 12px;
     max-width: 100%;
   }
@@ -360,8 +365,12 @@
 
   .primaryButton {
     font-size: 11px;
-    width: 100%;
-    padding: 8px 12px;
+    width: 126px;
+    padding-top: 4.54px;
+    padding-right: 7.94px;
+    padding-bottom: 4.54px;
+    padding-left: 7.94px;
+    font-size: 9px;
   }
 
   .secondaryButton {
@@ -369,12 +378,12 @@
     width: 100%;
     padding: 8px 12px;
     height: auto;
+    display: none;
   }
 
   .passwordForm {
-    gap: 16px;
-    margin-top: 20px;
-    padding: 16px;
+    gap: 9px;
+    margin-top: 10px;
   }
 
   .passwordField {
@@ -383,14 +392,24 @@
 
   .passwordLabel {
     font-size: 11px;
-    line-height: 18px;
+    line-height: 15.7px;
   }
 
-  .passwordInput {
+  /* .passwordInput {
     font-size: 13px;
     line-height: 20px;
     height: 44px;
     padding: 0 40px 0 14px;
+  } */
+
+  .togglePassword {
+    width: 14px;
+    height: 14px;
+  }
+
+  .togglePasswordIcon {
+    width: 14px;
+    height: 14px;
   }
 
   .passwordInput::placeholder {

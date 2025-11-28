@@ -186,6 +186,7 @@ const PersonalData = () => {
         >
           {passwordVisibility[field] ? (
             <svg
+              className={styles.togglePasswordIcon}
               width="20"
               height="20"
               viewBox="0 0 20 20"
@@ -209,6 +210,7 @@ const PersonalData = () => {
             </svg>
           ) : (
             <Image
+              className={styles.togglePasswordIcon}
               src="/images/login/eye-open.png"
               alt="Показать пароль"
               width={20}
@@ -258,25 +260,23 @@ const PersonalData = () => {
               ))}
             </div>
           </div>
-          {hasUnsavedChanges && (
-            <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.primaryButton}
-                onClick={handleSaveChanges}
-                disabled={isSaving}
-              >
-                {isSaving ? "Сохранение..." : "Сохранить изменения"}
-              </button>
-              <button
-                type="button"
-                className={styles.secondaryButton}
-                onClick={handleResetProfile}
-              >
-                Отмена
-              </button>
-            </div>
-          )}
+          <div className={styles.actions}>
+            <button
+              type="button"
+              className={styles.primaryButton}
+              onClick={handleSaveChanges}
+              disabled={isSaving || !hasUnsavedChanges}
+            >
+              {isSaving ? "Сохранение..." : "Сохранить изменения"}
+            </button>
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              onClick={handleResetProfile}
+            >
+              Отмена
+            </button>
+          </div>
         </section>
       </div>
 
@@ -300,25 +300,23 @@ const PersonalData = () => {
             "Введите пароль*"
           )}
         </form>
-        {hasPasswordChanges && (
-          <div className={styles.actions}>
-            <button
-              type="button"
-              className={styles.primaryButton}
-              onClick={handlePasswordSubmit}
-              disabled={isPasswordSubmitting}
-            >
-              {isPasswordSubmitting ? "Сохранение..." : "Сохранить изменения"}
-            </button>
-            <button
-              type="button"
-              className={styles.secondaryButton}
-              onClick={handlePasswordCancel}
-            >
-              Отмена
-            </button>
-          </div>
-        )}
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.primaryButton}
+            onClick={handlePasswordSubmit}
+            disabled={isPasswordSubmitting || !hasPasswordChanges}
+          >
+            {isPasswordSubmitting ? "Сохранение..." : "Сохранить изменения"}
+          </button>
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            onClick={handlePasswordCancel}
+          >
+            Отмена
+          </button>
+        </div>
         {passwordStatus && (
           <p
             className={`${styles.passwordMessage} ${
