@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./page.module.css";
+import checkoutStyles from "../checkout/page.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "../../components/Header/Header";
@@ -19,7 +20,7 @@ const CartPage = () => {
     useCart();
   const router = useRouter();
   const { width } = useWindowSize();
-  const isMobile = width > 0 && width <= 768;
+  const isMobile = width > 0 && width <= 1024;
 
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -277,18 +278,20 @@ const CartPage = () => {
               </button>
             </div>
             {showCheckoutForm && isMobile && (
-              <div className={styles.mobileCheckoutForm}>
-                <h2 className={styles.checkoutFormTitle}>Оформление заказа</h2>
+              <div className={checkoutStyles.mobileCheckoutForm}>
+                <h2 className={checkoutStyles.checkoutFormTitle}>
+                  Оформление заказа
+                </h2>
 
-                <div className={styles.checkoutSection}>
-                  <h3 className={styles.checkoutSectionTitle}>
+                <div className={checkoutStyles.checkoutSection}>
+                  <h3 className={checkoutStyles.checkoutSectionTitle}>
                     Контактная информация
                   </h3>
-                  <div className={styles.checkoutInputsRow}>
-                    <div className={styles.checkoutInputWrapper}>
+                  <div className={checkoutStyles.checkoutInputsRow}>
+                    <div className={checkoutStyles.checkoutInputWrapper}>
                       <label
                         htmlFor="mobile-firstName"
-                        className={styles.checkoutLabel}
+                        className={checkoutStyles.checkoutLabel}
                       >
                         Имя
                       </label>
@@ -299,13 +302,13 @@ const CartPage = () => {
                         placeholder="Введите ваше имя*"
                         value={formData.firstName}
                         onChange={handleInputChange}
-                        className={styles.checkoutInput}
+                        className={checkoutStyles.checkoutInput}
                       />
                     </div>
-                    <div className={styles.checkoutInputWrapper}>
+                    <div className={checkoutStyles.checkoutInputWrapper}>
                       <label
                         htmlFor="mobile-lastName"
-                        className={styles.checkoutLabel}
+                        className={checkoutStyles.checkoutLabel}
                       >
                         Фамилия
                       </label>
@@ -316,15 +319,15 @@ const CartPage = () => {
                         placeholder="Введите вашу фамилию*"
                         value={formData.lastName}
                         onChange={handleInputChange}
-                        className={styles.checkoutInput}
+                        className={checkoutStyles.checkoutInput}
                       />
                     </div>
                   </div>
-                  <div className={styles.checkoutInputsRow}>
-                    <div className={styles.checkoutInputWrapper}>
+                  <div className={checkoutStyles.checkoutInputsRow}>
+                    <div className={checkoutStyles.checkoutInputWrapper}>
                       <label
                         htmlFor="mobile-phone"
-                        className={styles.checkoutLabel}
+                        className={checkoutStyles.checkoutLabel}
                       >
                         Телефон
                       </label>
@@ -335,13 +338,13 @@ const CartPage = () => {
                         placeholder="Введите ваш телефон*"
                         value={formData.phone}
                         onChange={handleInputChange}
-                        className={styles.checkoutInput}
+                        className={checkoutStyles.checkoutInput}
                       />
                     </div>
-                    <div className={styles.checkoutInputWrapper}>
+                    <div className={checkoutStyles.checkoutInputWrapper}>
                       <label
                         htmlFor="mobile-email"
-                        className={styles.checkoutLabel}
+                        className={checkoutStyles.checkoutLabel}
                       >
                         Email
                       </label>
@@ -352,21 +355,21 @@ const CartPage = () => {
                         placeholder="Введите ваш email*"
                         value={formData.email}
                         onChange={handleInputChange}
-                        className={styles.checkoutInput}
+                        className={checkoutStyles.checkoutInput}
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className={styles.checkoutSection}>
-                  <h3 className={styles.checkoutSectionTitle}>
+                <div className={checkoutStyles.checkoutSection}>
+                  <h3 className={checkoutStyles.checkoutSectionTitle}>
                     Адрес доставки
                   </h3>
-                  <div className={styles.checkoutInputsRow}>
-                    <div className={styles.checkoutInputWrapper}>
+                  <div className={checkoutStyles.checkoutInputsRow}>
+                    <div className={checkoutStyles.checkoutInputWrapper}>
                       <label
                         htmlFor="mobile-city"
-                        className={styles.checkoutLabel}
+                        className={checkoutStyles.checkoutLabel}
                       >
                         Город
                       </label>
@@ -377,13 +380,13 @@ const CartPage = () => {
                         placeholder="Введите ваш город*"
                         value={formData.city}
                         onChange={handleInputChange}
-                        className={styles.checkoutInput}
+                        className={checkoutStyles.checkoutInput}
                       />
                     </div>
-                    <div className={styles.checkoutInputWrapper}>
+                    <div className={checkoutStyles.checkoutInputWrapper}>
                       <label
                         htmlFor="mobile-street"
-                        className={styles.checkoutLabel}
+                        className={checkoutStyles.checkoutLabel}
                       >
                         Улица
                       </label>
@@ -394,15 +397,15 @@ const CartPage = () => {
                         placeholder="Введите вашу улицу*"
                         value={formData.street}
                         onChange={handleInputChange}
-                        className={styles.checkoutInput}
+                        className={checkoutStyles.checkoutInput}
                       />
                     </div>
                   </div>
-                  <div className={styles.checkoutInputsRow}>
-                    <div className={styles.checkoutInputWrapper}>
+                  <div className={checkoutStyles.checkoutInputsRow}>
+                    <div className={checkoutStyles.checkoutInputWrapper}>
                       <label
                         htmlFor="mobile-house"
-                        className={styles.checkoutLabel}
+                        className={checkoutStyles.checkoutLabel}
                       >
                         Дом
                       </label>
@@ -413,13 +416,13 @@ const CartPage = () => {
                         placeholder="Введите ваш дом*"
                         value={formData.house}
                         onChange={handleInputChange}
-                        className={styles.checkoutInput}
+                        className={checkoutStyles.checkoutInput}
                       />
                     </div>
-                    <div className={styles.checkoutInputWrapper}>
+                    <div className={checkoutStyles.checkoutInputWrapper}>
                       <label
                         htmlFor="mobile-apartment"
-                        className={styles.checkoutLabel}
+                        className={checkoutStyles.checkoutLabel}
                       >
                         Квартира
                       </label>
@@ -430,57 +433,87 @@ const CartPage = () => {
                         placeholder="Введите вашу квартиру*"
                         value={formData.apartment}
                         onChange={handleInputChange}
-                        className={styles.checkoutInput}
+                        className={checkoutStyles.checkoutInput}
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className={styles.checkoutSection}>
-                  <h3 className={styles.checkoutSectionTitle}>Доставка</h3>
-                  <div className={styles.checkoutDeliveryOptions}>
-                    <label className={styles.checkoutRadioLabel}>
+                <div className={checkoutStyles.checkoutSection}>
+                  <div className={checkoutStyles.checkoutDeliveryOptions}>
+                    <h3 className={checkoutStyles.checkoutSectionTitle}>
+                      Доставка
+                    </h3>
+                    <label className={checkoutStyles.checkoutRadioLabel}>
                       <input
                         type="radio"
                         name="deliveryMethod"
                         value="cdek"
                         checked={formData.deliveryMethod === "cdek"}
                         onChange={handleInputChange}
-                        className={styles.checkoutRadio}
+                        className={checkoutStyles.checkoutRadio}
                       />
-                      <div className={styles.checkoutDeliveryOptionContent}>
-                        <div className={styles.checkoutDeliveryOptionInfo}>
-                          <span className={styles.checkoutDeliveryOptionName}>
+                      <div
+                        className={checkoutStyles.checkoutDeliveryOptionContent}
+                      >
+                        <div
+                          className={checkoutStyles.checkoutDeliveryOptionInfo}
+                        >
+                          <span
+                            className={
+                              checkoutStyles.checkoutDeliveryOptionName
+                            }
+                          >
                             Доставка СДЭК
                           </span>
-                          <span className={styles.checkoutDeliveryOptionTime}>
+                          <span
+                            className={
+                              checkoutStyles.checkoutDeliveryOptionTime
+                            }
+                          >
                             3-5 дней
                           </span>
                         </div>
-                        <span className={styles.checkoutDeliveryOptionPrice}>
+                        <span
+                          className={checkoutStyles.checkoutDeliveryOptionPrice}
+                        >
                           {formatPrice(deliveryPrices.cdek)}
                         </span>
                       </div>
                     </label>
-                    <label className={styles.checkoutRadioLabel}>
+                    <label className={checkoutStyles.checkoutRadioLabel}>
                       <input
                         type="radio"
                         name="deliveryMethod"
                         value="yandex"
                         checked={formData.deliveryMethod === "yandex"}
                         onChange={handleInputChange}
-                        className={styles.checkoutRadio}
+                        className={checkoutStyles.checkoutRadio}
                       />
-                      <div className={styles.checkoutDeliveryOptionContent}>
-                        <div className={styles.checkoutDeliveryOptionInfo}>
-                          <span className={styles.checkoutDeliveryOptionName}>
+                      <div
+                        className={checkoutStyles.checkoutDeliveryOptionContent}
+                      >
+                        <div
+                          className={checkoutStyles.checkoutDeliveryOptionInfo}
+                        >
+                          <span
+                            className={
+                              checkoutStyles.checkoutDeliveryOptionName
+                            }
+                          >
                             Доставка ЯНДЕКС
                           </span>
-                          <span className={styles.checkoutDeliveryOptionTime}>
+                          <span
+                            className={
+                              checkoutStyles.checkoutDeliveryOptionTime
+                            }
+                          >
                             0-1 дней
                           </span>
                         </div>
-                        <span className={styles.checkoutDeliveryOptionPrice}>
+                        <span
+                          className={checkoutStyles.checkoutDeliveryOptionPrice}
+                        >
                           {formatPrice(deliveryPrices.yandex)}
                         </span>
                       </div>
@@ -488,12 +521,14 @@ const CartPage = () => {
                   </div>
                 </div>
 
-                <div className={styles.checkoutSection}>
-                  <h3 className={styles.checkoutSectionTitle}>Получение</h3>
-                  <div className={styles.checkoutMapSearchContainer}>
+                <div className={checkoutStyles.checkoutSection}>
+                  <h1 className={checkoutStyles.checkoutSectionTitle}>
+                    Получение
+                  </h1>
+                  <div className={checkoutStyles.checkoutMapSearchContainer}>
                     <input
                       type="text"
-                      className={styles.checkoutMapSearchInput}
+                      className={checkoutStyles.checkoutMapSearchInput}
                       placeholder="Поиск адреса на карте"
                       value={
                         mapSearchValue ||
@@ -506,7 +541,7 @@ const CartPage = () => {
                       }}
                     />
                   </div>
-                  <div className={styles.checkoutMapContainer}>
+                  <div className={checkoutStyles.checkoutMapContainer}>
                     <Map
                       onAddressSelect={handleAddressSelect}
                       searchValue={mapSearchValue}
@@ -515,31 +550,34 @@ const CartPage = () => {
                   </div>
                 </div>
 
-                <div className={styles.checkoutSection}>
-                  <h3 className={styles.checkoutPaymentTitle}>Способ оплаты</h3>
-                  <div className={styles.checkoutPaymentOptions}>
-                    <label className={styles.checkoutRadioLabel}>
+                <div className={checkoutStyles.checkoutSection}>
+                  <h3 className={checkoutStyles.checkoutPaymentTitle}>
+                    Способ оплаты
+                  </h3>
+                  <div className={checkoutStyles.checkoutPaymentOptions}>
+                    <label className={checkoutStyles.checkoutRadioLabel}>
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="card"
                         checked={formData.paymentMethod === "card"}
                         onChange={handleInputChange}
-                        className={styles.checkoutRadio}
+                        className={checkoutStyles.checkoutRadio}
                       />
                       <span>Оплата банковской картой</span>
                     </label>
-                    <label className={styles.checkoutRadioLabel}>
+                    <label className={checkoutStyles.checkoutRadioLabel}>
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="cash"
                         checked={formData.paymentMethod === "cash"}
                         onChange={handleInputChange}
-                        className={styles.checkoutRadio}
+                        className={checkoutStyles.checkoutRadio}
                       />
-                      <div className={styles.checkoutPaymentIcon}>
+                      <div className={checkoutStyles.checkoutPaymentIcon}>
                         <Image
+                          className={checkoutStyles.checkoutPaymentIconImage}
                           src="/images/checkout/sbp.png"
                           alt="СПБ"
                           width={19}
@@ -548,17 +586,18 @@ const CartPage = () => {
                       </div>
                       <span>Оплата по СПБ </span>
                     </label>
-                    <label className={styles.checkoutRadioLabel}>
+                    <label className={checkoutStyles.checkoutRadioLabel}>
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="online"
                         checked={formData.paymentMethod === "online"}
                         onChange={handleInputChange}
-                        className={styles.checkoutRadio}
+                        className={checkoutStyles.checkoutRadio}
                       />
-                      <div className={styles.checkoutPaymentIcon}>
+                      <div className={checkoutStyles.checkoutPaymentIcon}>
                         <Image
+                          className={checkoutStyles.checkoutPaymentIconImage}
                           src="/images/checkout/dolya.png"
                           alt="Долями"
                           width={19}
@@ -567,17 +606,18 @@ const CartPage = () => {
                       </div>
                       <span>Долями</span>
                     </label>
-                    <label className={styles.checkoutRadioLabel}>
+                    <label className={checkoutStyles.checkoutRadioLabel}>
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="installment"
                         checked={formData.paymentMethod === "installment"}
                         onChange={handleInputChange}
-                        className={styles.checkoutRadio}
+                        className={checkoutStyles.checkoutRadio}
                       />
-                      <div className={styles.checkoutPaymentIcon}>
+                      <div className={checkoutStyles.checkoutPaymentIcon}>
                         <Image
+                          className={checkoutStyles.checkoutPaymentIconImage}
                           src="/images/checkout/y.png"
                           alt="Яндекс Pay"
                           width={19}
@@ -588,53 +628,56 @@ const CartPage = () => {
                     </label>
                   </div>
                 </div>
+                <div className={checkoutStyles.checkoutSubmitButtonWrapper}>
+                  <button
+                    type="button"
+                    className={checkoutStyles.checkoutSubmitButton}
+                    disabled={
+                      !formData.agreeToOffer || !formData.agreeToPrivacy
+                    }
+                    onClick={handleSubmitOrder}
+                  >
+                    Оформить заказ
+                  </button>
 
-                <button
-                  type="button"
-                  className={styles.checkoutSubmitButton}
-                  disabled={!formData.agreeToOffer || !formData.agreeToPrivacy}
-                  onClick={handleSubmitOrder}
-                >
-                  Оформить заказ
-                </button>
-
-                <div className={styles.checkoutCheckboxes}>
-                  <label className={styles.checkoutCheckboxLabel}>
-                    <input
-                      type="checkbox"
-                      name="agreeToOffer"
-                      checked={formData.agreeToOffer}
-                      onChange={handleInputChange}
-                      className={styles.checkoutCheckbox}
-                    />
-                    <span>
-                      Я соглашаюсь с условиями{" "}
-                      <Link
-                        href="/public-offer"
-                        className={styles.checkoutCheckboxLink}
-                      >
-                        публичной оферты
-                      </Link>
-                    </span>
-                  </label>
-                  <label className={styles.checkoutCheckboxLabel}>
-                    <input
-                      type="checkbox"
-                      name="agreeToPrivacy"
-                      checked={formData.agreeToPrivacy}
-                      onChange={handleInputChange}
-                      className={styles.checkoutCheckbox}
-                    />
-                    <span>
-                      Я принимаю{" "}
-                      <Link
-                        href="/privacy"
-                        className={styles.checkoutCheckboxLink}
-                      >
-                        политику конфиденциальности
-                      </Link>
-                    </span>
-                  </label>
+                  <div>
+                    <label className={checkoutStyles.checkoutCheckboxLabel}>
+                      <input
+                        type="checkbox"
+                        name="agreeToOffer"
+                        checked={formData.agreeToOffer}
+                        onChange={handleInputChange}
+                        className={checkoutStyles.checkoutCheckbox}
+                      />
+                      <span>
+                        Я соглашаюсь с условиями{" "}
+                        <Link
+                          href="/public-offer"
+                          className={checkoutStyles.checkoutCheckboxLink}
+                        >
+                          публичной оферты
+                        </Link>
+                      </span>
+                    </label>
+                    <label className={checkoutStyles.checkoutCheckboxLabel}>
+                      <input
+                        type="checkbox"
+                        name="agreeToPrivacy"
+                        checked={formData.agreeToPrivacy}
+                        onChange={handleInputChange}
+                        className={checkoutStyles.checkoutCheckbox}
+                      />
+                      <span>
+                        Я принимаю{" "}
+                        <Link
+                          href="/privacy"
+                          className={checkoutStyles.checkoutCheckboxLink}
+                        >
+                          политику конфиденциальности
+                        </Link>
+                      </span>
+                    </label>
+                  </div>
                 </div>
               </div>
             )}

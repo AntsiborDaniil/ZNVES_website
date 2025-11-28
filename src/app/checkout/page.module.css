@@ -257,7 +257,8 @@
   accent-color: #525252;
 }
 
-.mapContainer {
+/* Общие стили для карты - используются в checkout и cart */
+.checkoutMapContainer {
   width: 100%;
   border-radius: 3px;
   overflow: visible;
@@ -266,32 +267,81 @@
   z-index: 1;
 }
 
-.mapContainer :global([class*="ymaps"]) {
+.checkoutMapContainer :global([class*="ymaps"]) {
   border-radius: 3px;
 }
 
-.mapContainer :global(.ymaps-2-1-79-map) {
+.checkoutMapContainer :global(.ymaps-2-1-79-map) {
   border-radius: 3px;
 }
 
-.mapContainer :global(.ymaps-2-1-79-controls__control) {
+.checkoutMapContainer :global(.ymaps-2-1-79-controls__control) {
   border-radius: 3px;
 }
 
-.map {
-  display: block;
-  width: 100%;
-  border: none;
+/* Скрываем лишние элементы интерфейса Яндекс.Карт */
+.checkoutMapContainer :global(.ymaps-2-1-79-balloon__route),
+.checkoutMapContainer :global(.ymaps-2-1-79-balloon__taxi),
+.checkoutMapContainer :global(.ymaps-2-1-79-balloon__create-map),
+.checkoutMapContainer :global(.ymaps-2-1-79-balloon__route-link),
+.checkoutMapContainer :global(.ymaps-2-1-79-balloon__taxi-link),
+.checkoutMapContainer :global(.ymaps-2-1-79-balloon__create-map-link),
+.checkoutMapContainer :global([class*="balloon__route"]),
+.checkoutMapContainer :global([class*="balloon__taxi"]),
+.checkoutMapContainer :global([class*="balloon__create-map"]),
+.checkoutMapContainer :global(.ymaps-2-1-79-copyrights-promo),
+.checkoutMapContainer :global(.ymaps-2-1-79-copyrights),
+.checkoutMapContainer :global(.ymaps-2-1-79-copyrights__content),
+.checkoutMapContainer :global(.ymaps-2-1-79-copyrights__link),
+.checkoutMapContainer :global(.ymaps-2-1-79-copyrights__wrap),
+.checkoutMapContainer :global([class*="copyrights-promo"]),
+.checkoutMapContainer :global([class*="copyrights"]),
+.checkoutMapContainer :global([class*="copyrights__content"]),
+.checkoutMapContainer :global([class*="copyrights__link"]),
+.checkoutMapContainer :global([class*="copyrights__wrap"]),
+.checkoutMapContainer :global([class*="create-map"]),
+.checkoutMapContainer :global([class*="create-map-link"]),
+.checkoutMapContainer :global([class*="open-in-maps"]),
+.checkoutMapContainer :global([class*="open-in-yandex"]),
+.checkoutMapContainer :global(.ymaps-2-1-79-balloon__footer),
+.checkoutMapContainer :global(.ymaps-2-1-79-balloon__actions),
+.checkoutMapContainer :global([class*="balloon__footer"]),
+.checkoutMapContainer :global([class*="balloon__actions"]),
+.checkoutMapContainer :global(a[href*="yandex.ru/maps"]),
+.checkoutMapContainer :global(a[href*="yandex.com/maps"]),
+.checkoutMapContainer :global(div[class*="ymaps"] > div[class*="copyrights"] a),
+.checkoutMapContainer :global(div[class*="ymaps"] > div[class*="copyrights"]),
+/* Более агрессивное скрытие всех элементов внизу карты */
+.checkoutMapContainer :global(.ymaps-2-1-79-map > div:last-child),
+.checkoutMapContainer :global(.ymaps-2-1-79-map > div:last-child > *),
+.checkoutMapContainer :global(.ymaps-2-1-79-map > div:last-child a),
+.checkoutMapContainer :global(.ymaps-2-1-79-map > div:last-child button),
+.checkoutMapContainer :global(.ymaps-2-1-79-map > div:last-child span),
+.checkoutMapContainer :global(.ymaps-2-1-79-map a),
+.checkoutMapContainer :global(.ymaps-2-1-79-map button),
+.checkoutMapContainer :global([class*="ymaps"][class*="link"]),
+.checkoutMapContainer :global([class*="ymaps"][class*="button"]),
+.checkoutMapContainer :global([class*="ymaps"][class*="copyright"]),
+.checkoutMapContainer :global(.ymaps-2-1-79-map > div > a),
+.checkoutMapContainer :global(.ymaps-2-1-79-map > div > button),
+.checkoutMapContainer :global(.ymaps-2-1-79-map > div > span) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
 }
 
-.mapSearchContainer {
+.checkoutMapSearchContainer {
   margin-bottom: 20px;
   width: 100%;
   position: relative;
   z-index: 2;
 }
 
-.mapSearchInput {
+.checkoutMapSearchInput {
   width: 100%;
   padding: 12px 16px 0px 0px;
   border: none;
@@ -311,12 +361,12 @@
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
-.mapSearchInput:focus {
+.checkoutMapSearchInput:focus {
   outline: none;
   border-color: #1f1f1f;
 }
 
-.mapSearchInput::placeholder {
+.checkoutMapSearchInput::placeholder {
   color: #7a7a79;
 }
 
@@ -704,65 +754,509 @@
   }
 }
 
-@media (max-width: 768px) {
-  .main {
-    padding: 40px 16px 80px;
+/* Мобильная форма оформления заказа */
+.mobileCheckoutForm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.checkoutFormTitle {
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 38px;
+  letter-spacing: 0px;
+  color: #525252;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.checkoutSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.checkoutSectionTitle {
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 24px;
+  letter-spacing: 0px;
+  color: #525252;
+  margin: 0;
+}
+
+.checkoutInputsRow {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.checkoutInputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkoutLabel {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0%;
+  color: #525252;
+}
+
+.checkoutInput {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 3px;
+  background-color: #f8f8f8;
+  font-size: 16px;
+  color: #525252;
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 0 0 0.47px rgba(82, 82, 82, 0.5);
+}
+
+.checkoutInput:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.47px rgba(31, 31, 31, 0.8);
+  background-color: #ffffff;
+}
+
+.checkoutInput::placeholder {
+  color: #7a7a79;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0%;
+}
+
+.checkoutDeliveryOptions {
+  display: flex;
+  flex-direction: column;
+  border-top: 0.4px solid #5252528c;
+  border-bottom: 0.4px solid #5252528c;
+  gap: 0;
+  padding: 16px 0;
+}
+
+.checkoutRadioLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 23.93px;
+  letter-spacing: 0.3px;
+  vertical-align: middle;
+  color: #525252;
+  cursor: pointer;
+  user-select: none;
+  padding: 8px 0;
+}
+
+.checkoutRadio {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #525252;
+}
+
+.checkoutDeliveryOptionContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  gap: 16px;
+}
+
+.checkoutDeliveryOptionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checkoutDeliveryOptionName {
+  color: #525252;
+  font-weight: 600;
+  font-style: SemiBold;
+  font-size: 18px;
+  line-height: 14.11px;
+  letter-spacing: 0.18px;
+  vertical-align: middle;
+}
+
+.checkoutDeliveryOptionTime {
+  color: #525252cc;
+  font-weight: 400;
+  margin-top: 2px;
+  font-size: 16px;
+  line-height: 14.11px;
+  letter-spacing: 0.18px;
+}
+
+.checkoutDeliveryOptionPrice {
+  font-size: 16px;
+  color: #525252;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.checkoutMapSearchContainer {
+  margin-bottom: 20px;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.checkoutMapSearchInput {
+  width: 100%;
+  padding: 12px 16px 0px 0px;
+  border: none;
+  border-bottom: 0.4px solid #5252528c;
+  background-color: transparent;
+  font-weight: 400;
+  font-size: 16.47px;
+  line-height: 160%;
+  letter-spacing: 0.63px;
+  vertical-align: middle;
+  margin-top: 10px;
+  color: #525252;
+  font-family: inherit;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.checkoutMapSearchInput:focus {
+  outline: none;
+  border-bottom-color: #1f1f1f;
+}
+
+.checkoutMapSearchInput::placeholder {
+  color: #7a7a79;
+}
+
+.checkoutMapContainer {
+  width: 100%;
+  border-radius: 3px;
+  overflow: visible;
+  border: 1.5px solid #525252;
+  position: relative;
+  z-index: 1;
+}
+
+.checkoutPaymentTitle {
+  color: #525252;
+  font-weight: 400;
+  font-size: 25px;
+  line-height: 18.03px;
+  letter-spacing: 0px;
+  margin: 0;
+  margin-bottom: 21px;
+}
+
+.checkoutPaymentOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.checkoutPaymentIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+.checkoutSubmitButton {
+  width: 100%;
+  padding: 18px 32px;
+  background-color: #525252;
+  color: #ffffff;
+  border: none;
+  border-radius: 3px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 20px;
+}
+
+.checkoutSubmitButton:hover:not(:disabled) {
+  background-color: #1f1f1f;
+}
+
+.checkoutSubmitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkoutCheckboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.checkoutCheckboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  color: #525252;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkoutCheckbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #525252;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.checkoutCheckboxLink {
+  color: #525252;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.checkoutCheckboxLink:hover {
+  color: #1f1f1f;
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .checkoutFormTitle {
+    font-size: 26px;
+    line-height: 30px;
   }
 
-  .title {
-    font-size: 32px;
-    line-height: 38px;
+  .checkoutSectionTitle {
+    font-size: 18px;
+    line-height: 22px;
   }
 
-  .firstInputs,
-  .infoInputs {
-    flex-direction: column;
+  .checkoutLabel {
+    font-size: 13px;
+    line-height: 18px;
   }
 
-  .addressRow {
-    flex-direction: column;
+  .checkoutInput {
+    font-size: 15px;
   }
 
-  .addressRow .input {
-    width: 100% !important;
+  .checkoutInput::placeholder {
+    font-size: 15px;
   }
 
-  .sectionTitle {
+  .checkoutDeliveryOptionName {
+    font-size: 16px;
+  }
+
+  .checkoutDeliveryOptionTime {
+    font-size: 14px;
+  }
+
+  .checkoutDeliveryOptionPrice {
+    font-size: 14px;
+  }
+
+  .checkoutMapSearchInput {
+    font-size: 15px;
+  }
+
+  .checkoutPaymentTitle {
     font-size: 20px;
     line-height: 24px;
   }
 
-  .orderTitle {
-    font-size: 24px;
-    line-height: 28px;
+  .checkoutRadioLabel span {
+    font-size: 16px;
   }
 
-  .orderItem {
-    flex-direction: column;
+  .checkoutSubmitButton {
+    font-size: 16px;
   }
 
-  .orderItemImage {
-    width: 100%;
-    height: 200px;
+  .checkoutCheckboxLabel {
+    font-size: 13px;
+    align-items: center;
+  }
+
+  .checkoutSubmitButton {
+    margin-bottom: 12px;
+  }
+
+  .checkoutMapSearchInput {
+    padding-top: 0px;
+    margin-top: 0px;
+  }
+
+  .checkoutMapSearchContainer {
+    margin-bottom: 0px;
+  }
+
+  .checkoutPaymentTitle {
+    margin-bottom: 0px;
   }
 }
 
-@media (max-width: 480px) {
-  .title {
-    font-size: 28px;
-    line-height: 34px;
-  }
-
-  .backLink {
+@media (max-width: 768px) {
+  .checkoutFormTitle {
     font-size: 20px;
-    line-height: 26px;
+    line-height: 22.36px;
   }
 
-  .mapContainer {
-    height: 300px;
+  .checkoutSectionTitle {
+    font-size: 15.39px;
+    line-height: 10.67px;
+    font-weight: 500;
   }
 
-  .map {
-    height: 300px;
+  .checkoutLabel {
+    font-size: 10.99px;
+    line-height: 15.7px;
+  }
+
+  .checkoutInput {
+    padding: 8px 11px;
+  }
+
+  .checkoutInput::placeholder {
+    font-size: 12.56px;
+    line-height: 18.83px;
+  }
+
+  .checkoutDeliveryOptions {
+    padding: 16px 0px;
+  }
+
+  .checkoutDeliveryOptions h3 {
+    margin-bottom: 15px;
+  }
+
+  .checkoutSection h1 {
+    margin-top: 10px;
+  }
+
+  .checkoutRadio {
+    width: 11.797375679016113px;
+    height: 11.797375679016113px;
+  }
+
+  .mobileCheckoutForm {
+    gap: 20px;
+  }
+
+  .checkoutDeliveryOptionName {
+    font-size: 12px;
+    list-style: 14.11px;
+  }
+
+  .checkoutDeliveryOptionTime {
+    font-size: 10px;
+    list-style: 14.11px;
+  }
+
+  .checkoutDeliveryOptionInfo {
+    gap: 0px;
+  }
+
+  .checkoutDeliveryOptionPrice {
+    font-size: 12px;
+    list-style: 14.11px;
+  }
+
+  .checkoutMapSearchInput {
+    padding-top: 0px;
+    padding-bottom: 4px;
+    margin-top: 0px;
+    font-size: 12px;
+    line-height: 160%;
+    border-bottom: 0.4px solid #5252528c;
+  }
+
+  .checkoutMapSearchInput:focus {
+    border-bottom-color: #1f1f1f;
+  }
+
+  .checkoutMapSearchContainer {
+    margin-bottom: 0px;
+  }
+
+  .checkoutMapContainer {
+    margin-bottom: 8px;
+  }
+
+  .section h2 {
+    margin-top: 10px;
+    font-size: 13.65px;
+  }
+
+  .checkoutPaymentTitle {
+    font-size: 15.39px;
+    line-height: 10.67px;
+    font-weight: 500;
+    margin-bottom: 0px;
+  }
+
+  .checkoutRadioLabel span {
+    font-size: 12px;
+    line-height: 16.15px;
+    font-weight: 400;
+  }
+
+  .checkoutRadioLabel {
+    padding: 0px 0px 4px 0px;
+    gap: 7px;
+  }
+
+  .checkoutPaymentIconImage {
+    width: 12.4px;
+    height: 12.4px;
+  }
+
+  .checkoutPaymentIcon {
+    width: auto;
+    height: auto;
+  }
+
+  .checkoutSubmitButton {
+    width: 361;
+    height: 46;
+
+    padding-top: 1px;
+    padding-right: 16px;
+    padding-bottom: 1px;
+    padding-left: 16px;
+
+    font-size: 15px;
+
+    margin-top: 0px;
+    margin-bottom: 8px;
+  }
+
+  .checkoutCheckbox {
+    width: 11.1px;
+    height: 11.1px;
+  }
+
+  .checkoutSubmitButton {
+    width: 100%;
+  }
+
+  .checkoutCheckboxLabel {
+    font-size: 10.18px;
+    line-height: 18.5px;
+  }
+
+  .checkoutCheckboxLabel {
+    gap: 7px;
   }
 }

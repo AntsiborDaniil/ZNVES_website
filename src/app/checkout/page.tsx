@@ -415,12 +415,12 @@ const CheckoutPage = () => {
 
               <div className={styles.section}>
                 <h2 className={styles.sectionTitle}>Получение</h2>
-                <div className={styles.mapSearchContainer}>
+                <div className={styles.checkoutMapSearchContainer}>
                   <input
                     type="text"
                     id="mapSearchInput"
                     name="mapSearchInput"
-                    className={styles.mapSearchInput}
+                    className={styles.checkoutMapSearchInput}
                     placeholder="Поиск адреса на карте"
                     value={
                       mapSearchValue ||
@@ -433,7 +433,7 @@ const CheckoutPage = () => {
                     }}
                   />
                 </div>
-                <div className={styles.mapContainer}>
+                <div className={styles.checkoutMapContainer}>
                   <Map
                     onAddressSelect={handleAddressSelect}
                     searchValue={mapSearchValue}

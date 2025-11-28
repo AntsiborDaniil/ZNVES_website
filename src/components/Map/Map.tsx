@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type AddressData = {
   city?: string;
@@ -37,14 +37,9 @@ const Map = ({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
-  const searchManagerRef = useRef<any>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [isYmapsLoaded, setIsYmapsLoaded] = useState(false);
-  const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const geocodeDebounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const suggestDebounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
   const isGeocodingRef = useRef(false);
 
   // Загрузка Yandex Maps API
@@ -158,7 +153,7 @@ const Map = ({
         const map = new ymaps.Map(mapRef.current, {
           center: [55.7558, 37.6173],
           zoom: 13,
-          controls: ["zoomControl", "fullscreenControl"],
+          controls: [],
           // Отключаем рекламу для работы без API ключа
           suppressMapOpenBlock: true,
         });
@@ -492,28 +487,6 @@ const Map = ({
 
         map.events.add("click", handleMapClick);
 
-        // Инициализация поиска
-        const searchControl = new ymaps.control.SearchControl({
-          options: {
-            provider: "yandex#search",
-            noPlacemark: true,
-          },
-        });
-
-        map.controls.add(searchControl);
-        searchManagerRef.current = searchControl;
-
-        // Обработчик выбора результата поиска
-        searchControl.events.add("resultselect", async (e: any) => {
-          const index = e.get("index");
-          const results = searchControl.getResultsArray();
-          if (results[index]) {
-            const geoObject = results[index];
-            const coords = geoObject.geometry.getCoordinates();
-            await reverseGeocode(coords[0], coords[1]);
-          }
-        });
-
         mapInstanceRef.current = map;
         console.log("[Map] Карта успешно инициализирована");
       } catch (error) {
@@ -533,7 +506,6 @@ const Map = ({
         }
         mapInstanceRef.current = null;
         markerRef.current = null;
-        searchManagerRef.current = null;
       }
     };
   }, [isMounted, isYmapsLoaded]); // Убрали onAddressSelect из зависимостей
@@ -690,229 +662,141 @@ const Map = ({
     };
   }, [isMounted, isYmapsLoaded, searchValue]); // Убрали onAddressSelect из зависимостей
 
-  // Поиск с автодополнением через встроенный поиск Яндекс.Карт
   useEffect(() => {
-    if (!searchValue || searchValue.trim().length < 2) {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      return;
-    }
+    setIsMounted(true);
+  }, []);
 
+  // Скрытие лишних элементов интерфейса Яндекс.Карт
+  useEffect(() => {
     if (!isYmapsLoaded || !mapInstanceRef.current) {
       return;
     }
 
-    // Очищаем предыдущий таймер
-    if (suggestDebounceTimerRef.current) {
-      clearTimeout(suggestDebounceTimerRef.current);
-    }
-
-    // Debounce для поиска
-    suggestDebounceTimerRef.current = setTimeout(async () => {
-      try {
-        const { ymaps } = window;
-        // Используем встроенный поиск Яндекс.Карт
-        const suggestView = new ymaps.SuggestView(searchValue, {
-          provider: {
-            suggest: (request: string) => {
-              return ymaps.suggest(request, {
-                results: 5,
-              });
-            },
-          },
-        });
-
-        // Получаем подсказки через геокодер
-        const geocoder = ymaps.geocode(searchValue, {
-          results: 5,
-          kind: "house",
-        });
-
-        geocoder
-          .then((res: any) => {
-            const geoObjects = res.geoObjects.toArray();
-            if (geoObjects.length > 0) {
-              const suggestionsList = geoObjects
-                .slice(0, 5)
-                .map((geo: any) => ({
-                  title: { text: geo.getAddressLine() },
-                  subtitle: { text: geo.getAddressLine() },
-                  geoObject: geo,
-                }));
-              setSuggestions(suggestionsList);
-              setShowSuggestions(true);
-            } else {
-              setSuggestions([]);
-              setShowSuggestions(false);
-            }
-          })
-          .catch(() => {
-            setSuggestions([]);
-            setShowSuggestions(false);
-          });
-      } catch (error) {
-        // Если поиск недоступен, просто скрываем подсказки
-        setSuggestions([]);
-        setShowSuggestions(false);
-      }
-    }, 300); // 300ms debounce для поиска
-
-    return () => {
-      if (suggestDebounceTimerRef.current) {
-        clearTimeout(suggestDebounceTimerRef.current);
-      }
-    };
-  }, [searchValue, isYmapsLoaded]);
-
-  // Обработка выбора из подсказок
-  const handleSuggestionSelect = useCallback(
-    async (suggestion: any) => {
-      setShowSuggestions(false);
-      const geoObject = suggestion.geoObject || suggestion;
-      const selectedText =
-        suggestion.title?.text || geoObject.getAddressLine?.() || "";
-
-      if (onSearchChange && selectedText) {
-        onSearchChange(selectedText);
-      }
-
-      if (mapInstanceRef.current && isYmapsLoaded) {
-        try {
-          const { ymaps } = window;
-          let targetGeoObject = geoObject;
-
-          // Если geoObject уже есть, используем его, иначе геокодируем
-          if (!targetGeoObject || !targetGeoObject.geometry) {
-            const geocoder = ymaps.geocode(selectedText, {
-              results: 1,
-            });
-            const res = await geocoder;
-            targetGeoObject = res.geoObjects.get(0);
-          }
-
-          if (targetGeoObject) {
-            const coords = targetGeoObject.geometry.getCoordinates();
-            const addressComponents =
-              targetGeoObject.properties.get("metaDataProperty")
-                ?.GeocoderMetaData?.Address?.Components || [];
-
-            let addressCity = "";
-            let addressStreet = "";
-            let addressHouse = "";
-
-            addressComponents.forEach((component: any) => {
-              if (component.kind === "locality" || component.kind === "area") {
-                addressCity = component.name;
-              } else if (component.kind === "street") {
-                addressStreet = component.name;
-              } else if (component.kind === "house") {
-                addressHouse = component.name;
-              }
-            });
-
-            const fullAddress = targetGeoObject.getAddressLine();
-
-            // Обновляем маркер
-            if (markerRef.current) {
-              mapInstanceRef.current.geoObjects.remove(markerRef.current);
-            }
-
-            const marker = new ymaps.Placemark(
-              coords,
-              {
-                balloonContent: fullAddress,
-              },
-              {
-                preset: "islands#darkBlueDotIcon",
-                draggable: true,
-              }
-            );
-
-            marker.events.add("dragend", async () => {
-              const markerCoords = marker.geometry.getCoordinates();
-              const reverseGeocoder = ymaps.geocode(markerCoords, {
-                results: 1,
-              });
-              reverseGeocoder.then((reverseRes: any) => {
-                const reverseGeoObject = reverseRes.geoObjects.get(0);
-                if (reverseGeoObject && onAddressSelect) {
-                  const reverseComponents =
-                    reverseGeoObject.properties.get("metaDataProperty")
-                      ?.GeocoderMetaData?.Address?.Components || [];
-
-                  let reverseCity = "";
-                  let reverseStreet = "";
-                  let reverseHouse = "";
-
-                  reverseComponents.forEach((component: any) => {
-                    if (
-                      component.kind === "locality" ||
-                      component.kind === "area"
-                    ) {
-                      reverseCity = component.name;
-                    } else if (component.kind === "street") {
-                      reverseStreet = component.name;
-                    } else if (component.kind === "house") {
-                      reverseHouse = component.name;
-                    }
-                  });
-
-                  onAddressSelect({
-                    city: reverseCity,
-                    street: reverseStreet,
-                    house: reverseHouse,
-                    fullAddress: reverseGeoObject.getAddressLine(),
-                  });
-                }
-              });
-            });
-
-            markerRef.current = marker;
-            mapInstanceRef.current.geoObjects.add(marker);
-            mapInstanceRef.current.setCenter(coords, 15);
-
-            if (onAddressSelect) {
-              onAddressSelect({
-                city: addressCity,
-                street: addressStreet,
-                house: addressHouse,
-                fullAddress: fullAddress,
-              });
-            }
-          }
-        } catch (error) {
-          console.error("Ошибка геокодирования выбранного адреса:", error);
+    // Добавляем стили для скрытия лишних элементов
+    const styleId = "yandex-maps-hide-elements";
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement("style");
+      style.id = styleId;
+      style.textContent = `
+        /* Скрываем плашки "как добраться", "доехать на такси", "создать свою карту" */
+        .ymaps-2-1-79-balloon__route,
+        .ymaps-2-1-79-balloon__taxi,
+        .ymaps-2-1-79-balloon__create-map,
+        .ymaps-2-1-79-balloon__route-link,
+        .ymaps-2-1-79-balloon__taxi-link,
+        .ymaps-2-1-79-balloon__create-map-link,
+        [class*="balloon__route"],
+        [class*="balloon__taxi"],
+        [class*="balloon__create-map"],
+        [class*="balloon__route-link"],
+        [class*="balloon__taxi-link"],
+        [class*="balloon__create-map-link"] {
+          display: none !important;
         }
-      }
-    },
-    [isYmapsLoaded, onAddressSelect, onSearchChange]
-  );
+        
+        /* Скрываем "условия использования" и другие ссылки в нижней части карты */
+        .ymaps-2-1-79-copyrights-promo,
+        .ymaps-2-1-79-copyrights,
+        .ymaps-2-1-79-copyrights__content,
+        .ymaps-2-1-79-copyrights__link,
+        .ymaps-2-1-79-copyrights__wrap,
+        [class*="copyrights-promo"],
+        [class*="copyrights"],
+        [class*="copyrights__content"],
+        [class*="copyrights__link"],
+        [class*="copyrights__wrap"],
+        a[href*="yandex.ru/maps"],
+        a[href*="yandex.com/maps"],
+        /* Скрываем "Создать свою карту" */
+        [class*="create-map"],
+        [class*="create-map-link"],
+        /* Скрываем "Открыть в Яндекс.Картах" */
+        [class*="open-in-maps"],
+        [class*="open-in-yandex"],
+        /* Скрываем все ссылки в нижней части карты */
+        .ymaps-2-1-79-ground-pane ~ div a,
+        .ymaps-2-1-79-map a[href*="maps"],
+        /* Более агрессивное скрытие всех ссылок внизу карты */
+        div[class*="ymaps"] > div[class*="copyrights"] a,
+        div[class*="ymaps"] > div[class*="copyrights"],
+        /* Скрываем все элементы в нижней панели карты */
+        .ymaps-2-1-79-map > div:last-child a,
+        .ymaps-2-1-79-map > div:last-child button,
+        /* Скрываем все ссылки и кнопки в нижней части */
+        [class*="ymaps-2-1-79"] a[href],
+        [class*="ymaps-2-1-79"] button {
+          display: none !important;
+        }
+        
+        /* Скрываем другие лишние элементы */
+        .ymaps-2-1-79-balloon__footer,
+        .ymaps-2-1-79-balloon__actions,
+        [class*="balloon__footer"],
+        [class*="balloon__actions"] {
+          display: none !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
 
-  // Закрываем подсказки при клике вне их
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        suggestionsRef.current &&
-        !suggestionsRef.current.contains(event.target as Node) &&
-        mapRef.current &&
-        !mapRef.current.contains(event.target as Node)
-      ) {
-        setShowSuggestions(false);
-      }
+    // Дополнительно скрываем элементы по тексту через JavaScript
+    const hideElementsByText = () => {
+      if (!mapRef.current) return;
+
+      const mapElement = mapRef.current;
+      const allElements = mapElement.querySelectorAll("a, button, span, div");
+
+      allElements.forEach((element) => {
+        const text = element.textContent || "";
+        if (
+          text.includes("Создать свою карту") ||
+          text.includes("Условия использования") ||
+          text.includes("Открыть в Яндекс.Картах")
+        ) {
+          (element as HTMLElement).style.display = "none";
+          (element as HTMLElement).style.visibility = "hidden";
+          (element as HTMLElement).style.opacity = "0";
+          (element as HTMLElement).style.height = "0";
+          (element as HTMLElement).style.width = "0";
+          (element as HTMLElement).style.overflow = "hidden";
+        }
+      });
     };
 
-    if (showSuggestions) {
-      document.addEventListener("mousedown", handleClickOutside);
+    // Вызываем сразу и через интервалы для надежности
+    if (mapInstanceRef.current && mapRef.current) {
+      hideElementsByText();
+
+      // Используем MutationObserver для отслеживания динамически добавляемых элементов
+      const observer = new MutationObserver(() => {
+        hideElementsByText();
+      });
+
+      observer.observe(mapRef.current, {
+        childList: true,
+        subtree: true,
+        attributes: false,
+      });
+
+      const interval = setInterval(() => {
+        hideElementsByText();
+      }, 500);
+
+      setTimeout(() => {
+        clearInterval(interval);
+        observer.disconnect();
+      }, 10000);
+
+      return () => {
+        clearInterval(interval);
+        observer.disconnect();
+      };
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      // Не удаляем стили при размонтировании, так как они могут использоваться другими компонентами
     };
-  }, [showSuggestions]);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  }, [isYmapsLoaded]);
 
   return (
     <div style={{ position: "relative", width: "100%" }}>
@@ -920,59 +804,6 @@ const Map = ({
         ref={mapRef}
         style={{ width: "100%", height: "400px", borderRadius: "3px" }}
       />
-      {showSuggestions && suggestions.length > 0 && (
-        <div
-          ref={suggestionsRef}
-          style={{
-            position: "absolute",
-            top: "-220px",
-            left: "0",
-            right: "0",
-            backgroundColor: "#fff",
-            border: "1px solid #525252",
-            borderRadius: "3px",
-            maxHeight: "200px",
-            overflowY: "auto",
-            zIndex: 1000,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-          }}
-        >
-          {suggestions.map((suggestion, index) => (
-            <div
-              key={index}
-              onClick={() => handleSuggestionSelect(suggestion)}
-              style={{
-                padding: "12px 16px",
-                cursor: "pointer",
-                borderBottom:
-                  index < suggestions.length - 1 ? "1px solid #eee" : "none",
-                transition: "background-color 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#f5f5f5";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#fff";
-              }}
-            >
-              <div style={{ fontWeight: 500, color: "#525252" }}>
-                {suggestion.title.text}
-              </div>
-              {suggestion.subtitle && (
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#999",
-                    marginTop: "4px",
-                  }}
-                >
-                  {suggestion.subtitle.text}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 };
