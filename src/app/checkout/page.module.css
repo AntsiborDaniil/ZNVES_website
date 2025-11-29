@@ -508,7 +508,7 @@
 
 .checkboxLabel {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
   font-size: 14px;
   color: #525252;
@@ -540,7 +540,7 @@
   content: "";
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 40%;
   transform: translate(-50%, -50%) rotate(45deg);
   width: 4px;
   height: 8px;
