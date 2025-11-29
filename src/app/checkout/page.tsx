@@ -231,6 +231,15 @@ const CheckoutPage = () => {
             <div className={styles.leftColumn}>
               <h1 className={styles.title}>Оформление заказа</h1>
 
+              <div className={styles.telegramSection}>
+                <button className={styles.telegramButton} type="button">
+                  Подключить Telegram
+                </button>
+                <p className={styles.telegramDescription}>
+                  Получайте уведомления о статусе заказа прямо в Telegram.
+                </p>
+              </div>
+
               <div className={styles.section}>
                 <h2 className={styles.sectionTitle}>Контактная информация</h2>
                 <div className={styles.firstInputs}>

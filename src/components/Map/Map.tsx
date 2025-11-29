@@ -158,6 +158,33 @@ const Map = ({
           suppressMapOpenBlock: true,
         });
 
+        // Закрываем все balloon'ы при клике на любые объекты карты (метро, музеи и т.д.)
+        // Используем глобальный обработчик для всех geoObjects
+        map.geoObjects.events.add("click", (e: any) => {
+          try {
+            const target = e.get("target");
+            // Если клик был на объект, который не является нашим маркером
+            if (target && target !== markerRef.current) {
+              // Закрываем balloon через небольшую задержку после открытия
+              setTimeout(() => {
+                try {
+                  if (
+                    map.balloon &&
+                    map.balloon.isOpen &&
+                    map.balloon.isOpen()
+                  ) {
+                    map.balloon.close();
+                  }
+                } catch (error) {
+                  // Игнорируем ошибки
+                }
+              }, 300);
+            }
+          } catch (error) {
+            // Игнорируем ошибки
+          }
+        });
+
         // Ждем полной загрузки карты перед добавлением обработчиков
         await new Promise<void>((resolve) => {
           const onLoad = () => {
@@ -387,6 +414,27 @@ const Map = ({
                     await reverseGeocode(markerCoords[0], markerCoords[1]);
                   });
 
+                  // Закрываем balloon при клике на маркер, если он уже открыт
+                  marker.events.add("click", () => {
+                    try {
+                      // Если balloon уже открыт, закрываем его при повторном клике
+                      setTimeout(() => {
+                        if (
+                          map.balloon &&
+                          map.balloon.isOpen &&
+                          map.balloon.isOpen()
+                        ) {
+                          map.balloon.close();
+                        }
+                      }, 100);
+                    } catch (error) {
+                      console.warn(
+                        "[Map] Ошибка при закрытии balloon маркера:",
+                        error
+                      );
+                    }
+                  });
+
                   markerRef.current = marker;
                   map.geoObjects.add(marker);
                   map.setCenter([lat, lon], 15);
@@ -458,6 +506,15 @@ const Map = ({
         // Добавляем только после полной загрузки карты
         const handleMapClick = (e: any) => {
           try {
+            // Закрываем все открытые balloon'ы при клике на карту
+            try {
+              if (map.balloon && map.balloon.isOpen && map.balloon.isOpen()) {
+                map.balloon.close();
+              }
+            } catch (balloonError) {
+              // Игнорируем ошибки закрытия balloon
+            }
+
             // Проверяем готовность перед обработкой
             if (!window.ymaps || !window.ymaps.geocode) {
               console.warn("[Map] ymaps.geocode недоступен при клике, ждем...");
@@ -486,6 +543,33 @@ const Map = ({
         };
 
         map.events.add("click", handleMapClick);
+
+        // Закрываем balloon при клике на маркер, если он уже открыт
+        const handleMarkerClick = () => {
+          if (markerRef.current) {
+            try {
+              // Если balloon уже открыт, закрываем его при повторном клике
+              const marker = markerRef.current;
+              marker.events.add("click", () => {
+                try {
+                  if (map.balloon.isOpen()) {
+                    map.balloon.close();
+                  }
+                } catch (error) {
+                  console.warn(
+                    "[Map] Ошибка при закрытии balloon маркера:",
+                    error
+                  );
+                }
+              });
+            } catch (error) {
+              console.warn(
+                "[Map] Ошибка при добавлении обработчика маркера:",
+                error
+              );
+            }
+          }
+        };
 
         mapInstanceRef.current = map;
         console.log("[Map] Карта успешно инициализирована");
@@ -625,6 +709,27 @@ const Map = ({
                       });
                     }
                   });
+                });
+
+                // Закрываем balloon при клике на маркер, если он уже открыт
+                marker.events.add("click", () => {
+                  try {
+                    setTimeout(() => {
+                      if (
+                        mapInstanceRef.current &&
+                        mapInstanceRef.current.balloon &&
+                        mapInstanceRef.current.balloon.isOpen &&
+                        mapInstanceRef.current.balloon.isOpen()
+                      ) {
+                        mapInstanceRef.current.balloon.close();
+                      }
+                    }, 100);
+                  } catch (error) {
+                    console.warn(
+                      "[Map] Ошибка при закрытии balloon маркера:",
+                      error
+                    );
+                  }
                 });
 
                 markerRef.current = marker;

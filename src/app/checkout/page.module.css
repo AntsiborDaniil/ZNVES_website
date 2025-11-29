@@ -74,6 +74,48 @@
   border-top: 1px solid #ddd9d0;
 }
 
+.telegramSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 10px;
+  align-self: flex-start;
+}
+
+.telegramButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #525252;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 23.93px;
+  letter-spacing: 0%;
+  text-decoration: underline;
+  text-decoration-style: solid;
+  text-decoration-offset: 25%;
+  text-decoration-thickness: 7%;
+  text-decoration-skip-ink: auto;
+  text-align: left;
+  font-family: inherit;
+  transition: color 0.2s ease;
+}
+
+.telegramButton:hover {
+  color: #1f1f1f;
+}
+
+.telegramDescription {
+  color: #525252;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 23.93px;
+  letter-spacing: 0%;
+  margin: 0;
+  margin-top: 0;
+}
+
 .title {
   font-weight: 400;
   font-size: 40px;
@@ -81,8 +123,6 @@
   letter-spacing: 0px;
   color: #525252;
   margin: 0;
-
-  margin-bottom: 30px;
 }
 
 .section {
@@ -1279,5 +1319,135 @@
 
   .checkoutCheckboxLabel {
     gap: 7px;
+  }
+}
+
+@media (max-width: 1440px) {
+  .main {
+    padding: 60px 185px;
+  }
+
+  .content {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .leftColumn {
+    width: 100%;
+  }
+
+  .rightPart {
+    width: 100%;
+  }
+
+  .rightColumn {
+    width: 100%;
+  }
+
+  .title {
+    font-size: 32px;
+    line-height: 28px;
+  }
+
+  .telegramButton {
+    font-size: 16px;
+    line-height: 21px;
+  }
+
+  .telegramDescription {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .sectionTitle {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  .label {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .input {
+    font-size: 14px;
+  }
+
+  .backLink {
+    font-size: 20px;
+    line-height: 26px;
+  }
+
+  .paymentTitle {
+    font-size: 20px;
+    line-height: 16px;
+  }
+
+  .radioLabel {
+    font-size: 16px;
+    line-height: 21px;
+  }
+
+  .checkboxLabel {
+    font-size: 12px;
+  }
+
+  .submitButton {
+    font-size: 16px;
+  }
+
+  .orderItemTitle {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  .orderItemPrice {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  .orderSummary {
+    font-size: 18px;
+    line-height: 22px;
+  }
+
+  .orderTotal {
+    font-size: 24px;
+    line-height: 28px;
+  }
+
+  .input::placeholder {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .summaryLabel {
+    font-size: 16px;
+    line-height: 15px;
+  }
+
+  .summaryLabelTotal {
+    font-size: 24px;
+    line-height: 15px;
+  }
+
+  .summaryValue {
+    font-size: 16px;
+    line-height: 15px;
+  }
+
+  .summaryTotal {
+    font-size: 24px;
+    line-height: 21px;
+  }
+
+  .orderItemDetailLabel {
+    font-size: 10px;
+    line-height: 11px;
+  }
+
+  .orderItemDetailValue {
+    font-size: 12px;
+    line-height: 11px;
   }
 }
