@@ -4,6 +4,14 @@
   background-color: #f2f0ec;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.footerWrapper {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
 }
 
 .mobileNav {
@@ -23,7 +31,7 @@
   flex: 0 0 auto;
   background: none;
   border: none;
-  color: #525252C9;
+  color: #525252c9;
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;
@@ -105,6 +113,7 @@
   border-radius: 28px;
   padding: 40px 48px 40px 0px;
   display: flex;
+  margin-bottom: 60px;
   flex-direction: column;
   gap: 28px;
 }
@@ -405,6 +414,12 @@
   padding: 0;
 }
 
+@media (max-width: 1620px) and (min-width: 1025px) {
+  .aside {
+    margin-right: 50px;
+  }
+}
+
 @media (max-width: 1300px) {
   .accountPage {
     margin-top: 68px;
@@ -414,6 +429,13 @@
 
   .main {
     width: 90%;
+    max-width: 100%;
+  }
+
+  .accountPage > div:last-child {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
   }
 
   .mobileNav {
@@ -422,7 +444,7 @@
   }
 
   .mobileNavItem {
-    color: #525252C9;
+    color: #525252c9;
     padding: 12px;
     font-weight: 400;
     font-size: 16px;
@@ -446,21 +468,21 @@
 }
 
 @media (max-width: 500px) {
-    .mobileNav {
-        margin-top: 20px;
-    }
+  .mobileNav {
+    margin-top: 20px;
+  }
 
-    .main {
-        width: 100%;
-    }
+  .main {
+    width: 100%;
+  }
 
-    .accountPage {
-        margin-top: 68px;
-        align-items: normal;
-        width: 100%;
-      }
+  .accountPage {
+    margin-top: 68px;
+    align-items: normal;
+    width: 100%;
+  }
 
-    .mobileNavItem {
-        padding: 0px 11px;
-    }
+  .mobileNavItem {
+    padding: 0px 11px;
+  }
 }

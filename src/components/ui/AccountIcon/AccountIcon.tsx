@@ -21,8 +21,8 @@ const AccountIcon = () => {
             <Image
                 src="/images/account.png"
                 alt="Личный кабинет"
-                width={38}
-                height={38}
+                width={30}
+                height={30}
                 className={styles.accountImage}
             />
         </button>

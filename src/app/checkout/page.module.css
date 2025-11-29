@@ -359,11 +359,30 @@
   color: #525252;
   font-family: inherit;
   transition: border-color 0.2s ease, background-color 0.2s ease;
+  cursor: default;
+}
+
+.checkoutMapSearchInput:hover {
+  border-color: #525252c2;
+  background-color: transparent;
 }
 
 .checkoutMapSearchInput:focus {
   outline: none;
-  border-color: #1f1f1f;
+  border-color: #525252c2;
+}
+
+.checkoutMapSearchInput[readonly] {
+  cursor: default;
+}
+
+.checkoutMapSearchInput[readonly]:hover {
+  border-color: #525252c2;
+  background-color: transparent;
+}
+
+.checkoutMapSearchInput[readonly]:focus {
+  border-color: #525252c2;
 }
 
 .checkoutMapSearchInput::placeholder {
@@ -1126,6 +1145,8 @@
 
   .checkoutInput {
     padding: 8px 11px;
+    font-size: 12.56px;
+    line-height: 18.83px;
   }
 
   .checkoutInput::placeholder {

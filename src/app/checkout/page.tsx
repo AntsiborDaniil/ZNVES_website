@@ -431,6 +431,7 @@ const CheckoutPage = () => {
                     onChange={(e) => {
                       handleMapSearchChange(e.target.value);
                     }}
+                    readOnly
                   />
                 </div>
                 <div className={styles.checkoutMapContainer}>

@@ -15,8 +15,8 @@ const CartIcon = () => {
                 <Image
                     src="/images/cart.png"
                     alt="Корзина"
-                    width={38}
-                    height={38}
+                    width={30}
+                    height={30}
                     className={styles.cartImage}
                 />
                 {totalItems > 0 && (

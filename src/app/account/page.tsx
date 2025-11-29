@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
 import PersonalData from "../../components/AccountPage/PersonalData/PersonalData";
 import MyAccount from "../../components/AccountPage/MyAccount/MyAccount";
 import Orders from "../../components/AccountPage/Orders/Orders";
@@ -87,6 +88,9 @@ const AccountPage = () => {
           {activeTab === "orders" && <Orders />}
         </article>
       </main>
+      <div className={styles.footerWrapper}>
+        <Footer />
+      </div>
     </div>
   );
 };
