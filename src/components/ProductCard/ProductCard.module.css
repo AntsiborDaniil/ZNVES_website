@@ -103,6 +103,18 @@
   color: #1f1f1f;
 }
 
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .productTitle {
+    font-size: 25px;
+    line-height: 26.87px;
+  }
+
+  .productPrice {
+    font-size: 21px;
+    line-height: 26.87px;
+  }
+}
+
 .addToCartButton {
   margin-top: 12px;
   background-color: #525252;

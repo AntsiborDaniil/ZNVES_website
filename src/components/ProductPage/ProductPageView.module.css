@@ -1,134 +1,132 @@
 .page {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background-color: #f2f0ec;
-    color: #2c2c2c;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f2f0ec;
+  color: #2c2c2c;
 }
 
 .main {
-    display: flex;
-    width: 100%;
-    padding: 190px 96px 120px;
+  display: flex;
+  width: 100%;
+  padding: 142.615px 360px 120px 360px;
 }
 
 .content {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
+  display: flex;
+  width: 100%;
+  gap: 40px;
+  justify-content: space-between;
 }
 
 .gallery {
-    display: flex;
-    gap: 32px;
-    position: relative;
-    overscroll-behavior: contain;
-    max-width: 800px;
+  display: flex;
+  gap: 32px;
+  position: relative;
+  overscroll-behavior: contain;
+  max-width: 800px;
 }
 
 .imageViewport {
-    flex: 1;
-    background: transparent;
-    border-radius: 12px;
-    overflow: hidden;
-    max-height: 85vh;
-    position: relative;
+  flex: 1;
+  background: transparent;
+  border-radius: 12px;
+  overflow: visible;
+  position: relative;
 }
 
 .imageSlider {
-    height: 100%;
-    width: 100%;
+  display: none;
 }
 
-.imageSlider :global(.swiper-wrapper) {
-    height: auto;
-}
-
-.imageSlider :global(.swiper-slide) {
-    display: flex;
-    height: auto;
-}
-
-.slideWrapper {
-    height: auto !important;
+.imageColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  width: 100%;
 }
 
 .imageSlide {
-    position: relative;
-    flex: 1;
-    width: 100%;
-    display: flex;
-    justify-content: center;
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .imageSlideInner {
-    width: 100%;
-    border-radius: 18px;
-    overflow: hidden;
+  width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
 }
 
 .mainImage {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 
-    margin-right: 40px;
+  margin-right: 40px;
 }
 
 .info {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    top: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky;
+  top: 142.615px;
+  align-self: flex-start;
+  max-width: 560px;
 }
 
+/* Высота header: 20px (верхний padding) + 59.615px (высота логотипа) + 20px (нижний padding) = 99.615px */
+/* Расстояние 43px от нижнего края header: 99.615px + 43px = 142.615px */
+
 .breadcrumbs {
-    font-size: 14px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: #6f6f6f;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6f6f6f;
 }
 
 .titleRow {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
-    color: #525252;
+  color: #525252;
 
-    font-weight: 400;
-    font-size: 48px;
-    line-height: 35.9px;
-    letter-spacing: 0px;
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 35.9px;
+  letter-spacing: 0px;
 
-    text-transform: uppercase;
+  text-transform: uppercase;
 }
 
 .price {
-    color: #525252;
+  color: #525252;
 
-    font-weight: 500;
-    font-size: 28.33px;
+  font-weight: 500;
+  font-size: 28.33px;
 
-    line-height: 33.9px;
-    letter-spacing: 0px;
+  line-height: 33.9px;
+  letter-spacing: 0px;
 
-    margin-top: 32px;
-    margin-bottom: 89px;
+  margin-top: 32px;
+  margin-bottom: 89px;
 }
 
 .variantGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: transparent;
 }
 
 .variantRow {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .variantGroup button,
@@ -137,646 +135,1078 @@
 .quantityControl,
 .addToCartButton,
 .sizeWeb,
-.colorSelectWrapper::before {
-    transition: all 0.25s ease;
+.colorPickerButton {
+  transition: all 0.25s ease;
 }
 
 .variantRowCompact {
-    align-items: flex-start;
-    gap: 12px;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .variantRowCompact:last-of-type {
-    margin-bottom: 12px;
+  margin-bottom: 12px;
 }
 
 .label {
-    font-size: 16px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #6f6f6f;
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6f6f6f;
 }
 
 .select {
-    appearance: none;
-    border: 1px solid #d4d1cb;
-    padding: 14px 16px;
-    border-radius: 12px;
-    background-color: #f2f0ec;
-    font-size: 16px;
-    color: #2c2c2c;
-    background-image: url("data:image/svg+xml,%3Csvg width='14' height='9' viewBox='0 0 14 9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23525252' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-    background-size: 14px 9px;
+  appearance: none;
+  border: 1px solid #d4d1cb;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background-color: #f2f0ec;
+  font-size: 16px;
+  color: #2c2c2c;
+  background-image: url("data:image/svg+xml,%3Csvg width='14' height='9' viewBox='0 0 14 9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23525252' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 14px 9px;
 }
 
 .sizeSelect {
-    width: 192px;
-    padding: 10px 12px;
-    border: none;
-    border-bottom: 1px solid #d4d1cb;
-    border-radius: 0;
-    background-color: transparent;
-    font-size: 18px;
-    line-height: 24px;
-    color: #525252;
-    transition: border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+  width: 192px;
+  padding: 10px 12px;
+  border: none;
+  border-bottom: 1px solid #d4d1cb;
+  border-radius: 0;
+  background-color: transparent;
+  font-size: 18px;
+  line-height: 24px;
+  color: #525252;
+  transition: border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .sizeSelect:focus {
-    outline: none;
-    border-bottom-color: #2c2c2c;
-    color: #2c2c2c;
+  outline: none;
+  border-bottom-color: #2c2c2c;
+  color: #2c2c2c;
 }
 
 .sizeSelect:hover {
-    border-bottom-color: rgba(82, 82, 82, 0.6);
+  border-bottom-color: rgba(82, 82, 82, 0.6);
 }
 
 .sizeSelect option {
-    font-size: 16px;
-    font-family: inherit;
-    color: #525252;
-    background-color: #f6f2ec;
+  font-size: 16px;
+  font-family: inherit;
+  color: #525252;
+  background-color: #f6f2ec;
 }
 
 .sizeSelect option:checked {
-    background-color: rgba(82, 82, 82, 0.1);
-    color: #2c2c2c;
+  background-color: rgba(82, 82, 82, 0.1);
+  color: #2c2c2c;
 }
 
 .sizeSelect option:hover {
-    background-color: rgba(82, 82, 82, 0.15);
+  background-color: rgba(82, 82, 82, 0.15);
 }
 
-.colorSelectWrapper {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
+.colorPickerWrapper {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
 }
 
-.colorSelectWrapper::before {
-    content: "";
-    position: absolute;
-    left: 14px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background-color: var(--color-dot, #d1cdcb);
-    border: 1px solid #ffffff80;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+.colorPickerButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 216px;
+  padding: 8px 16px;
+  border: 1px solid #525252;
+  border-radius: 3px;
+  background-color: #ffffff;
+  font-size: 19.2px;
+  line-height: 24px;
+  color: #525252;
+  cursor: pointer;
+  transition: border-color 0.25s ease;
+  text-align: left;
+  font-family: inherit;
+  text-wrap: nowrap;
 }
 
-.colorSelect {
-    width: 216px;
-    padding: 8px 38px 8px 44px;
-    border: 1.37px solid #525252;
-    border-radius: 3px;
-    background-color: #f9f6f1;
-    font-size: 18px;
-    line-height: 24px;
-    color: #525252;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+.colorPickerButton:hover {
+  border-color: #2c2c2c;
 }
 
-.colorSelect:focus {
-    outline: none;
-    border-color: #2c2c2c;
-    box-shadow: 0 8px 14px rgba(82, 82, 82, 0.14);
+.colorPickerButton:focus {
+  outline: none;
+  border-color: #2c2c2c;
 }
 
-.colorSelect:hover {
-    border-color: #2c2c2c;
+.colorPickerButtonDot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--color-dot, #d1cdcb);
+  border: 1px solid #ffffff80;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
 }
 
-.colorSelect option {
-    padding: 10px 16px;
-    font-size: 16px;
-    font-family: inherit;
-    color: #525252;
-    background-color: #f6f2ec;
+.colorPickerWrapperWhite .colorPickerButtonDot {
+  border: 1px solid #d4d1cb;
 }
 
-.colorSelect option:checked {
-    background-color: rgba(82, 82, 82, 0.12);
-    color: #2c2c2c;
+.colorPickerButtonText {
+  flex: 1;
 }
 
-.colorSelect option:hover {
-    background-color: rgba(82, 82, 82, 0.18);
+.colorPickerArrow {
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.colorPickerWrapperOpen .colorPickerArrow {
+  transform: rotate(180deg);
+}
+
+.colorList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  border: 1px solid #525252;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+  z-index: 10;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.colorListItem {
+  margin: 0;
+  padding: 0;
+}
+
+.colorListItemButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background-color: #ffffff;
+  font-size: 16px;
+  line-height: 24px;
+  color: #6f6f6f;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+  text-align: left;
+  font-family: inherit;
+}
+
+.colorListItemButton:hover {
+  background-color: #52525238;
+}
+
+.colorListItemButtonSelected {
+  background-color: #52525238 !important;
+}
+
+.colorListItemDot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.colorListItemLabel {
+  flex: 1;
+  color: #6f6f6f;
+}
+
+.sizePickerWrapper {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.sizePickerButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 192px;
+  padding: 8px 16px;
+  border: none;
+  border-bottom: 1px solid #d4d1cb;
+  border-radius: 0;
+  background-color: transparent;
+  font-size: 18px;
+  line-height: 24px;
+  color: #525252;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease;
+  text-align: left;
+  font-family: inherit;
+  text-wrap: nowrap;
+}
+
+.sizePickerButton:hover {
+  border-bottom-color: rgba(82, 82, 82, 0.6);
+  color: #2c2c2c;
+}
+
+.sizePickerButton:focus {
+  outline: none;
+  border-bottom-color: #2c2c2c;
+  color: #2c2c2c;
+}
+
+.sizePickerButtonText {
+  flex: 1;
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 29.76px;
+  letter-spacing: 0%;
+  vertical-align: middle;
+}
+
+.sizePickerArrow {
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.sizePickerWrapperOpen .sizePickerArrow {
+  transform: rotate(180deg);
+}
+
+.sizeList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  border: 1px solid #525252;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+  z-index: 10;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  min-width: 192px;
+}
+
+.sizeListItem {
+  margin: 0;
+  padding: 0;
+}
+
+.sizeListItemButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 16px;
+  border: none;
+  background-color: #ffffff;
+  font-size: 16px;
+  line-height: 24px;
+  color: #6f6f6f;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+  text-align: left;
+  font-family: inherit;
+}
+
+.sizeListItemButton:hover {
+  background-color: #52525238;
+}
+
+.sizeListItemButtonSelected {
+  background-color: #52525238 !important;
+}
+
+.sizeListItemCheckmark {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.sizeListItemPlaceholder {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.sizeListItemLabel {
+  flex: 1;
+  color: #6f6f6f;
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 29.76px;
+  letter-spacing: 0%;
+  vertical-align: middle;
 }
 
 .countAndBuy {
-    display: flex;
-    gap: 16px;
-    align-items: center;
+  display: flex;
+  gap: 16px;
+  align-items: center;
 
-    margin-top: 26px;
+  margin-top: 26px;
 }
 
 .sizeWeb {
-    margin-top: 6px;
-    padding: 0;
-    border: none;
-    background: none;
-    font-size: 15px;
-    line-height: 15px;
-    letter-spacing: 0.02em;
-    text-underline-offset: 4px;
-    color: rgba(82, 82, 82, 0.48);
-    cursor: pointer;
-    transition: color 0.25s ease;
-    text-decoration: underline;
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 15px;
+  line-height: 15px;
+  letter-spacing: 0.02em;
+  text-underline-offset: 4px;
+  color: #525252;
+  cursor: pointer;
+  transition: color 0.25s ease;
+  text-decoration: underline;
 }
 
 .sizeWeb:hover {
-    color: #2c2c2c;
+  color: #2c2c2c;
 }
 
 .sizeGuideContent {
-    margin-top: 18px;
-    padding: 22px 26px;
-    border: 1px solid #dcd8d2;
-    border-radius: 16px;
-    background-color: #f9f7f2;
-    color: #525252;
+  margin-top: 18px;
+  padding: 22px 26px;
+  border: 1px solid #dcd8d2;
+  border-radius: 16px;
+  background-color: #f9f7f2;
+  color: #525252;
 }
 
 .sizeGuideTitle {
-    font-size: 14px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
 }
 
 .sizeGuideText {
-    font-size: 14px;
-    line-height: 1.6;
-    margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
 }
 
 .quantityRow {
-    display: flex;
-    align-items: center;
-    background-color: #f8f8f8;
-    border: 1.5px solid #525252;
+  display: flex;
+  align-items: center;
+  background-color: #f8f8f8;
+  border: 1.5px solid #525252;
 
-    gap: 16px;
+  gap: 16px;
 }
 
 .quantityControl {
-    background-color: transparent;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    width: 48px;
-    height: 48px;
-    font-size: 22px;
-    cursor: pointer;
-    transition: background-color 0.25s ease, color 0.25s ease,
-        transform 0.25s ease;
+  background-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  width: 48px;
+  height: 48px;
+  font-size: 22px;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease,
+    transform 0.25s ease;
 }
 
 .quantityControl:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .quantityControl:hover {
-    background-color: #9f9f9f;
-    color: #f2f0ec;
+  background-color: #9f9f9f;
+  color: #f2f0ec;
 }
 
 .quantityValue {
-    font-size: 20px;
-    min-width: 24px;
-    text-align: center;
+  font-size: 20px;
+  min-width: 24px;
+  text-align: center;
 }
 
 .addToCartButton {
-    border: 1px solid #525252;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  border: 1px solid #525252;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    width: 100%;
-    border-radius: 3px;
-    padding: 16px 220px;
+  width: 100%;
+  border-radius: 3px;
+  padding: 16px 220px;
 
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 100%;
-    letter-spacing: 0%;
-    text-align: center;
-    vertical-align: middle;
-    text-wrap: nowrap;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  text-align: center;
+  vertical-align: middle;
+  text-wrap: nowrap;
 
-    background-color: #525252;
-    color: #f2f0ec;
-    cursor: pointer;
-    transition: background-color 0.25s ease, color 0.25s ease,
-        border-color 0.25s ease;
+  background-color: #525252;
+  color: #f2f0ec;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .addToCartButton:hover {
-    background-color: transparent;
-    color: #525252;
-    border-color: #525252;
+  background-color: transparent;
+  color: #525252;
+  border-color: #525252;
 }
 
 .accordion {
-    display: flex;
-    flex-direction: column;
-    border-top: 0.8px solid #525252;
-    border-bottom: 0.8px solid #525252;
+  display: flex;
+  flex-direction: column;
+  border-top: 0.8px solid #525252;
+  border-bottom: 0.8px solid #525252;
 }
 
 .accordionItem {
-    border-bottom: 0.8px solid #525252;
-    background-color: transparent;
+  border-bottom: 0.8px solid #525252;
+  background-color: transparent;
 }
 
 .accordionItem:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .accordionButton {
-    width: 100%;
-    background: none;
-    border: none;
-    padding: 14px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 14px 10px 14px 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-    cursor: pointer;
-    color: #525252;
-    transition: color 0.25s ease, background-color 0.25s ease;
+  cursor: pointer;
+  color: #525252;
+  transition: color 0.25s ease, background-color 0.25s ease;
 
-    font-weight: 400;
-    font-size: 18.58px;
-    line-height: 14.95px;
-    letter-spacing: 0px;
+  font-weight: 400;
+  font-size: 18.58px;
+  line-height: 14.95px;
+  letter-spacing: 0px;
 }
 
 .accordionButton:hover,
 .accordionButton:focus-visible {
-    color: #000000;
+  color: #000000;
 }
 
 .accordionButtonSelected {
-    color: #2c2c2c;
+  color: #2c2c2c;
 }
 
 .accordionButtonOpen {
-    color: #000000;
+  color: #000000;
 }
 
 .accordionIcon {
-    width: 36px;
-    height: 36px;
-    object-fit: contain;
-    transform: rotate(0deg);
-    transition: transform 0.2s ease;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  transform: rotate(0deg);
+  transition: transform 0.2s ease;
 }
 
 .accordionButtonOpen .accordionIcon {
-    transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 .accordionContent {
-    overflow: hidden;
-    opacity: 0;
-    pointer-events: none;
-    transition: max-height 0.35s ease, opacity 0.25s ease;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: max-height 0.35s ease, opacity 0.25s ease;
 }
 
 .accordionContentOpen {
-    opacity: 1;
-    pointer-events: auto;
+  opacity: 1;
+  pointer-events: auto;
 
-    color: #525252;
+  color: #525252;
 
-    font-weight: 400;
-    font-size: 18.5px;
-    line-height: 112.99999999999999%;
-    margin-bottom: 43px;
-    letter-spacing: 0px;
+  font-weight: 400;
+  font-size: 18.5px;
+  line-height: 112.99999999999999%;
+  margin-bottom: 43px;
+  letter-spacing: 0px;
 }
 
 .accordionContentInner {
-    padding: 0 0 18px;
-    font-size: 16px;
+  padding: 0 0 18px;
+  font-size: 16px;
 }
 
 .sku {
-    font-size: 14px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #8a8a8a;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a8a8a;
 }
 
 .suggestions {
-    padding: 0 40px 120px;
-    background-color: #f2f0ec;
+  padding: 0 40px 120px;
+  background-color: #f2f0ec;
 }
 
-@media (max-width: 1200px) {
-    .main {
-        padding: 56px 32px 96px;
-    }
-
-    .content {
-        flex-direction: column;
-        gap: 48px;
-        align-items: stretch;
-    }
-
-    .gallery {
-        width: 100%;
-        flex-direction: column;
-        max-width: 100%;
-    }
-
-    .imageViewport {
-        height: clamp(420px, 70vh, 720px);
-        padding: 24px 14px;
-        width: 100%;
-    }
-
-    .info {
-        width: 100%;
-        position: static;
-        max-width: none;
-        top: 0;
-    }
-
-    .mainImage {
-        margin-right: 0;
-    }
+@media (max-width: 1919px) {
+  .main {
+    padding-top: 142.615px;
+    padding-right: 140px;
+    padding-bottom: 120px;
+    padding-left: 140px;
+  }
 }
 
-@media (max-width: 768px) {
-    .main {
-        padding: 40px 20px 72px;
-    }
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .content {
+    flex-direction: row;
+    justify-content: center;
+    gap: 40px;
+  }
 
-    .content {
-        flex-direction: column;
-        align-items: stretch;
-    }
+  .gallery {
+    flex: 0 1 auto;
+    max-width: min(600px, calc(48vw - 240px));
+    min-width: 400px;
+  }
 
-    .gallery {
-        flex-direction: column;
-        width: 100%;
-        max-width: 100%;
-    }
+  .imageViewport {
+    max-width: 100%;
+  }
 
-    .imageViewport {
-        max-height: none;
-        padding: 60px 12px 20px 12px;
-        width: 100%;
-    }
+  .info {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: calc(50vw - 240px);
+    position: sticky;
+    top: 142.615px;
+    align-self: flex-start;
+  }
 
-    .imageSlider {
-        height: 710px;
-    }
+  .title {
+    font-size: 30px;
+    line-height: 35.9px;
+  }
 
-    .info {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-    }
+  .price {
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 35.9px;
+    margin-top: 20px;
+  }
 
-    .titleRow {
-        flex-direction: column;
-        width: 100%;
-    }
+  .sizePickerButton {
+    width: 283.71429443359375px;
+  }
 
-    .title {
-        font-size: 36px;
-        width: 100%;
-    }
+  .accordionButton {
+    font-size: 17.58px;
+    line-height: 14.95px;
+  }
 
-    .price {
-        font-size: 26px;
-        width: 100%;
-    }
+  .sizePickerButton,
+  .colorPickerButton {
+    font-size: 18px;
+    line-height: 24px;
+  }
 
-    .variantGroup {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-    }
+  .addToCartButton {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 16px;
+    max-width: 100%;
+  }
 
-    .variantRow {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        width: 100%;
-    }
+  .countAndBuy {
+    width: 100%;
+  }
 
-    .variantRowCompact {
-        flex-direction: column;
-        width: 100%;
-    }
+  .variantGroup {
+    width: 100%;
+  }
 
-    .sizeSelect,
-    .colorSelect {
-        width: 100%;
-    }
+  .variantRow {
+    width: 100%;
+  }
+}
 
-    .colorSelectWrapper {
-        width: 100%;
-    }
+/* @media (max-width: 1023px) {
+  .main {
+    padding: 179px 140px 120px 140px;
+  }
 
-    .colorSelectWrapper::before {
-        left: 16px;
-    }
+  .content {
+    gap: 48px;
+    align-items: stretch;
+  }
 
-    .select {
-        width: 100%;
-    }
+  .gallery {
+    width: 100%;
+    flex-direction: column;
+    max-width: 100%;
+  }
 
-    .countAndBuy {
-        width: 100%;
-        flex-direction: column;
-    }
+  .imageViewport {
+    padding: 24px 14px;
+    width: 100%;
+  }
 
-    .addToCartButton {
-        width: 100%;
-        padding: 16px;
-    }
+  .info {
+    width: 100%;
+    position: static;
+    max-width: none;
+    top: 0;
+  }
 
-    .accordion {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-    }
+  .mainImage {
+    margin-right: 0;
+  }
 
-    .mainImage {
-        margin-right: 0;
-    }
+  .title {
+    font-size: 30px;
+  }
 
-    .suggestions {
-        padding: 0 24px 80px;
-    }
+  .price {
+    margin-top: 20px;
+  }
+} */
+
+@media (max-width: 1023px) {
+  .main {
+    padding: 103px 16px 72px 16px;
+  }
+
+  .content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .gallery {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .imageViewport {
+    max-height: none;
+    padding: 60px 12px 20px 12px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .imageColumn {
+    display: none;
+  }
+
+  .imageSlider {
+    width: 100%;
+    height: auto;
+  }
+
+  .imageSlider :global(.swiper-wrapper) {
+    display: flex;
+    align-items: center;
+  }
+
+  .imageSlider :global(.swiper-slide) {
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .imageSlider :global(.swiper-pagination-bullet) {
+    background-color: #525252;
+    opacity: 0.5;
+  }
+
+  .imageSlider :global(.swiper-pagination-bullet-active) {
+    opacity: 1;
+  }
+
+  .imageSlider {
+    display: block;
+  }
+
+  .info {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .titleRow {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .title {
+    font-size: 36px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .price {
+    font-size: 26px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .variantGroup {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .variantRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .variantRowCompact {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .countAndBuy {
+    width: 100%;
+    max-width: 100%;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  .addToCartButton {
+    width: 100%;
+    max-width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+
+  .sizePickerWrapper {
+    width: 350px;
+  }
+
+  .sizePickerButton {
+    width: 350px;
+  }
+
+  .colorPickerWrapper {
+    width: 251px;
+  }
+
+  .colorPickerButton {
+    width: 251px;
+  }
+
+  .select {
+    width: 100%;
+  }
+
+  .countAndBuy {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .addToCartButton {
+    width: 100%;
+    padding: 16px;
+  }
+
+  .accordion {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mainImage {
+    margin-right: 0;
+  }
+
+  .suggestions {
+    padding: 0 24px 80px;
+  }
 }
 
 @media (max-width: 480px) {
-    .main {
-        padding: 32px 16px 56px;
-    }
-    
-    .mainImage {
-        width: 100%;
-        height: 350px;
-    }
+  .main {
+    padding: 0px 16px 56px;
+  }
 
-    .imageSlider {
-        height: 525px;
-    }
+  .mainImage {
+    width: 100%;
+    height: 350px;
+  }
 
-    .content {
-        flex-direction: column;
-        gap: 32px;
-        align-items: stretch;
-    }
+  .imageSlider {
+    height: 525px;
+  }
 
-    .gallery {
-        flex-direction: column;
-        width: 100%;
-    }
+  .content {
+    flex-direction: column;
+    gap: 32px;
+    align-items: stretch;
+  }
 
-    .imageViewport {
-        width: 100%;
-    }
+  .gallery {
+    flex-direction: column;
+    width: 100%;
+  }
 
-    .info {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-    }
+  .imageViewport {
+    width: 100%;
+  }
 
-    .titleRow {
-        flex-direction: column;
-        width: 100%;
-    }
+  .info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 
-    .variantGroup {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-    }
+  .titleRow {
+    flex-direction: column;
+    width: 100%;
+  }
 
-    .variantRow {
-        flex-direction: column;
-        width: 100%;
-    }
+  .variantGroup {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
 
-    .variantRowCompact {
-        flex-direction: column;
-        width: 100%;
-    }
+  .variantRow {
+    flex-direction: column;
+    width: 100%;
+  }
 
-    .sizeWeb {
-        font-size: 13px;
-    }
+  .variantRowCompact {
+    flex-direction: column;
+    width: 100%;
+  }
 
-    .colorSelectWrapper {
-        width: 100%;
-    }
+  .sizeWeb {
+    font-size: 13px;
+  }
 
-    .colorSelectWrapper::before {
-        left: 18px;
-    }
+  .colorPickerWrapper {
+    width: auto;
+  }
 
-    .title {
-        font-size: 30px;
-        width: 100%;
-    }
+  .colorPickerButton {
+    width: fit-content;
+    min-width: fit-content;
+  }
 
-    .price {
-        font-size: 24px;
-        width: 100%;
-    }
+  .sizePickerButton {
+    width: 230px;
+  }
 
-    .addToCartButton {
-        font-size: 16px;
-        width: 100%;
-        padding: 16px;
-    }
+  .title {
+    font-size: 30px;
+    width: 100%;
+  }
 
-    .countAndBuy {
-        width: 100%;
-        flex-direction: column;
-    }
+  .price {
+    font-size: 24px;
+    width: 100%;
+    margin-top: 4px;
+    margin-bottom: 22px;
+  }
 
-    .accordion {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-    }
+  .addToCartButton {
+    font-size: 16px;
+    width: 100%;
+    padding: 16px;
+  }
 
-    .suggestions {
-        padding: 0 20px 64px;
-    }
+  .countAndBuy {
+    width: 100%;
+    flex-direction: column;
+    margin-top: 0px;
+    margin-bottom: 49px;
+  }
+
+  .accordion {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .accordionButton {
+    padding: 6.2px 9px 6.2px 0px;
+    font-size: 16px;
+    line-height: 22.75px;
+  }
+
+  .accordionIcon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .accordionContentInner {
+    font-size: 13px;
+    line-height: 15.2px;
+  }
+
+  .suggestions {
+    padding: 0 2px 64px 2px;
+  }
+
+  .title,
+  .price {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  .label {
+    font-size: 13px;
+    line-height: 14.53px;
+  }
+
+  .sizeButtonText {
+    font-size: 12.85px;
+    line-height: 19.92px;
+  }
+
+  .sizePickerArrow,
+  .colorPickerArrow {
+    width: 17px;
+    height: 7px;
+  }
+
+  .colorPickerButton {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
 }
 
 @media (min-width: 1440px) and (max-width: 1919px) {
-    .content {
-        flex-direction: row;
-        justify-content: space-between;
-    }
+  .content {
+    flex-direction: row;
+    justify-content: center;
+    gap: 40px;
+  }
 
-    .gallery {
-        flex-direction: row;
-        max-width: 800px;
-    }
+  .gallery {
+    flex-direction: row;
+    max-width: 800px;
+  }
 
-    .info {
-        width: 560px;
-        height: 844px;
-        display: flex;
-        flex-direction: column;
-    }
+  .info {
+    width: 560px;
+    display: flex;
+    flex-direction: column;
+  }
 
-    .title {
-        font-size: 30px;
-    }
+  .title {
+    font-size: 30px;
+  }
 
-    .price {
-        font-size: 30px;
-    }
+  .price {
+    font-size: 30px;
+  }
 
-    .label {
-        font-size: 18.44px;
-    }
+  .label {
+    font-size: 18.44px;
+  }
 
-    .colorSelect {
-        width: 181px;
-    }
+  .colorPickerWrapper {
+    width: 181px;
+  }
 
-    .sizeSelect {
-        width: 253.71429443359375px;
-    }
+  .sizePickerWrapper {
+    width: 253.71429443359375px;
+  }
 
-    .mainImage {
-        width: 600px;
-        margin-right: 40px;
-    }
+  .sizePickerButton {
+    width: 253.71429443359375px;
+  }
 
-    .sizeWeb {
-        font-size: 15px;
-    }
+  .mainImage {
+    width: 600px;
+    margin-right: 40px;
+  }
 
-    .accordionContentInner {
-        font-size: 17.58px;
-    }
+  .sizeWeb {
+    font-size: 15px;
+  }
 
-    .suggestions {
-        margin-top: 300px;
-    }
+  .accordionContentInner {
+    font-size: 17.58px;
+  }
+
+  .suggestions {
+    margin-top: 300px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .main {
+    padding-top: 142.615px;
+  }
+
+  .info {
+    top: 142.615px;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .main {
+    padding: 103px 120px 72px 120px;
+  }
+
+  .accordionButton {
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+
+  .imageColumn {
+    margin-top: 43px;
+  }
+
+  .content {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 40px;
+    align-items: flex-start;
+  }
+
+  .gallery {
+    align-self: flex-start;
+  }
+
+  .info {
+    width: 100%;
+    max-width: 100%;
+    flex: 1 1 auto;
+    align-self: flex-start;
+  }
 }
