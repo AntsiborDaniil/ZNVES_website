@@ -13,11 +13,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ProductCard from "../ProductCard/ProductCard";
 import styles from "./ProductDisplaySection.module.css";
-import {
-  catalogProducts as catalogProductsData,
-  newInProducts as newInProductsData,
-  toCatalogProduct,
-} from "../../data/products";
 import type { CatalogProduct } from "../../types/products";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode } from "swiper/modules";
@@ -25,6 +20,7 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import type { Swiper as SwiperInstance } from "swiper";
 import { useWindowSize } from "../../hooks/useWindowSize";
+import { useCatalogProducts } from "../../hooks/useCatalogProducts";
 
 type ActiveArrow = "prev" | "next" | null;
 
@@ -33,12 +29,6 @@ type ProductDisplaySectionProps = {
   showShopNow: boolean;
   id?: string;
 };
-
-const homepageNewInProducts: CatalogProduct[] =
-  newInProductsData.map(toCatalogProduct);
-
-const homepageCatalogProducts: CatalogProduct[] =
-  catalogProductsData.map(toCatalogProduct);
 
 const ProductDisplaySection = ({
   title,
@@ -56,6 +46,14 @@ const ProductDisplaySection = ({
   const hasPrefetchedProductsRef = useRef(false);
   const hasPrefetchedShopNowRef = useRef(false);
   const { width } = useWindowSize();
+
+  // Загружаем данные из API
+  const isNewIn = title === "NEW IN";
+  // Для CATALOG получаем все товары (без фильтрации по is_new)
+  // Для NEW IN получаем только новые товары
+  const { data: products = [] } = useCatalogProducts(
+    isNewIn ? { is_new: true } : undefined
+  );
 
   useEffect(() => {
     if (width === 0) return;
@@ -79,9 +77,10 @@ const ProductDisplaySection = ({
     }
   }, [width]);
 
-  const products = useMemo<CatalogProduct[]>(() => {
-    return title === "NEW IN" ? homepageNewInProducts : homepageCatalogProducts;
-  }, [title]);
+  // Используем данные из API, ограничиваем количество для главной страницы
+  const displayedProducts = useMemo<CatalogProduct[]>(() => {
+    return products.slice(0, 12); // Показываем максимум 12 товаров на главной
+  }, [products]);
 
   const handlePrev = () => {
     if (!isBeginning && swiperRef.current) {
@@ -97,7 +96,7 @@ const ProductDisplaySection = ({
     }
   };
 
-  const canNavigate = products.length > maxVisible;
+  const canNavigate = displayedProducts.length > maxVisible;
 
   const shopNowHref =
     title === "NEW IN"
@@ -134,17 +133,17 @@ const ProductDisplaySection = ({
       return;
     }
 
-    const prefetchCount = Math.min(products.length, 6);
-    const routesToPrefetch = products
+    const prefetchCount = Math.min(displayedProducts.length, 6);
+    const routesToPrefetch = displayedProducts
       .slice(0, prefetchCount)
-      .map((product) => `/catalog/${product.id}`);
+      .map((product) => `/catalog/${product.slug || product.id}`);
 
     routesToPrefetch.forEach((route) => {
       void router.prefetch(route);
     });
 
     hasPrefetchedProductsRef.current = true;
-  }, [products, router]);
+  }, [displayedProducts, router]);
 
   useEffect(() => {
     if (hasPrefetchedShopNowRef.current || !showShopNow) {
@@ -230,58 +229,59 @@ const ProductDisplaySection = ({
         </div>
       </div>
       <div className={styles.sliderContainer}>
-        {createElement(
-          Swiper as any,
-          {
-            className: styles.slider,
-            modules: [FreeMode],
-            freeMode: {
-              enabled: true,
-              momentum: true,
-              momentumRatio: 0.35,
-              minimumVelocity: 0.08,
-              sticky: false,
+        {displayedProducts.length > 0 &&
+          createElement(
+            Swiper as any,
+            {
+              className: styles.slider,
+              modules: [FreeMode],
+              freeMode: {
+                enabled: true,
+                momentum: true,
+                momentumRatio: 0.35,
+                minimumVelocity: 0.08,
+                sticky: false,
+              },
+              resistance: true,
+              resistanceRatio: 0.85,
+              spaceBetween,
+              slidesPerView: maxVisible,
+              slidesPerGroup: 1,
+              loop: false,
+              centeredSlides: isMobile,
+              speed: 600,
+              watchSlidesProgress: true,
+              watchOverflow: true,
+              onSwiper: handleSwiper,
+              onSlideChange: handleSlideChange,
+              onBeforeInit: handleBeforeInit,
+              lazy: {
+                enabled: true,
+                loadOnTransitionStart: false,
+                loadPrevNext: true,
+                loadPrevNextAmount: 2,
+              },
             },
-            resistance: true,
-            resistanceRatio: 0.85,
-            spaceBetween,
-            slidesPerView: maxVisible,
-            slidesPerGroup: 1,
-            loop: false,
-            centeredSlides: isMobile,
-            speed: 600,
-            watchSlidesProgress: true,
-            watchOverflow: true,
-            onSwiper: handleSwiper,
-            onSlideChange: handleSlideChange,
-            onBeforeInit: handleBeforeInit,
-            lazy: {
-              enabled: true,
-              loadOnTransitionStart: false,
-              loadPrevNext: true,
-              loadPrevNextAmount: 2,
-            },
-          },
-          products.map((product) => (
-            <SwiperSlide key={product.id} className={styles.slideItem}>
-              <Link
-                href={`/catalog/${product.id}`}
-                className={styles.slideLink}
-                aria-label={`Перейти к товару ${product.title}`}
-              >
-                <ProductCard
-                  title={product.title}
-                  price={product.price}
-                  images={product.images}
-                  isNew={product.isNew}
-                  productId={product.id}
-                  showAddToCart={false}
-                  isSliderCard={true}
-                />
-              </Link>
-            </SwiperSlide>
-          ))
-        )}
+            displayedProducts.map((product) => (
+              <SwiperSlide key={product.id} className={styles.slideItem}>
+                <Link
+                  href={`/catalog/${product.slug || product.id}`}
+                  className={styles.slideLink}
+                  aria-label={`Перейти к товару ${product.title}`}
+                >
+                  <ProductCard
+                    title={product.title}
+                    price={product.price}
+                    images={product.images}
+                    isNew={product.isNew}
+                    productId={product.id}
+                    showAddToCart={false}
+                    isSliderCard={true}
+                  />
+                </Link>
+              </SwiperSlide>
+            ))
+          )}
       </div>
       {canNavigate && (
         <div className={styles.arrowsBottom}>

@@ -1,8 +1,14 @@
+"use client";
+
 import CatalogPage from "../../components/CatalogPage/CatalogPage";
-import { newInProducts as newInProductsData } from "../../data/products";
+import { useCatalogProducts } from "../../hooks/useCatalogProducts";
 
 const NewIn = () => {
-    return <CatalogPage title="NEW IN" products={newInProductsData} />;
+  const { data: products = [] } = useCatalogProducts({
+    is_new: true,
+  });
+
+  return <CatalogPage title="NEW IN" products={products} />;
 };
 
 export default NewIn;

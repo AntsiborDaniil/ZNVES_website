@@ -12,6 +12,7 @@ import {
 import { useCart } from "../../contexts/CartContext";
 import { useToast } from "../ui/ToastProvider/ToastProvider";
 import { getProductById } from "../../data/products";
+import { isExternalImage } from "../../utils/imageUtils";
 import styles from "./ProductCard.module.css";
 
 type ProductCardProps = {
@@ -150,6 +151,7 @@ const ProductCard = ({
           {imageList.map((image, index) => {
             const isActive = index === currentIndex;
             const isLoaded = loadedStates[index];
+            const isExternal = isExternalImage(image);
             return (
               <Image
                 key={image + index}
@@ -167,6 +169,7 @@ const ProductCard = ({
                 loading={index === 0 ? "eager" : "lazy"}
                 onLoad={() => markImageLoaded(index)}
                 quality={80}
+                unoptimized={isExternal}
               />
             );
           })}

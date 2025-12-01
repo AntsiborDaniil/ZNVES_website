@@ -11,6 +11,7 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
 } from "react";
+import { isExternalImage } from "../../utils/imageUtils";
 import styles from "./CatalogPage.module.css";
 import type { CatalogProduct } from "../../types/products";
 
@@ -79,13 +80,13 @@ const CatalogGridCard = ({ product }: CatalogGridCardProps) => {
       return;
     }
 
-    void router.prefetch(`/catalog/${product.id}`);
+    void router.prefetch(`/catalog/${product.slug || product.id}`);
     hasPrefetchedRef.current = true;
-  }, [router, product.id]);
+  }, [router, product.id, product.slug]);
 
   return (
     <Link
-      href={`/catalog/${product.id}`}
+      href={`/catalog/${product.slug || product.id}`}
       className={styles.catalogCardLink}
       aria-label={`Открыть товар ${product.title}`}
       onPointerEnter={prefetchProduct}
@@ -103,6 +104,7 @@ const CatalogGridCard = ({ product }: CatalogGridCardProps) => {
             {imageList.map((image, index) => {
               const isActive = index === currentIndex;
               const isLoaded = loadedStates[index];
+              const isExternal = isExternalImage(image);
               return (
                 <Image
                   key={image + index}
@@ -120,6 +122,7 @@ const CatalogGridCard = ({ product }: CatalogGridCardProps) => {
                   loading={index === 0 ? "eager" : "lazy"}
                   onLoad={() => markImageLoaded(index)}
                   quality={80}
+                  unoptimized={isExternal}
                 />
               );
             })}

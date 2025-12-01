@@ -31,6 +31,30 @@ const categories = [
   "Shorts",
 ];
 
+// Маппинг между отображаемыми категориями (множественное число) и query параметрами (единственное число)
+const categoryToQueryMap: Record<string, string> = {
+  All: "all",
+  Pants: "pant",
+  Jeans: "jean",
+  "T-shirts": "t-shirt",
+  "Zip hoodies": "zip-hoodie",
+  Jackets: "jacket",
+  Hoodies: "hoodie",
+  Shorts: "short",
+};
+
+// Обратный маппинг: из query параметра (единственное число) в отображаемую категорию (множественное число)
+const queryToCategoryMap: Record<string, string> = {
+  all: "All",
+  pant: "Pants",
+  jean: "Jeans",
+  "t-shirt": "T-shirts",
+  "zip-hoodie": "Zip hoodies",
+  jacket: "Jackets",
+  hoodie: "Hoodies",
+  short: "Shorts",
+};
+
 type FilterOption = {
   value: string;
   label: string;
@@ -172,10 +196,8 @@ const CatalogPageContent = ({ title, products }: CatalogPageContentProps) => {
   const getNormalizedCategory = useCallback(() => {
     if (!categoryParam) return "All";
     const decodedParam = decodeURIComponent(categoryParam).toLowerCase();
-    return (
-      categories.find((category) => category.toLowerCase() === decodedParam) ??
-      "All"
-    );
+    // Преобразуем query параметр (единственное число) в отображаемую категорию (множественное число)
+    return queryToCategoryMap[decodedParam] || "All";
   }, [categoryParam]);
 
   const [activeCategory, setActiveCategory] = useState<string>(
@@ -281,10 +303,11 @@ const CatalogPageContent = ({ title, products }: CatalogPageContentProps) => {
         if (updates.category === "All") {
           params.delete("category");
         } else {
-          // Нормализуем категорию к нижнему регистру для соответствия с бургер-меню
-          // URLSearchParams.set() автоматически кодирует значение, не нужно encodeURIComponent
-          const normalizedCategory = updates.category.toLowerCase();
-          params.set("category", normalizedCategory);
+          // Преобразуем отображаемую категорию (множественное число) в query параметр (единственное число)
+          const queryCategory =
+            categoryToQueryMap[updates.category] ||
+            updates.category.toLowerCase();
+          params.set("category", queryCategory);
         }
       }
 
@@ -357,11 +380,13 @@ const CatalogPageContent = ({ title, products }: CatalogPageContentProps) => {
   const filteredProducts = useMemo(() => {
     let currentProducts = [...products];
 
-    if (activeCategory !== "All") {
-      currentProducts = currentProducts.filter(
-        (product) => product.category === activeCategory
-      );
-    }
+    // Фильтрация по категории происходит на сервере через API
+    // Не нужно фильтровать на клиенте, так как API уже вернул отфильтрованные товары
+    // if (activeCategory !== "All") {
+    //   currentProducts = currentProducts.filter(
+    //     (product) => product.category === activeCategory
+    //   );
+    // }
 
     if (colorFilter !== "all") {
       currentProducts = currentProducts.filter(
@@ -471,7 +496,7 @@ const CatalogPageContent = ({ title, products }: CatalogPageContentProps) => {
           {filteredProducts.map((product) => (
             <Link
               key={product.id}
-              href={`/catalog/${product.id}`}
+              href={`/catalog/${product.slug || product.id}`}
               className={styles.catalogCardLink}
               aria-label={`Открыть товар ${product.title}`}
             >

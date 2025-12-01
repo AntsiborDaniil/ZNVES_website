@@ -1,42 +1,40 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import ProductPageView from "../../../components/ProductPage/ProductPageView";
-import {
-    catalogProducts,
-    newInProducts,
-    getProductById,
-} from "../../../data/products";
+import { useProductBySlug } from "../../../hooks/useProductBySlug";
 
 type ProductPageProps = {
-    params: Promise<{
-        id: string;
-    }>;
+  params: Promise<{
+    id: string;
+  }>;
 };
 
-export const dynamicParams = false;
+const ProductPage = ({ params }: ProductPageProps) => {
+  const [slug, setSlug] = useState<string>("");
 
-export const generateStaticParams = () => {
-    const allProducts = [...catalogProducts, ...newInProducts];
+  useEffect(() => {
+    params.then(({ id }) => {
+      setSlug(id);
+    });
+  }, [params]);
 
-    return allProducts.map((product) => ({
-        id: product.id.toString(),
-    }));
-};
+  const { data: product, isError, isLoading } = useProductBySlug(slug);
 
-const ProductPage = async ({ params }: ProductPageProps) => {
-    const { id } = await params;
-    const productId = Number(id);
+  if (!slug) {
+    return null;
+  }
 
-    if (Number.isNaN(productId)) {
-        notFound();
-    }
+  if (isError) {
+    notFound();
+  }
 
-    const product = getProductById(productId);
+  if (isLoading || !product) {
+    return null;
+  }
 
-    if (!product) {
-        notFound();
-    }
-
-    return <ProductPageView product={product} />;
+  return <ProductPageView product={product} />;
 };
 
 export default ProductPage;

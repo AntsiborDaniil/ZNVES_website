@@ -1,17 +1,23 @@
+"use client";
+
 import CatalogPage from "../../components/CatalogPage/CatalogPage";
-import {
-    catalogProducts as catalogProductsData,
-    newInProducts as newInProductsData,
-    toCatalogProduct,
-} from "../../data/products";
+import { useCatalogProducts } from "../../hooks/useCatalogProducts";
+import { useSearchParams } from "next/navigation";
 
 const Catalog = () => {
-    const allProducts = [
-        ...catalogProductsData.map(toCatalogProduct),
-        ...newInProductsData.map(toCatalogProduct),
-    ];
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams?.get("category");
 
-    return <CatalogPage title="CATALOG" products={allProducts} />;
+  // Декодируем категорию из URL и нормализуем (убираем лишние пробелы, приводим к нижнему регистру)
+  const normalizedCategory = categoryParam
+    ? decodeURIComponent(categoryParam).toLowerCase().trim()
+    : undefined;
+
+  const { data: products = [] } = useCatalogProducts({
+    category: normalizedCategory,
+  });
+
+  return <CatalogPage title="CATALOG" products={products} />;
 };
 
 export default Catalog;
