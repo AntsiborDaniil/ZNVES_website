@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  transition: transform 0.2s ease;
   outline: none;
 }
 
@@ -29,9 +28,7 @@
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transform: scale(1.08);
-  filter: blur(12px);
-  transition: opacity 0.45s ease, transform 0.45s ease, filter 0.45s ease;
+  transition: opacity 0.45s ease;
 }
 
 .productImageLoading {
@@ -39,8 +36,7 @@
 }
 
 .productImageLoaded {
-  transform: scale(1);
-  filter: blur(0);
+  opacity: 0;
 }
 
 .productImageVisible {
@@ -68,7 +64,6 @@
 .productInfo {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .productTitle {
@@ -137,6 +132,18 @@
   transform: scale(0.98);
 }
 
+@media (max-width: 1280px) {
+  .productTitle {
+    font-size: 21px;
+    line-height: 26.87px;
+  }
+
+  .productPrice {
+    font-size: 17px;
+    line-height: 26.87px;
+  }
+}
+
 @media (max-width: 768px) {
   .imageWrapper {
     padding: 64px 24px;
@@ -159,12 +166,14 @@
   }
 
   .productTitle {
-    font-size: 28px;
+    margin-top: 4px;
+    font-size: 18px;
+    line-height: 21.87px;
   }
 
   .productPrice {
-    font-size: 20px;
-    line-height: 24px;
+    font-size: 14px;
+    line-height: 21.87px;
   }
 
   .addToCartButton {
@@ -205,15 +214,16 @@
   }
 
   .productTitle {
+    margin-top: 5px;
     font-weight: 400;
-    font-size: 13px;
-    line-height: 13.88px;
+    font-size: 17.64px;
+    line-height: 21.1px;
   }
 
   .productPrice {
     font-weight: 400;
-    font-size: 13px;
-    line-height: 13.88px;
+    font-size: 17.64px;
+    line-height: 21.1px;
   }
 
   .productCard {
@@ -223,11 +233,11 @@
   /* Стили для карточек в слайдере на мобильных */
   .sliderCard .productTitle {
     font-size: 17.64px !important;
-    line-height: 17.64px !important;
+    line-height: 21.1px !important;
   }
 
   .sliderCard .productPrice {
     font-size: 17.64px !important;
-    line-height: 17.64px !important;
+    line-height: 21.1px !important;
   }
 }

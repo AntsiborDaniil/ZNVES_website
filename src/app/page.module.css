@@ -2,6 +2,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background-color: #F2F0EC;
 }
 
 .productDisplaySections {
@@ -10,4 +11,28 @@
     gap: 40px;
     margin-bottom: 100px;
     margin-top: 30px;
+}
+
+@media (max-width: 1440px) {
+    .productDisplaySections {
+        gap: 10px;
+        margin-top: 10px;
+        margin-bottom: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .productDisplaySections {
+        gap: 0px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .productDisplaySections {
+        gap: 0px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
 }

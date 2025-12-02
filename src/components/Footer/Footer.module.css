@@ -130,14 +130,24 @@
   margin: 0;
 }
 
+.privacyTextBreak {
+  display: inline;
+}
+
 .privacyLink {
   color: #f2f0ecb8;
   font-weight: 500;
   font-size: 15px;
   line-height: 16.5px;
   letter-spacing: 0%;
-  vertical-align: middle;
+  vertical-align: baseline;
   text-decoration: underline;
+  transition: color 0.2s ease;
+  display: inline;
+}
+
+.privacyLink:hover {
+  color: #fff5d9;
 }
 
 .columnTitle {
@@ -183,7 +193,7 @@
 }
 
 .footerLinks a:hover {
-  color: #ffffff;
+  color: #fff5d9;
 }
 
 .catalogColumns {
@@ -201,7 +211,8 @@
 }
 
 .underlinedLink:hover {
-  border-color: #ffffff;
+  border-color: #fff5d9;
+  color: #fff5d9;
 }
 
 .legalLinks {
@@ -221,7 +232,7 @@
 }
 
 .legalLink:hover {
-  color: #f2f0ec;
+  color: #fff5d9;
 }
 
 .metaNote {
@@ -594,7 +605,7 @@
     font-size: 9px;
     line-height: 12.37px;
     letter-spacing: 0%;
-    vertical-align: middle;
+    vertical-align: baseline;
   }
 
   .legalLink {
@@ -606,7 +617,6 @@
   }
 
   .metaNote {
-    font-family: Roboto;
     font-weight: 300;
     font-style: Light;
     font-size: 7.5px;
@@ -615,7 +625,6 @@
   }
 
   .metaNote span {
-    font-family: Roboto;
     font-weight: 300;
     font-style: Light;
     font-size: 7.5px;
@@ -745,7 +754,7 @@
     font-size: 10px;
     line-height: 12.37px;
     letter-spacing: 0%;
-    vertical-align: middle;
+    vertical-align: baseline;
   }
 
   .legalLink {
@@ -757,7 +766,6 @@
   }
 
   .metaNote {
-    font-family: Roboto;
     font-weight: 300;
     font-style: Light;
     font-size: 8.5px;
@@ -766,7 +774,6 @@
   }
 
   .metaNote span {
-    font-family: Roboto;
     font-weight: 300;
     font-style: Light;
     font-size: 8.5px;
@@ -790,6 +797,10 @@
 @media (min-width: 1440px) and (max-width: 1799px) {
   .footer {
     padding-right: 44px;
+  }
+
+  .privacyTextBreak {
+    display: block;
   }
 
   .logo {
@@ -880,7 +891,7 @@
     font-size: 11.25px;
     line-height: 12.37px;
     letter-spacing: 0%;
-    vertical-align: middle;
+    vertical-align: baseline;
   }
 
   .legalLink {
@@ -888,7 +899,6 @@
   }
 
   .metaNote {
-    font-family: Roboto;
     font-weight: 300;
     font-style: Light;
     font-size: 9.75px;
@@ -897,7 +907,6 @@
   }
 
   .metaNote span {
-    font-family: Roboto;
     font-weight: 300;
     font-style: Light;
     font-size: 9.75px;
@@ -1010,8 +1019,14 @@
     font-size: 10.59px;
     line-height: 11.04px;
     letter-spacing: 0%;
-    vertical-align: middle;
+    vertical-align: baseline;
     text-decoration: underline;
+    transition: color 0.2s ease;
+    display: inline;
+  }
+
+  .mobilePrivacyLink:hover {
+    color: #fff5d9;
   }
 
   .mobileNavSection {
@@ -1045,7 +1060,7 @@
   }
 
   .mobileNavHeader:hover {
-    color: #ffffff;
+    color: #FFF5D991;
   }
 
   .plusIcon {
@@ -1097,7 +1112,7 @@
   }
 
   .mobileNavLinks a:hover {
-    color: #ffffff;
+    color: #fff5d9;
   }
 
   .mobileUnderlinedLink {
@@ -1110,7 +1125,8 @@
   }
 
   .mobileUnderlinedLink:hover {
-    border-color: #ffffff;
+    border-color: #fff5d9;
+    color: #fff5d9;
   }
 
   .mobileLegalLinks {
@@ -1132,11 +1148,10 @@
   }
 
   .mobileLegalLink:hover {
-    color: #f2f0ec;
+    color: #fff5d9;
   }
 
   .metaNote {
-    font-family: Roboto;
     font-weight: 300;
     font-style: Light;
     font-size: 10px;
@@ -1150,7 +1165,6 @@
   }
 
   .metaNote span {
-    font-family: Roboto;
     font-weight: 300;
     font-style: Light;
     font-size: 10px;
@@ -1171,4 +1185,20 @@
   .footer {
     padding: 40px 16px 24px;
   }
+}
+
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .footer {
+    padding: 47px 44px 28px 44px;
+  }
+
+  .privacyText {
+    max-width: 383px;
+  }
+}
+
+@media (max-width: 480px)  {
+    .metaNote > span {
+        max-width: 140px;
+      }
 }

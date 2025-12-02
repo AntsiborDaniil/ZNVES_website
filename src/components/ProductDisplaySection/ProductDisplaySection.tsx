@@ -65,7 +65,7 @@ const ProductDisplaySection = ({
       setSpaceBetween(8);
       setIsMobile(false);
     } else if (width <= 768) {
-      setMaxVisible(2);
+      setMaxVisible(3);
       setSpaceBetween(10);
       setIsMobile(false);
     } else if (width <= 1200) {

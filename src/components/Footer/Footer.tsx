@@ -107,10 +107,14 @@ const Footer = () => {
         <div className={styles.consentSection}>
           <p className={styles.privacyText}>
             Нажимая на кнопку «Подписаться», вы даете согласие на обработку
-            персональных данных в соответствии с{" "}
+            <span className={styles.privacyTextBreak}>
+              {" "}
+              персональных данных в
+            соответствии с{" "}
             <Link href="/privacy" className={styles.privacyLink}>
               Политикой конфиденциальности
             </Link>
+            </span>
           </p>
           <div className={styles.legalLinks}>
             <Link href="/public-offer" className={styles.legalLink}>

@@ -1,82 +1,90 @@
 .header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 60px;
-    z-index: 1000;
-    background: transparent;
-    backdrop-filter: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 20px 60px;
+  z-index: 1000;
+  background: transparent;
+  backdrop-filter: none;
 }
 
 .headerGreen {
-    background-color: #0a5840;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  background-color: #0a5840;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: "Roboto", sans-serif;
-    font-weight: 700;
-    font-size: 24px;
-    color: #fff7df;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Roboto", sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: #fff7df;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
 }
 
 .logoImage {
-    width: 125px;
-    height: 59.615386962890625px;
+  width: 125px;
+  height: 59.615386962890625px;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  justify-self: start;
 }
 
 .logoLink {
-    display: inline-flex;
-    align-items: center;
-    transition: opacity 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  transition: opacity 0.2s ease;
+  justify-self: center;
 }
 
 .logoLink:hover {
-    opacity: 0.7;
+  opacity: 0.7;
 }
 
 .rightIcons {
-    display: flex;
-    gap: 27px;
-    align-items: center;
+  display: flex;
+  gap: 27px;
+  align-items: center;
+  justify-self: end;
 }
 
 @media (max-width: 768px) {
-    .header {
-        padding: 15px 20px;
-    }
+  .header {
+    padding: 15px 20px;
+  }
 
-    .logoImage {
-        width: 80px;
-        height: auto;
-    }
+  .logoImage {
+    width: 80px;
+    height: auto;
+  }
 
-    .rightIcons {
-        gap: 15px;
-    }
+  .rightIcons {
+    gap: 15px;
+  }
 }
 
 @media (max-width: 480px) {
-    .header {
-        padding: 12px 15px;
-    }
+  .header {
+    padding: 12px 15px;
+  }
 
-    .logoImage {
-        width: 70px;
-        height: auto;
-    }
+  .logoImage {
+    width: 70px;
+    height: auto;
+  }
 
-    .rightIcons {
-        gap: 12px;
-    }
+  .rightIcons {
+    gap: 12px;
+  }
 }

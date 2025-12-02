@@ -39,12 +39,14 @@ const Header = ({ variant = "transparent" }: HeaderProps) => {
 
   return (
     <header className={headerClassName}>
-      <Suspense fallback={<div style={{ width: 40, height: 40 }} />}>
-        <BurgerMenu
-          isOpen={isMenuOpen}
-          onToggle={() => setIsMenuOpen((prev) => !prev)}
-        />
-      </Suspense>
+      <div className={styles.leftSection}>
+        <Suspense fallback={<div style={{ width: 40, height: 40 }} />}>
+          <BurgerMenu
+            isOpen={isMenuOpen}
+            onToggle={() => setIsMenuOpen((prev) => !prev)}
+          />
+        </Suspense>
+      </div>
       <Link href="/" className={styles.logoLink} aria-label="Go to homepage">
         <Image
           src="/images/logo.png"

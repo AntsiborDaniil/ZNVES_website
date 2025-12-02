@@ -1,128 +1,148 @@
 .hero {
-    position: relative;
-    min-height: 600px;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+  position: relative;
+  min-height: 600px;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .heroBackground {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
 }
 
 .heroBackgroundImage {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    object-fit: cover;
-    z-index: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 0;
 }
 
 .heroBackgroundImage2 {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    object-fit: cover;
-    z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 1;
 }
 
 .heroBackgroundImageMobile {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    object-fit: cover;
-    z-index: 2;
-    display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 2;
+  display: none;
 }
 
 .heroContent {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .catalogButton {
-    font-weight: 400;
-    font-size: 40px;
-    line-height: 100%;
-    letter-spacing: 0%;
-    text-decoration: underline;
-    text-decoration-style: solid;
-    text-decoration-thickness: 0%;
-    text-decoration-skip-ink: auto;
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  text-decoration: underline;
+  text-decoration-style: solid;
+  text-decoration-thickness: 0%;
+  text-decoration-skip-ink: auto;
 
-    background: transparent;
-    border: none;
-    color: #fff7df;
-    font-weight: 400;
-    cursor: pointer;
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 5px;
-    text-transform: uppercase;
-    transition: color 0.3s ease, text-decoration-color 0.3s ease;
+  background: transparent;
+  border: none;
+  color: #fff7df;
+  font-weight: 400;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+  text-transform: uppercase;
+  transition: color 0.3s ease, text-decoration-color 0.3s ease;
 }
 
 .catalogButton:hover {
-    color: #fff7dfad;
-    text-decoration-color: #fff7dfad;
+  color: #fff7dfad;
+  text-decoration-color: #fff7dfad;
+}
+
+@media (max-width: 1024px) {
+    .catalogButton {
+        font-size: 25px;
+    }
 }
 
 @media (max-width: 768px) {
-    .hero {
-        min-height: 500px;
-    }
+  .hero {
+    min-height: 500px;
+  }
 
-    .heroBackgroundImage,
-    .heroBackgroundImage2 {
-        display: none;
-    }
+  .heroBackgroundImage,
+  .heroBackgroundImage2 {
+    display: none;
+  }
 
-    .heroBackgroundImageMobile {
-        display: block;
-        height: 70vh;
-    }
+  .heroBackgroundImageMobile {
+    display: block;
+    height: 70vh;
+  }
 
-    .catalogButton {
-        font-size: 32px;
-        letter-spacing: 2px;
-        text-underline-offset: 10px;
-    }
+  .catalogButton {
+    font-size: 32px;
+    letter-spacing: 2px;
+    text-underline-offset: 10px;
+  }
 }
 
 @media (max-width: 480px) {
-    .hero {
-        min-height: 400px;
-    }
+  .hero {
+    min-height: 400px;
+  }
 
-    .heroBackgroundImage,
-    .heroBackgroundImage2 {
-        display: none;
-    }
+  .heroBackgroundImage,
+  .heroBackgroundImage2 {
+    display: none;
+  }
 
-    .heroBackgroundImageMobile {
-        display: block;
-        height: 60vh;
-    }
+  .heroBackgroundImageMobile {
+    display: block;
+    height: 60vh;
+  }
 
+  .catalogButton {
+    font-size: 24px;
+    letter-spacing: 1px;
+    line-height: 2.8px;
+    text-underline-offset: 2px;
+  }
+}
+
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .catalogButton {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 1439px)  {
     .catalogButton {
-        font-size: 24px;
-        letter-spacing: 1px;
-        text-underline-offset: 8px;
+        font-size: 30px;
     }
 }
+
