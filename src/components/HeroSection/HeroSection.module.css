@@ -57,6 +57,7 @@
 }
 
 .catalogButton {
+  display: inline-block;
   font-weight: 400;
   font-size: 40px;
   line-height: 100%;
@@ -84,9 +85,21 @@
 }
 
 @media (max-width: 1024px) {
-    .catalogButton {
-        font-size: 25px;
-    }
+  .catalogButton {
+    font-size: 25px;
+  }
+}
+
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .catalogButton {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 1439px) {
+  .catalogButton {
+    font-size: 30px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -105,9 +118,9 @@
   }
 
   .catalogButton {
-    font-size: 32px;
+    font-size: 24px;
     letter-spacing: 2px;
-    text-underline-offset: 10px;
+    text-underline-offset: 3px;
   }
 }
 
@@ -130,19 +143,7 @@
     font-size: 24px;
     letter-spacing: 1px;
     line-height: 2.8px;
-    text-underline-offset: 2px;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 2.5px;
   }
 }
-
-@media (min-width: 1440px) and (max-width: 1919px) {
-  .catalogButton {
-    font-size: 30px;
-  }
-}
-
-@media (max-width: 1439px)  {
-    .catalogButton {
-        font-size: 30px;
-    }
-}
-

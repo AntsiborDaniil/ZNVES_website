@@ -76,7 +76,6 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
     const isAccountActive = pathname.startsWith("/account");
     const isCartActive = pathname === "/cart";
 
-    // Получаем текущую категорию из URL
     const currentCategory = searchParams.get("category");
 
     return (

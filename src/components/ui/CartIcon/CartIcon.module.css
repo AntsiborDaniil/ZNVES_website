@@ -46,6 +46,21 @@
     line-height: 1;
 }
 
+@media (max-width: 1024px) {
+    .cartImage {
+        width: 25px;
+        height: 25px;
+    }
+
+    .cartBadge {
+        min-width: 15px;
+        height: 15px;
+        font-size: 10px;
+        top: -3px;
+        right: -3px;
+    }
+}
+
 @media (max-width: 480px) {
     .cartImage {
         width: 28px;

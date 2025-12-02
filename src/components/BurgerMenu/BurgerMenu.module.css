@@ -23,7 +23,7 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
   padding: 8px;
   z-index: 1001;
   justify-content: center;
@@ -322,4 +322,26 @@
 .socialLink:hover,
 .socialLink:focus-visible {
   color: #ffffff;
+}
+
+@media (max-width: 1440px) {
+  .burgerButton {
+    gap: 5.25px;
+  }
+
+  .burgerButton span {
+    width: 23.25px;
+    height: 3px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .burgerButton {
+    gap: 5px;
+  }
+
+  .burgerButton span {
+    width: 22.653846740722656px;
+    height: 3px;
+  }
 }

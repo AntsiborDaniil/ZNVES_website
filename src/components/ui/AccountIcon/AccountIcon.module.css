@@ -19,6 +19,13 @@
     height: 30px;
 }
 
+@media (max-width: 1024px) {
+    .accountImage {
+        width: 25px;
+        height: 25px;
+    }
+}
+
 @media (max-width: 480px) {
     .accountImage {
         display: none;
