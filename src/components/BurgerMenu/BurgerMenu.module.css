@@ -23,16 +23,16 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  padding: 8px;
+  gap: 2px;
+  padding: 5px;
   z-index: 1001;
   justify-content: center;
   align-items: center;
 }
 
 .burgerButton span {
-  width: 31px;
-  height: 4px;
+  width: 19px;
+  height: 2px;
   background-color: #fff7df;
   border-radius: 999px;
   transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -123,7 +123,6 @@
   text-decoration: none;
   color: #fff7df;
   font-weight: 400;
-  font-style: Regular;
   font-size: 20px;
   letter-spacing: 0%;
   vertical-align: middle;
@@ -163,10 +162,10 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  margin-left: 20px;
+  margin-left: 9px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
   animation: slideDown 0.3s ease-out forwards;
   overflow: hidden;
 }
@@ -237,12 +236,11 @@
   text-decoration: none;
   color: #fff7df;
   font-weight: 400;
-  font-style: Regular;
-  font-size: 16px;
+  font-size: 12px;
+  line-height: 22.6px;
   letter-spacing: 0%;
   text-transform: none;
   display: block;
-  padding: 4px 0;
   transition: color 0.2s ease;
 }
 
@@ -273,14 +271,14 @@
   text-decoration: none;
   color: #fff7df;
   font-weight: 400;
-  font-style: Regular;
   font-size: 18px;
+  line-height: 24.8px;
   letter-spacing: 0%;
   vertical-align: middle;
   text-transform: uppercase;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 0;
   transition: color 0.2s ease;
 }
@@ -311,9 +309,10 @@
   text-decoration: none;
   color: #fff7df;
   font-weight: 400;
-  font-style: Regular;
   font-size: 14px;
+  line-height: 14.4px;
   letter-spacing: 0%;
+  
   vertical-align: middle;
   text-transform: none;
   transition: color 0.2s ease;
@@ -326,22 +325,118 @@
 
 @media (max-width: 1440px) {
   .burgerButton {
-    gap: 5.25px;
+    gap: 2px;
   }
 
   .burgerButton span {
-    width: 23.25px;
-    height: 3px;
+    width: 18.600000381469727px;
+    height: 2px;  
+  }
+
+  .menuHeader {
+    font-size: 20px;
+    line-height: 24.8px;
+  }
+
+  .menuHeaderButton {
+    font-size: 20px;
+    line-height: 24.8px;
+  }
+
+  .catalogSubmenu {
+    margin-left: 9px;
+    gap: 2px;
+  }
+
+  .catalogLink {
+    font-size: 12px;
+    line-height: 18.6px;
+  }
+
+  .menuItemWithIcon {
+    font-size: 18px;
+    line-height: 24.8px;
+    gap: 7px;
+  }
+
+  .menuIcon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .socialSection {
+    gap: 4px;
+  }
+
+  .socialLink {
+    font-size: 14px;
+    line-height: 14.4px;
+  }
+
+  .closeButton {
+    padding: 24px 16px 17px 16px;
   }
 }
 
 @media (max-width: 1024px) {
   .burgerButton {
-    gap: 5px;
+    gap: 2px;
   }
 
   .burgerButton span {
-    width: 22.653846740722656px;
-    height: 3px;
+    width: 19px;
+    height: 2px;
+  }
+
+  .menuOpen {
+    width: 280px;
+  }
+
+  .menuContent {
+    padding: 10px 16px 40px 28px;
+  }
+
+  .menuHeader {
+    font-size: 18px;
+    line-height: 24.8px;
+  }
+
+  .menuHeaderButton {
+    font-size: 18px;
+    line-height: 24.8px;
+  }
+
+  .catalogSubmenu {
+    margin-left: 12px;
+    gap: 2px;
+  }
+
+  .catalogLink {
+    font-size: 12px;
+    line-height: 18.6px;
+  }
+
+  .menuItemWithIcon {
+    font-size: 16px;
+    line-height: 24.8px;
+    gap: 10px;
+  }
+
+  .menuIcon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .socialSection {
+    gap: 4px;
+  }
+
+  .socialLink {
+    font-size: 15px;
+    line-height: 14.4px;
+  }
+
+  .closeButton {
+    padding: 15px 16px 27px 16px;
   }
 }
