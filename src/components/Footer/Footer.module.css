@@ -142,6 +142,7 @@
 .columnList {
   display: flex;
   flex-direction: column;
+  gap: 8px;
   overflow: visible;
   transition: max-height 0.3s ease, opacity 0.3s ease;
 }

@@ -61,16 +61,12 @@ const Footer = () => {
                   isMenuOpen ? styles.columnListOpen : ""
                 }`}
               >
-                <li className={styles.columnLi}>
                   <Link className={styles.columnItem} href="/account">
                     Личный кабинет
                   </Link>
-                </li>
-                <li className={styles.columnLi}>
                   <Link className={styles.columnItem} href="/cart">
                     Корзина
                   </Link>
-                </li>
               </ul>
             </div>
             <div className={styles.column}>
@@ -95,55 +91,40 @@ const Footer = () => {
                     isCatalogOpen ? styles.columnListOpen : ""
                   }`}
                 >
-                  <li className={styles.columnLi}>
                     <Link className={styles.columnItem} href="/new-in">
                       New in
                     </Link>
-                  </li>
-                  <li className={styles.columnLi}>
                     <Link className={styles.columnItem} href="/catalog/t-shirt">
                       T-shirt
                     </Link>
-                  </li>
-                  <li className={styles.columnLi}>
+                  
                     <Link className={styles.columnItem} href="/catalog/hoodies">
                       Hoodies
                     </Link>
-                  </li>
-                  <li className={styles.columnLi}>
                     <Link
                       className={styles.columnItem}
                       href="/catalog/zip-hoodies"
                     >
                       Zip hoodies
                     </Link>
-                  </li>
                 </ul>
                 <ul
                   className={`${styles.columnList} ${
                     isCatalogOpen ? styles.columnListOpen : ""
                   }`}
                 >
-                  <li className={styles.columnLi}>
                     <Link className={styles.columnItem} href="/catalog/jeans">
                       Jeans
                     </Link>
-                  </li>
-                  <li className={styles.columnLi}>
                     <Link className={styles.columnItem} href="/catalog/pants">
                       Pants
                     </Link>
-                  </li>
-                  <li className={styles.columnLi}>
                     <Link className={styles.columnItem} href="/catalog/shorts">
                       Shorts
                     </Link>
-                  </li>
-                  <li className={styles.columnLi}>
                     <Link className={styles.columnItem} href="/catalog/jackets">
                       Jackets
                     </Link>
-                  </li>
                 </ul>
               </div>
             </div>
@@ -164,7 +145,6 @@ const Footer = () => {
                   isContactOpen ? styles.columnListOpen : ""
                 }`}
               >
-                <li className={styles.columnLi}>
                   <Link
                     href="https://t.me/znves"
                     target="_blank"
@@ -173,8 +153,6 @@ const Footer = () => {
                   >
                     Telegram
                   </Link>
-                </li>
-                <li className={styles.columnLi}>
                   <Link
                     href="https://www.instagram.com/real.ponama?igsh=b2w5YWdoNmJ2djVo"
                     target="_blank"
@@ -183,7 +161,6 @@ const Footer = () => {
                   >
                     Instagram*
                   </Link>
-                </li>
               </ul>
             </div>
           </div>
