@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #F2F0EC;
+  background-color: #f2f0ec;
   color: #525252;
 }
 
@@ -408,7 +408,6 @@
   font-size: 26.38px;
   line-height: 31.56px;
   letter-spacing: 0px;
-  transition: color 0.25s ease;
 }
 
 .catalogCardPrice {
@@ -417,14 +416,6 @@
   font-size: 26.38px;
   line-height: 31.56px;
   letter-spacing: 0px;
-  transition: color 0.25s ease;
-}
-
-.catalogCard:hover .catalogCardTitle,
-.catalogCard:focus-visible .catalogCardTitle,
-.catalogCard:hover .catalogCardPrice,
-.catalogCard:focus-visible .catalogCardPrice {
-  color: #1f1f1f;
 }
 
 .catalogCardImageContainer::after {
@@ -450,10 +441,10 @@
 }
 
 @media (max-width: 1440px) {
-    .productsGrid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 30px 8px;
-    }
+  .productsGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 30px 8px;
+  }
 }
 
 @media (max-width: 1280px) {
