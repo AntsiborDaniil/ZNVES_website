@@ -401,6 +401,10 @@
     line-height: 24.8px;
   }
 
+  .menuSection {
+    gap: 6px;
+  }
+
   .menuHeaderButton {
     font-size: 18px;
     line-height: 24.8px;
@@ -432,7 +436,7 @@
   }
 
   .socialLink {
-    font-size: 15px;
+    font-size: 12px;
     line-height: 14.4px;
   }
 

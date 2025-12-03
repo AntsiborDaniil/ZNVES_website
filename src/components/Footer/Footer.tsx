@@ -12,266 +12,197 @@ const Footer = () => {
 
   return (
     <footer className={styles.footer}>
-      <div className={styles.footerContent}>
-        <div className={styles.footerColumn}>
-          <div className={styles.leftPart}>
-            <Image
-              src="/images/logo.png"
-              alt="ZNVES"
-              width={125}
-              height={60}
-              className={styles.logo}
+      <div className={styles.upper}>
+        <div className={styles.upperLeft}>
+          <Image
+            src="/images/logo.png"
+            className={styles.logo}
+            alt="logo"
+            width={65}
+            height={31}
+          />
+          <h1 className={styles.subText}>
+            Подпишитесь на получение рассылки рекламно-информационных материалов
+          </h1>
+          <div className={styles.inputContainer}>
+            <input
+              type="email"
+              className={styles.input}
+              placeholder="Введите ваш email"
             />
-            <p className={styles.subscriptionTitle}>
-              Подпишитесь на получение рассылки <br />
-              рекламно-информационных материалов
-            </p>
+            <button type="submit" className={styles.button}>
+              Подписаться
+            </button>
           </div>
-
-          <div className={styles.rightSide}>
-            <div className={styles.navColumn}>
-              <h3 className={styles.columnTitle}>MENU</h3>
-              <ul className={styles.footerLinks}>
-                <li>
-                  <Link href="/account">Личный кабинет</Link>
+          <h2 className={styles.politics}>
+            Нажимая на кнопку «Подписаться», вы даете согласие на обработку
+            персональных данных в соответствии с{" "}
+            <Link href="/privacy" className={styles.politicsLink}>
+              Политикой конфиденциальности
+            </Link>
+          </h2>
+        </div>
+        <div className={styles.upperRight}>
+          <div className={styles.rowColumns}>
+            <div className={styles.column}>
+              <button
+                type="button"
+                className={styles.columnTitleButton}
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-expanded={isMenuOpen}
+              >
+                <h1 className={styles.columnTitle}>MENU</h1>
+                <span className={styles.columnToggle}>
+                  {isMenuOpen ? "−" : "+"}
+                </span>
+              </button>
+              <ul
+                className={`${styles.columnList} ${
+                  isMenuOpen ? styles.columnListOpen : ""
+                }`}
+              >
+                <li className={styles.columnLi}>
+                  <Link className={styles.columnItem} href="/account">
+                    Личный кабинет
+                  </Link>
                 </li>
-                <li>
-                  <Link href="/cart">Корзина</Link>
+                <li className={styles.columnLi}>
+                  <Link className={styles.columnItem} href="/cart">
+                    Корзина
+                  </Link>
                 </li>
               </ul>
             </div>
-
-            <div className={styles.navColumn}>
-              <h1 className={styles.columnTitle}>CATALOG</h1>
-              <div className={styles.catalogColumns}>
-                <ul className={styles.footerLinks}>
-                  <li>
-                    <Link href="/new-in">New in</Link>
+            <div className={styles.column}>
+              <button
+                type="button"
+                className={styles.columnTitleButton}
+                onClick={() => setIsCatalogOpen(!isCatalogOpen)}
+                aria-expanded={isCatalogOpen}
+              >
+                <h1 className={styles.columnTitle}>CATALOG</h1>
+                <span className={styles.columnToggle}>
+                  {isCatalogOpen ? "−" : "+"}
+                </span>
+              </button>
+              <div
+                className={`${styles.catalogColumns} ${
+                  isCatalogOpen ? styles.catalogColumnsOpen : ""
+                }`}
+              >
+                <ul
+                  className={`${styles.columnList} ${
+                    isCatalogOpen ? styles.columnListOpen : ""
+                  }`}
+                >
+                  <li className={styles.columnLi}>
+                    <Link className={styles.columnItem} href="/new-in">
+                      New in
+                    </Link>
                   </li>
-                  <li>
-                    <Link href="/catalog?category=t-shirts">T-shirt</Link>
+                  <li className={styles.columnLi}>
+                    <Link className={styles.columnItem} href="/catalog/t-shirt">
+                      T-shirt
+                    </Link>
                   </li>
-                  <li>
-                    <Link href="/catalog?category=hoodies">Hoodies</Link>
+                  <li className={styles.columnLi}>
+                    <Link className={styles.columnItem} href="/catalog/hoodies">
+                      Hoodies
+                    </Link>
                   </li>
-                  <li>
-                    <Link href="/catalog?category=zip%20hoodies">
+                  <li className={styles.columnLi}>
+                    <Link
+                      className={styles.columnItem}
+                      href="/catalog/zip-hoodies"
+                    >
                       Zip hoodies
                     </Link>
                   </li>
                 </ul>
-                <ul className={styles.footerLinks}>
-                  <li>
-                    <Link href="/catalog?category=jeans">Jeans</Link>
+                <ul
+                  className={`${styles.columnList} ${
+                    isCatalogOpen ? styles.columnListOpen : ""
+                  }`}
+                >
+                  <li className={styles.columnLi}>
+                    <Link className={styles.columnItem} href="/catalog/jeans">
+                      Jeans
+                    </Link>
                   </li>
-                  <li>
-                    <Link href="/catalog?category=pants">Pants</Link>
+                  <li className={styles.columnLi}>
+                    <Link className={styles.columnItem} href="/catalog/pants">
+                      Pants
+                    </Link>
                   </li>
-                  <li>
-                    <Link href="/catalog?category=shorts">Shorts</Link>
+                  <li className={styles.columnLi}>
+                    <Link className={styles.columnItem} href="/catalog/shorts">
+                      Shorts
+                    </Link>
                   </li>
-                  <li>
-                    <Link href="/catalog?category=jackets">Jackets</Link>
+                  <li className={styles.columnLi}>
+                    <Link className={styles.columnItem} href="/catalog/jackets">
+                      Jackets
+                    </Link>
                   </li>
                 </ul>
               </div>
             </div>
-
-            <div className={styles.navColumn}>
-              <h3 className={styles.columnTitle}>CONTACT</h3>
-              <ul className={styles.footerLinks}>
-                <li>
-                  <a href="#telegram">Telegram</a>
+            <div className={styles.column}>
+              <button
+                type="button"
+                className={styles.columnTitleButton}
+                onClick={() => setIsContactOpen(!isContactOpen)}
+                aria-expanded={isContactOpen}
+              >
+                <h1 className={styles.columnTitle}>CONTACT</h1>
+                <span className={styles.columnToggle}>
+                  {isContactOpen ? "−" : "+"}
+                </span>
+              </button>
+              <ul
+                className={`${styles.columnList} ${
+                  isContactOpen ? styles.columnListOpen : ""
+                }`}
+              >
+                <li className={styles.columnLi}>
+                  <Link
+                    href="https://t.me/znves"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.columnItem}
+                  >
+                    Telegram
+                  </Link>
                 </li>
-                <li>
-                  <a href="#instagram" className={styles.underlinedLink}>
+                <li className={styles.columnLi}>
+                  <Link
+                    href="https://www.instagram.com/real.ponama?igsh=b2w5YWdoNmJ2djVo"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.columnInst}
+                  >
                     Instagram*
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
           </div>
-        </div>
-
-        <div className={styles.newsletter}>
-          <input
-            type="email"
-            placeholder="Введите e-mail"
-            className={styles.newsletterInput}
-          />
-          <button className={styles.newsletterButton} type="button">
-            Подписаться
-          </button>
-        </div>
-
-        <div className={styles.consentSection}>
-          <p className={styles.privacyText}>
-            Нажимая на кнопку «Подписаться», вы даете согласие на обработку
-            <span className={styles.privacyTextBreak}>
-              {" "}
-              персональных данных в
-            соответствии с{" "}
-            <Link href="/privacy" className={styles.privacyLink}>
-              Политикой конфиденциальности
-            </Link>
-            </span>
-          </p>
-          <div className={styles.legalLinks}>
-            <Link href="/public-offer" className={styles.legalLink}>
+          <div className={styles.links}>
+            <Link className={styles.link} href="/public-offer">
               Публичная оферта
             </Link>
-            <Link href="/privacy" className={styles.legalLink}>
+            <Link className={styles.link} href="/privacy">
               Политика конфиденциальности
             </Link>
           </div>
         </div>
       </div>
-
-      {/* Mobile footer section */}
-      <div className={styles.mobileFooter}>
-        <div className={styles.mobileLogoSection}>
-          <Image
-            src="/images/logo.png"
-            alt="ZNVES"
-            width={125}
-            height={60}
-            className={styles.mobileLogo}
-          />
-          <p className={styles.mobileSubscriptionTitle}>
-            Подпишитесь на получение рассылки рекламно-информационных материалов
-          </p>
-        </div>
-
-        <div className={styles.mobileNewsletter}>
-          <input
-            type="email"
-            placeholder="Введите e-mail"
-            className={styles.mobileNewsletterInput}
-          />
-          <button className={styles.mobileNewsletterButton} type="button">
-            Подписаться
-          </button>
-          <p className={styles.mobilePrivacyText}>
-            Нажимая на кнопку «Подписаться», вы даете согласие на обработку
-            персональных данных в соответствии с{" "}
-            <Link href="/privacy" className={styles.mobilePrivacyLink}>
-              Политикой конфиденциальности
-            </Link>
-          </p>
-        </div>
-
-        <div className={styles.mobileNavSection}>
-          <div className={styles.mobileNavItem}>
-            <button
-              className={styles.mobileNavHeader}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              type="button"
-            >
-              <span>MENU</span>
-              <span className={styles.plusIcon}>{isMenuOpen ? "−" : "+"}</span>
-            </button>
-            {isMenuOpen && (
-              <ul className={styles.mobileNavLinks}>
-                <li>
-                  <Link href="/account">Личный кабинет</Link>
-                </li>
-                <li>
-                  <Link href="/cart">Корзина</Link>
-                </li>
-              </ul>
-            )}
-          </div>
-
-          <div className={styles.mobileNavItem}>
-            <button
-              className={styles.mobileNavHeader}
-              onClick={() => setIsCatalogOpen(!isCatalogOpen)}
-              type="button"
-            >
-              <span>CATALOG</span>
-              <span className={styles.plusIcon}>
-                {isCatalogOpen ? "−" : "+"}
-              </span>
-            </button>
-            {isCatalogOpen && (
-              <ul className={styles.mobileNavLinks}>
-                <li>
-                  <Link href="/new-in">New in</Link>
-                </li>
-                <li>
-                  <Link href="/catalog?category=t-shirts">T-shirt</Link>
-                </li>
-                <li>
-                  <Link href="/catalog?category=hoodies">Hoodies</Link>
-                </li>
-                <li>
-                  <Link href="/catalog?category=zip%20hoodies">
-                    Zip hoodies
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/catalog?category=jeans">Jeans</Link>
-                </li>
-                <li>
-                  <Link href="/catalog?category=pants">Pants</Link>
-                </li>
-                <li>
-                  <Link href="/catalog?category=shorts">Shorts</Link>
-                </li>
-                <li>
-                  <Link href="/catalog?category=jackets">Jackets</Link>
-                </li>
-              </ul>
-            )}
-          </div>
-
-          <div className={styles.mobileNavItem}>
-            <button
-              className={styles.mobileNavHeader}
-              onClick={() => setIsContactOpen(!isContactOpen)}
-              type="button"
-            >
-              <span>CONTACT</span>
-              <span className={styles.plusIcon}>
-                {isContactOpen ? "−" : "+"}
-              </span>
-            </button>
-            {isContactOpen && (
-              <ul className={styles.mobileNavLinks}>
-                <li>
-                  <a href="#telegram">Telegram</a>
-                </li>
-                <li>
-                  <a href="#instagram" className={styles.mobileUnderlinedLink}>
-                    Instagram*
-                  </a>
-                </li>
-              </ul>
-            )}
-          </div>
-        </div>
-
-        <div className={styles.mobileLegalLinks}>
-          <Link href="/public-offer" className={styles.mobileLegalLink}>
-            Публичная оферта
-          </Link>
-          <Link href="/privacy" className={styles.mobileLegalLink}>
-            Политика конфиденциальности
-          </Link>
-        </div>
-      </div>
-
-      <div className={styles.metaNote}>
-        <div className={styles.metaPrimary}>
-          <span>© 2025 Все права защищены</span>
-          {/* <span className={styles.studioNote}>
-                        Выполнено студией RisePoint
-                    </span> */}
-        </div>
-        <span>
-          * продукт принадлежит компании Meta, признанной экстремистской
-          организацией <br />и запрещенной в РФ
-        </span>
+      <div className={styles.lower}>
+        <p className={styles.copyright}>© 2025 Все права защищены</p>
+        <p className={styles.copyrightInsta}>
+          * Instagram принадлежит компании Meta, признанной экстремистской
+          организацией и запрещенной в РФ
+        </p>
       </div>
     </footer>
   );
