@@ -6,7 +6,7 @@
 }
 
 .imageWrapper {
-  padding: 82px 33px;
+  padding: 140px 66px;
   background-color: #5252520f;
 }
 
@@ -45,8 +45,8 @@
 
 .newBadge {
   position: absolute;
-  top: -44px;
-  right: 0px;
+  top: -90px;
+  right: -20px;
   background-color: #525252;
   color: #f2f0ec;
   padding: 7px 14px;
@@ -120,6 +120,17 @@
   transform: scale(0.98);
 }
 
+@media (max-width: 1440px) {
+  .imageWrapper {
+    padding: 100px 44px;
+  }
+
+  .newBadge {
+    top: -70px;
+    right: -15px;
+  }
+}
+
 @media (max-width: 1280px) {
   .productTitle {
     font-size: 21px;
@@ -132,9 +143,9 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .imageWrapper {
-    padding: 64px 24px;
+    padding: 69px 28px;
   }
 
   .newBadge {
