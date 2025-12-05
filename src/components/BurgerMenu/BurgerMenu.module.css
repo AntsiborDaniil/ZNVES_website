@@ -122,7 +122,7 @@
 .menuHeader {
   text-decoration: none;
   color: #fff7df;
-  font-weight: 400;
+  font-weight: 300;
   font-size: 20px;
   letter-spacing: 0%;
   vertical-align: middle;
@@ -139,7 +139,7 @@
   cursor: pointer;
   color: #fff7df;
 
-  font-weight: 400;
+  font-weight: 300;
   font-style: Regular;
   font-size: 20px;
   letter-spacing: 0%;
@@ -149,7 +149,7 @@
 
 .menuHeader:hover,
 .menuHeader:focus-visible {
-  color: #ffffff;
+  color: rgba(255, 247, 223, 0.5);
 }
 
 .menuHeaderActive {
@@ -235,7 +235,7 @@
 .catalogLink {
   text-decoration: none;
   color: #fff7df;
-  font-weight: 400;
+  font-weight: 300;
   font-size: 12px;
   line-height: 22.6px;
   letter-spacing: 0%;
@@ -246,12 +246,12 @@
 
 .catalogLink:hover,
 .catalogLink:focus-visible {
-  color: #ffffff;
+  color: #fff7df80;
 }
 
 .catalogLinkActive {
-  color: #ffffff;
-  font-weight: 500;
+  color: #fff7df80;
+  font-weight: 300;
   position: relative;
 }
 
@@ -270,7 +270,7 @@
 .menuItemWithIcon {
   text-decoration: none;
   color: #fff7df;
-  font-weight: 400;
+  font-weight: 300;
   font-size: 18px;
   line-height: 24.8px;
   letter-spacing: 0%;
@@ -308,11 +308,11 @@
 .socialLink {
   text-decoration: none;
   color: #fff7df;
-  font-weight: 400;
+  font-weight: 300;
   font-size: 14px;
   line-height: 14.4px;
   letter-spacing: 0%;
-  
+
   vertical-align: middle;
   text-transform: none;
   transition: color 0.2s ease;
@@ -330,7 +330,7 @@
 
   .burgerButton span {
     width: 18.600000381469727px;
-    height: 2px;  
+    height: 2px;
   }
 
   .menuHeader {

@@ -6,10 +6,16 @@
   color: #2c2c2c;
 }
 
+.variantGroupRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .main {
   display: flex;
   width: 100%;
-  padding: 142.615px 360px 120px 360px;
+  padding: 122.615px 360px 120px 360px;
 }
 
 .content {
@@ -70,10 +76,9 @@
 .info {
   display: flex;
   flex-direction: column;
+  align-self: flex-start;
   gap: 24px;
   position: sticky;
-  top: 142.615px;
-  align-self: flex-start;
   max-width: 560px;
 }
 
@@ -96,7 +101,7 @@
   color: #525252;
 
   font-weight: 400;
-  font-size: 48px;
+  font-size: 40px;
   line-height: 35.9px;
   letter-spacing: 0px;
 
@@ -106,20 +111,19 @@
 .price {
   color: #525252;
 
-  font-weight: 500;
-  font-size: 28.33px;
+  font-weight: 400;
+  font-size: 26.33px;
 
   line-height: 33.9px;
   letter-spacing: 0px;
 
-  margin-top: 32px;
-  margin-bottom: 89px;
+  margin-top: 12px;
+  margin-bottom: 49px;
 }
 
 .variantGroup {
   display: flex;
   flex-direction: column;
-  gap: 24px;
   background: transparent;
 }
 
@@ -149,10 +153,8 @@
 }
 
 .label {
-  font-size: 16px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #6f6f6f;
+  font-size: 18.44px;
+  color: #525252;
 }
 
 .select {
@@ -218,28 +220,31 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 216px;
+  width: 192px;
   padding: 8px 16px;
-  border: 1px solid #525252;
-  border-radius: 3px;
-  background-color: #ffffff;
-  font-size: 19.2px;
+  border: none;
+  border-bottom: 1px solid #d4d1cb;
+  border-radius: 0;
+  background-color: transparent;
+  font-size: 18px;
   line-height: 24px;
   color: #525252;
   cursor: pointer;
-  transition: border-color 0.25s ease;
+  transition: border-color 0.25s ease, color 0.25s ease;
   text-align: left;
   font-family: inherit;
   text-wrap: nowrap;
 }
 
 .colorPickerButton:hover {
-  border-color: #2c2c2c;
+  border-bottom-color: rgba(82, 82, 82, 0.6);
+  color: #2c2c2c;
 }
 
 .colorPickerButton:focus {
   outline: none;
-  border-color: #2c2c2c;
+  border-bottom-color: #2c2c2c;
+  color: #2c2c2c;
 }
 
 .colorPickerButtonDot {
@@ -256,8 +261,14 @@
   border: 1px solid #d4d1cb;
 }
 
-.colorPickerButtonText {
+.colorPickerButtonText,
+.sizePickerButtonText {
   flex: 1;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 29.76px;
+  letter-spacing: 0%;
+  vertical-align: middle;
 }
 
 .colorPickerArrow {
@@ -339,7 +350,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 192px;
+  width: 220px;
   padding: 8px 16px;
   border: none;
   border-bottom: 1px solid #d4d1cb;
@@ -369,7 +380,6 @@
 .sizePickerButtonText {
   flex: 1;
   font-weight: 300;
-  font-size: 15px;
   line-height: 29.76px;
   letter-spacing: 0%;
   vertical-align: middle;
@@ -463,6 +473,7 @@
 }
 
 .sizeWeb {
+  display: flex;
   margin-top: 6px;
   padding: 0;
   border: none;
@@ -593,7 +604,7 @@
   width: 100%;
   background: none;
   border: none;
-  padding: 14px 10px 14px 0px;
+  padding: 6px 10px 6px 0px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -608,18 +619,6 @@
   letter-spacing: 0px;
 }
 
-.accordionButton:hover,
-.accordionButton:focus-visible {
-  color: #000000;
-}
-
-.accordionButtonSelected {
-  color: #2c2c2c;
-}
-
-.accordionButtonOpen {
-  color: #000000;
-}
 
 .accordionIcon {
   width: 36px;
@@ -672,14 +671,14 @@
 
 @media (max-width: 1919px) {
   .main {
-    padding-top: 142.615px;
+    padding-top: 122.615px;
     padding-right: 140px;
     padding-bottom: 120px;
     padding-left: 140px;
   }
 }
 
-@media (min-width: 1024px) and (max-width: 1439px) {
+@media (max-width: 1440px) {
   .content {
     flex-direction: row;
     justify-content: center;
@@ -701,7 +700,6 @@
     min-width: 0;
     max-width: calc(50vw - 240px);
     position: sticky;
-    top: 142.615px;
     align-self: flex-start;
   }
 
@@ -712,30 +710,43 @@
 
   .price {
     font-weight: 400;
-    font-size: 30px;
+    font-size: 24px;
     line-height: 35.9px;
-    margin-top: 20px;
+    margin-top: 0px;
+    margin-bottom: 20px;
   }
 
   .sizePickerButton {
-    width: 283.71429443359375px;
+    width: 200px;
   }
 
   .accordionButton {
-    font-size: 17.58px;
+    font-size: 16px;
     line-height: 14.95px;
+    padding: 4px 10px 4px 0px;
   }
 
-  .sizePickerButton,
-  .colorPickerButton {
-    font-size: 18px;
+  .sizePickerButtonText,
+  .colorPickerButtonText {
+    font-size: 14px;
+    line-height: 24px;
+  }
+
+  .accordionIcon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .colorListItemLabel,
+  .sizeListItemLabel {
+    font-size: 14px;
     line-height: 24px;
   }
 
   .addToCartButton {
     width: 100%;
     padding: 16px 20px;
-    font-size: 16px;
+    font-size: 14px;
     max-width: 100%;
   }
 
@@ -746,9 +757,137 @@
   .variantGroup {
     width: 100%;
   }
+}
 
-  .variantRow {
+@media (max-width: 1280px) {
+  .main {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  .mainImage {
+    object-fit: contain;
+  }
+
+  .info {
+    gap: 0px;
+  }
+
+  .variantGroup {
+    gap: 0px;
+  }
+
+  .variantRowCompact {
+    gap: 0px;
+  }
+
+  .title {
+    font-weight: 400;
+    font-size: 25px;
+    line-height: 35.9px;
+    margin-bottom: 20px;
+  }
+
+  .price {
+    font-weight: 400;
+    font-size: 25px;
+    line-height: 35.9px;
+
+    margin-top: 0px;
+    margin-bottom: 102px;
+  }
+
+  .label {
+    font-weight: 300;
+    font-size: 18.44px;
+    line-height: 21.7px;
+    letter-spacing: 0%;
+    margin-bottom: 16px;
+
+    margin-top: 22px;
+  }
+
+  .colorPickerButton {
+    width: 181px;
+    gap: 7px;
+    padding: 6px 15px;
+    margin-bottom: 0px;
+  }
+
+  .colorPickerButtonDot .colorListItemDot,
+  .sizeListItemDot {
+    width: 24.685714721679688px;
+    height: 24.685714721679688px;
+  }
+
+  .colorPickerButtonText,
+  .sizePickerButtonText,
+  .colorListItemLabel,
+  .sizeListItemLabel {
+    font-weight: 300;
+    font-size: 19.2px;
+    line-height: 29.76px;
+  }
+
+  .sizePickerButton {
+    padding: 1px 16px 4px 13px;
+    width: 180px;
+  }
+
+  .sizePickerArrow,
+  .colorPickerArrow {
+    height: 8px;
+    width: 16px;
+  }
+
+  .countAndBuy {
+    margin-top: 0;
+  }
+
+  .sizeWeb {
+    margin-top: 14.38px;
+    margin-bottom: 50px;
+
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 14.7px;
+    text-decoration: underline;
+    text-decoration-style: solid;
+    text-decoration-offset: 25%;
+    text-decoration-thickness: 0%;
+    text-decoration-skip-ink: auto;
+  }
+
+  .addToCartButton {
     width: 100%;
+    height: 53;
+    opacity: 1;
+    top: 555px;
+    left: 660px;
+    border-radius: 3px;
+    padding-top: 1px;
+    padding-right: 16px;
+    padding-bottom: 1px;
+    padding-left: 16px;
+
+    margin-bottom: 40px;
+  }
+
+  .accordionButton {
+    padding: 10px 15px 10px 0px;
+
+    font-weight: 400;
+    font-size: 17.58px;
+    line-height: 14.95px;
+  }
+
+  .accordionIcon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .sizeGuideContent {
+    margin-bottom: 14px;
   }
 }
 
@@ -960,6 +1099,7 @@
 @media (max-width: 480px) {
   .main {
     padding: 0px 16px 56px;
+    overflow: hidden;
   }
 
   .mainImage {
@@ -1073,6 +1213,8 @@
     font-size: 16px;
     width: 100%;
     padding: 16px;
+    min-width: 343px;
+    margin-bottom: 0px;
   }
 
   .countAndBuy {
@@ -1137,105 +1279,27 @@
   }
 }
 
-@media (min-width: 1440px) and (max-width: 1919px) {
-  .content {
-    flex-direction: row;
-    justify-content: center;
-    gap: 40px;
-  }
-
-  .gallery {
-    flex-direction: row;
-    max-width: 800px;
-  }
-
-  .info {
-    width: 560px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .title {
-    font-size: 30px;
-  }
-
-  .price {
-    font-size: 30px;
-  }
-
-  .label {
-    font-size: 18.44px;
-  }
-
-  .colorPickerWrapper {
-    width: 181px;
-  }
-
-  .sizePickerWrapper {
-    width: 253.71429443359375px;
-  }
-
-  .sizePickerButton {
-    width: 253.71429443359375px;
-  }
-
-  .mainImage {
-    width: 600px;
-    margin-right: 40px;
-  }
-
-  .sizeWeb {
-    font-size: 15px;
-  }
-
-  .accordionContentInner {
-    font-size: 17.58px;
-  }
-
-  .suggestions {
-    margin-top: 300px;
+@media (min-width: 2560px) {
+  .main {
+    padding-right: 500px;
+    padding-left: 500px;
   }
 }
 
-@media (min-width: 1920px) {
+@media (min-width: 3840px) {
   .main {
-    padding-top: 142.615px;
+    padding-right: 800px;
+    padding-left: 800px;
+  }
+
+  .gallery {
+    max-width: 800px;
+    flex: 0 0 800px;
   }
 
   .info {
     top: 142.615px;
-  }
-}
-
-@media (min-width: 1024px) and (max-width: 1439px) {
-  .main {
-    padding: 103px 120px 72px 120px;
-  }
-
-  .accordionButton {
-    padding-top: 3px;
-    padding-bottom: 3px;
-  }
-
-  .imageColumn {
-    margin-top: 43px;
-  }
-
-  .content {
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 40px;
-    align-items: flex-start;
-  }
-
-  .gallery {
-    align-self: flex-start;
-  }
-
-  .info {
-    width: 100%;
-    max-width: 100%;
-    flex: 1 1 auto;
-    align-self: flex-start;
+    max-width: 560px;
+    flex: 0 0 560px;
   }
 }

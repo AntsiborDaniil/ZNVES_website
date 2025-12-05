@@ -197,187 +197,189 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
             </div>
 
             <div className={styles.variantGroup}>
-              <div
-                className={`${styles.variantRow} ${styles.variantRowCompact}`}
-              >
-                <label className={styles.label}>Цвет</label>
+              <div className={styles.variantGroupRow}>
                 <div
-                  className={`${styles.colorPickerWrapper} ${
-                    isColorListOpen ? styles.colorPickerWrapperOpen : ""
-                  } ${
-                    selectedColorOption.hex === "#ffffff" ||
-                    selectedColorOption.hex === "#fff"
-                      ? styles.colorPickerWrapperWhite
-                      : ""
-                  }`}
-                  ref={colorPickerRef}
+                  className={`${styles.variantRow} ${styles.variantRowCompact}`}
                 >
-                  <button
-                    type="button"
-                    className={styles.colorPickerButton}
-                    onClick={() => setIsColorListOpen((prev) => !prev)}
-                    aria-label="Выбрать цвет"
-                    style={colorSelectStyle}
+                  <label className={styles.label}>Цвет</label>
+                  <div
+                    className={`${styles.colorPickerWrapper} ${
+                      isColorListOpen ? styles.colorPickerWrapperOpen : ""
+                    } ${
+                      selectedColorOption.hex === "#ffffff" ||
+                      selectedColorOption.hex === "#fff"
+                        ? styles.colorPickerWrapperWhite
+                        : ""
+                    }`}
+                    ref={colorPickerRef}
                   >
-                    <span className={styles.colorPickerButtonDot} />
-                    <span className={styles.colorPickerButtonText}>
-                      {selectedColorOption.label}
-                    </span>
-                    <svg
-                      width="14"
-                      height="9"
-                      viewBox="0 0 14 9"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className={styles.colorPickerArrow}
+                    <button
+                      type="button"
+                      className={styles.sizePickerButton}
+                      onClick={() => setIsColorListOpen((prev) => !prev)}
+                      aria-label="Выбрать цвет"
+                      style={colorSelectStyle}
                     >
-                      <path
-                        d="M1 1l6 6 6-6"
-                        stroke="#525252"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </button>
-                  {isColorListOpen && (
-                    <ul className={styles.colorList}>
-                      {colorOptions.map((color) => {
-                        const isSelected = selectedColor === color.value;
-                        return (
-                          <li
-                            key={color.value}
-                            className={styles.colorListItem}
-                          >
-                            <button
-                              type="button"
-                              className={`${styles.colorListItemButton} ${
-                                isSelected
-                                  ? styles.colorListItemButtonSelected
-                                  : ""
-                              }`}
-                              onClick={() => {
-                                setSelectedColor(color.value);
-                                setIsColorListOpen(false);
-                              }}
-                              aria-label={`Выбрать цвет ${color.label}`}
+                      <span className={styles.colorPickerButtonDot} />
+                      <span className={styles.colorPickerButtonText}>
+                        {selectedColorOption.label}
+                      </span>
+                      <svg
+                        width="14"
+                        height="9"
+                        viewBox="0 0 14 9"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={styles.colorPickerArrow}
+                      >
+                        <path
+                          d="M1 1l6 6 6-6"
+                          stroke="#525252"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                    {isColorListOpen && (
+                      <ul className={styles.colorList}>
+                        {colorOptions.map((color) => {
+                          const isSelected = selectedColor === color.value;
+                          return (
+                            <li
+                              key={color.value}
+                              className={styles.colorListItem}
                             >
-                              <span
-                                className={styles.colorListItemDot}
-                                style={{
-                                  backgroundColor: color.hex ?? "#d1cdcb",
-                                  border:
-                                    color.hex === "#ffffff" ||
-                                    color.hex === "#fff"
-                                      ? "1px solid #d4d1cb"
-                                      : "1px solid #ffffff80",
+                              <button
+                                type="button"
+                                className={`${styles.colorListItemButton} ${
+                                  isSelected
+                                    ? styles.colorListItemButtonSelected
+                                    : ""
+                                }`}
+                                onClick={() => {
+                                  setSelectedColor(color.value);
+                                  setIsColorListOpen(false);
                                 }}
-                              />
-                              <span className={styles.colorListItemLabel}>
-                                {color.label}
-                              </span>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </div>
-              </div>
-              <div
-                className={`${styles.variantRow} ${styles.variantRowCompact}`}
-              >
-                <label className={styles.label}>Размер</label>
-                <div
-                  className={`${styles.sizePickerWrapper} ${
-                    isSizeListOpen ? styles.sizePickerWrapperOpen : ""
-                  }`}
-                  ref={sizePickerRef}
-                >
-                  <button
-                    type="button"
-                    className={styles.sizePickerButton}
-                    onClick={() => setIsSizeListOpen((prev) => !prev)}
-                    aria-label="Выбрать размер"
-                  >
-                    <span className={styles.sizePickerButtonText}>
-                      {selectedSize.toUpperCase()}
-                    </span>
-                    <svg
-                      width="14"
-                      height="9"
-                      viewBox="0 0 14 9"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className={styles.sizePickerArrow}
-                    >
-                      <path
-                        d="M1 1l6 6 6-6"
-                        stroke="#525252"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </button>
-                  {isSizeListOpen && (
-                    <ul className={styles.sizeList}>
-                      {product.availableSizes.map((size) => {
-                        const isSelected = selectedSize === size;
-                        return (
-                          <li key={size} className={styles.sizeListItem}>
-                            <button
-                              type="button"
-                              className={`${styles.sizeListItemButton} ${
-                                isSelected
-                                  ? styles.sizeListItemButtonSelected
-                                  : ""
-                              }`}
-                              onClick={() => {
-                                setSelectedSize(size);
-                                setIsSizeListOpen(false);
-                              }}
-                              aria-label={`Выбрать размер ${size}`}
-                            >
-                              {isSelected && (
-                                <svg
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 16 16"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className={styles.sizeListItemCheckmark}
-                                >
-                                  <path
-                                    d="M13 4L6 11L3 8"
-                                    stroke="#525252"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              )}
-                              {!isSelected && (
+                                aria-label={`Выбрать цвет ${color.label}`}
+                              >
                                 <span
-                                  className={styles.sizeListItemPlaceholder}
+                                  className={styles.colorListItemDot}
+                                  style={{
+                                    backgroundColor: color.hex ?? "#d1cdcb",
+                                    border:
+                                      color.hex === "#ffffff" ||
+                                      color.hex === "#fff"
+                                        ? "1px solid #d4d1cb"
+                                        : "1px solid #ffffff80",
+                                  }}
                                 />
-                              )}
-                              <span className={styles.sizeListItemLabel}>
-                                {size.toUpperCase()}
-                              </span>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
+                                <span className={styles.colorListItemLabel}>
+                                  {color.label}
+                                </span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  className={styles.sizeWeb}
-                  onClick={() => setIsSizeGuideOpen((prev) => !prev)}
+                <div
+                  className={`${styles.variantRow} ${styles.variantRowCompact}`}
                 >
-                  Размерная сетка
-                </button>
+                  <label className={styles.label}>Размер</label>
+                  <div
+                    className={`${styles.sizePickerWrapper} ${
+                      isSizeListOpen ? styles.sizePickerWrapperOpen : ""
+                    }`}
+                    ref={sizePickerRef}
+                  >
+                    <button
+                      type="button"
+                      className={styles.sizePickerButton}
+                      onClick={() => setIsSizeListOpen((prev) => !prev)}
+                      aria-label="Выбрать размер"
+                    >
+                      <span className={styles.sizePickerButtonText}>
+                        {selectedSize.toUpperCase()}
+                      </span>
+                      <svg
+                        width="14"
+                        height="9"
+                        viewBox="0 0 14 9"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={styles.sizePickerArrow}
+                      >
+                        <path
+                          d="M1 1l6 6 6-6"
+                          stroke="#525252"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                    {isSizeListOpen && (
+                      <ul className={styles.sizeList}>
+                        {product.availableSizes.map((size) => {
+                          const isSelected = selectedSize === size;
+                          return (
+                            <li key={size} className={styles.sizeListItem}>
+                              <button
+                                type="button"
+                                className={`${styles.sizeListItemButton} ${
+                                  isSelected
+                                    ? styles.sizeListItemButtonSelected
+                                    : ""
+                                }`}
+                                onClick={() => {
+                                  setSelectedSize(size);
+                                  setIsSizeListOpen(false);
+                                }}
+                                aria-label={`Выбрать размер ${size}`}
+                              >
+                                {isSelected && (
+                                  <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 16 16"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className={styles.sizeListItemCheckmark}
+                                  >
+                                    <path
+                                      d="M13 4L6 11L3 8"
+                                      stroke="#525252"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                )}
+                                {!isSelected && (
+                                  <span
+                                    className={styles.sizeListItemPlaceholder}
+                                  />
+                                )}
+                                <span className={styles.sizeListItemLabel}>
+                                  {size.toUpperCase()}
+                                </span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
+                </div>
               </div>
+              <button
+                type="button"
+                className={styles.sizeWeb}
+                onClick={() => setIsSizeGuideOpen((prev) => !prev)}
+              >
+                Размерная сетка
+              </button>
               <div className={styles.countAndBuy}>
                 <button
                   type="button"
@@ -417,7 +419,7 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
                     <button
                       type="button"
                       className={`${styles.accordionButton} ${
-                        isSelected ? styles.accordionButtonSelected : ""
+                        isOpen ? styles.accordionButtonSelected : ""
                       } ${isOpen ? styles.accordionButtonOpen : ""}`}
                       onClick={() => handleToggleSection(section.id)}
                       aria-expanded={isOpen}

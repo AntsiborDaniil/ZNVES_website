@@ -187,6 +187,7 @@ const CatalogPageContent = ({ title, products }: CatalogPageContentProps) => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const filtersPanelRef = useRef<HTMLDivElement | null>(null);
   const filtersButtonRef = useRef<HTMLButtonElement | null>(null);
+  const filtersButtonDesktopRef = useRef<HTMLButtonElement | null>(null);
   const categoriesRef = useRef<HTMLElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -195,12 +196,22 @@ const CatalogPageContent = ({ title, products }: CatalogPageContentProps) => {
   // Закрываем панель фильтров при клике вне её
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const clickedOnMobileButton = filtersButtonRef.current?.contains(
+        event.target as Node
+      );
+      const clickedOnDesktopButton = filtersButtonDesktopRef.current?.contains(
+        event.target as Node
+      );
+      const clickedOnPanel = filtersPanelRef.current?.contains(
+        event.target as Node
+      );
+
       if (
         isFiltersOpen &&
         filtersPanelRef.current &&
-        filtersButtonRef.current &&
-        !filtersPanelRef.current.contains(event.target as Node) &&
-        !filtersButtonRef.current.contains(event.target as Node)
+        !clickedOnPanel &&
+        !clickedOnMobileButton &&
+        !clickedOnDesktopButton
       ) {
         setIsFiltersOpen(false);
       }
@@ -395,7 +406,24 @@ const CatalogPageContent = ({ title, products }: CatalogPageContentProps) => {
   return (
     <>
       <div className={styles.intro}>
-        <h1 className={styles.title}>{title}</h1>
+        <div className={styles.titleRow}>
+          <h1 className={styles.title}>{title}</h1>
+          <button
+            ref={filtersButtonRef}
+            className={styles.filtersButtonMobile}
+            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            type="button"
+            aria-label="Фильтры"
+            aria-expanded={isFiltersOpen}
+          >
+            <Image
+              src="/images/catalogs/filters.png"
+              alt="Фильтры"
+              width={24}
+              height={24}
+            />
+          </button>
+        </div>
       </div>
 
       <div className={styles.categoriesRow}>
@@ -425,7 +453,7 @@ const CatalogPageContent = ({ title, products }: CatalogPageContentProps) => {
           })}
         </nav>
         <button
-          ref={filtersButtonRef}
+          ref={filtersButtonDesktopRef}
           className={styles.filtersButton}
           onClick={() => setIsFiltersOpen(!isFiltersOpen)}
           type="button"
