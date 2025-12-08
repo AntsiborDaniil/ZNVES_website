@@ -32,6 +32,7 @@ type ProductDisplaySectionProps = {
   title: string;
   showShopNow: boolean;
   id?: string;
+  isBestseller?: boolean;
 };
 
 const homepageNewInProducts: CatalogProduct[] =
@@ -44,6 +45,7 @@ const ProductDisplaySection = ({
   title,
   showShopNow,
   id,
+  isBestseller = false,
 }: ProductDisplaySectionProps) => {
   const swiperRef = useRef<SwiperInstance | null>(null);
   const [activeArrow, setActiveArrow] = useState<ActiveArrow>(null);
@@ -156,7 +158,10 @@ const ProductDisplaySection = ({
   }, [router, shopNowHref, showShopNow]);
 
   return (
-    <section id={id} className={styles.section}>
+    <section
+      id={id}
+      className={`${styles.section} ${isBestseller ? styles.isBestseller : ""}`}
+    >
       <div className={styles.header}>
         <h1 className={styles.title}>{title}</h1>
         <div className={styles.headerRight}>

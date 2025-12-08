@@ -3,6 +3,10 @@
   background: transparent;
 }
 
+.isBestseller {
+  padding: 0 !important;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -166,6 +170,10 @@
   .section {
     padding: 10px 24px;
   }
+
+  .isBestseller {
+    padding: 0 !important;
+  }
 }
 
 @media (max-width: 1280px) {
@@ -191,6 +199,10 @@
     width: 25px;
     height: 25px;
   }
+
+  .isBestseller {
+    padding: 0 !important;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -215,6 +227,10 @@
   .arrowButton {
     width: 25px;
     height: 25px;
+  }
+
+  .isBestseller {
+    padding: 0 !important;
   }
 }
 
@@ -262,6 +278,10 @@
   .sliderContainer {
     margin: 0;
     padding: 0;
+  }
+
+  .isBestseller {
+    padding: 0 !important;
   }
 }
 
@@ -341,5 +361,9 @@
   .slideLink {
     width: 100%;
     display: block;
+  }
+
+  .isBestseller {
+    padding: 0 !important;
   }
 }

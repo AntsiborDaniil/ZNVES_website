@@ -150,7 +150,7 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
         <section className={styles.content}>
           <div className={styles.gallery} aria-live="polite">
             <div className={styles.imageViewport}>
-              {width && width < 1024 ? (
+              {width && width < 1025 ? (
                 <Swiper
                   slidesPerView={1}
                   spaceBetween={20}
@@ -456,7 +456,11 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
         </section>
       </main>
       <div className={styles.suggestions}>
-        <ProductDisplaySection title="BESTSELLER" showShopNow={false} />
+        <ProductDisplaySection
+          title="BESTSELLER"
+          showShopNow={false}
+          isBestseller={true}
+        />
       </div>
       <Footer />
     </div>

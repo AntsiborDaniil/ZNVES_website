@@ -15,13 +15,19 @@
 .main {
   display: flex;
   width: 100%;
-  padding: 122.615px 360px 120px 360px;
+  padding-top: 122.615px;
+  padding-bottom: 120px;
+  padding-left: clamp(140px, calc(400px - (1920px - 100vw) * 260 / 480), 400px);
+  padding-right: clamp(
+    140px,
+    calc(400px - (1920px - 100vw) * 260 / 480),
+    400px
+  );
 }
 
 .content {
   display: flex;
   width: 100%;
-  gap: 40px;
   justify-content: space-between;
 }
 
@@ -30,7 +36,6 @@
   gap: 32px;
   position: relative;
   overscroll-behavior: contain;
-  max-width: 800px;
 }
 
 .imageViewport {
@@ -66,11 +71,10 @@
 }
 
 .mainImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 600px;
+  height: auto;
 
-  margin-right: 40px;
+  object-fit: contain;
 }
 
 .info {
@@ -79,6 +83,8 @@
   align-self: flex-start;
   gap: 24px;
   position: sticky;
+  top: 100.615px;
+  margin-left: 40px;
   max-width: 560px;
 }
 
@@ -338,6 +344,7 @@
 .colorListItemLabel {
   flex: 1;
   color: #6f6f6f;
+  font-size: 18px;
 }
 
 .sizePickerWrapper {
@@ -458,7 +465,7 @@
   flex: 1;
   color: #6f6f6f;
   font-weight: 300;
-  font-size: 15px;
+  font-size: 18px;
   line-height: 29.76px;
   letter-spacing: 0%;
   vertical-align: middle;
@@ -619,7 +626,6 @@
   letter-spacing: 0px;
 }
 
-
 .accordionIcon {
   width: 36px;
   height: 36px;
@@ -646,7 +652,7 @@
   color: #525252;
 
   font-weight: 400;
-  font-size: 18.5px;
+  font-size: 18.58px;
   line-height: 112.99999999999999%;
   margin-bottom: 43px;
   letter-spacing: 0px;
@@ -654,7 +660,8 @@
 
 .accordionContentInner {
   padding: 0 0 18px;
-  font-size: 16px;
+  font-size: 18.58px;
+  opacity: 0.8;
 }
 
 .sku {
@@ -669,15 +676,6 @@
   background-color: #f2f0ec;
 }
 
-@media (max-width: 1919px) {
-  .main {
-    padding-top: 122.615px;
-    padding-right: 140px;
-    padding-bottom: 120px;
-    padding-left: 140px;
-  }
-}
-
 @media (max-width: 1440px) {
   .content {
     flex-direction: row;
@@ -686,9 +684,7 @@
   }
 
   .gallery {
-    flex: 0 1 auto;
-    max-width: min(600px, calc(48vw - 240px));
-    min-width: 400px;
+    max-width: 100%;
   }
 
   .imageViewport {
@@ -698,14 +694,19 @@
   .info {
     flex: 1 1 auto;
     min-width: 0;
-    max-width: calc(50vw - 240px);
+    width: 100%;
     position: sticky;
+    top: 142.615px;
     align-self: flex-start;
   }
 
   .title {
     font-size: 30px;
     line-height: 35.9px;
+  }
+
+  .label {
+    font-size: 15px;
   }
 
   .price {
@@ -717,13 +718,17 @@
   }
 
   .sizePickerButton {
-    width: 200px;
+    width: 160px;
   }
 
   .accordionButton {
     font-size: 16px;
     line-height: 14.95px;
     padding: 4px 10px 4px 0px;
+  }
+
+  .accordionContentInner {
+    font-size: 16px;
   }
 
   .sizePickerButtonText,
@@ -750,107 +755,71 @@
     max-width: 100%;
   }
 
+  .mainImage {
+    width: 560px;
+  }
+
   .countAndBuy {
     width: 100%;
   }
 
   .variantGroup {
     width: 100%;
+  }
+
+  .sizeWeb {
+    font-size: 12px;
   }
 }
 
 @media (max-width: 1280px) {
+  .content {
+    flex-direction: row;
+    justify-content: center;
+    gap: 40px;
+  }
+
   .main {
-    padding-left: 30px;
-    padding-right: 30px;
+    padding-left: 60px;
+    padding-right: 60px;
   }
 
   .mainImage {
-    object-fit: contain;
+    width: 480px;
+  }
+
+  .imageViewport {
+    max-width: 480px;
   }
 
   .info {
-    gap: 0px;
-  }
-
-  .variantGroup {
-    gap: 0px;
-  }
-
-  .variantRowCompact {
-    gap: 0px;
+    flex: 1 1 auto;
+    min-width: 0;
+    position: sticky;
+    top: 142.615px;
+    align-self: flex-start;
   }
 
   .title {
-    font-weight: 400;
     font-size: 25px;
-    line-height: 35.9px;
-    margin-bottom: 20px;
+    line-height: 25.9px;
   }
 
   .price {
     font-weight: 400;
-    font-size: 25px;
-    line-height: 35.9px;
-
+    font-size: 20px;
     margin-top: 0px;
-    margin-bottom: 102px;
+    margin-bottom: 20px;
   }
 
   .label {
-    font-weight: 300;
-    font-size: 18.44px;
-    line-height: 21.7px;
-    letter-spacing: 0%;
-    margin-bottom: 16px;
-
-    margin-top: 22px;
-  }
-
-  .colorPickerButton {
-    width: 181px;
-    gap: 7px;
-    padding: 6px 15px;
-    margin-bottom: 0px;
-  }
-
-  .colorPickerButtonDot .colorListItemDot,
-  .sizeListItemDot {
-    width: 24.685714721679688px;
-    height: 24.685714721679688px;
-  }
-
-  .colorPickerButtonText,
-  .sizePickerButtonText,
-  .colorListItemLabel,
-  .sizeListItemLabel {
-    font-weight: 300;
-    font-size: 19.2px;
-    line-height: 29.76px;
-  }
-
-  .sizePickerButton {
-    padding: 1px 16px 4px 13px;
-    width: 180px;
-  }
-
-  .sizePickerArrow,
-  .colorPickerArrow {
-    height: 8px;
-    width: 16px;
-  }
-
-  .countAndBuy {
-    margin-top: 0;
+    font-size: 16px;
   }
 
   .sizeWeb {
-    margin-top: 14.38px;
-    margin-bottom: 50px;
-
     font-weight: 400;
-    font-size: 15px;
-    line-height: 14.7px;
+    font-size: 12px;
+    letter-spacing: 0px;
     text-decoration: underline;
     text-decoration-style: solid;
     text-decoration-offset: 25%;
@@ -858,27 +827,37 @@
     text-decoration-skip-ink: auto;
   }
 
-  .addToCartButton {
-    width: 100%;
-    height: 53;
-    opacity: 1;
-    top: 555px;
-    left: 660px;
-    border-radius: 3px;
-    padding-top: 1px;
-    padding-right: 16px;
-    padding-bottom: 1px;
-    padding-left: 16px;
+  .sizePickerButton {
+    width: 150px;
+    padding-bottom: 6px;
+    padding-left: 12px;
+  }
 
-    margin-bottom: 40px;
+  .colorPickerDot {
+    width: 16px;
+    height: 16px;
+  }
+
+  .colorPickerArrow,
+  .sizePickerArrow {
+    width: 10px;
+    height: 10px;
   }
 
   .accordionButton {
-    padding: 10px 15px 10px 0px;
-
-    font-weight: 400;
-    font-size: 17.58px;
+    font-size: 15px;
     line-height: 14.95px;
+    padding: 3px 10px 3px 0px;
+  }
+
+  .accordionContentInner {
+    font-size: 15px;
+  }
+
+  .sizePickerButtonText,
+  .colorPickerButtonText {
+    font-size: 13px;
+    line-height: 24px;
   }
 
   .accordionIcon {
@@ -886,8 +865,25 @@
     height: 30px;
   }
 
-  .sizeGuideContent {
-    margin-bottom: 14px;
+  .colorListItemLabel,
+  .sizeListItemLabel {
+    font-size: 13px;
+    line-height: 24px;
+  }
+
+  .addToCartButton {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 14px;
+    max-width: 100%;
+  }
+
+  .countAndBuy {
+    width: 100%;
+  }
+
+  .variantGroup {
+    width: 100%;
   }
 }
 
@@ -932,7 +928,60 @@
   }
 } */
 
-@media (max-width: 1023px) {
+@media (max-width: 1100px) {
+  .sizePickerButton {
+    width: 140px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .main {
+    padding-left: 42px;
+    padding-right: 42px;
+  }
+
+  .content {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info {
+    margin-left: 0;
+    max-width: 100%;
+  }
+
+  .imageSlider :global(.swiper-pagination-bullet) {
+    background-color: #525252;
+    opacity: 0.5;
+    width: 8px;
+    height: 8px;
+  }
+
+  .imageSlider :global(.swiper-pagination-bullet-active) {
+    background-color: #525252;
+    opacity: 1;
+    width: 8px;
+    height: 8px;
+  }
+
+  .sizePickerButton {
+    width: 180px;
+  }
+
+  .sizePickerButtonText,
+  .colorPickerButtonText {
+    font-size: 14px;
+    line-height: 24px;
+  }
+
+  .colorListItemLabel,
+  .sizeListItemLabel {
+    font-size: 14px;
+    line-height: 24px;
+  }
+}
+
+/* @media (max-width: 1024px) {
   .main {
     padding: 103px 16px 72px 16px;
   }
@@ -956,10 +1005,11 @@
   }
 
   .imageColumn {
-    display: none;
+    display: none !important;
   }
 
   .imageSlider {
+    display: block !important;
     width: 100%;
     height: auto;
   }
@@ -979,10 +1029,14 @@
   .imageSlider :global(.swiper-pagination-bullet) {
     background-color: #525252;
     opacity: 0.5;
+    width: 6px;
+    height: 6px;
   }
 
   .imageSlider :global(.swiper-pagination-bullet-active) {
     opacity: 1;
+    width: 6px;
+    height: 6px;
   }
 
   .imageSlider {
@@ -1094,188 +1148,129 @@
     padding: 0;
     padding-bottom: 30px;
   }
+} */
+
+@media (max-width: 550px) {
+  .main {
+    overflow: hidden;
+  }
+  .mainImage,
+  .imageViewport {
+    width: 350px;
+  }
+}
+
+@media (max-width: 768px) {
+  .imageSlider :global(.swiper-pagination-bullet) {
+    width: 8px;
+    height: 8px;
+  }
+
+  .imageSlider :global(.swiper-pagination-bullet-active) {
+    width: 8px;
+    height: 8px;
+  }
 }
 
 @media (max-width: 480px) {
   .main {
-    padding: 0px 16px 56px;
+    padding-top: 86px;
+    padding-bottom: 56px;
+    padding-left: 16px;
+    padding-right: 16px;
+
     overflow: hidden;
   }
 
-  .mainImage {
-    width: 100%;
-    height: 350px;
-    object-fit: contain;
-  }
-
-  .imageSlider {
-    height: 525px;
-  }
-
-  .content {
-    flex-direction: column;
-    gap: 32px;
-    align-items: stretch;
-  }
-
-  .gallery {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .imageViewport {
-    width: 100%;
-    padding: 0px;
-  }
-
-  .info {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .titleRow {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .variantGroup {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .variantRow {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .variantRowCompact {
-    flex-direction: column;
-    gap: 9px;
-    width: 100%;
-  }
-
-  .sizeWeb {
-    font-size: 12px;
-    margin-top: 0px;
-    text-underline-offset: 2px;
-  }
-
-  .colorPickerWrapper {
-    width: auto;
-  }
-
-  .colorPickerButton {
-    width: fit-content;
-    min-width: fit-content;
-    gap: 0px;
-    height: 25px;
-  }
-
-  .colorPickerButtonDot {
-    width: 16.524171829223633px;
-    height: 16.524171829223633px;
-  }
-
-  .colorPickerButtonText {
-    font-size: 12.85px;
-    line-height: 19.92px;
-    margin-left: 5px;
-    margin-right: 27px;
-    font-weight: 300;
-  }
-
-  .sizePickerButton {
-    width: 169.83180236816406px;
-    padding: 0px 10px 4px 9px;
-  }
-
-  .sizePickerButtonText {
-    font-weight: 300;
-    font-size: 12.85px;
-    line-height: 19.92px;
-  }
-
   .title {
-    font-size: 30px;
-    width: 100%;
-  }
-
-  .price {
-    font-size: 24px;
-    width: 100%;
-    margin-top: 4px;
-    margin-bottom: 0px;
-  }
-
-  .addToCartButton {
-    font-size: 16px;
-    width: 100%;
-    padding: 16px;
-    min-width: 343px;
-    margin-bottom: 0px;
-  }
-
-  .countAndBuy {
-    width: 100%;
-    flex-direction: column;
-    margin-top: 0px;
-    margin-bottom: 49px;
-  }
-
-  .accordion {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .accordionButton {
-    padding: 6.2px 9px 6.2px 0px;
-    font-size: 16px;
-    line-height: 22.75px;
-  }
-
-  .accordionIcon {
-    width: 24px;
-    height: 24px;
-  }
-
-  .accordionContentInner {
-    font-size: 13px;
-    line-height: 15.2px;
-  }
-
-  .suggestions {
-    padding: 0 2px 64px 2px;
-  }
-
-  .title,
-  .price {
     font-size: 18px;
-    line-height: 24px;
+    line-height: 21.43px;
+  }
+
+  .imageSlider :global(.swiper-pagination-bullet) {
+    width: 6px;
+    height: 6px;
+  }
+
+  .imageSlider :global(.swiper-pagination-bullet-active) {
+    width: 6px;
+    height: 6px;
+  }
+
+  .price {
+    font-size: 16px;
+    line-height: 21.43px;
   }
 
   .label {
-    font-weight: 300;
-    font-size: 13px;
-    line-height: 19.53px;
+    font-size: 12px;
+    line-height: 16.43px;
   }
 
-  .sizeButtonText {
-    font-size: 12.85px;
-    line-height: 19.92px;
+  .sizePickerButton {
+    width: 150px;
+    gap: 10px;
   }
 
-  .sizePickerArrow,
-  .colorPickerArrow {
-    width: 17px;
-    height: 7px;
+  .sizePickerButtonText,
+  .colorPickerButtonText {
+    font-size: 12px;
+    line-height: 16.43px;
   }
 
-  .colorPickerButton {
-    padding-right: 10px;
-    padding-left: 10px;
+  .colorListItemLabel,
+  .sizeListItemLabel {
+    font-size: 12px;
+    line-height: 16.43px;
+  }
+
+  .sizeListItemPlaceholder {
+    width: 12px;
+    height: 12px;
+  }
+
+  .sizeListItemCheckmark {
+    width: 12px;
+    height: 12px;
+  }
+
+  .colorPickerButtonDot {
+    width: 16px;
+    height: 16px;
+  }
+
+  .variantRowCompact {
+    gap: 5px;
+  }
+
+  .sizeWeb {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 9.84px;
+    letter-spacing: 0px;
+    text-decoration: underline;
+    text-decoration-style: solid;
+    text-decoration-offset: 25%;
+    text-decoration-thickness: 0%;
+    text-decoration-skip-ink: auto;
+  }
+
+  .suggestions {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 30px;
+  }
+
+  .accordionButton {
+    padding: 2px 10px 2px 0px;
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .main {
+    padding-right: 400px;
+    padding-left: 400px;
   }
 }
 

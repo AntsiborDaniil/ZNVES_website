@@ -161,12 +161,12 @@
 
 @media (max-width: 768px) {
   .imageWrapper {
-    padding: 127px 59px;
+    padding: 82px 33px;
   }
 
   .newBadge {
-    top: -90px;
-    right: -25px;
+    top: -55px;
+    right: -5px;
   }
 
   .addToCartButton {
