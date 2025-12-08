@@ -405,7 +405,8 @@
   position: absolute;
   top: 100%;
   left: 0;
-  right: 0;
+  right: auto;
+  width: 220px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -416,7 +417,6 @@
   overflow: hidden;
   z-index: 10;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  min-width: 192px;
 }
 
 .sizeListItem {
@@ -672,7 +672,7 @@
 }
 
 .suggestions {
-  padding: 0 40px 120px;
+  padding: 0 29px 120px;
   background-color: #f2f0ec;
 }
 
@@ -681,6 +681,10 @@
     flex-direction: row;
     justify-content: center;
     gap: 40px;
+  }
+
+  .main {
+    padding-top: 94px;
   }
 
   .gallery {
@@ -696,7 +700,7 @@
     min-width: 0;
     width: 100%;
     position: sticky;
-    top: 142.615px;
+    top: 94px;
     align-self: flex-start;
   }
 
@@ -719,6 +723,11 @@
 
   .sizePickerButton {
     width: 160px;
+    padding-left: 10px;
+  }
+
+  .sizeList {
+    width: 160px;
   }
 
   .accordionButton {
@@ -737,6 +746,10 @@
     line-height: 24px;
   }
 
+  .colorPickerButtonText {
+    margin-right: 5px;
+  }
+
   .accordionIcon {
     width: 30px;
     height: 30px;
@@ -751,7 +764,7 @@
   .addToCartButton {
     width: 100%;
     padding: 16px 20px;
-    font-size: 14px;
+    font-size: 16px;
     max-width: 100%;
   }
 
@@ -769,6 +782,15 @@
 
   .sizeWeb {
     font-size: 12px;
+  }
+
+  .suggestions {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .sizeList {
+    width: 160px;
   }
 }
 
@@ -796,7 +818,7 @@
     flex: 1 1 auto;
     min-width: 0;
     position: sticky;
-    top: 142.615px;
+    top: 97px;
     align-self: flex-start;
   }
 
@@ -831,6 +853,10 @@
     width: 150px;
     padding-bottom: 6px;
     padding-left: 12px;
+  }
+
+  .sizeList {
+    width: 150px;
   }
 
   .colorPickerDot {
@@ -876,6 +902,11 @@
     padding: 16px 20px;
     font-size: 14px;
     max-width: 100%;
+  }
+
+  .suggestions {
+    padding-right: 20px;
+    padding-left: 20px;
   }
 
   .countAndBuy {
@@ -932,6 +963,10 @@
   .sizePickerButton {
     width: 140px;
   }
+
+  .sizeList {
+    width: 140px;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -950,6 +985,20 @@
     max-width: 100%;
   }
 
+  .addToCartButton {
+    font-size: 16px;
+  }
+
+  .imageSlider {
+    padding-bottom: 30px;
+  }
+
+  .imageSlider :global(.swiper-pagination) {
+    position: static !important;
+    margin-top: 0px;
+    bottom: auto !important;
+  }
+
   .imageSlider :global(.swiper-pagination-bullet) {
     background-color: #525252;
     opacity: 0.5;
@@ -965,6 +1014,10 @@
   }
 
   .sizePickerButton {
+    width: 180px;
+  }
+
+  .sizeList {
     width: 180px;
   }
 
@@ -1012,6 +1065,7 @@
     display: block !important;
     width: 100%;
     height: auto;
+    padding-bottom: 30px;
   }
 
   .imageSlider :global(.swiper-wrapper) {
@@ -1024,6 +1078,12 @@
     height: auto;
     display: flex;
     justify-content: center;
+  }
+
+  .imageSlider :global(.swiper-pagination) {
+    position: static !important;
+    margin-top: 20px;
+    bottom: auto !important;
   }
 
   .imageSlider :global(.swiper-pagination-bullet) {
@@ -1112,6 +1172,10 @@
     width: 350px;
   }
 
+  .sizeList {
+    width: 350px;
+  }
+
   .colorPickerWrapper {
     width: 251px;
   }
@@ -1161,6 +1225,26 @@
 }
 
 @media (max-width: 768px) {
+  .main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .suggestions {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .imageSlider {
+    padding-bottom: 30px;
+  }
+
+  .imageSlider :global(.swiper-pagination) {
+    position: static !important;
+    margin-top: 0px;
+    bottom: auto !important;
+  }
+
   .imageSlider :global(.swiper-pagination-bullet) {
     width: 8px;
     height: 8px;
@@ -1176,15 +1260,29 @@
   .main {
     padding-top: 86px;
     padding-bottom: 56px;
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: 10px;
+    padding-right: 10px;
 
     overflow: hidden;
+  }
+
+  .info {
+    gap: 0px;
   }
 
   .title {
     font-size: 18px;
     line-height: 24.09px;
+  }
+
+  .imageSlider {
+    padding-bottom: 25px;
+  }
+
+  .imageSlider :global(.swiper-pagination) {
+    position: static !important;
+    margin-top: 0px;
+    bottom: auto !important;
   }
 
   .imageSlider :global(.swiper-pagination-bullet) {
@@ -1202,6 +1300,7 @@
   .price {
     font-size: 14px;
     line-height: 22.75px;
+    margin-bottom: 18px;
   }
 
   .label {
@@ -1212,6 +1311,10 @@
   .sizePickerButton {
     width: 150px;
     gap: 10px;
+  }
+
+  .sizeList {
+    width: 150px;
   }
 
   .sizePickerButtonText,
@@ -1255,6 +1358,14 @@
     text-decoration-offset: 25%;
     text-decoration-thickness: 0%;
     text-decoration-skip-ink: auto;
+  }
+
+  .countAndBuy {
+    margin-top: 16px;
+  }
+
+  .addToCartButton {
+    margin-bottom: 28px;
   }
 
   .suggestions {

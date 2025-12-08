@@ -246,6 +246,10 @@
   .rowColumns {
     margin-right: 47px;
   }
+
+  .copyrightInsta {
+    max-width: 405px;
+  }
 }
 
 .columnTitleButton {

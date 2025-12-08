@@ -373,13 +373,6 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
                   </div>
                 </div>
               </div>
-              <button
-                type="button"
-                className={styles.sizeWeb}
-                onClick={() => setIsSizeGuideOpen((prev) => !prev)}
-              >
-                Размерная сетка
-              </button>
               <div className={styles.countAndBuy}>
                 <button
                   type="button"
