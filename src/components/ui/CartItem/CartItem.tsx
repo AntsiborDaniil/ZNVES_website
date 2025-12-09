@@ -70,11 +70,6 @@ const CartItem = ({
                             </p>
                         </div>
                     </div>
-                    {sku && (
-                        <span className={styles.cartItemInfoCenterLeftLabel}>
-                            Артикул: {sku}
-                        </span>
-                    )}
                 </div>
                 <div className={styles.cartItemPrice}>
                     <div className={styles.priceWrapper}>
