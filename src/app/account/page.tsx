@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import PersonalData from "../../components/AccountPage/PersonalData/PersonalData";
@@ -49,6 +50,9 @@ const AccountPage = () => {
       </nav>
       <main className={styles.main}>
         <div className={styles.aside}>
+          <Link href="/catalog" className={styles.backLink}>
+            Вернуться в каталог
+          </Link>
           <h2 className={styles.asideTitle}>Личный кабинет</h2>
           <ul className={styles.navList}>
             <li

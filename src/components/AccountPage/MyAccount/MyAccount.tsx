@@ -75,7 +75,7 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
                             <h1 className={styles.cardHeader}>
                                 Активные заказы
                             </h1>
-                            <h1 className={styles.cardTitle}>
+                            <h1 className={styles.cardTitleCart}>
                                 Заказ от 24.09.2025
                             </h1>
                         </div>
