@@ -292,8 +292,7 @@
   }
 
   .upper {
-    flex-direction: column;
-    gap: 20px;
+    gap: 120px;
     padding-bottom: 10px;
   }
 
@@ -390,6 +389,7 @@
     opacity: 0;
     margin-top: 0;
     gap: 0;
+    pointer-events: none;
   }
 
   .columnListOpen {
@@ -399,16 +399,19 @@
     gap: 2px;
     margin-top: 5px;
     margin-bottom: 25px;
+    pointer-events: auto;
   }
 
   .catalogColumns {
     max-height: 10px;
     opacity: 0;
+    pointer-events: none;
   }
 
   .catalogColumnsOpen {
     max-height: 1000px;
     opacity: 1;
+    pointer-events: auto;
   }
 
   .links {
@@ -463,6 +466,11 @@
 @media (max-width: 768px) {
   .copyrightInsta {
     max-width: 125px;
+  }
+
+  .upper {
+    flex-direction: column;
+    gap: 20px;
   }
 }
 
