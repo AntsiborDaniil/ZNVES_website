@@ -1,6 +1,6 @@
 .accountPage {
   min-height: 100vh;
-  margin-top: 104px;
+  margin-top: 51px;
   background-color: #f2f0ec;
   display: flex;
   flex-direction: column;
@@ -62,22 +62,41 @@
 .main {
   flex: 1;
   display: flex;
-  padding: 60px 20px 100px 0;
+  padding: 20px 210px 90px 200px;
   justify-content: space-between;
 }
 
 .aside {
   flex-shrink: 0;
-  margin-right: 137px;
-  padding-left: 47px;
+  margin-right: 75px;
+}
+
+.backLink {
+  color: #525252c9;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 32.94px;
+  letter-spacing: 0px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  display: block;
+  margin-bottom: 23px;
+}
+
+.backLink:hover {
+  color: #1f1f1f;
+  text-decoration: underline;
 }
 
 .asideTitle {
-  font-weight: 600;
+  color: #525252;
+
+  font-weight: 400;
   font-size: 30px;
   line-height: 32.94px;
-  color: #525252;
-  margin: 0 0 47px 0;
+  letter-spacing: 0px;
+
+  margin-bottom: 35px;
 }
 
 .navList {
@@ -91,29 +110,34 @@
 
 .navListItem {
   font-weight: 400;
-  font-size: 20px;
-  line-height: 32.94px;
+  font-size: 16px;
+  line-height: 28px;
+  letter-spacing: 0px;
+  
   color: #525252;
   cursor: pointer;
   transition: color 0.2s ease;
-  padding: 4px 0;
 }
 
 .navListItem:hover {
-  color: #1f1f1f;
+  color: #525252;
+  font-weight: 500;
+}
+
+.navListItem::marker {
+  color: #525252;
 }
 
 .navListItemActive {
   color: #525252;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .card {
   flex: 1;
-  border-radius: 28px;
-  padding: 40px 48px 40px 0px;
+  border-radius: 3px;
+  padding: 124px 0px 40px 0px;
   display: flex;
-  margin-bottom: 60px;
   flex-direction: column;
   gap: 28px;
 }
@@ -414,58 +438,20 @@
   padding: 0;
 }
 
-@media (max-width: 1620px) and (min-width: 1025px) {
-  .aside {
-    margin-right: 50px;
+@media (max-width: 1500px) {
+  .main {
+    padding-left: 32px;
+    padding-right: 32px;
   }
 }
 
-@media (max-width: 1300px) {
-  .accountPage {
-    margin-top: 68px;
-    align-items: center;
-    width: 100%;
-  }
-
+@media (max-width: 1280px) {
   .main {
-    width: 90%;
-    max-width: 100%;
-  }
-
-  .accountPage > div:last-child {
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
-    margin-right: calc(-50vw + 50%);
-  }
-
-  .mobileNav {
-    display: flex;
-    position: relative;
-  }
-
-  .mobileNavItem {
-    color: #525252c9;
-    padding: 12px;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 32.94px;
-    letter-spacing: 0px;
-  }
-
-  .main {
-    flex-direction: column;
-    padding: 0;
-  }
-
-  .aside {
-    display: none;
-  }
-
-  .card {
-    padding: 20px 16px;
-    border-radius: 0;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 }
+
 
 @media (max-width: 500px) {
   .mobileNav {
