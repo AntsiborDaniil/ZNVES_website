@@ -20,7 +20,7 @@ const CartPage = () => {
     useCart();
   const router = useRouter();
   const { width } = useWindowSize();
-  const isMobile = width > 0 && width <= 1024;
+  const isMobile = width > 0 && width <= 768;
 
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -274,7 +274,7 @@ const CartPage = () => {
                 onClick={handleCheckoutClick}
                 disabled={showCheckoutForm && isMobile}
               >
-                {isMobile ? "Оформить заказ" : "Перейти к оформлению"}
+                Перейти к оформлению
               </button>
             </div>
             {showCheckoutForm && isMobile && (

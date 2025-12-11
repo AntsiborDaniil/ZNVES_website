@@ -10,7 +10,7 @@
   flex: 1;
   display: flex;
   justify-content: center;
-  padding: 60px 210px 100px;
+  padding: 20px 210px 90px;
 }
 
 .backLink {
@@ -42,7 +42,7 @@
   line-height: 32.94px;
   letter-spacing: 0px;
   color: #525252;
-  margin-bottom: 35px;
+  margin-bottom: 20px;
 }
 
 .mainContentWrapper {
@@ -104,12 +104,12 @@
   width: 100%;
   padding: 8px 12px 8px 0px;
   border: none;
-  border-bottom: 1px solid #525252c2;
+  border-bottom: 0.8px solid #B2B2B2;
   background-color: transparent;
   font-size: 16px;
-  color: #525252;
+  color: #B2B2B2;
   font-family: inherit;
-  margin-top: 48px;
+  margin-top: 29px;
   margin-bottom: 15px;
 }
 
@@ -165,6 +165,10 @@
         padding: 20px 32px 100px 32px;
     }
     
+    .cartItemsWrapper {
+        gap: 12px;
+    }
+
   .summary {
     padding: 21px 14px 19px 16px;
   }
@@ -183,15 +187,15 @@
 
   .promoInput {
     font-size: 16px;
-    margin-top: 40px;
-    margin-bottom: 24px;
+    margin-top: 33px;
+    margin-bottom: 15px;
     padding: 4px 16px 6px 0px;
   }
 
   .checkoutButton {
     font-size: 18px;
 
-    height: 58px;
+    height: 53px;
     border-radius: 3px;
     border-width: 0.95px;
     padding-top: 0.95px;
@@ -201,32 +205,55 @@
   }
 }
 
-@media (max-width: 1200px) {
-  .summary {
-    width: 330px;
-  }
+@media (max-width: 1280px) {
+    .main {
+        padding: 20px 20px 90px 20px;
+    }
+
+    .summary {
+        width: 300px;
+        padding: 21px 14px 19px 16px;
+    }
+
+    .summaryLabel {
+        font-size: 20px;
+    }
+
+    .summaryTotal {
+        font-size: 20px;
+    }
+
+    .promoInput {
+        font-size: 14px;
+        margin-top: 33px;
+        margin-bottom: 15px;
+        padding: 4px 16px 6px 0px;
+    }
+
+    .checkoutButton {
+        font-size: 14px;
+        height: 46px;
+        padding-top: 0.95px;
+        padding-right: 15.17px;
+        padding-bottom: 0.95px;
+        padding-left: 15.17px;
+    }
 }
 
-@media (max-width: 1150px) {
-  .cart {
-    margin-top: 68px;
-  }
+@media (max-width: 1024px) {
+    .mainContentWrapper {
+        gap: 12px;
+    }
 
-  .mainContentWrapper {
-    flex-direction: column;
-  }
+    .cartTitle {
+        font-size: 29px;
+        line-height: 32.94px;
+    }
 
-  .cartTitle {
-    font-size: 36px;
-    line-height: 44px;
-  }
-
-  .summary {
-    width: 100%;
-    position: static;
-  }
+    .backLink {
+        font-size: 13px;
+    }
 }
-
 /* @media (max-width: 1300px) {
   .mainContentWrapper {
      flex-direction: column; 
@@ -238,54 +265,7 @@
   }
 } */
 
-@media (max-width: 768px) {
-  .main {
-    padding: 20px 16px 41px 15px;
-  }
 
-  .summary {
-    padding: 21px 14px 19px 16px;
-  }
-
-  .mainContentWrapper {
-    align-items: normal;
-  }
-
-  .summaryLabel {
-    font-size: 20px;
-  }
-
-  .summaryTotal {
-    font-size: 20px;
-  }
-
-  .promoInput {
-    font-size: 13px;
-    margin-top: 33px;
-    margin-bottom: 27px;
-    padding: 4px 16px 6px 0px;
-  }
-
-  .checkoutButton {
-    font-size: 15px;
-
-    height: 50px;
-    padding-top: 1px;
-    padding-right: 16px;
-    padding-bottom: 1px;
-    padding-left: 16px;
-  }
-
-  .backLink {
-    display: none;
-  }
-
-  .cartTitle {
-    text-transform: uppercase;
-    margin-bottom: 30px;
-    font-size: 25px;
-  }
-}
 
 .emptyCart {
   display: flex;
@@ -337,33 +317,16 @@
   color: #525252;
 }
 
-@media (max-width: 1024px) {
-  .emptyCart {
-    padding: 80px 20px;
-    min-height: 50vh;
-  }
-
-  .emptyTitle {
-    font-weight: 400;
-    font-size: 32px;
-    line-height: 22.36px;
-    letter-spacing: 0px;
-  }
-
-  .emptyText {
-    font-size: 16px;
-    line-height: 24px;
-  }
-
-  .shopButton {
-    padding: 16px 40px;
-    font-size: 16px;
-    width: 100%;
-    max-width: 300px;
-  }
-}
-
 @media (max-width: 768px) {
+    .mainContentWrapper {
+        flex-direction: column;
+    }
+
+    .summary {
+        width: 100%;
+        position: static;
+    }
+
   .emptyCart {
     padding: 60px 16px;
     min-height: 40vh;
@@ -384,6 +347,18 @@
     padding: 14px 32px;
     font-size: 15px;
   }
+
+
+}
+
+@media (max-width: 480px) {
+    .main {
+        padding: 20px 16px 51px 16px;
+    }
+
+    .backLink {
+        margin-bottom: 20px;
+    }
 }
 
 /* Мобильная форма оформления заказа */
