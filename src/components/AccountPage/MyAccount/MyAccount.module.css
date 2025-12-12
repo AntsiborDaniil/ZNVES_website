@@ -144,8 +144,7 @@
 }
 
 .thumbnail {
-  width: 60px;
-  height: 60px;
+  width: 68px;
   border-radius: 8px;
   overflow: hidden;
   background-color: #ffffff;
@@ -191,7 +190,6 @@
     font-size: 16px;
     line-height: 20px;
     letter-spacing: 0%;
-    
   }
 
   .orderStatus {
@@ -204,11 +202,6 @@
     line-height: 28px;
   }
 
-  .thumbnailImage {
-    width: 25px ;
-    height: 23.425756454467773px;    
-  }
-
   .thumbnailImageArrow {
     width: 31.21px;
     height: 29.25px;
@@ -219,7 +212,179 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1024px) {
+  .cardHeader {
+    font-size: 14px;
+    line-height: 28px;
+  }
+
+  .cardTitle {
+    font-size: 19px;
+    line-height: 28px;
+  }
+
+  .cardInfoItem {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0%;
+  }
+
+  .cardTitleCart {
+    font-size: 19px;
+    line-height: 28px;
+  }
+
+  .orderStatus {
+    font-size: 14px;
+    line-height: 28px;
+    text-wrap: nowrap;
+  }
+
+  .orderStateText {
+    font-size: 14px;
+    line-height: 28px;
+  }
+
+  .thumbnail {
+    display: none;
+  }
+
+  .thumbnailImageArrow {
+    width: 25px;
+    height: 23px;
+  }
+
+  .orderDetailsLeft {
+    gap: 7px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cardHeader {
+    font-size: 14px;
+    line-height: 28px;
+  }
+
+  .card {
+    padding: 20px 27px;
+  }
+
+  .cardTitle {
+    font-size: 19px;
+    line-height: 28px;
+  }
+
+  .cardInfo {
+    flex-direction: row;
+    gap: 14px;
+  }
+
+  .cardInfoItem {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0%;
+  }
+
+  .cardTitleCart {
+    font-size: 19px;
+    line-height: 28px;
+  }
+
+  .orderStatus {
+    font-size: 14px;
+    line-height: 28px;
+    text-wrap: nowrap;
+  }
+
+  .orderStateText,
+  .orderDetailsBottom {
+    display: none;
+  }
+
+  .thumbnail {
+    display: none;
+  }
+
+  .thumbnailImageArrow {
+    width: 25px;
+    height: 23px;
+  }
+
+  .orderDetailsLeft {
+    gap: 7px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    gap: 10px;
+  }
+
+  .card {
+    padding: 19px 16px 19px;
+  }
+
+  .cardHeader {
+    font-size: 14px;
+    line-height: 28px;
+  }
+
+  .cardTitle {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0%;
+
+    text-wrap: nowrap;
+  }
+
+  .cardInfo {
+    flex-direction: row;
+    gap: 14px;
+  }
+
+  .cardInfoItem {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 0%;
+  }
+
+  .cardTitleCart {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .cardContent {
+    gap: 15px;
+  }
+
+  .orderStatus {
+    font-size: 12px;
+    line-height: 28px;
+    text-wrap: nowrap;
+  }
+
+  .orderStateText,
+  .orderDetailsBottom {
+    display: none;
+  }
+
+  .thumbnail {
+    display: none;
+  }
+
+  .thumbnailImageArrow {
+    width: 17px;
+    height: 16px;
+  }
+
+  .orderDetailsLeft {
+    gap: 7px;
+  }
+
   .orderDetailsContainer {
     gap: 0px;
     justify-content: space-between;
@@ -262,73 +427,3 @@
     height: 22px;
   }
 } */
-
-@media (max-width: 500px) {
-  .card {
-    padding: 14px 12px 14px 14px;
-  }
-
-  .cardHeader {
-    font-size: 14px;
-    line-height: 28px;
-  }
-
-  .cardTitle {
-    font-size: 16px;
-    line-height: 28px;
-    max-width: 200px;
-  }
-
-  .cardInfoItem {
-    font-size: 12px;
-    line-height: 20px;
-  }
-
-  .orderStatus {
-    font-size: 12px;
-    line-height: 28px;
-    text-wrap: nowrap;
-  }
-
-  .orderStateText {
-    font-size: 10.06px;
-    line-height: 17.6px;
-    letter-spacing: 0%;
-    text-decoration: underline;
-    text-decoration-style: solid;
-    text-decoration-offset: 25%;
-  }
-
-  .thumbnail {
-    width: 39.82857131958008px;
-    height: 53.31383514404297px;
-  }
-
-  .orderDetailsLeft {
-    gap: 0px;
-  }
-
-  .thumbnailImage {
-    width: 39.82857131958008px;
-    height: 53.31383514404297px;
-    object-fit: cover;
-  }
-
-  .thumbnailImageArrow {
-    width: 17.075220108032227px;
-    height: 16px;
-    margin-top: 6px;
-  }
-
-  .orderThumbnails {
-    gap: 4px;
-  }
-
-  .cardContent {
-    gap: 15px;
-  }
-
-  .cardContentInner {
-    align-items: normal;
-  }
-}

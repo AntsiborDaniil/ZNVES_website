@@ -113,7 +113,7 @@
   font-size: 16px;
   line-height: 28px;
   letter-spacing: 0px;
-  
+
   color: #525252;
   cursor: pointer;
   transition: color 0.2s ease;
@@ -452,18 +452,63 @@
   }
 }
 
+@media (max-width: 1024px) {
+  .aside {
+    display: none;
+  }
 
-@media (max-width: 500px) {
+  .main {
+    padding-top: 5px;
+  }
+
+  .mobileNavSeparator {
+    display: block;
+    height: 9px;
+  }
+
+  .mobileNavItem {
+    padding: 0px;
+    padding-right: 11px;
+    padding-left: 11px;
+
+    color: #525252c9;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 32.94px;
+    letter-spacing: 0px;
+  }
+
+  .mobileNavItemActive {
+    color: #525252;
+  }
+
+  .mobileNav {
+    display: flex;
+    margin-top: 20px;
+    margin-bottom: 21px;
+  }
+
+  .card {
+    padding-top: 0px;
+  }
+}
+
+@media (max-width: 480px) {
   .mobileNav {
     margin-top: 20px;
   }
 
+  .accountPage {
+    margin-top: 51px;
+  }
+
   .main {
     width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .accountPage {
-    margin-top: 68px;
     align-items: normal;
     width: 100%;
   }
