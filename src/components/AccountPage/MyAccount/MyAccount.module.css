@@ -175,12 +175,16 @@
 }
 
 @media (max-width: 1440px) {
+    .card {
+        padding: 27px;
+    }
   .cardHeader {
     font-size: 16px;
     line-height: 28px;
   }
 
-  .cardTitle {
+  .cardTitle,
+  .cardTitleCart {
     font-size: 24px;
     line-height: 28px;
   }
@@ -216,6 +220,10 @@
   .cardHeader {
     font-size: 14px;
     line-height: 28px;
+  }
+
+  .card {
+    padding: 20px;
   }
 
   .cardTitle {

@@ -65,7 +65,7 @@
   flex-shrink: 0;
   background-color: #f8f8f8;
   border-radius: 3px;
-  padding: 26px 20px;
+  padding: 24px 20px;
   display: flex;
   flex-direction: column;
   height: fit-content;
@@ -88,7 +88,7 @@
 }
 
 .summaryTotal {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 24px;
   line-height: 38px;
   color: #525252;
@@ -170,7 +170,7 @@
     }
 
   .summary {
-    padding: 21px 14px 19px 16px;
+    padding: 24px 20px;
   }
 
   .mainContentWrapper {
@@ -212,7 +212,6 @@
 
     .summary {
         width: 300px;
-        padding: 21px 14px 19px 16px;
     }
 
     .summaryLabel {
@@ -354,6 +353,10 @@
 @media (max-width: 480px) {
     .main {
         padding: 20px 16px 51px 16px;
+    }
+
+    .summary {
+        padding: 20px;
     }
 
     .backLink {

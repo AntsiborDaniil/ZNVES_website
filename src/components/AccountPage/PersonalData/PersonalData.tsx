@@ -170,7 +170,7 @@ const PersonalData = () => {
       <label className={styles.passwordLabel}>{label}</label>
       <div className={styles.passwordInputWrapper}>
         <input
-          className={styles.passwordInput}
+          className={styles.input}
           type={passwordVisibility[field] ? "text" : "password"}
           placeholder={placeholder}
           value={passwordForm[field]}
@@ -283,7 +283,7 @@ const PersonalData = () => {
       <section className={styles.passwordPanel}>
         <h2 className={styles.subsectionHeading}>Изменить пароль</h2>
         <form
-          className={styles.passwordForm}
+          className={styles.fieldsGrid}
           onSubmit={(event) => {
             event.preventDefault();
             handlePasswordSubmit();
