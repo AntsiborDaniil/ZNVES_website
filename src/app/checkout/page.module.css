@@ -88,22 +88,39 @@
   padding: 0;
   cursor: pointer;
   color: #525252;
-  font-weight: 600;
+  font-weight: 400;
   font-size: 18px;
   line-height: 23.93px;
   letter-spacing: 0%;
   text-decoration: underline;
   text-decoration-style: solid;
-  text-decoration-offset: 25%;
-  text-decoration-thickness: 7%;
-  text-decoration-skip-ink: auto;
+  text-decoration-thickness: 1px;
   text-align: left;
   font-family: inherit;
   transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .telegramButton:hover {
   color: #1f1f1f;
+}
+
+.telegramIcon {
+  width: 24px;
+  height: 24px;
+  background-color: #525252;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.telegramIcon svg {
+  width: 14px;
+  height: 14px;
 }
 
 .telegramDescription {
@@ -207,9 +224,261 @@
   padding: 16px 0;
 }
 
+.deliveryTypeRow {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+.deliveryTypeButton {
+  width: 221px;
+  height: 80px;
+  padding: 2px;
+  display: flex;
+  align-items: flex-start;
+  border: none;
+  border-radius: 8px;
+  background-color: #f8f8f8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  box-shadow: 0px 2px 5px 0px rgba(82, 82, 82, 0.2), 0px 0px 0px 2px #525252;
+}
+
+.deliveryTypeButton:hover {
+  background-color: #f0f0f0;
+}
+
+.deliveryTypeButton input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.deliveryTypeButton:has(input[type="radio"]:checked) {
+  background-color: #ffffff;
+  box-shadow: 0px 2px 5px 0px rgba(82, 82, 82, 0.2), 0px 0px 0px 2px #525252;
+}
+
+.deliveryTypeButton:not(:has(input[type="radio"]:checked)) {
+  background-color: #f8f8f8;
+  box-shadow: 0px 2px 5px 0px rgba(82, 82, 82, 0.2),
+    0px 0px 0px 1px rgba(82, 82, 82, 0.3);
+}
+
+.deliveryTypeButtonContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  position: relative;
+}
+
+.deliveryTypeText {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 23.93px;
+  color: #525252;
+}
+
+.deliveryButtonsRow {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.deliveryButton {
+  width: 221px;
+  height: 116px;
+  padding: 2px;
+  display: flex;
+  align-items: flex-start;
+  border: none;
+  border-radius: 8px;
+  background-color: #f8f8f8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  box-shadow: 0px 2px 5px 0px rgba(82, 82, 82, 0.2), 0px 0px 0px 2px #525252;
+}
+
+.deliveryButton:hover {
+  background-color: #f0f0f0;
+}
+
+.deliveryButton input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.deliveryButton:has(input[type="radio"]:checked) {
+  background-color: #ffffff;
+  box-shadow: 0px 2px 5px 0px rgba(82, 82, 82, 0.2), 0px 0px 0px 2px #525252;
+}
+
+.deliveryButton:not(:has(input[type="radio"]:checked)) {
+  background-color: #f8f8f8;
+  box-shadow: 0px 2px 5px 0px rgba(82, 82, 82, 0.2),
+    0px 0px 0px 1px rgba(82, 82, 82, 0.3);
+}
+
+.deliveryButtonContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  position: relative;
+}
+
+.deliveryButtonInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.deliveryButtonName {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 23.93px;
+  color: #525252;
+}
+
+.deliveryButtonSubtext {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
+  color: #525252cc;
+}
+
+.deliveryButtonPrice {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
+  color: #22a55a;
+  white-space: nowrap;
+}
+
+.deliveryButtonPriceCourier {
+  color: #525252;
+}
+
+.deliveryCheckmark {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(25, 24, 23, 0.11);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.deliveryCheckmarkActive {
+  background-color: #525252;
+}
+
+.checkmarkIcon {
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkmark {
+  font-size: 20px;
+  color: #525252;
+  font-weight: bold;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .paymentOptions {
   display: flex;
   flex-direction: column;
+}
+
+.paymentButtonsRow {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.paymentButton {
+  width: 110px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid #525252;
+  border-radius: 3px;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.paymentButton:hover {
+  border-color: #1f1f1f;
+}
+
+.paymentButton input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.paymentButton:has(input[type="radio"]:checked) {
+  box-shadow: 0px 0px 0px 2px #525252;
+  border-color: #525252;
+}
+
+.paymentButtonContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+}
+
+.paymentButtonIcon {
+  flex-shrink: 0;
+}
+
+.paymentButtonText {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  color: #525252;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.radioInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 .paymentTitle {
   color: #525252;
@@ -811,6 +1080,36 @@
     position: static;
     max-height: none;
   }
+
+  .deliveryTypeRow {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .deliveryTypeButton {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .deliveryButtonsRow {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .deliveryButton {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .paymentButtonsRow {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .paymentButton {
+    width: calc(50% - 6px);
+    height: 65px;
+  }
 }
 
 /* Мобильная форма оформления заказа */
@@ -1323,6 +1622,32 @@
 }
 
 @media (max-width: 1440px) {
+  .deliveryTypeRow {
+    gap: 12px;
+  }
+
+  .deliveryTypeButton {
+    width: 200px;
+    height: 75px;
+  }
+
+  .deliveryButtonsRow {
+    gap: 12px;
+  }
+
+  .deliveryButton {
+    width: 200px;
+    height: 110px;
+  }
+
+  .paymentButtonsRow {
+    gap: 12px;
+  }
+
+  .paymentButton {
+    width: 100px;
+    height: 65px;
+  }
   .main {
     padding: 60px 185px;
   }

@@ -21,12 +21,17 @@ const CheckoutPage = () => {
     lastName: "",
     phone: "",
     email: "",
+    deliveryFirstName: "",
+    deliveryLastName: "",
+    deliveryPhone: "",
+    deliveryEmail: "",
     city: "",
     street: "",
     house: "",
     apartment: "",
-    deliveryMethod: "cdek",
-    paymentMethod: "card",
+    deliveryType: "cdek",
+    deliveryMethod: "pickup",
+    paymentMethod: "sberbank",
     agreeToOffer: false,
     agreeToPrivacy: false,
   });
@@ -38,8 +43,8 @@ const CheckoutPage = () => {
 
   // Цены доставки
   const deliveryPrices = {
-    cdek: 300,
-    yandex: 800,
+    pickup: 0,
+    yandex: 300,
   };
 
   // Расчет итоговой суммы
@@ -65,10 +70,20 @@ const CheckoutPage = () => {
   ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+
+    // При смене типа доставки сбрасываем метод доставки на pickup
+    if (name === "deliveryType") {
+      setFormData((prev) => ({
+        ...prev,
+        deliveryType: value,
+        deliveryMethod: "pickup",
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
   };
 
   const handleAddressSelect = (addressData: {
@@ -233,15 +248,26 @@ const CheckoutPage = () => {
 
               <div className={styles.telegramSection}>
                 <button className={styles.telegramButton} type="button">
-                  Подключить Telegram
+                  <div className={styles.telegramIcon}>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM16.64 8.8C16.49 10.38 15.84 14.22 15.51 15.99C15.37 16.74 15.09 16.99 14.83 17.02C14.25 17.07 13.81 16.64 13.25 16.27C12.37 15.69 11.87 15.33 11.02 14.77C10.03 14.12 10.67 13.76 11.24 13.18C11.39 13.03 13.95 10.7 14 10.49C14.01 10.45 14.01 10.29 13.94 10.23C13.87 10.17 13.74 10.19 13.65 10.2C13.52 10.22 11.98 11.24 9.78 12.98C9.29 13.34 8.84 13.52 8.45 13.5C8.01 13.48 7.16 13.23 6.5 13.01C5.79 12.77 5.23 12.64 5.28 12.25C5.31 12.02 5.66 11.78 6.35 11.52C10.17 9.89 12.62 8.78 13.69 8.19C16.45 6.81 17.07 6.49 17.45 6.49C17.54 6.49 17.75 6.51 17.88 6.62C17.99 6.71 18.02 6.83 18.03 6.92C18.04 7.01 18.06 7.21 17.95 7.33C17.85 7.45 16.78 8.2 16.64 8.8Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </div>
+                  <span>Подключить Telegram</span>
                 </button>
-                <p className={styles.telegramDescription}>
-                  Получайте уведомления о статусе заказа прямо в Telegram.
-                </p>
               </div>
 
               <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>Контактная информация</h2>
+                <h2 className={styles.sectionTitle}>Личные данные</h2>
                 <div className={styles.firstInputs}>
                   <div className={styles.inputWrapper}>
                     <label htmlFor="firstName" className={styles.label}>
@@ -251,7 +277,7 @@ const CheckoutPage = () => {
                       type="text"
                       id="firstName"
                       name="firstName"
-                      placeholder="Введите ваше имя*"
+                      placeholder="Введите ваше имя"
                       value={formData.firstName}
                       onChange={handleInputChange}
                       className={styles.input}
@@ -259,13 +285,13 @@ const CheckoutPage = () => {
                   </div>
                   <div className={styles.inputWrapper}>
                     <label htmlFor="lastName" className={styles.label}>
-                      Фамилия
+                      Имя
                     </label>
                     <input
                       type="text"
                       id="lastName"
                       name="lastName"
-                      placeholder="Введите вашу фамилию*"
+                      placeholder="Введите ваше имя"
                       value={formData.lastName}
                       onChange={handleInputChange}
                       className={styles.input}
@@ -274,20 +300,6 @@ const CheckoutPage = () => {
                 </div>
                 <div className={styles.infoInputs}>
                   <div className={styles.inputWrapper}>
-                    <label htmlFor="phone" className={styles.label}>
-                      Телефон
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      placeholder="Введите ваш телефон*"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  </div>
-                  <div className={styles.inputWrapper}>
                     <label htmlFor="email" className={styles.label}>
                       Email
                     </label>
@@ -295,7 +307,21 @@ const CheckoutPage = () => {
                       type="email"
                       id="email"
                       name="email"
-                      placeholder="Введите ваш email*"
+                      placeholder="Введите ваш email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="email2" className={styles.label}>
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="email2"
+                      name="email"
+                      placeholder="Введите ваш email"
                       value={formData.email}
                       onChange={handleInputChange}
                       className={styles.input}
@@ -305,8 +331,244 @@ const CheckoutPage = () => {
               </div>
 
               <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>Адрес доставки</h2>
-                <div className={styles.delivery}>
+                <h2 className={styles.sectionTitle}>Вариант доставки</h2>
+                <div className={styles.deliveryTypeRow}>
+                  <label className={styles.deliveryTypeButton}>
+                    <input
+                      type="radio"
+                      name="deliveryType"
+                      value="cdek"
+                      checked={formData.deliveryType === "cdek"}
+                      onChange={handleInputChange}
+                      className={styles.radioInput}
+                    />
+                    <div className={styles.deliveryTypeButtonContent}>
+                      <span className={styles.deliveryTypeText}>СДЕК</span>
+                      <div
+                        className={`${styles.deliveryCheckmark} ${
+                          formData.deliveryType === "cdek"
+                            ? styles.deliveryCheckmarkActive
+                            : ""
+                        }`}
+                      >
+                        {formData.deliveryType === "cdek" && (
+                          <span className={styles.checkmarkIcon}>✓</span>
+                        )}
+                      </div>
+                    </div>
+                  </label>
+                  <label className={styles.deliveryTypeButton}>
+                    <input
+                      type="radio"
+                      name="deliveryType"
+                      value="yandex"
+                      checked={formData.deliveryType === "yandex"}
+                      onChange={handleInputChange}
+                      className={styles.radioInput}
+                    />
+                    <div className={styles.deliveryTypeButtonContent}>
+                      <span className={styles.deliveryTypeText}>
+                        ЯНДЕКС.КУРЬЕР
+                      </span>
+                      <div
+                        className={`${styles.deliveryCheckmark} ${
+                          formData.deliveryType === "yandex"
+                            ? styles.deliveryCheckmarkActive
+                            : ""
+                        }`}
+                      >
+                        {formData.deliveryType === "yandex" && (
+                          <span className={styles.checkmarkIcon}>✓</span>
+                        )}
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Доставка</h2>
+                <div className={styles.deliveryButtonsRow}>
+                  {formData.deliveryType === "cdek" && (
+                    <label className={styles.deliveryButton}>
+                      <input
+                        type="radio"
+                        name="deliveryMethod"
+                        value="pickup"
+                        checked={formData.deliveryMethod === "pickup"}
+                        onChange={handleInputChange}
+                        className={styles.radioInput}
+                      />
+                      <div className={styles.deliveryButtonContent}>
+                        <div className={styles.deliveryButtonInfo}>
+                          <span className={styles.deliveryButtonName}>
+                            Пункт выдачи
+                          </span>
+                          <span className={styles.deliveryButtonSubtext}>
+                            Послезавтра
+                          </span>
+                        </div>
+                        <span className={styles.deliveryButtonPrice}>
+                          бесплатно
+                        </span>
+                        <div
+                          className={`${styles.deliveryCheckmark} ${
+                            formData.deliveryMethod === "pickup"
+                              ? styles.deliveryCheckmarkActive
+                              : ""
+                          }`}
+                        >
+                          {formData.deliveryMethod === "pickup" && (
+                            <span className={styles.checkmarkIcon}>✓</span>
+                          )}
+                        </div>
+                      </div>
+                    </label>
+                  )}
+                  {formData.deliveryType === "yandex" && (
+                    <>
+                      <label className={styles.deliveryButton}>
+                        <input
+                          type="radio"
+                          name="deliveryMethod"
+                          value="pickup"
+                          checked={formData.deliveryMethod === "pickup"}
+                          onChange={handleInputChange}
+                          className={styles.radioInput}
+                        />
+                        <div className={styles.deliveryButtonContent}>
+                          <div className={styles.deliveryButtonInfo}>
+                            <span className={styles.deliveryButtonName}>
+                              Пункт выдачи
+                            </span>
+                            <span className={styles.deliveryButtonSubtext}>
+                              Послезавтра
+                            </span>
+                          </div>
+                          <span className={styles.deliveryButtonPrice}>
+                            бесплатно
+                          </span>
+                          <div
+                            className={`${styles.deliveryCheckmark} ${
+                              formData.deliveryMethod === "pickup"
+                                ? styles.deliveryCheckmarkActive
+                                : ""
+                            }`}
+                          >
+                            {formData.deliveryMethod === "pickup" && (
+                              <span className={styles.checkmarkIcon}>✓</span>
+                            )}
+                          </div>
+                        </div>
+                      </label>
+                      <label className={styles.deliveryButton}>
+                        <input
+                          type="radio"
+                          name="deliveryMethod"
+                          value="yandex"
+                          checked={formData.deliveryMethod === "yandex"}
+                          onChange={handleInputChange}
+                          className={styles.radioInput}
+                        />
+                        <div className={styles.deliveryButtonContent}>
+                          <div className={styles.deliveryButtonInfo}>
+                            <span className={styles.deliveryButtonName}>
+                              Курьером
+                            </span>
+                            <span className={styles.deliveryButtonSubtext}>
+                              1-7 дней
+                            </span>
+                          </div>
+                          <span
+                            className={`${styles.deliveryButtonPrice} ${styles.deliveryButtonPriceCourier}`}
+                          >
+                            от {formatPrice(deliveryPrices.yandex)}
+                          </span>
+                          <div
+                            className={`${styles.deliveryCheckmark} ${
+                              formData.deliveryMethod === "yandex"
+                                ? styles.deliveryCheckmarkActive
+                                : ""
+                            }`}
+                          >
+                            {formData.deliveryMethod === "yandex" && (
+                              <span className={styles.checkmarkIcon}>✓</span>
+                            )}
+                          </div>
+                        </div>
+                      </label>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Данные о доставке</h2>
+                <div className={styles.firstInputs}>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="deliveryFirstName" className={styles.label}>
+                      Имя
+                    </label>
+                    <input
+                      type="text"
+                      id="deliveryFirstName"
+                      name="deliveryFirstName"
+                      placeholder="Введите ваше имя"
+                      value={formData.deliveryFirstName}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="deliveryLastName" className={styles.label}>
+                      Имя
+                    </label>
+                    <input
+                      type="text"
+                      id="deliveryLastName"
+                      name="deliveryLastName"
+                      placeholder="Введите ваше имя"
+                      value={formData.deliveryLastName}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                </div>
+                <div className={styles.infoInputs}>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="deliveryEmail" className={styles.label}>
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="deliveryEmail"
+                      name="deliveryEmail"
+                      placeholder="Введите ваш email"
+                      value={formData.deliveryEmail}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="deliveryEmail2" className={styles.label}>
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="deliveryEmail2"
+                      name="deliveryEmail"
+                      placeholder="Введите ваш email"
+                      value={formData.deliveryEmail}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {formData.deliveryMethod === "yandex" && (
+                <div className={styles.section}>
+                  <h2 className={styles.sectionTitle}>Адрес доставки</h2>
                   <div className={styles.firstInputs}>
                     <div className={styles.inputWrapper}>
                       <label htmlFor="city" className={styles.label}>
@@ -316,7 +578,7 @@ const CheckoutPage = () => {
                         type="text"
                         id="city"
                         name="city"
-                        placeholder="Введите ваш город*"
+                        placeholder="Введите ваш город"
                         value={formData.city}
                         onChange={handleInputChange}
                         className={styles.input}
@@ -330,7 +592,7 @@ const CheckoutPage = () => {
                         type="text"
                         id="street"
                         name="street"
-                        placeholder="Введите вашу улицу*"
+                        placeholder="Введите вашу улицу"
                         value={formData.street}
                         onChange={handleInputChange}
                         className={styles.input}
@@ -346,7 +608,7 @@ const CheckoutPage = () => {
                         type="text"
                         id="house"
                         name="house"
-                        placeholder="Введите ваш дом*"
+                        placeholder="Введите ваш дом"
                         value={formData.house}
                         onChange={handleInputChange}
                         className={styles.input}
@@ -360,7 +622,7 @@ const CheckoutPage = () => {
                         type="text"
                         id="apartment"
                         name="apartment"
-                        placeholder="Введите вашу квартиру*"
+                        placeholder="Введите вашу квартиру"
                         value={formData.apartment}
                         onChange={handleInputChange}
                         className={styles.input}
@@ -368,69 +630,17 @@ const CheckoutPage = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               <div className={styles.section}>
-                <div className={styles.deliveryOptions}>
-                  <h2 className={styles.sectionTitle}>Доставка</h2>
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="deliveryMethod"
-                      value="cdek"
-                      checked={formData.deliveryMethod === "cdek"}
-                      onChange={handleInputChange}
-                      className={styles.radio}
-                    />
-                    <div className={styles.deliveryOptionContent}>
-                      <div className={styles.deliveryOptionInfo}>
-                        <span className={styles.deliveryOptionName}>
-                          Доставка СДЭК
-                        </span>
-                        <span className={styles.deliveryOptionTime}>
-                          3-5 дней
-                        </span>
-                      </div>
-                      <span className={styles.deliveryOptionPrice}>
-                        {formatPrice(deliveryPrices.cdek)}
-                      </span>
-                    </div>
-                  </label>
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="deliveryMethod"
-                      value="yandex"
-                      checked={formData.deliveryMethod === "yandex"}
-                      onChange={handleInputChange}
-                      className={styles.radio}
-                    />
-                    <div className={styles.deliveryOptionContent}>
-                      <div className={styles.deliveryOptionInfo}>
-                        <span className={styles.deliveryOptionName}>
-                          Доставка ЯНДЕКС
-                        </span>
-                        <span className={styles.deliveryOptionTime}>
-                          6-7 дней
-                        </span>
-                      </div>
-                      <span className={styles.deliveryOptionPrice}>
-                        {formatPrice(deliveryPrices.yandex)}
-                      </span>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>Получение</h2>
+                <h2 className={styles.sectionTitle}>Пункт получения</h2>
                 <div className={styles.checkoutMapSearchContainer}>
                   <input
                     type="text"
                     id="mapSearchInput"
                     name="mapSearchInput"
                     className={styles.checkoutMapSearchInput}
-                    placeholder="Поиск адреса на карте"
+                    placeholder="Выберите пункт получения"
                     value={
                       mapSearchValue ||
                       [formData.city, formData.street, formData.house]
@@ -454,74 +664,110 @@ const CheckoutPage = () => {
 
               <div className={styles.section}>
                 <h2 className={styles.paymentTitle}>Способ оплаты</h2>
-                <div className={styles.paymentOptions}>
-                  <label className={styles.radioLabel}>
+                <div className={styles.paymentButtonsRow}>
+                  <label className={styles.paymentButton}>
                     <input
                       type="radio"
                       name="paymentMethod"
-                      value="card"
-                      checked={formData.paymentMethod === "card"}
+                      value="sberbank"
+                      checked={formData.paymentMethod === "sberbank"}
                       onChange={handleInputChange}
-                      className={styles.radio}
+                      className={styles.radioInput}
                     />
-                    <span>Оплата банковской картой</span>
-                  </label>
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="cash"
-                      checked={formData.paymentMethod === "cash"}
-                      onChange={handleInputChange}
-                      className={styles.radio}
-                    />
-                    <div className={styles.paymentIcon}>
+                    <div className={styles.paymentButtonContent}>
                       <Image
                         src="/images/checkout/sbp.png"
-                        alt="СПБ"
-                        width={19}
-                        height={19}
+                        alt="Сбербанк"
+                        width={24}
+                        height={24}
+                        className={styles.paymentButtonIcon}
                       />
+                      <span className={styles.paymentButtonText}>сбл</span>
                     </div>
-                    <span>Оплата по СПБ </span>
                   </label>
-                  <label className={styles.radioLabel}>
+                  <label className={styles.paymentButton}>
                     <input
                       type="radio"
                       name="paymentMethod"
-                      value="online"
-                      checked={formData.paymentMethod === "online"}
+                      value="yandexpay"
+                      checked={formData.paymentMethod === "yandexpay"}
                       onChange={handleInputChange}
-                      className={styles.radio}
+                      className={styles.radioInput}
                     />
-                    <div className={styles.paymentIcon}>
+                    <div className={styles.paymentButtonContent}>
                       <Image
-                        src="/images/checkout/dolya.png"
-                        alt="Долями"
-                        width={19}
-                        height={19}
+                        src="/images/checkout/y.png"
+                        alt="Яндекс Pay"
+                        width={24}
+                        height={24}
+                        className={styles.paymentButtonIcon}
                       />
+                      <span className={styles.paymentButtonText}>пэй</span>
                     </div>
-                    <span>Долями</span>
                   </label>
-                  <label className={styles.radioLabel}>
+                  <label className={styles.paymentButton}>
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="installment"
                       checked={formData.paymentMethod === "installment"}
                       onChange={handleInputChange}
-                      className={styles.radio}
+                      className={styles.radioInput}
                     />
-                    <div className={styles.paymentIcon}>
-                      <Image
-                        src="/images/checkout/y.png"
-                        alt="Яндекс Pay"
-                        width={19}
-                        height={19}
-                      />
+                    <div className={styles.paymentButtonContent}>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={styles.paymentButtonIcon}
+                      >
+                        <path
+                          d="M2 2H4V14H2V2ZM6 2H8V14H6V2ZM10 2H12V14H10V2Z"
+                          fill="#525252"
+                        />
+                      </svg>
+                      <span className={styles.paymentButtonText}>долями</span>
                     </div>
-                    <span>Яндекс Pay</span>
+                  </label>
+                  <label className={styles.paymentButton}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="card"
+                      checked={formData.paymentMethod === "card"}
+                      onChange={handleInputChange}
+                      className={styles.radioInput}
+                    />
+                    <div className={styles.paymentButtonContent}>
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={styles.paymentButtonIcon}
+                      >
+                        <path
+                          d="M2.5 6.25H17.5M4.16667 10.8333H15.8333M6.66667 13.75H13.3333M3.33333 4.16667H16.6667C17.1269 4.16667 17.5 4.53976 17.5 5V15C17.5 15.4602 17.1269 15.8333 16.6667 15.8333H3.33333C2.8731 15.8333 2.5 15.4602 2.5 15V5C2.5 4.53976 2.8731 4.16667 3.33333 4.16667Z"
+                          stroke="#525252"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M13.75 4.16667L16.25 6.66667L13.75 9.16667"
+                          stroke="#525252"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <span className={styles.paymentButtonText}>
+                        Картой онлайн
+                      </span>
+                    </div>
                   </label>
                 </div>
               </div>
@@ -642,11 +888,13 @@ const CheckoutPage = () => {
                     <div className={styles.summaryRow}>
                       <span className={styles.summaryLabel}>Доставка:</span>
                       <span className={styles.summaryValue}>
-                        {formatPrice(
-                          deliveryPrices[
-                            formData.deliveryMethod as keyof typeof deliveryPrices
-                          ] || 0
-                        )}
+                        {formData.deliveryMethod === "pickup"
+                          ? "Бесплатно"
+                          : formatPrice(
+                              deliveryPrices[
+                                formData.deliveryMethod as keyof typeof deliveryPrices
+                              ] || 0
+                            )}
                       </span>
                     </div>
                     <div className={styles.summaryRow}>
