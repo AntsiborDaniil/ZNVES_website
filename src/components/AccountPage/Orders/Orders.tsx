@@ -147,7 +147,9 @@ const Orders = () => {
               </div>
               <div className={styles.paymentField}>
                 <span className={styles.label}>Сумма</span>
-                <span className={styles.value}>{mockOrder.payment.amount}</span>
+                <span className={styles.valuePay}>
+                  {mockOrder.payment.amount}
+                </span>
               </div>
             </div>
           </div>
@@ -193,32 +195,26 @@ const Orders = () => {
                   width={104}
                   height={149}
                 />
-                <div className={styles.productInfo}>
-                  <div className={styles.productDetail}>
-                    <div className={styles.productDetails}>
-                      <h1 className={styles.productName}>{product.name}</h1>
-                      <div className={styles.productDetailsRow}>
-                        <div className={styles.productDetailColumn}>
-                          <span className={styles.productLabel}>Цвет</span>
-                          <span className={styles.productText}>
-                            {product.color}
-                          </span>
-                        </div>
-                        <div className={styles.productDetailColumn}>
-                          <span className={styles.productLabel}>Размер</span>
-                          <span className={styles.productText}>
-                            {product.size}
-                          </span>
-                        </div>
-                      </div>
+                <div className={styles.productDetails}>
+                  <div className={styles.upper}>
+                    <div className={styles.left}>
+                      <h3 className={styles.category}>Zip hoodies</h3>
+                      <h1 className={styles.title}>{product.name}</h1>
                     </div>
-                    <h3 className={styles.productCount}>
-                      Количество: {product.quantity}
-                    </h3>
+                    <div className={styles.right}>
+                      <h3 className={styles.amountWord}>Сумма</h3>
+                      <h1 className={styles.amount}>{product.price}</h1>
+                    </div>
                   </div>
-                  <div className={styles.productPrice}>
-                    <span className={styles.priceLabel}>Сумма</span>
-                    <span className={styles.priceText}>{product.price}</span>
+                  <div className={styles.bottom}>
+                    <div className={styles.leftBottom}>
+                      <h3 className={styles.labelBottom}>Цвет</h3>
+                      <h1 className={styles.word}>{product.color}</h1>
+                    </div>
+                    <div className={styles.rightBottom}>
+                      <h3 className={styles.labelBottom}>Размер</h3>
+                      <h1 className={styles.word}>{product.size}</h1>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -226,17 +222,17 @@ const Orders = () => {
           </div>
         </div>
       </div>
-        <div className={styles.totalSection}>
-          <div className={styles.totalAmount}>
-            <h1 className={styles.totalTitle}>Итого</h1>
-            <span className={styles.totalAmountValue}>
-              {mockOrder.total.totalAmount}
-            </span>
-          </div>
-          <h2 className={styles.totalItems}>
-            Товары, {mockOrder.total.itemsCount} шт
-          </h2>
-          <button className={styles.payButton}>Оплатить заказ</button>
+      <div className={styles.totalSection}>
+        <div className={styles.totalAmount}>
+          <h1 className={styles.totalTitle}>Итого</h1>
+          <span className={styles.totalAmountValue}>
+            {mockOrder.total.totalAmount}
+          </span>
+        </div>
+        <h2 className={styles.totalItems}>
+          Товары, {mockOrder.total.itemsCount} шт
+        </h2>
+        <button className={styles.payButton}>Оплатить заказ</button>
       </div>
     </section>
   );
