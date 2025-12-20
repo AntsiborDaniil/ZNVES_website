@@ -18,7 +18,7 @@
 }
 
 .orderHeader {
-  background-color: #0000000d;
+  background-color: #F8F8F8;
   padding: 17px 24px;
   border-radius: 3px;
   display: flex;
@@ -78,7 +78,7 @@
 }
 
 .orderStatusUnpaid {
-  color: #d12a15;
+  color: #999999;
 }
 
 .orderStatusPaid {
@@ -96,6 +96,10 @@
   gap: 0.75rem;
 }
 
+.productsSection {
+    gap: 2px
+}
+
 .sectionIcon {
   width: 24px;
   height: 24px;
@@ -107,9 +111,9 @@
   margin-top: 0.25rem;
 }
 
-.sectionIcon svg {
-  width: 100%;
-  height: 100%;
+.sectionIcon img {
+    width: 15.5px;
+    height: 15.5px;
 }
 
 .buyerSectionText,
@@ -126,7 +130,7 @@
   font-size: 15px;
   line-height: 24px;
   letter-spacing: 0%;
-  margin-top: 6px;
+  margin-top: 2px;
 
   color: #525252;
   margin-bottom: 14px;
@@ -177,8 +181,8 @@
 
 .deliverySectionInfo {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex-direction: row;
+  gap: 2rem;
 }
 
 .valuePay {
@@ -205,7 +209,7 @@
 
 .productsSection {
   flex-direction: column;
-  padding: 36px 47px;
+  padding: 24px 24px 24px 56px;
 }
 
 .productsList {
@@ -392,7 +396,7 @@
 
 .upper {
   display: flex;
-  justify-content: space-between;
+  gap: 3rem;
 }
 
 .bottom {
@@ -424,6 +428,7 @@
   font-size: 16px;
   line-height: 27.51px;
   letter-spacing: 0px;
+  max-width: 133px;
   text-transform: uppercase;
 }
 
@@ -665,5 +670,22 @@
 @media (max-width: 480px) {
     .title {
         line-height: 18px;
+    }
+
+    .upper {
+        gap: 0;
+        justify-content: space-between;
+    }
+
+    .amount {
+        text-wrap: nowrap;
+    }
+
+    .orderHeader {
+        gap: 0px;
+    }
+
+    .orderStatus {
+        margin-left: 26px;
     }
 }
