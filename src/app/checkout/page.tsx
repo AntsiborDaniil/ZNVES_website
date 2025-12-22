@@ -249,18 +249,12 @@ const CheckoutPage = () => {
               <div className={styles.telegramSection}>
                 <button className={styles.telegramButton} type="button">
                   <div className={styles.telegramIcon}>
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM16.64 8.8C16.49 10.38 15.84 14.22 15.51 15.99C15.37 16.74 15.09 16.99 14.83 17.02C14.25 17.07 13.81 16.64 13.25 16.27C12.37 15.69 11.87 15.33 11.02 14.77C10.03 14.12 10.67 13.76 11.24 13.18C11.39 13.03 13.95 10.7 14 10.49C14.01 10.45 14.01 10.29 13.94 10.23C13.87 10.17 13.74 10.19 13.65 10.2C13.52 10.22 11.98 11.24 9.78 12.98C9.29 13.34 8.84 13.52 8.45 13.5C8.01 13.48 7.16 13.23 6.5 13.01C5.79 12.77 5.23 12.64 5.28 12.25C5.31 12.02 5.66 11.78 6.35 11.52C10.17 9.89 12.62 8.78 13.69 8.19C16.45 6.81 17.07 6.49 17.45 6.49C17.54 6.49 17.75 6.51 17.88 6.62C17.99 6.71 18.02 6.83 18.03 6.92C18.04 7.01 18.06 7.21 17.95 7.33C17.85 7.45 16.78 8.2 16.64 8.8Z"
-                        fill="white"
-                      />
-                    </svg>
+                    <Image
+                      src="/images/checkout/telegram.png"
+                      alt="Telegram"
+                      width={32}
+                      height={32}
+                    />
                   </div>
                   <span>Подключить Telegram</span>
                 </button>
@@ -352,7 +346,14 @@ const CheckoutPage = () => {
                         }`}
                       >
                         {formData.deliveryType === "cdek" && (
-                          <span className={styles.checkmarkIcon}>✓</span>
+                          <span className={styles.checkmarkIcon}>
+                            <Image
+                              src="/images/checkout/checkmark.png"
+                              alt="checkmark"
+                              width={11.64}
+                              height={10}
+                            />
+                          </span>
                         )}
                       </div>
                     </div>
@@ -378,7 +379,14 @@ const CheckoutPage = () => {
                         }`}
                       >
                         {formData.deliveryType === "yandex" && (
-                          <span className={styles.checkmarkIcon}>✓</span>
+                          <span className={styles.checkmarkIcon}>
+                            <Image
+                              src="/images/checkout/checkmark.png"
+                              alt="checkmark"
+                              width={11.64}
+                              height={10}
+                            />
+                          </span>
                         )}
                       </div>
                     </div>
@@ -404,13 +412,15 @@ const CheckoutPage = () => {
                           <span className={styles.deliveryButtonName}>
                             Пункт выдачи
                           </span>
+                        </div>
+                        <div className={styles.deliveryButtonInfo}>
                           <span className={styles.deliveryButtonSubtext}>
                             Послезавтра
                           </span>
+                          <span className={styles.deliveryButtonPrice}>
+                            бесплатно
+                          </span>
                         </div>
-                        <span className={styles.deliveryButtonPrice}>
-                          бесплатно
-                        </span>
                         <div
                           className={`${styles.deliveryCheckmark} ${
                             formData.deliveryMethod === "pickup"
@@ -419,7 +429,14 @@ const CheckoutPage = () => {
                           }`}
                         >
                           {formData.deliveryMethod === "pickup" && (
-                            <span className={styles.checkmarkIcon}>✓</span>
+                            <span className={styles.checkmarkIcon}>
+                              <Image
+                                src="/images/checkout/checkmark.png"
+                                alt="checkmark"
+                                width={11.64}
+                                height={10}
+                              />
+                            </span>
                           )}
                         </div>
                       </div>
@@ -441,13 +458,15 @@ const CheckoutPage = () => {
                             <span className={styles.deliveryButtonName}>
                               Пункт выдачи
                             </span>
+                          </div>
+                          <div className={styles.deliveryButtonInfo}>
                             <span className={styles.deliveryButtonSubtext}>
                               Послезавтра
                             </span>
+                            <span className={styles.deliveryButtonPrice}>
+                              бесплатно
+                            </span>
                           </div>
-                          <span className={styles.deliveryButtonPrice}>
-                            бесплатно
-                          </span>
                           <div
                             className={`${styles.deliveryCheckmark} ${
                               formData.deliveryMethod === "pickup"
@@ -456,7 +475,14 @@ const CheckoutPage = () => {
                             }`}
                           >
                             {formData.deliveryMethod === "pickup" && (
-                              <span className={styles.checkmarkIcon}>✓</span>
+                              <span className={styles.checkmarkIcon}>
+                                <Image
+                                  src="/images/checkout/checkmark.png"
+                                  alt="checkmark"
+                                  width={11.64}
+                                  height={10}
+                                />
+                              </span>
                             )}
                           </div>
                         </div>
@@ -475,15 +501,17 @@ const CheckoutPage = () => {
                             <span className={styles.deliveryButtonName}>
                               Курьером
                             </span>
+                          </div>
+                          <div className={styles.deliveryButtonInfo}>
                             <span className={styles.deliveryButtonSubtext}>
-                              1-7 дней
+                              6-7 дней
+                            </span>
+                            <span
+                              className={`${styles.deliveryButtonPrice} ${styles.deliveryButtonPriceCourier}`}
+                            >
+                              от {formatPrice(deliveryPrices.yandex)}
                             </span>
                           </div>
-                          <span
-                            className={`${styles.deliveryButtonPrice} ${styles.deliveryButtonPriceCourier}`}
-                          >
-                            от {formatPrice(deliveryPrices.yandex)}
-                          </span>
                           <div
                             className={`${styles.deliveryCheckmark} ${
                               formData.deliveryMethod === "yandex"
@@ -492,7 +520,14 @@ const CheckoutPage = () => {
                             }`}
                           >
                             {formData.deliveryMethod === "yandex" && (
-                              <span className={styles.checkmarkIcon}>✓</span>
+                              <span className={styles.checkmarkIcon}>
+                                <Image
+                                  src="/images/checkout/checkmark.png"
+                                  alt="checkmark"
+                                  width={11.64}
+                                  height={10}
+                                />
+                              </span>
                             )}
                           </div>
                         </div>
@@ -633,7 +668,7 @@ const CheckoutPage = () => {
               )}
 
               <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>Пункт получения</h2>
+                <h2 className={styles.sectionTitlePunct}>Пункт получения</h2>
                 <div className={styles.checkoutMapSearchContainer}>
                   <input
                     type="text"
@@ -678,11 +713,10 @@ const CheckoutPage = () => {
                       <Image
                         src="/images/checkout/sbp.png"
                         alt="Сбербанк"
-                        width={24}
-                        height={24}
+                        width={54}
+                        height={30}
                         className={styles.paymentButtonIcon}
                       />
-                      <span className={styles.paymentButtonText}>сбл</span>
                     </div>
                   </label>
                   <label className={styles.paymentButton}>
@@ -698,11 +732,10 @@ const CheckoutPage = () => {
                       <Image
                         src="/images/checkout/y.png"
                         alt="Яндекс Pay"
-                        width={24}
-                        height={24}
+                        width={60}
+                        height={20}
                         className={styles.paymentButtonIcon}
                       />
-                      <span className={styles.paymentButtonText}>пэй</span>
                     </div>
                   </label>
                   <label className={styles.paymentButton}>
@@ -715,20 +748,13 @@ const CheckoutPage = () => {
                       className={styles.radioInput}
                     />
                     <div className={styles.paymentButtonContent}>
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
+                      <Image
+                        src="/images/checkout/dolya.png"
+                        alt="Долями"
+                        width={73}
+                        height={14}
                         className={styles.paymentButtonIcon}
-                      >
-                        <path
-                          d="M2 2H4V14H2V2ZM6 2H8V14H6V2ZM10 2H12V14H10V2Z"
-                          fill="#525252"
-                        />
-                      </svg>
-                      <span className={styles.paymentButtonText}>долями</span>
+                      />
                     </div>
                   </label>
                   <label className={styles.paymentButton}>
@@ -741,32 +767,20 @@ const CheckoutPage = () => {
                       className={styles.radioInput}
                     />
                     <div className={styles.paymentButtonContent}>
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 20 20"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
+                      <Image
+                        src="/images/checkout/card.png"
+                        alt="Картой онлайн"
+                        width={86}
+                        height={24}
                         className={styles.paymentButtonIcon}
-                      >
-                        <path
-                          d="M2.5 6.25H17.5M4.16667 10.8333H15.8333M6.66667 13.75H13.3333M3.33333 4.16667H16.6667C17.1269 4.16667 17.5 4.53976 17.5 5V15C17.5 15.4602 17.1269 15.8333 16.6667 15.8333H3.33333C2.8731 15.8333 2.5 15.4602 2.5 15V5C2.5 4.53976 2.8731 4.16667 3.33333 4.16667Z"
-                          stroke="#525252"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M13.75 4.16667L16.25 6.66667L13.75 9.16667"
-                          stroke="#525252"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      <span className={styles.paymentButtonText}>
-                        Картой онлайн
-                      </span>
+                      />
+                      <Image
+                        src="/images/checkout/cardText.png"
+                        alt="Онлайн"
+                        width={86}
+                        height={16}
+                        className={styles.paymentButtonIcon}
+                      />
                     </div>
                   </label>
                 </div>
