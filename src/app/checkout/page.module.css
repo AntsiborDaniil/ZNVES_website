@@ -21,13 +21,13 @@
 .backLink {
   color: #525252c9;
   font-weight: 400;
-  font-size: 25px;
-  line-height: 32.94px;
+  font-size: 13px;
+  line-height: 25px;
   letter-spacing: 0px;
   text-decoration: none;
   transition: color 0.2s ease;
   align-self: flex-start;
-  margin-bottom: 50px;
+  margin-bottom: 25px;
 }
 
 .backLink:hover {
@@ -45,8 +45,8 @@
 .leftColumn {
   flex: 1;
   display: flex;
+  gap: 20px;
   flex-direction: column;
-  gap: 30px;
 }
 
 .rightColumn {
@@ -77,7 +77,6 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  margin-top: 10px;
   align-self: flex-start;
 }
 
@@ -129,11 +128,11 @@
 
 .title {
   font-weight: 400;
-  font-size: 40px;
+  font-size: 25px;
   line-height: 32.94px;
   letter-spacing: 0px;
+  margin-bottom: 10px;
   color: #525252;
-  margin: 0;
 }
 
 .section {
@@ -159,6 +158,7 @@
 .infoInputs {
   display: flex;
   gap: 20px;
+  margin-bottom: 40px;
 }
 
 .delivery {
