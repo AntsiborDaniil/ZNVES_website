@@ -49,10 +49,13 @@
   flex-direction: column;
 }
 
-.rightColumn {
-  width: 544px;
-  flex-shrink: 0;
+.rightPart {
   background-color: #f8f8f8;
+  padding: 20px;
+}
+
+.rightColumn {
+  flex-shrink: 0;
   border-radius: 3px;
   position: sticky;
   top: 120px;
@@ -64,12 +67,10 @@
 }
 
 .orderItemsBlock {
-  padding: 48px 48px 0px 48px;
   margin-bottom: 100px;
 }
 
 .orderSummaryBlock {
-  padding: 20px 48px 48px 48px;
   border-top: 1px solid #ddd9d0;
 }
 
