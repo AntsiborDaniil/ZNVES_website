@@ -52,6 +52,8 @@
 .rightPart {
   background-color: #f8f8f8;
   padding: 20px;
+  border-radius: 3px;
+  width: 470px;
 }
 
 .rightColumn {
@@ -67,11 +69,11 @@
 }
 
 .orderItemsBlock {
-  margin-bottom: 100px;
+  margin-bottom: 12px;
 }
 
 .orderSummaryBlock {
-  border-top: 1px solid #ddd9d0;
+  border-top: 1px solid #7d7d7d;
 }
 
 .telegramSection {
@@ -725,8 +727,8 @@
 }
 
 .submitButtonRight {
-  margin-top: 24px;
-  margin-bottom: 20px;
+  margin-top: 36px;
+  margin-bottom: 12px;
 }
 
 .quantityControls {
@@ -759,6 +761,17 @@
   color: #1f1f1f;
 }
 
+.sectionTitlePunct {
+  color: #7d7d7d;
+
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24.8px;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  margin-bottom: 17.74px;
+}
+
 .quantityValue {
   font-size: 16px;
   font-weight: 500;
@@ -770,22 +783,26 @@
 .checkboxes {
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
 .checkboxLabel {
   display: flex;
   align-items: center;
   gap: 8px;
+  color: #7d7d7d;
+  font-weight: 400;
   font-size: 14px;
-  color: #525252;
+  line-height: 21px;
+  letter-spacing: 0%;
+  text-wrap: nowrap;
+
   cursor: pointer;
   user-select: none;
 }
 
 .checkbox {
-  width: 18px;
-  height: 18px;
+  width: 12px;
+  height: 12px;
   cursor: pointer;
   accent-color: #525252;
   margin-top: 2px;
@@ -809,14 +826,15 @@
   left: 50%;
   top: 40%;
   transform: translate(-50%, -50%) rotate(45deg);
-  width: 4px;
-  height: 8px;
-  border: solid #525252;
-  border-width: 0 2px 2px 0;
+  width: 2px;
+  height: 6px;
+  border: 1.67px solid #525252;
+  border-width: 0 1.67px 1.67px 0;
 }
 
 .checkboxLink {
-  color: #525252;
+  color: #7d7d7d;
+  text-underline-offset: 1px;
   text-decoration: underline;
   transition: color 0.2s ease;
 }
@@ -834,8 +852,8 @@
 
 .orderTitle {
   font-weight: 400;
-  font-size: 40px;
-  line-height: 32.94px;
+  font-size: 20px;
+  line-height: 24px;
   letter-spacing: 0px;
 
   color: #525252;
@@ -845,11 +863,12 @@
 .editLink {
   font-weight: 400;
   font-style: Regular;
-  font-size: 20px;
-  line-height: 18.89px;
+  font-size: 14px;
+  line-height: 21px;
   letter-spacing: 0px;
   text-decoration: underline;
   text-decoration-style: solid;
+  text-decoration-thickness: 1px;
   text-decoration-offset: 0%;
   text-decoration-thickness: 0%;
   text-decoration-skip-ink: auto;
@@ -865,6 +884,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  margin-bottom: 40px;
 }
 
 .orderItem {
@@ -879,43 +899,54 @@
 
 .orderItemImage {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 120px;
-  height: 120px;
-  border-radius: 12px;
+  height: 140px;
+  border-radius: 3px;
   overflow: hidden;
   flex-shrink: 0;
+  background-color: #5252520f;
 }
 
 .orderImage {
-  object-fit: cover;
+  width: 82px;
+  height: 82px;
 }
 
 .orderItemInfo {
   flex: 1;
   display: flex;
+  justify-content: space-between;
+}
+
+.column {
+  display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .orderItemCategory {
   font-weight: 500;
-  font-size: 13px;
-  line-height: 13.15px;
+  font-size: 12px;
+  line-height: 20px;
   letter-spacing: 0%;
   vertical-align: middle;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
   color: #919191;
-  margin: 0;
-  margin-bottom: 4px;
 }
 
 .orderItemTitle {
   color: #525252;
   font-weight: 400;
-  font-size: 25px;
-  line-height: 22.35px;
+  font-size: 14px;
+  line-height: 20px;
   letter-spacing: 0px;
   text-transform: uppercase;
-  margin: 0;
 }
 
 .orderItemDetailsRow {
@@ -936,8 +967,8 @@
   color: #a7a7a7;
 
   font-weight: 400;
-  font-size: 12px;
-  line-height: 13.15px;
+  font-size: 14px;
+  line-height: 16.18px;
   letter-spacing: 0%;
   vertical-align: middle;
 }
@@ -947,7 +978,7 @@
 
   font-weight: 500;
   font-size: 14px;
-  line-height: 13.15px;
+  line-height: 20px;
   letter-spacing: 0%;
   vertical-align: middle;
 }
@@ -965,15 +996,14 @@
 
 .orderItemPrice {
   color: #525252;
-  font-weight: 400;
-  font-size: 30px;
-  line-height: 32.79px;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 21px;
   letter-spacing: 0px;
 }
 
 .orderSummary {
   width: 100%;
-  margin-bottom: 24px;
 }
 
 .summaryRow {
@@ -990,31 +1020,29 @@
 .summaryRowTotal {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-top: 16px;
-  padding-top: 16px;
+  margin-top: 12px;
 }
 
 .summaryLabel {
-  color: #a3a3a3;
+  color: #525252;
   font-weight: 400;
-  font-size: 20px;
-  line-height: 18.89px;
+  font-size: 14px;
+  line-height: 21px;
   letter-spacing: 0px;
 }
 
 .summaryLabelTotal {
   color: #525252;
-  font-weight: 400;
-  font-size: 30px;
-  line-height: 18.89px;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 30px;
   letter-spacing: 0px;
 }
 
 .summaryValue {
-  font-weight: 500;
-  font-size: 20px;
-  line-height: 18.89px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
   letter-spacing: 0px;
   color: #525252;
 }
@@ -1022,8 +1050,8 @@
 .summaryTotal {
   color: #525252;
   font-weight: 500;
-  font-size: 30px;
-  line-height: 26.57px;
+  font-size: 27px;
+  line-height: 40px;
   letter-spacing: 0px;
 }
 
@@ -1066,705 +1094,4 @@
 
 .shopButton:hover {
   background-color: #1f1f1f;
-}
-
-@media (max-width: 1024px) {
-  .content {
-    flex-direction: column;
-  }
-
-  .rightColumn {
-    width: 100%;
-    position: static;
-    max-height: none;
-  }
-
-  .deliveryTypeRow {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .deliveryTypeButton {
-    width: 100%;
-    min-width: 100%;
-  }
-
-  .deliveryButtonsRow {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .deliveryButton {
-    width: 100%;
-    min-width: 100%;
-  }
-
-  .paymentButtonsRow {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .paymentButton {
-    width: calc(50% - 6px);
-    height: 65px;
-  }
-}
-
-/* Мобильная форма оформления заказа */
-.mobileCheckoutForm {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-.checkoutFormTitle {
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 38px;
-  letter-spacing: 0px;
-  color: #525252;
-  margin: 0;
-  margin-bottom: 10px;
-}
-
-.checkoutSection {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.checkoutSectionTitle {
-  font-weight: 400;
-  font-size: 20px;
-  line-height: 24px;
-  letter-spacing: 0px;
-  color: #525252;
-  margin: 0;
-}
-
-.checkoutInputsRow {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.checkoutInputWrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.checkoutLabel {
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
-  letter-spacing: 0%;
-  color: #525252;
-}
-
-.checkoutInput {
-  width: 100%;
-  padding: 12px 16px;
-  border: none;
-  border-radius: 3px;
-  background-color: #f8f8f8;
-  font-size: 16px;
-  color: #525252;
-  transition: box-shadow 0.2s ease, background-color 0.2s ease;
-  box-shadow: 0 0 0 0.47px rgba(82, 82, 82, 0.5);
-}
-
-.checkoutInput:focus {
-  outline: none;
-  box-shadow: 0 0 0 0.47px rgba(31, 31, 31, 0.8);
-  background-color: #ffffff;
-}
-
-.checkoutInput::placeholder {
-  color: #7a7a79;
-  font-weight: 400;
-  font-style: Regular;
-  font-size: 16px;
-  line-height: 24px;
-  letter-spacing: 0%;
-}
-
-.checkoutDeliveryOptions {
-  display: flex;
-  flex-direction: column;
-  border-top: 0.4px solid #5252528c;
-  border-bottom: 0.4px solid #5252528c;
-  gap: 0;
-  padding: 16px 0;
-}
-
-.checkoutRadioLabel {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 600;
-  font-size: 18px;
-  line-height: 23.93px;
-  letter-spacing: 0.3px;
-  vertical-align: middle;
-  color: #525252;
-  cursor: pointer;
-  user-select: none;
-  padding: 8px 0;
-}
-
-.checkoutRadio {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  accent-color: #525252;
-}
-
-.checkoutDeliveryOptionContent {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex: 1;
-  gap: 16px;
-}
-
-.checkoutDeliveryOptionInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.checkoutDeliveryOptionName {
-  color: #525252;
-  font-weight: 600;
-  font-style: SemiBold;
-  font-size: 18px;
-  line-height: 14.11px;
-  letter-spacing: 0.18px;
-  vertical-align: middle;
-}
-
-.checkoutDeliveryOptionTime {
-  color: #525252cc;
-  font-weight: 400;
-  margin-top: 2px;
-  font-size: 16px;
-  line-height: 14.11px;
-  letter-spacing: 0.18px;
-}
-
-.checkoutDeliveryOptionPrice {
-  font-size: 16px;
-  color: #525252;
-  font-weight: 400;
-  white-space: nowrap;
-}
-
-.checkoutMapSearchContainer {
-  margin-bottom: 20px;
-  width: 100%;
-  position: relative;
-  z-index: 2;
-}
-
-.checkoutMapSearchInput:focus {
-  outline: none;
-  border-bottom-color: #1f1f1f;
-}
-
-.checkoutMapSearchInput::placeholder {
-  color: #7a7a79;
-}
-
-.checkoutMapContainer {
-  width: 100%;
-  border-radius: 3px;
-  overflow: visible;
-  border: 1.5px solid #525252;
-  position: relative;
-  z-index: 1;
-}
-
-.checkoutPaymentTitle {
-  color: #525252;
-  font-weight: 400;
-  font-size: 25px;
-  line-height: 18.03px;
-  letter-spacing: 0px;
-  margin: 0;
-  margin-bottom: 21px;
-}
-
-.checkoutPaymentOptions {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.checkoutPaymentIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 19px;
-  height: 19px;
-  flex-shrink: 0;
-}
-
-.checkoutSubmitButton {
-  width: 100%;
-  padding: 18px 32px;
-  background-color: #525252;
-  color: #ffffff;
-  border: none;
-  border-radius: 3px;
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  margin-top: 20px;
-}
-
-.checkoutSubmitButton:hover:not(:disabled) {
-  background-color: #1f1f1f;
-}
-
-.checkoutSubmitButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.checkoutCheckboxes {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.checkoutCheckboxLabel {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-size: 14px;
-  color: #525252;
-  cursor: pointer;
-  user-select: none;
-}
-
-.sectionTitlePunct {
-  color: #7d7d7d;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 24.8px;
-  letter-spacing: 0%;
-  vertical-align: middle;
-
-  margin-bottom: 17.75px;
-}
-
-.checkoutCheckbox {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  accent-color: #525252;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.checkoutCheckboxLink {
-  color: #525252;
-  text-decoration: underline;
-  transition: color 0.2s ease;
-}
-
-.checkoutCheckboxLink:hover {
-  color: #1f1f1f;
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-  .checkoutFormTitle {
-    font-size: 26px;
-    line-height: 30px;
-  }
-
-  .checkoutSectionTitle {
-    font-size: 18px;
-    line-height: 22px;
-  }
-
-  .checkoutLabel {
-    font-size: 13px;
-    line-height: 18px;
-  }
-
-  .checkoutInput {
-    font-size: 15px;
-  }
-
-  .checkoutInput::placeholder {
-    font-size: 15px;
-  }
-
-  .checkoutDeliveryOptionName {
-    font-size: 16px;
-  }
-
-  .checkoutDeliveryOptionTime {
-    font-size: 14px;
-  }
-
-  .checkoutDeliveryOptionPrice {
-    font-size: 14px;
-  }
-
-  .checkoutMapSearchInput {
-    font-size: 15px;
-  }
-
-  .checkoutPaymentTitle {
-    font-size: 20px;
-    line-height: 24px;
-  }
-
-  .checkoutRadioLabel span {
-    font-size: 16px;
-  }
-
-  .checkoutSubmitButton {
-    font-size: 16px;
-  }
-
-  .checkoutCheckboxLabel {
-    font-size: 13px;
-    align-items: center;
-  }
-
-  .checkoutSubmitButton {
-    margin-bottom: 12px;
-  }
-
-  .checkoutMapSearchInput {
-    padding-top: 0px;
-    margin-top: 0px;
-  }
-
-  .checkoutMapSearchContainer {
-    margin-bottom: 0px;
-  }
-
-  .checkoutPaymentTitle {
-    margin-bottom: 0px;
-  }
-}
-
-@media (max-width: 768px) {
-  .checkoutFormTitle {
-    font-size: 20px;
-    line-height: 22.36px;
-  }
-
-  .checkoutSectionTitle {
-    font-size: 15.39px;
-    line-height: 10.67px;
-    font-weight: 500;
-  }
-
-  .checkoutLabel {
-    font-size: 10.99px;
-    line-height: 15.7px;
-  }
-
-  .checkoutInput {
-    padding: 8px 11px;
-    font-size: 12.56px;
-    line-height: 18.83px;
-  }
-
-  .checkoutInput::placeholder {
-    font-size: 12.56px;
-    line-height: 18.83px;
-  }
-
-  .checkoutDeliveryOptions {
-    padding: 16px 0px;
-  }
-
-  .checkoutDeliveryOptions h3 {
-    margin-bottom: 15px;
-  }
-
-  .checkoutSection h1 {
-    margin-top: 10px;
-  }
-
-  .checkoutRadio {
-    width: 11.797375679016113px;
-    height: 11.797375679016113px;
-  }
-
-  .mobileCheckoutForm {
-    gap: 20px;
-  }
-
-  .checkoutDeliveryOptionName {
-    font-size: 12px;
-    list-style: 14.11px;
-  }
-
-  .checkoutDeliveryOptionTime {
-    font-size: 10px;
-    list-style: 14.11px;
-  }
-
-  .checkoutDeliveryOptionInfo {
-    gap: 0px;
-  }
-
-  .checkoutDeliveryOptionPrice {
-    font-size: 12px;
-    list-style: 14.11px;
-  }
-
-  .checkoutMapSearchInput {
-    padding-top: 0px;
-    padding-bottom: 4px;
-    margin-top: 0px;
-    font-size: 12px;
-    line-height: 160%;
-    border-bottom: 0.4px solid #5252528c;
-  }
-
-  .checkoutMapSearchInput:focus {
-    border-bottom-color: #1f1f1f;
-  }
-
-  .checkoutMapSearchContainer {
-    margin-bottom: 0px;
-  }
-
-  .checkoutMapContainer {
-    margin-bottom: 8px;
-  }
-
-  .section h2 {
-    margin-top: 10px;
-    font-size: 13.65px;
-  }
-
-  .checkoutPaymentTitle {
-    font-size: 15.39px;
-    line-height: 10.67px;
-    font-weight: 500;
-    margin-bottom: 0px;
-  }
-
-  .checkoutRadioLabel span {
-    font-size: 12px;
-    line-height: 16.15px;
-    font-weight: 400;
-  }
-
-  .checkoutRadioLabel {
-    padding: 0px 0px 4px 0px;
-    gap: 7px;
-  }
-
-  .checkoutPaymentIconImage {
-    width: 12.4px;
-    height: 12.4px;
-  }
-
-  .checkoutPaymentIcon {
-    width: auto;
-    height: auto;
-  }
-
-  .checkoutSubmitButton {
-    width: 361;
-    height: 46;
-
-    padding-top: 1px;
-    padding-right: 16px;
-    padding-bottom: 1px;
-    padding-left: 16px;
-
-    font-size: 15px;
-
-    margin-top: 0px;
-    margin-bottom: 8px;
-  }
-
-  .checkoutCheckbox {
-    width: 11.1px;
-    height: 11.1px;
-  }
-
-  .checkoutSubmitButton {
-    width: 100%;
-  }
-
-  .checkoutCheckboxLabel {
-    font-size: 10.18px;
-    line-height: 18.5px;
-  }
-
-  .checkoutCheckboxLabel {
-    gap: 7px;
-  }
-}
-
-@media (max-width: 1440px) {
-  .deliveryTypeRow {
-    gap: 12px;
-  }
-
-  .deliveryTypeButton {
-    width: 200px;
-    height: 75px;
-  }
-
-  .deliveryButtonsRow {
-    gap: 12px;
-  }
-
-  .deliveryButton {
-    width: 200px;
-    height: 110px;
-  }
-
-  .paymentButtonsRow {
-    gap: 12px;
-  }
-
-  .paymentButton {
-    width: 100px;
-    height: 65px;
-  }
-  .main {
-    padding: 60px 185px;
-  }
-
-  .content {
-    width: 100%;
-    flex-direction: column;
-  }
-
-  .leftColumn {
-    width: 100%;
-  }
-
-  .rightPart {
-    width: 100%;
-  }
-
-  .rightColumn {
-    width: 100%;
-  }
-
-  .title {
-    font-size: 32px;
-    line-height: 28px;
-  }
-
-  .telegramButton {
-    font-size: 16px;
-    line-height: 21px;
-  }
-
-  .telegramDescription {
-    font-size: 14px;
-    line-height: 20px;
-  }
-
-  .sectionTitle {
-    font-size: 20px;
-    line-height: 24px;
-  }
-
-  .label {
-    font-size: 12px;
-    line-height: 16px;
-  }
-
-  .input {
-    font-size: 14px;
-  }
-
-  .backLink {
-    font-size: 20px;
-    line-height: 26px;
-  }
-
-  .paymentTitle {
-    font-size: 20px;
-    line-height: 16px;
-  }
-
-  .radioLabel {
-    font-size: 16px;
-    line-height: 21px;
-  }
-
-  .checkboxLabel {
-    font-size: 12px;
-  }
-
-  .submitButton {
-    font-size: 16px;
-  }
-
-  .orderItemTitle {
-    font-size: 16px;
-    line-height: 20px;
-  }
-
-  .orderItemPrice {
-    font-size: 16px;
-    line-height: 20px;
-  }
-
-  .orderSummary {
-    font-size: 18px;
-    line-height: 22px;
-  }
-
-  .orderTotal {
-    font-size: 24px;
-    line-height: 28px;
-  }
-
-  .input::placeholder {
-    font-size: 14px;
-    line-height: 20px;
-  }
-
-  .summaryLabel {
-    font-size: 16px;
-    line-height: 15px;
-  }
-
-  .summaryLabelTotal {
-    font-size: 24px;
-    line-height: 15px;
-  }
-
-  .summaryValue {
-    font-size: 16px;
-    line-height: 15px;
-  }
-
-  .summaryTotal {
-    font-size: 24px;
-    line-height: 21px;
-  }
-
-  .orderItemDetailLabel {
-    font-size: 10px;
-    line-height: 11px;
-  }
-
-  .orderItemDetailValue {
-    font-size: 12px;
-    line-height: 11px;
-  }
 }

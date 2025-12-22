@@ -790,7 +790,7 @@ const CheckoutPage = () => {
               <div className={styles.orderHeader}>
                 <h2 className={styles.orderTitle}>Ваши товары</h2>
                 <Link href="/cart" className={styles.editLink}>
-                  Изменить
+                  изменить
                 </Link>
               </div>
               <div className={styles.rightColumn}>
@@ -815,108 +815,74 @@ const CheckoutPage = () => {
                                 "/images/catalogs/placeholder.png"
                               }
                               alt={item.product.title}
-                              fill
+                              width={82}
+                              height={82}
                               className={styles.orderImage}
-                              sizes="120px"
                             />
                           </div>
                           <div className={styles.orderItemInfo}>
                             <div className={styles.orderItemCategory}>
-                              {fullProduct?.category ||
-                                item.product.category ||
-                                ""}
+                              <div className={styles.column}>
+                                {fullProduct?.category ||
+                                  item.product.category ||
+                                  ""}
+
+                                <h2 className={styles.orderItemTitle}>
+                                  {item.product.title}
+                                </h2>
+                              </div>
+                              <div className={styles.orderItemDetailsRow}>
+                                <div className={styles.orderItemDetailColumn}>
+                                  <span className={styles.orderItemDetailLabel}>
+                                    Цвет
+                                  </span>
+                                  <span className={styles.orderItemDetailValue}>
+                                    {colorLabel}
+                                  </span>
+                                </div>
+                                <div className={styles.orderItemDetailColumn}>
+                                  <span className={styles.orderItemDetailLabel}>
+                                    Размер
+                                  </span>
+                                  <span
+                                    className={`${styles.orderItemDetailValue} ${styles.orderItemSizeValue}`}
+                                  >
+                                    {item.size}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
-                            <h3 className={styles.orderItemTitle}>
-                              {item.product.title}
-                            </h3>
-                            <div className={styles.orderItemDetailsRow}>
-                              <div className={styles.orderItemDetailColumn}>
-                                <span className={styles.orderItemDetailLabel}>
-                                  Цвет
-                                </span>
-                                <span className={styles.orderItemDetailValue}>
-                                  {colorLabel}
-                                </span>
-                              </div>
-                              <div className={styles.orderItemDetailColumn}>
-                                <span className={styles.orderItemDetailLabel}>
-                                  Размер
-                                </span>
-                                <span
-                                  className={`${styles.orderItemDetailValue} ${styles.orderItemSizeValue}`}
-                                >
-                                  {item.size}
-                                </span>
-                              </div>
-                            </div>
-                            <div className={styles.orderItemBottom}>
-                              <div className={styles.quantityControls}>
-                                <button
-                                  type="button"
-                                  className={styles.quantityButton}
-                                  onClick={() =>
-                                    updateQuantity(
-                                      item.productId,
-                                      item.size,
-                                      item.color,
-                                      item.quantity - 1
-                                    )
-                                  }
-                                  aria-label="Уменьшить количество"
-                                >
-                                  −
-                                </button>
-                                <span className={styles.quantityValue}>
-                                  {item.quantity}
-                                </span>
-                                <button
-                                  type="button"
-                                  className={styles.quantityButton}
-                                  onClick={() =>
-                                    updateQuantity(
-                                      item.productId,
-                                      item.size,
-                                      item.color,
-                                      item.quantity + 1
-                                    )
-                                  }
-                                  aria-label="Увеличить количество"
-                                >
-                                  +
-                                </button>
-                              </div>
-                              <div className={styles.orderItemPrice}>
-                                {formatPrice(
-                                  item.product.priceValue * item.quantity
-                                )}
-                              </div>
+                            <div className={styles.orderItemPrice}>
+                              {formatPrice(
+                                item.product.priceValue * item.quantity
+                              )}
                             </div>
                           </div>
                         </div>
                       );
                     })}
                   </div>
+                  <div className={styles.summaryRow}>
+                    <span className={styles.summaryLabel}>Доставка:</span>
+                    <span className={styles.summaryValue}>
+                      {formData.deliveryMethod === "pickup"
+                        ? "Бесплатно"
+                        : formatPrice(
+                            deliveryPrices[
+                              formData.deliveryMethod as keyof typeof deliveryPrices
+                            ] || 0
+                          )}
+                    </span>
+                  </div>
+                  <div className={styles.summaryRow}>
+                    <span className={styles.summaryLabel}>Товаров на:</span>
+                    <span className={styles.summaryValue}>
+                      {formatPrice(getTotalPrice())}
+                    </span>
+                  </div>
                 </div>
                 <div className={styles.orderSummaryBlock}>
                   <div className={styles.orderSummary}>
-                    <div className={styles.summaryRow}>
-                      <span className={styles.summaryLabel}>Доставка:</span>
-                      <span className={styles.summaryValue}>
-                        {formData.deliveryMethod === "pickup"
-                          ? "Бесплатно"
-                          : formatPrice(
-                              deliveryPrices[
-                                formData.deliveryMethod as keyof typeof deliveryPrices
-                              ] || 0
-                            )}
-                      </span>
-                    </div>
-                    <div className={styles.summaryRow}>
-                      <span className={styles.summaryLabel}>Товаров на:</span>
-                      <span className={styles.summaryValue}>
-                        {formatPrice(getTotalPrice())}
-                      </span>
-                    </div>
                     <div className={styles.summaryRowTotal}>
                       <span className={styles.summaryLabelTotal}>Итого</span>
                       <span className={styles.summaryTotal}>
