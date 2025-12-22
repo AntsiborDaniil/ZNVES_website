@@ -136,13 +136,13 @@ const Orders = () => {
                 <div
                   className={`${styles.value} ${styles.paymentValueContainer}`}
                 >
+                  <span>{mockOrder.payment.system}</span>
                   <Image
                     src="/images/checkout/sbp.png"
                     alt="СБП"
-                    width={24}
-                    height={24}
+                    width={18}
+                    height={18}
                   />
-                  <span>{mockOrder.payment.system}</span>
                 </div>
               </div>
               <div className={styles.paymentField}>

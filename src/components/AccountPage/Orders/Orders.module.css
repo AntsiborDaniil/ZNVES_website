@@ -93,7 +93,7 @@
   padding: 1.5rem;
   border-radius: 3px;
   display: flex;
-  gap: 0.75rem;
+  gap: 10px;
 }
 
 .productsSection {
@@ -112,8 +112,8 @@
 }
 
 .sectionIcon img {
-    width: 15.5px;
-    height: 15.5px;
+    width: 16px;
+    height: 16px;
 }
 
 .buyerSectionText,
@@ -396,7 +396,7 @@
 
 .upper {
   display: flex;
-  gap: 3rem;
+  justify-content: space-between;
 }
 
 .bottom {
@@ -419,6 +419,7 @@
   font-size: 14px;
   line-height: 16.18px;
   letter-spacing: 0%;
+  margin-bottom: 4px;
 }
 
 .title {
@@ -426,9 +427,9 @@
 
   font-weight: 400;
   font-size: 16px;
-  line-height: 27.51px;
+  line-height: 18.51px;
   letter-spacing: 0px;
-  max-width: 133px;
+  max-width: 225.55px;
   text-transform: uppercase;
 }
 
