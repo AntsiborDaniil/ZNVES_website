@@ -241,7 +241,13 @@
 
 @media (max-width: 1024px) {
     .mainContentWrapper {
-        gap: 12px;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .summary {
+        width: 100%;
+        position: static;
     }
 
     .cartTitle {
@@ -251,6 +257,11 @@
 
     .backLink {
         font-size: 13px;
+    }
+
+    /* Убеждаемся, что CheckoutForm занимает всю ширину */
+    .mainContentWrapper > div:last-child {
+        width: 100%;
     }
 }
 /* @media (max-width: 1300px) {
