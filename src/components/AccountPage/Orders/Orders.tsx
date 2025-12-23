@@ -1,0 +1,559 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import styles from "./Orders.module.css";
+import Image from "next/image";
+
+interface OrderProduct {
+  id: number;
+  name: string;
+  category: string;
+  color: string;
+  size: string;
+  quantity: number;
+  price: string;
+  priceValue: number;
+  image: string;
+}
+
+interface OrderData {
+  id: string;
+  date: string;
+  status: string;
+  buyer: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  };
+  delivery: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    city: string;
+    street: string;
+    house: string;
+    apartment: string;
+    type: string;
+    method: string;
+  };
+  payment: {
+    method: string;
+    amount: string;
+  };
+  products: OrderProduct[];
+  total: {
+    itemsCount: number;
+    totalAmount: string;
+    totalAmountValue: number;
+  };
+}
+
+const getPaymentSystemName = (method: string) => {
+  const paymentNames: Record<string, string> = {
+    sberbank: "Оплата по СПБ",
+    yandexpay: "Яндекс Pay",
+    installment: "Долями",
+    card: "Картой онлайн",
+  };
+  return paymentNames[method] || "Оплата по СПБ";
+};
+
+const getDeliveryServiceName = (type: string, method: string) => {
+  if (type === "cdek") {
+    return method === "pickup"
+      ? "СДЭК: доставка в пункт выдачи"
+      : "СДЭК: курьером";
+  } else if (type === "yandex") {
+    return method === "pickup"
+      ? "Яндекс.Курьер: пункт выдачи"
+      : "Яндекс.Курьер: курьером";
+  }
+  return "СДЭК: доставка в пункт выдачи";
+};
+
+type OrdersProps = {
+  initialOrderId?: string;
+};
+
+const Orders = ({ initialOrderId }: OrdersProps) => {
+  const [orders, setOrders] = useState<OrderData[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(true);
+
+  useEffect(() => {
+    // Загружаем заказы из sessionStorage
+    if (typeof window !== "undefined") {
+      try {
+        const storedOrders = sessionStorage.getItem("znves:orders");
+        if (storedOrders) {
+          const parsedOrders = JSON.parse(storedOrders);
+          // Сортируем заказы по дате (новые первыми)
+          const sortedOrders = parsedOrders.sort(
+            (a: OrderData, b: OrderData) => {
+              const dateA = new Date(a.date.split(".").reverse().join("-"));
+              const dateB = new Date(b.date.split(".").reverse().join("-"));
+              return dateB.getTime() - dateA.getTime();
+            }
+          );
+          setOrders(sortedOrders);
+
+          // Если передан initialOrderId, выбираем заказ по ID
+          if (initialOrderId) {
+            const orderToSelect = sortedOrders.find(
+              (order: OrderData) => order.id === initialOrderId
+            );
+            if (orderToSelect) {
+              setSelectedOrder(orderToSelect);
+              setIsDetailsOpen(true);
+            } else if (sortedOrders.length > 0) {
+              setSelectedOrder(sortedOrders[0]);
+              setIsDetailsOpen(true);
+            }
+          } else if (sortedOrders.length > 0 && !selectedOrder) {
+            // Если нет initialOrderId, выбираем первый заказ
+            setSelectedOrder(sortedOrders[0]);
+            setIsDetailsOpen(true);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load orders from sessionStorage:", error);
+      }
+    }
+  }, [initialOrderId]);
+
+  // Автоматически открываем детали при смене выбранного заказа
+  useEffect(() => {
+    if (selectedOrder) {
+      setIsDetailsOpen(true);
+    }
+  }, [selectedOrder?.id]);
+
+  // Если нет заказов, показываем пустое состояние
+  if (orders.length === 0) {
+    return (
+      <section className={styles.panel}>
+        <div className={styles.emptyState}>
+          <h2 className={styles.emptyTitle}>У вас пока нет заказов</h2>
+          <p className={styles.emptyText}>
+            После оформления заказа он появится здесь
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  // Разделяем заказы на выбранный и остальные
+  const otherOrders = orders.filter((order) => order.id !== selectedOrder?.id);
+
+  return (
+    <section className={styles.panel}>
+      {/* Выбранный заказ (плашка) - сверху */}
+      {selectedOrder && (
+        <div className={styles.selectedOrderSection}>
+          <div
+            className={`${styles.orderCard} ${styles.orderCardActive}`}
+            onClick={() => setIsDetailsOpen(!isDetailsOpen)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setIsDetailsOpen(!isDetailsOpen);
+              }
+            }}
+          >
+            <div className={styles.orderCardContent}>
+              <div className={styles.orderCardHeader}>
+                <h1 className={styles.orderCardTitle}>
+                  Заказ от {selectedOrder.date}
+                </h1>
+                <Image
+                  src="/images/account/arrowRight.png"
+                  alt="Стрелка"
+                  width={41}
+                  height={39}
+                  className={`${styles.orderCardArrow} ${
+                    isDetailsOpen ? styles.orderCardArrowRotated : ""
+                  }`}
+                />
+              </div>
+              <div className={styles.orderCardDetails}>
+                <div className={styles.orderCardDetailsLeft}>
+                  <div className={styles.orderCardDetailsTop}>
+                    <div className={styles.orderCardNumber}>
+                      №{selectedOrder.id}
+                    </div>
+                    <div className={styles.orderCardStatus}>
+                      {selectedOrder.status === "не оплачен"
+                        ? "Ожидает оплаты"
+                        : "Оплачен"}
+                    </div>
+                  </div>
+                  <div className={styles.orderCardDetailsBottom}>
+                    <div className={styles.orderCardState}>
+                      <span>•</span>{" "}
+                      <h2 className={styles.orderCardStateText}>
+                        Новый ({selectedOrder.status})
+                      </h2>
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.orderCardDetailsRight}>
+                  <div className={styles.orderCardThumbnails}>
+                    {selectedOrder.products
+                      .slice(0, 3)
+                      .map((product, index) => (
+                        <div key={index} className={styles.orderCardThumbnail}>
+                          <Image
+                            src={product.image}
+                            alt={product.name}
+                            width={60}
+                            height={60}
+                            className={styles.orderCardThumbnailImage}
+                          />
+                        </div>
+                      ))}
+                    {selectedOrder.products.length > 3 && (
+                      <div className={styles.orderCardThumbnailMore}>
+                        +{selectedOrder.products.length - 3}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Детали выбранного заказа - под плашкой */}
+          <div
+            className={`${styles.orderDetailsWrapper} ${
+              isDetailsOpen
+                ? styles.orderDetailsOpen
+                : styles.orderDetailsClosed
+            }`}
+          >
+            <div className={styles.orderDetailsContent}>
+              <div className={styles.ordersContainer}>
+                <div className={styles.orderHeader}>
+                  <div className={styles.orderHeaderLeft}>
+                    <div className={styles.orderIcon}>
+                      <Image
+                        src="/images/account/info.png"
+                        alt="Заказ"
+                        width={20}
+                        height={20}
+                      />
+                    </div>
+                    <div className={styles.orderInfo}>
+                      <span className={styles.orderNumber}>
+                        Заказ: <strong>№{selectedOrder.id}</strong> от{" "}
+                        {selectedOrder.date}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.orderStatus}>
+                    <span className={styles.orderStatusLabel}>Статус:</span>{" "}
+                    <span
+                      className={
+                        selectedOrder.status
+                          .toLowerCase()
+                          .includes("не оплачен") ||
+                        selectedOrder.status.toLowerCase().includes("неоплачен")
+                          ? styles.orderStatusUnpaid
+                          : styles.orderStatusPaid
+                      }
+                    >
+                      {selectedOrder.status}
+                    </span>
+                  </div>
+                </div>
+
+                <div className={styles.buyerSection}>
+                  <div className={styles.sectionIcon}>
+                    <Image
+                      src="/images/account/accountImage.png"
+                      alt="Заказ"
+                      width={20}
+                      height={23}
+                    />
+                  </div>
+                  <div className={styles.buyerSectionText}>
+                    <h1 className={styles.sectionTitle}>Покупатель</h1>
+                    <div className={styles.buyerSectionInfo}>
+                      <div className={styles.buyerColumn}>
+                        <div className={styles.buyerSectionInfoItem}>
+                          <span className={styles.label}>Имя</span>
+                          <p className={styles.value}>
+                            {selectedOrder.buyer.firstName}
+                          </p>
+                        </div>
+                        <div className={styles.buyerSectionInfoItem}>
+                          <span className={styles.label}>Email</span>
+                          <p className={styles.value}>
+                            {selectedOrder.buyer.email}
+                          </p>
+                        </div>
+                      </div>
+                      <div className={styles.buyerColumn}>
+                        <div className={styles.buyerSectionInfoItem}>
+                          <span className={styles.label}>Фамилия</span>
+                          <p className={styles.value}>
+                            {selectedOrder.buyer.lastName}
+                          </p>
+                        </div>
+                        <div className={styles.buyerSectionInfoItem}>
+                          <span className={styles.label}>Номер телефона</span>
+                          <p className={styles.value}>
+                            {selectedOrder.buyer.phone}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.paymentSection}>
+                  <div className={styles.sectionIcon}>
+                    <Image
+                      src="/images/account/buyImage.png"
+                      alt="Заказ"
+                      width={21.5}
+                      height={19.65}
+                    />
+                  </div>
+                  <div className={styles.paymentSectionText}>
+                    <h1 className={styles.sectionTitle}>Способ оплаты</h1>
+                    <div className={styles.paymentSectionInfo}>
+                      <div className={styles.paymentField}>
+                        <span className={styles.label}>Система оплаты</span>
+                        <div
+                          className={`${styles.value} ${styles.paymentValueContainer}`}
+                        >
+                          <span>
+                            {getPaymentSystemName(selectedOrder.payment.method)}
+                          </span>
+                          {selectedOrder.payment.method === "sberbank" && (
+                            <Image
+                              src="/images/account/sbpAcc.png"
+                              alt="СБП"
+                              width={18}
+                              height={18}
+                            />
+                          )}
+                        </div>
+                      </div>
+                      <div className={styles.paymentField}>
+                        <span className={styles.label}>Сумма</span>
+                        <span className={styles.valuePay}>
+                          {selectedOrder.payment.amount}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.deliverySection}>
+                  <div className={styles.sectionIcon}>
+                    <Image
+                      src="/images/account/delivery.png"
+                      alt="Заказ"
+                      width={23}
+                      height={18.4}
+                    />
+                  </div>
+                  <div className={styles.deliverySectionText}>
+                    <h1 className={styles.sectionTitle}>Способ доставки</h1>
+                    <div className={styles.deliverySectionInfo}>
+                      <div className={styles.deliveryField}>
+                        <span className={styles.label}>Служба доставки</span>
+                        <span className={styles.value}>
+                          {getDeliveryServiceName(
+                            selectedOrder.delivery.type,
+                            selectedOrder.delivery.method
+                          )}
+                        </span>
+                      </div>
+                      <div className={styles.deliveryField}>
+                        <span className={styles.label}>Адрес</span>
+                        <span className={styles.value}>
+                          {selectedOrder.delivery.city ||
+                          selectedOrder.delivery.street ||
+                          selectedOrder.delivery.house
+                            ? [
+                                selectedOrder.delivery.city,
+                                selectedOrder.delivery.street,
+                                selectedOrder.delivery.house,
+                                selectedOrder.delivery.apartment,
+                              ]
+                                .filter(Boolean)
+                                .join(", ")
+                            : "г. Москва"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.productsSection}>
+                  <h1 className={styles.sectionTitle}>Товары</h1>
+                  <div className={styles.productsList}>
+                    {selectedOrder.products.map((product, index) => (
+                      <div
+                        key={`${product.id}-${index}`}
+                        className={styles.productItem}
+                      >
+                        <Image
+                          src={product.image}
+                          className={styles.productImage}
+                          alt={product.name}
+                          width={104}
+                          height={149}
+                        />
+                        <div className={styles.productDetails}>
+                          <div className={styles.upper}>
+                            <div className={styles.left}>
+                              <h3 className={styles.category}>
+                                {product.category}
+                              </h3>
+                              <h1 className={styles.title}>{product.name}</h1>
+                            </div>
+                            <div className={styles.right}>
+                              <h3 className={styles.amountWord}>Сумма</h3>
+                              <h1 className={styles.amount}>{product.price}</h1>
+                            </div>
+                          </div>
+                          <div className={styles.bottom}>
+                            <div className={styles.leftBottom}>
+                              <h3 className={styles.labelBottom}>Цвет</h3>
+                              <h1 className={styles.wordColor}>
+                                {product.color}
+                              </h1>
+                            </div>
+                            <div className={styles.rightBottom}>
+                              <h3 className={styles.labelBottom}>Размер</h3>
+                              <h1 className={styles.word}>{product.size}</h1>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Блок Итого во всю ширину */}
+              <div className={styles.totalSection}>
+                {selectedOrder.status === "не оплачен" && (
+                  <button className={styles.payButton}>Оплатить заказ</button>
+                )}
+                <div className={styles.totalInfo}>
+                  <div className={styles.totalAmount}>
+                    <h1 className={styles.totalTitle}>Итого</h1>
+                    <span className={styles.totalAmountValue}>
+                      {selectedOrder.total.totalAmount}
+                    </span>
+                  </div>
+                  <h2 className={styles.totalItems}>
+                    Товары, {selectedOrder.total.itemsCount} шт
+                  </h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Остальные заказы - под деталями выбранного */}
+      {otherOrders.length > 0 && (
+        <div className={styles.otherOrdersSection}>
+          <h2 className={styles.otherOrdersTitle}>Другие заказы</h2>
+          <div className={styles.ordersList}>
+            {otherOrders.map((order) => (
+              <div
+                key={order.id}
+                className={styles.orderCard}
+                onClick={() => {
+                  setSelectedOrder(order);
+                  setIsDetailsOpen(true);
+                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelectedOrder(order);
+                    setIsDetailsOpen(true);
+                  }
+                }}
+              >
+                <div className={styles.orderCardContent}>
+                  <div className={styles.orderCardHeader}>
+                    <h1 className={styles.orderCardTitle}>
+                      Заказ от {order.date}
+                    </h1>
+                    <Image
+                      src="/images/account/arrowRight.png"
+                      alt="Стрелка"
+                      width={41}
+                      height={39}
+                      className={styles.orderCardArrow}
+                    />
+                  </div>
+                  <div className={styles.orderCardDetails}>
+                    <div className={styles.orderCardDetailsLeft}>
+                      <div className={styles.orderCardDetailsTop}>
+                        <div className={styles.orderCardNumber}>
+                          №{order.id}
+                        </div>
+                        <div className={styles.orderCardStatus}>
+                          {order.status === "не оплачен"
+                            ? "Ожидает оплаты"
+                            : "Оплачен"}
+                        </div>
+                      </div>
+                      <div className={styles.orderCardDetailsBottom}>
+                        <div className={styles.orderCardState}>
+                          <span>•</span>{" "}
+                          <h2 className={styles.orderCardStateText}>
+                            Новый ({order.status})
+                          </h2>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={styles.orderCardDetailsRight}>
+                      <div className={styles.orderCardThumbnails}>
+                        {order.products.slice(0, 3).map((product, index) => (
+                          <div
+                            key={index}
+                            className={styles.orderCardThumbnail}
+                          >
+                            <Image
+                              src={product.image}
+                              alt={product.name}
+                              width={60}
+                              height={60}
+                              className={styles.orderCardThumbnailImage}
+                            />
+                          </div>
+                        ))}
+                        {order.products.length > 3 && (
+                          <div className={styles.orderCardThumbnailMore}>
+                            +{order.products.length - 3}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+};
+
+export default Orders;

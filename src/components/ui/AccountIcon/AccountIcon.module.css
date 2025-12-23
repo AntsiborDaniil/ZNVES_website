@@ -1,0 +1,33 @@
+.accountIcon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #1a1a1a;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease;
+}
+
+.accountIcon:hover {
+    opacity: 0.7;
+}
+
+.accountImage {
+    width: 13px;
+    height: 13px;
+}
+
+@media (max-width: 1440px) {
+    .accountImage {
+        width: 13px;
+        height: 13px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .accountImage {
+        display: none;
+    }
+}

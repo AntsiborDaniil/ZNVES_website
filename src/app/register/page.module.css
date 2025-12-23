@@ -1,0 +1,19 @@
+.authPage {
+    min-height: 100vh;
+    background-color: #f2f0ec;
+    display: flex;
+    flex-direction: column;
+}
+
+.authContainer {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+@media (max-width: 768px) {
+    .authContainer {
+        padding: 40px 16px;
+    }
+}

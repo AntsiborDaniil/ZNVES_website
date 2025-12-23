@@ -1,0 +1,451 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background-color: #f8f8f8;
+  border-radius: 3px;
+  max-width: 1094px;
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.card:active {
+  transform: translateY(0);
+}
+
+.cardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.cardHeader {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 28px;
+  letter-spacing: 0%;
+
+  color: #525252;
+}
+
+.cardTitle {
+  font-weight: 500;
+  font-size: 27px;
+  line-height: 28px;
+  letter-spacing: 0%;
+
+  color: #525252;
+}
+
+.cardTitleCart {
+  font-weight: 500;
+  font-size: 27px;
+  line-height: 28px;
+  letter-spacing: 0%;
+  color: #525252;
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardInfoItem {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: 0%;
+
+  color: #525252;
+}
+
+.orderDetailsContainer {
+  display: flex;
+  gap: 190px;
+}
+
+.orderDetailsLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.orderDetailsTop {
+  display: flex;
+  align-items: center;
+  gap: 23px;
+}
+
+.orderDetailsBottom {
+  display: flex;
+  align-items: center;
+}
+
+.orderStatus {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 28px;
+  letter-spacing: 0%;
+
+  color: #d12a15;
+}
+
+.orderStateText {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 28px;
+  letter-spacing: 0%;
+  color: #262626;
+}
+
+.orderState {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #525252;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.orderState span {
+  margin-right: 4px;
+}
+
+.orderState u {
+  text-decoration: underline;
+}
+
+.orderDetailsRight {
+  display: flex;
+  align-items: center;
+}
+
+.orderThumbnails {
+  display: flex;
+  gap: 8px;
+}
+
+.thumbnail {
+  width: 68px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff;
+  flex-shrink: 0;
+}
+
+.thumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.thumbnailMore {
+  width: 68px;
+  height: 68px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 400;
+  font-size: 14px;
+  color: #525252;
+  flex-shrink: 0;
+}
+
+.thumbnailImageArrow {
+  width: 25px;
+  height: 23.425756454467773px;
+}
+
+.cardContentInner {
+  display: flex;
+  justify-content: space-between;
+}
+
+.cardArrow {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1440px) {
+    .card {
+        padding: 27px;
+    }
+  .cardHeader {
+    font-size: 16px;
+    line-height: 28px;
+  }
+
+  .cardTitle,
+  .cardTitleCart {
+    font-size: 24px;
+    line-height: 28px;
+  }
+
+  .cardInfoItem {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: 0%;
+  }
+
+  .orderStatus {
+    font-size: 16px;
+    line-height: 28px;
+  }
+
+  .orderStateText {
+    font-size: 16px;
+    line-height: 28px;
+  }
+
+  .thumbnailImageArrow {
+    width: 31.21px;
+    height: 29.25px;
+  }
+
+  .orderDetailsLeft {
+    gap: 7px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .cardHeader {
+    font-size: 14px;
+    line-height: 28px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .cardTitle {
+    font-size: 19px;
+    line-height: 28px;
+  }
+
+  .cardInfoItem {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0%;
+  }
+
+  .cardTitleCart {
+    font-size: 19px;
+    line-height: 28px;
+  }
+
+  .orderStatus {
+    font-size: 14px;
+    line-height: 28px;
+    text-wrap: nowrap;
+  }
+
+  .orderStateText {
+    font-size: 14px;
+    line-height: 28px;
+  }
+
+  .thumbnail {
+    display: none;
+  }
+
+  .thumbnailImageArrow {
+    width: 25px;
+    height: 23px;
+  }
+
+  .orderDetailsLeft {
+    gap: 7px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cardHeader {
+    font-size: 14px;
+    line-height: 28px;
+  }
+
+  .card {
+    padding: 20px 27px;
+  }
+
+  .cardTitle {
+    font-size: 19px;
+    line-height: 28px;
+  }
+
+  .cardInfo {
+    flex-direction: row;
+    gap: 14px;
+  }
+
+  .cardInfoItem {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0%;
+  }
+
+  .cardTitleCart {
+    font-size: 19px;
+    line-height: 28px;
+  }
+
+  .orderStatus {
+    font-size: 14px;
+    line-height: 28px;
+    text-wrap: nowrap;
+  }
+
+  .orderStateText,
+  .orderDetailsBottom {
+    display: none;
+  }
+
+  .thumbnail {
+    display: none;
+  }
+
+  .thumbnailImageArrow {
+    width: 25px;
+    height: 23px;
+  }
+
+  .orderDetailsLeft {
+    gap: 7px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    gap: 10px;
+  }
+
+  .card {
+    padding: 19px 16px 19px;
+  }
+
+  .cardHeader {
+    font-size: 14px;
+    line-height: 28px;
+  }
+
+  .cardTitle {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0%;
+
+    text-wrap: nowrap;
+  }
+
+  .cardInfo {
+    flex-direction: row;
+    gap: 14px;
+  }
+
+  .cardInfoItem {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 0%;
+  }
+
+  .cardTitleCart {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .cardContent {
+    gap: 15px;
+  }
+
+  .orderStatus {
+    font-size: 12px;
+    line-height: 28px;
+    text-wrap: nowrap;
+  }
+
+  .orderStateText,
+  .orderDetailsBottom {
+    display: none;
+  }
+
+  .thumbnail {
+    display: none;
+  }
+
+  .thumbnailImageArrow {
+    width: 17px;
+    height: 16px;
+  }
+
+  .orderDetailsLeft {
+    gap: 7px;
+  }
+
+  .orderDetailsContainer {
+    gap: 0px;
+    justify-content: space-between;
+  }
+}
+
+/* @media (max-width: 570px) {
+  .cardHeader {
+    font-size: 15px;
+    line-height: 24px;
+  }
+
+  .cardTitle {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  .cardInfoItem {
+    font-size: 12px;
+    line-height: 17px;
+  }
+
+  .orderStatus {
+    font-size: 12px;
+    line-height: 24px;
+  }
+
+  .orderStateText {
+    font-size: 11px;
+    line-height: 19px;
+  }
+
+  .thumbnailImage {
+    width: 45px;
+    height: 60px;
+  }
+
+  .thumbnailImageArrow {
+    width: 24px;
+    height: 22px;
+  }
+} */

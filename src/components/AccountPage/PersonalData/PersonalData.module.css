@@ -1,0 +1,414 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f8f8;
+
+  border-radius: 3px;
+  padding: 30px;
+
+  gap: 5px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.passwordPanel {
+  border-radius: 3px;
+  padding: 30px;
+
+  background-color: #f8f8f8;
+}
+
+.panel + .panel {
+  margin-top: 15px;
+}
+
+.sectionHeading {
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 32px;
+  letter-spacing: 0%;
+  color: #525252;
+}
+
+.sectionDescription {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0%;
+  max-width: 640px;
+  color: #525252;
+  text-wrap: nowrap;
+}
+
+.subsectionHeading {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 28px;
+  letter-spacing: 0%;
+  color: #525252;
+}
+
+.infoPanel {
+  margin-top: 12px;
+  border-radius: 16px;
+  background-color: #f8f8f8;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 94px;
+  width: 100%;
+}
+
+.fieldRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fieldLabel {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0%;
+  color: #525252;
+}
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  max-width: 100%;
+  height: 53px;
+  border-radius: 3px;
+  border: 0.6px solid #525252;
+  background: #ffffff;
+  padding: 0px 14px 0px 14px;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0%;
+  color: #525252c2;
+  box-sizing: border-box;
+}
+
+.input::placeholder {
+  color: #525252c2;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0%;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #0a5840;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.primaryButton {
+  background-color: #525252;
+  color: #f2f0ec;
+  width: 224px;
+  height: 53px;
+  border-radius: 3px;
+  padding-top: 8px;
+  padding-right: 14px;
+  padding-bottom: 8px;
+  padding-left: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-wrap: nowrap;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 20px;
+  letter-spacing: 0%;
+
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.primaryButton:disabled {
+  background-color: #525252ad;
+
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondaryButton {
+  background-color: transparent;
+  color: #525252;
+  border: 1px solid #525252;
+  width: 113px;
+  height: 53px;
+  border-radius: 3px;
+  border-width: 1px;
+  padding-top: 8px;
+  padding-right: 14px;
+  padding-bottom: 8px;
+  padding-left: 14px;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 20px;
+  letter-spacing: 0%;
+
+  cursor: pointer;
+}
+
+.passwordForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+  border-radius: 16px;
+  background-color: #f8f8f8;
+}
+
+.passwordField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.passwordLabel {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0%;
+  margin-top: 20px;
+  color: #525252;
+}
+
+.passwordInputWrapper {
+  position: relative;
+}
+
+.passwordInput {
+  width: 100%;
+  max-width: 100%;
+  height: 53px;
+  border-radius: 3px;
+  border: 0.6px solid #525252;
+  background: #ffffff;
+  padding: 0 46px 0 18px;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0%;
+  color: #525252c2;
+  box-sizing: border-box;
+}
+
+.passwordInput::placeholder {
+  color: #525252c2;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0%;
+}
+
+.passwordInput:focus {
+  outline: none;
+  border-color: #0a5840;
+}
+
+.togglePassword {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.passwordMessage {
+  font-size: 13px;
+  margin: 0;
+}
+
+.passwordMessageSuccess {
+  color: #0a5840;
+}
+
+.passwordMessageError {
+  color: #c93c3c;
+}
+/* 
+@media (max-width: 1440px) {
+  .sectionHeading {
+    font-size: 22px;
+  }
+
+  .sectionDescription {
+    font-size: 12px;
+  }
+
+  .subsectionHeading {
+    font-size: 16px;
+  }
+
+  .fieldLabel {
+    font-size: 12px;
+  }
+
+  .input {
+    font-size: 14px;
+  }
+
+  .input::placeholder {
+    font-size: 14px;
+  }
+
+  .primaryButton {
+    font-size: 12px;
+  }
+
+  .secondaryButton {
+    font-size: 12px;
+  }
+
+  .passwordLabel {
+    font-size: 12px;
+  }
+
+  .passwordInput {
+    font-size: 14px;
+  }
+
+  .passwordInput::placeholder {
+    font-size: 14px;
+  }
+
+  .passwordMessage {
+    font-size: 11px;
+  }
+} */
+
+@media (max-width: 1440px) {
+  .container {
+    padding: 27px;
+  }
+
+  .fieldsGrid {
+    gap: 10px 69px;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .subsectionHeading {
+    margin-bottom: 4px;
+  }
+
+  .infoPanel {
+    margin-top: 0px;
+  }
+
+  .passwordField {
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 1280px) {
+    .sectionDescription {
+        text-wrap: wrap;
+    }
+}
+
+@media (max-width: 1024px) {
+    .container,
+    .passwordPanel {
+        padding: 20px 25px;
+    }
+
+    .primaryButton,
+    .secondaryButton {
+        height: 44px;
+        font-size: 18px;
+    }
+
+    .subsectionHeading {
+        margin-bottom: 12px;
+    }
+
+    .input {
+        height: 44px;
+    }
+
+    .panel {
+        gap: 0px;
+    }
+
+    .actions {
+        margin-top: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .fieldsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 19px;
+    }
+
+    .sectionDescription {
+        display: none;
+    }
+
+    .sectionHeading {
+        font-size: 19px;
+    }
+
+    .subsectionHeading {
+        font-size: 17px;
+        
+    }
+
+    .input {
+        font-size: 14px;
+        height: 38px;
+    }
+
+    .fieldLabel {
+        font-size: 12px;
+    }
+
+    .primaryButton {
+        font-size: 14px;
+        width: 178px;
+        height: 38px;
+    }
+
+    .secondaryButton {
+        width: 90px;
+        font-size: 14px;
+        height: 38px;
+    }
+
+    .passwordLabel,
+    .passwordField {
+        margin-top: 0px;
+    }
+}
