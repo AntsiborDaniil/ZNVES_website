@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import styles from "./page.module.css";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -13,7 +13,7 @@ import { useWindowSize } from "../../hooks/useWindowSize";
 import OrderSuccessModal from "../../components/OrderSuccessModal/OrderSuccessModal";
 import CheckoutForm from "../../components/CheckoutForm/CheckoutForm";
 
-const CartPage = () => {
+const CartPageContent = () => {
   const { items, removeItem, updateQuantity, getTotalPrice, clearCart } =
     useCart();
   const router = useRouter();
@@ -189,6 +189,28 @@ const CartPage = () => {
         />
       )}
     </div>
+  );
+};
+
+const CartPage = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className={styles.cart}>
+          <Header variant="green" />
+          <main className={styles.main}>
+            <div className={styles.cartContainer}>
+              <div className={styles.emptyCart}>
+                <h1 className={styles.emptyTitle}>Загрузка...</h1>
+              </div>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      }
+    >
+      <CartPageContent />
+    </Suspense>
   );
 };
 

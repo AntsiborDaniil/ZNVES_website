@@ -12,6 +12,10 @@
     max-width: 400px;
 }
 
+.toastClosing {
+    animation: slideOut 0.3s ease-in forwards;
+}
+
 .toastMessage {
     font-size: 16px;
     font-weight: 500;
@@ -29,11 +33,49 @@
     }
 }
 
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
 @media (max-width: 480px) {
     .toast {
         bottom: 16px;
         right: 16px;
         left: 16px;
         max-width: none;
+        animation: slideInMobile 0.3s ease-out;
+    }
+
+    .toastClosing {
+        animation: slideOutMobile 0.3s ease-in forwards;
+    }
+}
+
+@keyframes slideInMobile {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutMobile {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(100%);
+        opacity: 0;
     }
 }

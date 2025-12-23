@@ -380,7 +380,7 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
                   onClick={() => {
                     const catalogProduct = toCatalogProduct(product);
                     addItem(catalogProduct, selectedSize, selectedColor, 1);
-                    showToast("Товар добавлен в корзину");
+                    showToast("Добавлено в корзину");
                   }}
                 >
                   Добавить в корзину

@@ -33,15 +33,32 @@ const CheckoutForm = ({
     street: "",
     house: "",
     apartment: "",
+    floor: "",
+    entrance: "",
+    intercom: "",
+    pickupCity: "",
+    postalCode: "",
+    pvzAddress: "",
     deliveryType: "cdek",
     deliveryMethod: "pickup",
     paymentMethod: "sberbank",
     agreeToOffer: false,
     agreeToPrivacy: false,
+    differentRecipient: false,
   });
   const [mapSearchValue, setMapSearchValue] = useState("");
   const isUpdatingFromMapRef = useRef(false);
   const lastGeocodedAddressRef = useRef<string>("");
+
+  // Устанавливаем город "Москва" при выборе курьерской доставки
+  useEffect(() => {
+    if (formData.deliveryMethod === "yandex") {
+      setFormData((prev) => ({
+        ...prev,
+        city: "Москва",
+      }));
+    }
+  }, [formData.deliveryMethod]);
 
   // Цены доставки
   const deliveryPrices = {
@@ -80,6 +97,13 @@ const CheckoutForm = ({
         deliveryType: value,
         deliveryMethod: "pickup",
       }));
+    } else if (name === "deliveryMethod" && value === "yandex") {
+      // При выборе курьерской доставки устанавливаем город "Москва"
+      setFormData((prev) => ({
+        ...prev,
+        deliveryMethod: value,
+        city: "Москва",
+      }));
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -93,6 +117,7 @@ const CheckoutForm = ({
     street?: string;
     house?: string;
     fullAddress?: string;
+    pvzAddress?: string;
   }) => {
     const fullAddress =
       addressData.fullAddress ||
@@ -107,16 +132,26 @@ const CheckoutForm = ({
     lastGeocodedAddressRef.current = fullAddress;
     isUpdatingFromMapRef.current = true;
 
-    const newAddress = {
-      city: addressData.city || "",
-      street: addressData.street || "",
-      house: addressData.house || "",
-    };
+    // Если выбран пункт выдачи, сохраняем адрес ПВЗ
+    if (formData.deliveryMethod === "pickup") {
+      setFormData((prev) => ({
+        ...prev,
+        pvzAddress: addressData.pvzAddress || fullAddress || "",
+        city: addressData.city || prev.city,
+      }));
+    } else {
+      // Для курьерской доставки сохраняем полный адрес
+      const newAddress = {
+        city: addressData.city || "",
+        street: addressData.street || "",
+        house: addressData.house || "",
+      };
 
-    setFormData((prev) => ({
-      ...prev,
-      ...newAddress,
-    }));
+      setFormData((prev) => ({
+        ...prev,
+        ...newAddress,
+      }));
+    }
 
     if (fullAddress && fullAddress !== mapSearchValue) {
       setMapSearchValue(fullAddress);
@@ -190,6 +225,12 @@ const CheckoutForm = ({
         street: formData.street,
         house: formData.house,
         apartment: formData.apartment,
+        floor: formData.floor,
+        entrance: formData.entrance,
+        intercom: formData.intercom,
+        pickupCity: formData.pickupCity,
+        postalCode: formData.postalCode,
+        pvzAddress: formData.pvzAddress,
         type: formData.deliveryType,
         method: formData.deliveryMethod,
       },
@@ -269,7 +310,7 @@ const CheckoutForm = ({
                   type="text"
                   id="firstName"
                   name="firstName"
-                  placeholder="Введите ваше имя"
+                  placeholder="Введите имя"
                   value={formData.firstName}
                   onChange={handleInputChange}
                   className={styles.input}
@@ -277,13 +318,13 @@ const CheckoutForm = ({
               </div>
               <div className={styles.inputWrapper}>
                 <label htmlFor="lastName" className={styles.label}>
-                  Имя
+                  Фамилия
                 </label>
                 <input
                   type="text"
                   id="lastName"
                   name="lastName"
-                  placeholder="Введите ваше имя"
+                  placeholder="Введите фамилию"
                   value={formData.lastName}
                   onChange={handleInputChange}
                   className={styles.input}
@@ -292,6 +333,20 @@ const CheckoutForm = ({
             </div>
             <div className={styles.infoInputs}>
               <div className={styles.inputWrapper}>
+                <label htmlFor="phone" className={styles.label}>
+                  Телефон
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  placeholder="+7 (___) ___-__-__"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.inputWrapper}>
                 <label htmlFor="email" className={styles.label}>
                   Email
                 </label>
@@ -299,21 +354,7 @@ const CheckoutForm = ({
                   type="email"
                   id="email"
                   name="email"
-                  placeholder="Введите ваш email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.inputWrapper}>
-                <label htmlFor="email2" className={styles.label}>
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email2"
-                  name="email"
-                  placeholder="Введите ваш email"
+                  placeholder="Введите email"
                   value={formData.email}
                   onChange={handleInputChange}
                   className={styles.input}
@@ -535,66 +576,137 @@ const CheckoutForm = ({
 
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>Данные о доставке</h2>
-            <div className={styles.firstInputs}>
-              <div className={styles.inputWrapper}>
-                <label htmlFor="deliveryFirstName" className={styles.label}>
-                  Имя
-                </label>
-                <input
-                  type="text"
-                  id="deliveryFirstName"
-                  name="deliveryFirstName"
-                  placeholder="Введите ваше имя"
-                  value={formData.deliveryFirstName}
-                  onChange={handleInputChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.inputWrapper}>
-                <label htmlFor="deliveryLastName" className={styles.label}>
-                  Имя
-                </label>
-                <input
-                  type="text"
-                  id="deliveryLastName"
-                  name="deliveryLastName"
-                  placeholder="Введите ваше имя"
-                  value={formData.deliveryLastName}
-                  onChange={handleInputChange}
-                  className={styles.input}
-                />
-              </div>
-            </div>
-            <div className={styles.infoInputs}>
-              <div className={styles.inputWrapper}>
-                <label htmlFor="deliveryEmail" className={styles.label}>
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="deliveryEmail"
-                  name="deliveryEmail"
-                  placeholder="Введите ваш email"
-                  value={formData.deliveryEmail}
-                  onChange={handleInputChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.inputWrapper}>
-                <label htmlFor="deliveryEmail2" className={styles.label}>
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="deliveryEmail2"
-                  name="deliveryEmail"
-                  placeholder="Введите ваш email"
-                  value={formData.deliveryEmail}
-                  onChange={handleInputChange}
-                  className={styles.input}
-                />
-              </div>
-            </div>
+            <label
+              className={styles.checkboxLabel}
+              style={{ marginBottom: "20px" }}
+            >
+              <input
+                type="checkbox"
+                name="differentRecipient"
+                checked={formData.differentRecipient}
+                onChange={handleInputChange}
+                className={styles.checkbox}
+              />
+              <span>Получатель отличается от покупателя</span>
+            </label>
+            {formData.differentRecipient && (
+              <>
+                <div className={styles.firstInputs}>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="deliveryFirstName" className={styles.label}>
+                      Имя получателя
+                    </label>
+                    <input
+                      type="text"
+                      id="deliveryFirstName"
+                      name="deliveryFirstName"
+                      placeholder="Введите имя"
+                      value={formData.deliveryFirstName}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="deliveryLastName" className={styles.label}>
+                      Фамилия получателя
+                    </label>
+                    <input
+                      type="text"
+                      id="deliveryLastName"
+                      name="deliveryLastName"
+                      placeholder="Введите фамилию"
+                      value={formData.deliveryLastName}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                </div>
+                <div className={styles.infoInputs}>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="deliveryPhone" className={styles.label}>
+                      Телефон получателя
+                    </label>
+                    <input
+                      type="tel"
+                      id="deliveryPhone"
+                      name="deliveryPhone"
+                      placeholder="+7 (___) ___-__-__"
+                      value={formData.deliveryPhone}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="deliveryEmail" className={styles.label}>
+                      Email получателя
+                    </label>
+                    <input
+                      type="email"
+                      id="deliveryEmail"
+                      name="deliveryEmail"
+                      placeholder="Введите email"
+                      value={formData.deliveryEmail}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+            {formData.deliveryMethod === "pickup" && (
+              <>
+                <div className={styles.firstInputs}>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="pickupCity" className={styles.label}>
+                      Город
+                    </label>
+                    <input
+                      type="text"
+                      id="pickupCity"
+                      name="pickupCity"
+                      placeholder="Введите город"
+                      value={formData.pickupCity || ""}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="postalCode" className={styles.label}>
+                      Почтовый индекс
+                    </label>
+                    <input
+                      type="text"
+                      id="postalCode"
+                      name="postalCode"
+                      placeholder="Введите индекс"
+                      value={formData.postalCode}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                </div>
+                <div className={styles.infoInputs}>
+                  <div
+                    className={styles.inputWrapper}
+                    style={{ width: "100%" }}
+                  >
+                    <label htmlFor="pvzAddress" className={styles.label}>
+                      Адрес пункта выдачи
+                    </label>
+                    <input
+                      type="text"
+                      id="pvzAddress"
+                      name="pvzAddress"
+                      placeholder="Выберите пункт выдачи на карте"
+                      value={formData.pvzAddress}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                      readOnly
+                    />
+                  </div>
+                </div>
+              </>
+            )}
             {formData.deliveryMethod === "yandex" && (
               <>
                 <div className={styles.firstInputs}>
@@ -606,10 +718,10 @@ const CheckoutForm = ({
                       type="text"
                       id="city"
                       name="city"
-                      placeholder="Введите ваш город"
-                      value={formData.city}
-                      onChange={handleInputChange}
+                      placeholder="Москва"
+                      value="Москва"
                       className={styles.input}
+                      readOnly
                     />
                   </div>
                   <div className={styles.inputWrapper}>
@@ -620,7 +732,7 @@ const CheckoutForm = ({
                       type="text"
                       id="street"
                       name="street"
-                      placeholder="Введите вашу улицу"
+                      placeholder="Введите улицу"
                       value={formData.street}
                       onChange={handleInputChange}
                       className={styles.input}
@@ -636,7 +748,7 @@ const CheckoutForm = ({
                       type="text"
                       id="house"
                       name="house"
-                      placeholder="Введите ваш дом"
+                      placeholder="Введите дом"
                       value={formData.house}
                       onChange={handleInputChange}
                       className={styles.input}
@@ -650,8 +762,54 @@ const CheckoutForm = ({
                       type="text"
                       id="apartment"
                       name="apartment"
-                      placeholder="Введите вашу квартиру"
+                      placeholder="Введите квартиру"
                       value={formData.apartment}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                </div>
+                <div className={styles.firstInputs}>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="floor" className={styles.label}>
+                      Этаж
+                    </label>
+                    <input
+                      type="text"
+                      id="floor"
+                      name="floor"
+                      placeholder="Введите этаж"
+                      value={formData.floor}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="entrance" className={styles.label}>
+                      Подъезд
+                    </label>
+                    <input
+                      type="text"
+                      id="entrance"
+                      name="entrance"
+                      placeholder="Введите подъезд"
+                      value={formData.entrance}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                </div>
+                <div className={styles.infoInputs}>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="intercom" className={styles.label}>
+                      Домофон
+                    </label>
+                    <input
+                      type="text"
+                      id="intercom"
+                      name="intercom"
+                      placeholder="Введите домофон"
+                      value={formData.intercom}
                       onChange={handleInputChange}
                       className={styles.input}
                     />
@@ -662,19 +820,32 @@ const CheckoutForm = ({
           </div>
 
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Пункт получения</h2>
+            <h2 className={styles.sectionTitle}>
+              {formData.deliveryMethod === "pickup"
+                ? "Пункт получения"
+                : "Адрес доставки"}
+            </h2>
             <div className={styles.checkoutMapSearchContainer}>
               <input
                 type="text"
                 id="mapSearchInput"
                 name="mapSearchInput"
                 className={styles.checkoutMapSearchInput}
-                placeholder="Выберите пункт получения"
+                placeholder={
+                  formData.deliveryMethod === "pickup"
+                    ? "Выберите пункт получения"
+                    : "Выберите адрес доставки"
+                }
                 value={
-                  mapSearchValue ||
-                  [formData.city, formData.street, formData.house]
-                    .filter(Boolean)
-                    .join(", ")
+                  formData.deliveryMethod === "pickup"
+                    ? formData.pvzAddress ||
+                      mapSearchValue ||
+                      "Выберите пункт выдачи на карте"
+                    : mapSearchValue ||
+                      [formData.city, formData.street, formData.house]
+                        .filter(Boolean)
+                        .join(", ") ||
+                      "Выберите адрес на карте"
                 }
                 onChange={(e) => {
                   handleMapSearchChange(e.target.value);
@@ -687,6 +858,8 @@ const CheckoutForm = ({
                 onAddressSelect={handleAddressSelect}
                 searchValue={mapSearchValue}
                 onSearchChange={handleMapSearchChange}
+                deliveryMethod={formData.deliveryMethod}
+                deliveryType={formData.deliveryType}
               />
             </div>
           </div>

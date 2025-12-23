@@ -7,6 +7,7 @@ type AddressData = {
   street?: string;
   house?: string;
   fullAddress?: string;
+  pvzAddress?: string;
 };
 
 type MapProps = {
@@ -17,6 +18,8 @@ type MapProps = {
   onAddressSelect?: (address: AddressData) => void;
   searchValue?: string;
   onSearchChange?: (value: string) => void;
+  deliveryMethod?: string;
+  deliveryType?: string;
 };
 
 declare global {
@@ -33,6 +36,8 @@ const Map = ({
   onAddressSelect,
   searchValue,
   onSearchChange,
+  deliveryMethod,
+  deliveryType,
 }: MapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -382,6 +387,7 @@ const Map = ({
                     street: addressStreet,
                     house: addressHouse,
                     fullAddress: fullAddress,
+                    pvzAddress: deliveryMethod === "pickup" ? fullAddress : undefined,
                   };
 
                   // Проверяем, что карта еще существует перед обновлением
@@ -706,6 +712,7 @@ const Map = ({
                         street: reverseStreet,
                         house: reverseHouse,
                         fullAddress: reverseGeoObject.getAddressLine(),
+                        pvzAddress: deliveryMethod === "pickup" ? reverseGeoObject.getAddressLine() : undefined,
                       });
                     }
                   });

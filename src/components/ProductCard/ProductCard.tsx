@@ -130,7 +130,7 @@ const ProductCard = ({
       1
     );
 
-    showToast("Товар добавлен в корзину");
+    showToast("Добавлено в корзину");
   };
 
   return (
