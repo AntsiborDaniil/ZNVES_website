@@ -2920,6 +2920,7 @@ const transformApiProduct = (apiProduct, index)=>{
     const id = hashString(apiProduct.slug) || index + 1;
     return {
         id,
+        slug: apiProduct.slug,
         title: apiProduct.name,
         price: formattedPrice,
         priceValue,
@@ -3191,7 +3192,7 @@ const ProductDisplaySection = (param)=>{
             }
             const prefetchCount = Math.min(products.length, 6);
             const routesToPrefetch = products.slice(0, prefetchCount).map({
-                "ProductDisplaySection.useEffect.routesToPrefetch": (product)=>"/catalog/".concat(product.id)
+                "ProductDisplaySection.useEffect.routesToPrefetch": (product)=>"/catalog/".concat(product.slug || product.id)
             }["ProductDisplaySection.useEffect.routesToPrefetch"]);
             routesToPrefetch.forEach({
                 "ProductDisplaySection.useEffect": (route)=>{
@@ -3379,7 +3380,7 @@ const ProductDisplaySection = (param)=>{
                 }, products.map((product)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$swiper$2d$react$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SwiperSlide"], {
                         className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].slideItem,
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                            href: "/catalog/".concat(product.id),
+                            href: "/catalog/".concat(product.slug || product.id),
                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].slideLink,
                             "aria-label": "Перейти к товару ".concat(product.title),
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {

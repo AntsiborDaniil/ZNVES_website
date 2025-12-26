@@ -1,0 +1,4553 @@
+(globalThis.TURBOPACK || (globalThis.TURBOPACK = [])).push([typeof document === "object" ? document.currentScript : undefined,
+"[project]/src/components/BurgerMenu/BurgerMenu.module.css [app-client] (css module)", ((__turbopack_context__) => {
+
+__turbopack_context__.v({
+  "burgerButton": "BurgerMenu-module__YlH9FW__burgerButton",
+  "burgerMenu": "BurgerMenu-module__YlH9FW__burgerMenu",
+  "catalogItem": "BurgerMenu-module__YlH9FW__catalogItem",
+  "catalogLink": "BurgerMenu-module__YlH9FW__catalogLink",
+  "catalogLinkActive": "BurgerMenu-module__YlH9FW__catalogLinkActive",
+  "catalogSubmenu": "BurgerMenu-module__YlH9FW__catalogSubmenu",
+  "closeButton": "BurgerMenu-module__YlH9FW__closeButton",
+  "fadeInItem": "BurgerMenu-module__YlH9FW__fadeInItem",
+  "menu": "BurgerMenu-module__YlH9FW__menu",
+  "menuContent": "BurgerMenu-module__YlH9FW__menuContent",
+  "menuHeader": "BurgerMenu-module__YlH9FW__menuHeader",
+  "menuHeaderActive": "BurgerMenu-module__YlH9FW__menuHeaderActive",
+  "menuHeaderButton": "BurgerMenu-module__YlH9FW__menuHeaderButton",
+  "menuIcon": "BurgerMenu-module__YlH9FW__menuIcon",
+  "menuItemActive": "BurgerMenu-module__YlH9FW__menuItemActive",
+  "menuItemWithIcon": "BurgerMenu-module__YlH9FW__menuItemWithIcon",
+  "menuOpen": "BurgerMenu-module__YlH9FW__menuOpen",
+  "menuSection": "BurgerMenu-module__YlH9FW__menuSection",
+  "menuSectionAccount": "BurgerMenu-module__YlH9FW__menuSectionAccount",
+  "menuSectionNavigation": "BurgerMenu-module__YlH9FW__menuSectionNavigation",
+  "overlay": "BurgerMenu-module__YlH9FW__overlay",
+  "overlayOpen": "BurgerMenu-module__YlH9FW__overlayOpen",
+  "slideDown": "BurgerMenu-module__YlH9FW__slideDown",
+  "socialLink": "BurgerMenu-module__YlH9FW__socialLink",
+  "socialSection": "BurgerMenu-module__YlH9FW__socialSection",
+});
+}),
+"[project]/src/hooks/useKeyboardEvent.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "useKeyboardEvent",
+    ()=>useKeyboardEvent
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var _s = __turbopack_context__.k.signature();
+;
+const useKeyboardEvent = function(key, handler) {
+    let enabled = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : true;
+    _s();
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "useKeyboardEvent.useEffect": ()=>{
+            if (!enabled) {
+                return;
+            }
+            const handleKeyDown = {
+                "useKeyboardEvent.useEffect.handleKeyDown": (event)=>{
+                    if (event.key === key) {
+                        handler(event);
+                    }
+                }
+            }["useKeyboardEvent.useEffect.handleKeyDown"];
+            window.addEventListener("keydown", handleKeyDown);
+            return ({
+                "useKeyboardEvent.useEffect": ()=>{
+                    window.removeEventListener("keydown", handleKeyDown);
+                }
+            })["useKeyboardEvent.useEffect"];
+        }
+    }["useKeyboardEvent.useEffect"], [
+        key,
+        handler,
+        enabled
+    ]);
+};
+_s(useKeyboardEvent, "OD7bBpZva5O2jO+Puf00hKivP7c=");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/components/BurgerMenu/BurgerMenu.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/src/components/BurgerMenu/BurgerMenu.module.css [app-client] (css module)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$useKeyboardEvent$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/hooks/useKeyboardEvent.ts [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+;
+;
+const CATALOG_CATEGORIES = [
+    {
+        label: "All",
+        href: "/catalog"
+    },
+    {
+        label: "Pants",
+        href: "/catalog?category=pants"
+    },
+    {
+        label: "Jeans",
+        href: "/catalog?category=jeans"
+    },
+    {
+        label: "T-Shirt",
+        href: "/catalog?category=t-shirts"
+    },
+    {
+        label: "Zip Hoodies",
+        href: "/catalog?category=zip%20hoodies"
+    },
+    {
+        label: "Jackets",
+        href: "/catalog?category=jackets"
+    },
+    {
+        label: "Hoodies",
+        href: "/catalog?category=hoodies"
+    },
+    {
+        label: "Shorts",
+        href: "/catalog?category=shorts"
+    }
+];
+const SOCIAL_LINKS = [
+    {
+        label: "Telegram",
+        href: "#telegram"
+    },
+    {
+        label: "Instagram*",
+        href: "#instagram"
+    }
+];
+const BurgerMenu = (param)=>{
+    let { isOpen, onToggle } = param;
+    _s();
+    const menuId = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useId"])();
+    const pathname = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"])();
+    const searchParams = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"])();
+    const [isCatalogOpen, setIsCatalogOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    // Автоматически открываем каталог при открытии меню
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "BurgerMenu.useEffect": ()=>{
+            if (isOpen) {
+                setIsCatalogOpen(true);
+            }
+        }
+    }["BurgerMenu.useEffect"], [
+        isOpen
+    ]);
+    const handleLinkClick = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "BurgerMenu.useCallback[handleLinkClick]": ()=>{
+            if (isOpen) {
+                onToggle();
+            }
+        }
+    }["BurgerMenu.useCallback[handleLinkClick]"], [
+        isOpen,
+        onToggle
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$useKeyboardEvent$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useKeyboardEvent"])("Escape", (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "BurgerMenu.useKeyboardEvent.useCallback": ()=>{
+            if (isOpen) {
+                onToggle();
+            }
+        }
+    }["BurgerMenu.useKeyboardEvent.useCallback"], [
+        isOpen,
+        onToggle
+    ]), isOpen);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "BurgerMenu.useEffect": ()=>{
+            if (!isOpen) {
+                setIsCatalogOpen(false);
+                return;
+            }
+            const previousOverflow = document.body.style.overflow;
+            document.body.style.overflow = "hidden";
+            return ({
+                "BurgerMenu.useEffect": ()=>{
+                    document.body.style.overflow = previousOverflow;
+                }
+            })["BurgerMenu.useEffect"];
+        }
+    }["BurgerMenu.useEffect"], [
+        isOpen
+    ]);
+    const isNewInActive = pathname === "/new-in";
+    const isCatalogActive = pathname.startsWith("/catalog");
+    const isAccountActive = pathname.startsWith("/account");
+    const isCartActive = pathname === "/cart";
+    const currentCategory = searchParams.get("category");
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].burgerMenu,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].burgerButton, " ").concat(isOpen ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].open : ""),
+                onClick: onToggle,
+                "aria-label": "Toggle menu",
+                "aria-expanded": isOpen,
+                "aria-controls": "".concat(menuId, "-menu"),
+                type: "button",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {}, void 0, false, {
+                        fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                        lineNumber: 91,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {}, void 0, false, {
+                        fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                        lineNumber: 92,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {}, void 0, false, {
+                        fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                        lineNumber: 93,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                lineNumber: 83,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].overlay, " ").concat(isOpen ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].overlayOpen : ""),
+                "aria-hidden": !isOpen,
+                onClick: onToggle
+            }, void 0, false, {
+                fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                lineNumber: 96,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
+                className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menu, " ").concat(isOpen ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuOpen : ""),
+                id: "".concat(menuId, "-menu"),
+                "aria-hidden": !isOpen,
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].closeButton,
+                        onClick: onToggle,
+                        "aria-label": "Закрыть меню",
+                        type: "button",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                            src: "/images/burger/burgerCancel.png",
+                            alt: "Закрыть",
+                            width: 27,
+                            height: 27
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                            lineNumber: 113,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0))
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                        lineNumber: 107,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuContent,
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuSectionNavigation,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuSection,
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                            href: "/new-in",
+                                            className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuHeader, " ").concat(isNewInActive ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuHeaderActive : ""),
+                                            onClick: handleLinkClick,
+                                            children: "NEW IN"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                            lineNumber: 124,
+                                            columnNumber: 15
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                        lineNumber: 123,
+                                        columnNumber: 13
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuSection,
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/catalog",
+                                                className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuHeader, " ").concat(isCatalogActive ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuHeaderActive : ""),
+                                                onClick: handleLinkClick,
+                                                children: "CATALOG"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                                lineNumber: 136,
+                                                columnNumber: 15
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            isCatalogOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].catalogSubmenu,
+                                                children: CATALOG_CATEGORIES.map((category)=>{
+                                                    // Определяем активную категорию
+                                                    let isCategoryActive = false;
+                                                    if (category.href === "/catalog") {
+                                                        // Для "All" проверяем, что мы на /catalog без параметров
+                                                        isCategoryActive = pathname === "/catalog" && !currentCategory;
+                                                    } else {
+                                                        // Для остальных категорий извлекаем параметр category из href
+                                                        const categoryParam = category.href.split("?category=")[1];
+                                                        if (categoryParam && currentCategory) {
+                                                            // Декодируем параметр из URL (может быть закодирован)
+                                                            let decodedCategory = categoryParam;
+                                                            try {
+                                                                decodedCategory = decodeURIComponent(categoryParam);
+                                                            } catch (e) {
+                                                            // Если ошибка декодирования, используем как есть
+                                                            }
+                                                            const decodedLower = decodedCategory.toLowerCase();
+                                                            // currentCategory уже декодирован из URL через searchParams.get()
+                                                            const currentCategoryLower = currentCategory.toLowerCase();
+                                                            // Сравниваем без учета регистра
+                                                            isCategoryActive = currentCategoryLower === decodedLower;
+                                                        }
+                                                    }
+                                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].catalogItem,
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                            href: category.href,
+                                                            className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].catalogLink, " ").concat(isCategoryActive ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].catalogLinkActive : ""),
+                                                            onClick: handleLinkClick,
+                                                            children: category.label
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                                            lineNumber: 179,
+                                                            columnNumber: 25
+                                                        }, ("TURBOPACK compile-time value", void 0))
+                                                    }, category.href, false, {
+                                                        fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                                        lineNumber: 178,
+                                                        columnNumber: 23
+                                                    }, ("TURBOPACK compile-time value", void 0));
+                                                })
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                                lineNumber: 146,
+                                                columnNumber: 17
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                        lineNumber: 135,
+                                        columnNumber: 13
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                lineNumber: 122,
+                                columnNumber: 11
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuSectionAccount,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                        href: "/account",
+                                        className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuItemWithIcon, " ").concat(isAccountActive ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuItemActive : ""),
+                                        onClick: handleLinkClick,
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                src: "/images/burger/cabinet.png",
+                                                alt: "",
+                                                width: 14,
+                                                height: 16,
+                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuIcon
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                                lineNumber: 204,
+                                                columnNumber: 15
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            "ЛИЧНЫЙ КАБИНЕТ"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                        lineNumber: 197,
+                                        columnNumber: 13
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                        href: "/cart",
+                                        className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuItemWithIcon, " ").concat(isCartActive ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuItemActive : ""),
+                                        onClick: handleLinkClick,
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                src: "/images/burger/cart.png",
+                                                alt: "",
+                                                width: 14,
+                                                height: 14,
+                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].menuIcon
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                                lineNumber: 220,
+                                                columnNumber: 15
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            "КОРЗИНА"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                        lineNumber: 213,
+                                        columnNumber: 13
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                lineNumber: 196,
+                                columnNumber: 11
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].socialSection,
+                                children: SOCIAL_LINKS.map((link)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                        href: link.href,
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].socialLink,
+                                        onClick: handleLinkClick,
+                                        children: link.label
+                                    }, link.href, false, {
+                                        fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                        lineNumber: 233,
+                                        columnNumber: 15
+                                    }, ("TURBOPACK compile-time value", void 0)))
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                                lineNumber: 231,
+                                columnNumber: 11
+                            }, ("TURBOPACK compile-time value", void 0))
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                        lineNumber: 121,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+                lineNumber: 102,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0))
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
+        lineNumber: 82,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_s(BurgerMenu, "XLJ0jmMp/tU2lh73yFWzB52AJnI=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useId"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$useKeyboardEvent$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useKeyboardEvent"]
+    ];
+});
+_c = BurgerMenu;
+const __TURBOPACK__default__export__ = BurgerMenu;
+var _c;
+__turbopack_context__.k.register(_c, "BurgerMenu");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/components/ui/CartIcon/CartIcon.module.css [app-client] (css module)", ((__turbopack_context__) => {
+
+__turbopack_context__.v({
+  "cartBadge": "CartIcon-module__b-CSMq__cartBadge",
+  "cartIcon": "CartIcon-module__b-CSMq__cartIcon",
+  "cartIconWrapper": "CartIcon-module__b-CSMq__cartIconWrapper",
+});
+}),
+"[project]/src/components/ui/CartIcon/CartIcon.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$CartContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/contexts/CartContext.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$CartIcon$2f$CartIcon$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/src/components/ui/CartIcon/CartIcon.module.css [app-client] (css module)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+const CartIcon = ()=>{
+    _s();
+    const { getTotalItems } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$CartContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCart"])();
+    const totalItems = getTotalItems();
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+        href: "/cart",
+        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$CartIcon$2f$CartIcon$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].cartIcon,
+        "aria-label": "Корзина",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$CartIcon$2f$CartIcon$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].cartIconWrapper,
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                    src: "/images/cart.png",
+                    alt: "Корзина",
+                    width: 12,
+                    height: 11.5,
+                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$CartIcon$2f$CartIcon$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].cartImage
+                }, void 0, false, {
+                    fileName: "[project]/src/components/ui/CartIcon/CartIcon.tsx",
+                    lineNumber: 15,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                totalItems > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$CartIcon$2f$CartIcon$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].cartBadge,
+                    children: totalItems
+                }, void 0, false, {
+                    fileName: "[project]/src/components/ui/CartIcon/CartIcon.tsx",
+                    lineNumber: 23,
+                    columnNumber: 11
+                }, ("TURBOPACK compile-time value", void 0))
+            ]
+        }, void 0, true, {
+            fileName: "[project]/src/components/ui/CartIcon/CartIcon.tsx",
+            lineNumber: 14,
+            columnNumber: 7
+        }, ("TURBOPACK compile-time value", void 0))
+    }, void 0, false, {
+        fileName: "[project]/src/components/ui/CartIcon/CartIcon.tsx",
+        lineNumber: 13,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_s(CartIcon, "h9VZNuUwhpdlCtb4blC3dksopYI=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$CartContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCart"]
+    ];
+});
+_c = CartIcon;
+const __TURBOPACK__default__export__ = CartIcon;
+var _c;
+__turbopack_context__.k.register(_c, "CartIcon");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/components/ui/AccountIcon/AccountIcon.module.css [app-client] (css module)", ((__turbopack_context__) => {
+
+__turbopack_context__.v({
+  "accountIcon": "AccountIcon-module__yZNQtq__accountIcon",
+  "accountImage": "AccountIcon-module__yZNQtq__accountImage",
+});
+}),
+"[project]/src/components/ui/AccountIcon/AccountIcon.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/src/components/ui/AccountIcon/AccountIcon.module.css [app-client] (css module)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+const AccountIcon = ()=>{
+    _s();
+    const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
+    const handleClick = ()=>{
+        router.push("/account");
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].accountIcon,
+        "aria-label": "Личный кабинет",
+        type: "button",
+        onClick: handleClick,
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+            src: "/images/account.png",
+            alt: "Личный кабинет",
+            width: 12,
+            height: 12,
+            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].accountImage
+        }, void 0, false, {
+            fileName: "[project]/src/components/ui/AccountIcon/AccountIcon.tsx",
+            lineNumber: 21,
+            columnNumber: 7
+        }, ("TURBOPACK compile-time value", void 0))
+    }, void 0, false, {
+        fileName: "[project]/src/components/ui/AccountIcon/AccountIcon.tsx",
+        lineNumber: 15,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_s(AccountIcon, "fN7XvhJ+p5oE6+Xlo0NJmXpxjC8=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
+    ];
+});
+_c = AccountIcon;
+const __TURBOPACK__default__export__ = AccountIcon;
+var _c;
+__turbopack_context__.k.register(_c, "AccountIcon");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/components/Header/Header.module.css [app-client] (css module)", ((__turbopack_context__) => {
+
+__turbopack_context__.v({
+  "header": "Header-module__ldgnoG__header",
+  "headerGreen": "Header-module__ldgnoG__headerGreen",
+  "leftSection": "Header-module__ldgnoG__leftSection",
+  "logo": "Header-module__ldgnoG__logo",
+  "logoImage": "Header-module__ldgnoG__logoImage",
+  "logoLink": "Header-module__ldgnoG__logoLink",
+  "rightIcons": "Header-module__ldgnoG__rightIcons",
+});
+}),
+"[project]/src/components/Header/Header.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/BurgerMenu/BurgerMenu.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$CartIcon$2f$CartIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/CartIcon/CartIcon.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/AccountIcon/AccountIcon.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Header$2f$Header$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/src/components/Header/Header.module.css [app-client] (css module)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+;
+;
+;
+;
+const Header = (param)=>{
+    let { variant = "transparent" } = param;
+    _s();
+    const [isMenuOpen, setIsMenuOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "Header.useEffect": ()=>{
+            const routesToPrefetch = [
+                "/catalog",
+                "/new-in",
+                "/privacy",
+                "/public-offer",
+                "/cart"
+            ];
+            routesToPrefetch.forEach({
+                "Header.useEffect": (route)=>{
+                    void router.prefetch(route);
+                }
+            }["Header.useEffect"]);
+        }
+    }["Header.useEffect"], [
+        router
+    ]);
+    const headerClassName = "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Header$2f$Header$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].header, " ").concat(variant === "green" ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Header$2f$Header$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].headerGreen : "");
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
+        className: headerClassName,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Header$2f$Header$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].leftSection,
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Suspense"], {
+                    fallback: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        style: {
+                            width: 40,
+                            height: 40
+                        }
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/Header/Header.tsx",
+                        lineNumber: 43,
+                        columnNumber: 29
+                    }, void 0),
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                        isOpen: isMenuOpen,
+                        onToggle: ()=>setIsMenuOpen((prev)=>!prev)
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/Header/Header.tsx",
+                        lineNumber: 44,
+                        columnNumber: 11
+                    }, ("TURBOPACK compile-time value", void 0))
+                }, void 0, false, {
+                    fileName: "[project]/src/components/Header/Header.tsx",
+                    lineNumber: 43,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0))
+            }, void 0, false, {
+                fileName: "[project]/src/components/Header/Header.tsx",
+                lineNumber: 42,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                href: "/",
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Header$2f$Header$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].logoLink,
+                "aria-label": "Go to homepage",
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                    src: "/images/logo.png",
+                    alt: "ZNVES logo",
+                    width: 125,
+                    height: 60,
+                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Header$2f$Header$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].logoImage,
+                    priority: true
+                }, void 0, false, {
+                    fileName: "[project]/src/components/Header/Header.tsx",
+                    lineNumber: 51,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0))
+            }, void 0, false, {
+                fileName: "[project]/src/components/Header/Header.tsx",
+                lineNumber: 50,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Header$2f$Header$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].rightIcons,
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                        fileName: "[project]/src/components/Header/Header.tsx",
+                        lineNumber: 61,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$CartIcon$2f$CartIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                        fileName: "[project]/src/components/Header/Header.tsx",
+                        lineNumber: 62,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/Header/Header.tsx",
+                lineNumber: 60,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0))
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/Header/Header.tsx",
+        lineNumber: 41,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_s(Header, "EXXh0uFEahuu34Nc519oYzE/iwg=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
+    ];
+});
+_c = Header;
+const __TURBOPACK__default__export__ = Header;
+var _c;
+__turbopack_context__.k.register(_c, "Header");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/components/Footer/Footer.module.css [app-client] (css module)", ((__turbopack_context__) => {
+
+__turbopack_context__.v({
+  "button": "Footer-module__Grjkva__button",
+  "catalogColumns": "Footer-module__Grjkva__catalogColumns",
+  "catalogColumnsOpen": "Footer-module__Grjkva__catalogColumnsOpen",
+  "column": "Footer-module__Grjkva__column",
+  "columnInst": "Footer-module__Grjkva__columnInst",
+  "columnItem": "Footer-module__Grjkva__columnItem",
+  "columnLi": "Footer-module__Grjkva__columnLi",
+  "columnList": "Footer-module__Grjkva__columnList",
+  "columnListOpen": "Footer-module__Grjkva__columnListOpen",
+  "columnTitle": "Footer-module__Grjkva__columnTitle",
+  "columnTitleButton": "Footer-module__Grjkva__columnTitleButton",
+  "columnToggle": "Footer-module__Grjkva__columnToggle",
+  "copyright": "Footer-module__Grjkva__copyright",
+  "copyrightInsta": "Footer-module__Grjkva__copyrightInsta",
+  "footer": "Footer-module__Grjkva__footer",
+  "input": "Footer-module__Grjkva__input",
+  "inputContainer": "Footer-module__Grjkva__inputContainer",
+  "link": "Footer-module__Grjkva__link",
+  "links": "Footer-module__Grjkva__links",
+  "logo": "Footer-module__Grjkva__logo",
+  "lower": "Footer-module__Grjkva__lower",
+  "politics": "Footer-module__Grjkva__politics",
+  "politicsLink": "Footer-module__Grjkva__politicsLink",
+  "rowColumns": "Footer-module__Grjkva__rowColumns",
+  "subText": "Footer-module__Grjkva__subText",
+  "upper": "Footer-module__Grjkva__upper",
+  "upperLeft": "Footer-module__Grjkva__upperLeft",
+  "upperRight": "Footer-module__Grjkva__upperRight",
+});
+}),
+"[project]/src/components/Footer/Footer.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/src/components/Footer/Footer.module.css [app-client] (css module)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+const Footer = ()=>{
+    _s();
+    const [isMenuOpen, setIsMenuOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isCatalogOpen, setIsCatalogOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isContactOpen, setIsContactOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("footer", {
+        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].footer,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].upper,
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].upperLeft,
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                src: "/images/logo.png",
+                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].logo,
+                                alt: "logo",
+                                width: 65,
+                                height: 31
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                lineNumber: 17,
+                                columnNumber: 11
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].subText,
+                                children: "Подпишитесь на получение рассылки рекламно-информационных материалов"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                lineNumber: 24,
+                                columnNumber: 11
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].inputContainer,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        type: "email",
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input,
+                                        placeholder: "Введите ваш email"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                        lineNumber: 28,
+                                        columnNumber: 13
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "submit",
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].button,
+                                        children: "Подписаться"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                        lineNumber: 33,
+                                        columnNumber: 13
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                lineNumber: 27,
+                                columnNumber: 11
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].politics,
+                                children: [
+                                    "Нажимая на кнопку «Подписаться», вы даете согласие на обработку персональных данных в соответствии с",
+                                    " ",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                        href: "/privacy",
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].politicsLink,
+                                        children: "Политикой конфиденциальности"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                        lineNumber: 40,
+                                        columnNumber: 13
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                lineNumber: 37,
+                                columnNumber: 11
+                            }, ("TURBOPACK compile-time value", void 0))
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                        lineNumber: 16,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].upperRight,
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].rowColumns,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].column,
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                type: "button",
+                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnTitleButton,
+                                                onClick: ()=>setIsMenuOpen(!isMenuOpen),
+                                                "aria-expanded": isMenuOpen,
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnTitle,
+                                                        children: "MENU"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                        lineNumber: 54,
+                                                        columnNumber: 17
+                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnToggle,
+                                                        children: isMenuOpen ? "−" : "+"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                        lineNumber: 55,
+                                                        columnNumber: 17
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                lineNumber: 48,
+                                                columnNumber: 15
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                                className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnList, " ").concat(isMenuOpen ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnListOpen : ""),
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnItem,
+                                                        href: "/account",
+                                                        children: "Личный кабинет"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                        lineNumber: 64,
+                                                        columnNumber: 19
+                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnItem,
+                                                        href: "/cart",
+                                                        children: "Корзина"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                        lineNumber: 67,
+                                                        columnNumber: 19
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                lineNumber: 59,
+                                                columnNumber: 15
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                        lineNumber: 47,
+                                        columnNumber: 13
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].column,
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                type: "button",
+                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnTitleButton,
+                                                onClick: ()=>setIsCatalogOpen(!isCatalogOpen),
+                                                "aria-expanded": isCatalogOpen,
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnTitle,
+                                                        children: "CATALOG"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                        lineNumber: 79,
+                                                        columnNumber: 17
+                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnToggle,
+                                                        children: isCatalogOpen ? "−" : "+"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                        lineNumber: 80,
+                                                        columnNumber: 17
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                lineNumber: 73,
+                                                columnNumber: 15
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].catalogColumns, " ").concat(isCatalogOpen ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].catalogColumnsOpen : ""),
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                                        className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnList, " ").concat(isCatalogOpen ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnListOpen : ""),
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnItem,
+                                                                href: "/new-in",
+                                                                children: "New in"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                                lineNumber: 94,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0)),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnItem,
+                                                                href: "/catalog/t-shirt",
+                                                                children: "T-shirt"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                                lineNumber: 97,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0)),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnItem,
+                                                                href: "/catalog/hoodies",
+                                                                children: "Hoodies"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                                lineNumber: 101,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0)),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnItem,
+                                                                href: "/catalog/zip-hoodies",
+                                                                children: "Zip hoodies"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                                lineNumber: 104,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0))
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                        lineNumber: 89,
+                                                        columnNumber: 17
+                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                                        className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnList, " ").concat(isCatalogOpen ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnListOpen : ""),
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnItem,
+                                                                href: "/catalog/jeans",
+                                                                children: "Jeans"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                                lineNumber: 116,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0)),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnItem,
+                                                                href: "/catalog/pants",
+                                                                children: "Pants"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                                lineNumber: 119,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0)),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnItem,
+                                                                href: "/catalog/shorts",
+                                                                children: "Shorts"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                                lineNumber: 122,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0)),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnItem,
+                                                                href: "/catalog/jackets",
+                                                                children: "Jackets"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                                lineNumber: 125,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0))
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                        lineNumber: 111,
+                                                        columnNumber: 17
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                lineNumber: 84,
+                                                columnNumber: 15
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                        lineNumber: 72,
+                                        columnNumber: 13
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].column,
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                type: "button",
+                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnTitleButton,
+                                                onClick: ()=>setIsContactOpen(!isContactOpen),
+                                                "aria-expanded": isContactOpen,
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnTitle,
+                                                        children: "CONTACT"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                        lineNumber: 138,
+                                                        columnNumber: 17
+                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnToggle,
+                                                        children: isContactOpen ? "−" : "+"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                        lineNumber: 139,
+                                                        columnNumber: 17
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                lineNumber: 132,
+                                                columnNumber: 15
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                                className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnList, " ").concat(isContactOpen ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnListOpen : ""),
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                        href: "https://t.me/znves",
+                                                        target: "_blank",
+                                                        rel: "noopener noreferrer",
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnItem,
+                                                        children: "Telegram"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                        lineNumber: 148,
+                                                        columnNumber: 19
+                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                        href: "https://www.instagram.com/real.ponama?igsh=b2w5YWdoNmJ2djVo",
+                                                        target: "_blank",
+                                                        rel: "noopener noreferrer",
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].columnInst,
+                                                        children: "Instagram*"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                        lineNumber: 156,
+                                                        columnNumber: 19
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                                lineNumber: 143,
+                                                columnNumber: 15
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                        lineNumber: 131,
+                                        columnNumber: 13
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                lineNumber: 46,
+                                columnNumber: 11
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].links,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].link,
+                                        href: "/public-offer",
+                                        children: "Публичная оферта"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                        lineNumber: 168,
+                                        columnNumber: 13
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].link,
+                                        href: "/privacy",
+                                        children: "Политика конфиденциальности"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                                        lineNumber: 171,
+                                        columnNumber: 13
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                lineNumber: 167,
+                                columnNumber: 11
+                            }, ("TURBOPACK compile-time value", void 0))
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                        lineNumber: 45,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/Footer/Footer.tsx",
+                lineNumber: 15,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].lower,
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].copyright,
+                        children: "© 2025 Все права защищены"
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                        lineNumber: 178,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].copyrightInsta,
+                        children: [
+                            "* Instagram принадлежит компании Meta, признанной экстремистской организацией ",
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
+                                fileName: "[project]/src/components/Footer/Footer.tsx",
+                                lineNumber: 181,
+                                columnNumber: 24
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            " и запрещенной в РФ"
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/Footer/Footer.tsx",
+                        lineNumber: 179,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/Footer/Footer.tsx",
+                lineNumber: 177,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0))
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/Footer/Footer.tsx",
+        lineNumber: 14,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_s(Footer, "MAJV3Wn7UyAIzDIQ3ewrZRY1cTg=");
+_c = Footer;
+const __TURBOPACK__default__export__ = Footer;
+var _c;
+__turbopack_context__.k.register(_c, "Footer");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/data/products.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "catalogProducts",
+    ()=>catalogProducts,
+    "getProductById",
+    ()=>getProductById,
+    "newInProducts",
+    ()=>newInProducts,
+    "toCatalogProduct",
+    ()=>toCatalogProduct
+]);
+var _catalogProductsData_, _catalogProductsData_1, _catalogProductsData_2, _catalogProductsData_3, _catalogProductsData_4, _catalogProductsData_5, _catalogProductsData_6, _catalogProductsData_7;
+const catalogProductsData = [
+    {
+        id: 1,
+        sku: "ZN-TSH-001",
+        title: "T-SHIRT",
+        price: "4 990 ₽",
+        priceValue: 4990,
+        images: [
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/green-zip.png",
+            "/images/catalogs/brown-jacket.png",
+            "/images/catalogs/blue-zip.png"
+        ],
+        isNew: false,
+        category: "T-shirts",
+        color: "green",
+        size: "m",
+        sortOrder: 1,
+        defaultSize: "m",
+        availableSizes: [
+            "xxs",
+            "xs",
+            "s",
+            "m",
+            "l",
+            "xl"
+        ],
+        availableColors: [
+            {
+                label: "Серый",
+                value: "gray",
+                hex: "#d1cdcb"
+            },
+            {
+                label: "Зеленый",
+                value: "green",
+                hex: "#1f4c38"
+            },
+            {
+                label: "Ржавчина",
+                value: "rust",
+                hex: "#7b3f2f"
+            },
+            {
+                label: "Темно-синий",
+                value: "navy",
+                hex: "#1c2743"
+            }
+        ],
+        sections: [
+            {
+                id: "description",
+                title: "Описание",
+                content: "Свободная футболка из плотного хлопка с фирменной вышивкой ZNVES на груди. Идеально сочетается с денимом и нижним слоем."
+            },
+            {
+                id: "printing",
+                title: "Нанесение",
+                content: "Логотип нанесен методом вышивки, устойчивой к стирке и выгоранию."
+            },
+            {
+                id: "size-chart",
+                title: "Таблица размеров",
+                content: "XS — 42, S — 44, M — 46, L — 48, XL — 50. Рост модели 175 см."
+            },
+            {
+                id: "model",
+                title: "Параметры модели",
+                content: "Параметры модели: 86-60-90, рост 175 см. На модели размер M."
+            },
+            {
+                id: "care",
+                title: "Состав и уход",
+                content: "100% хлопок. Рекомендуем деликатную стирку при температуре до 30°C, сушить на горизонтальной поверхности."
+            },
+            {
+                id: "delivery",
+                title: "Доставка",
+                content: "Курьерская доставка по России — 2-5 рабочих дней. Самовывоз доступен в фирменных шоурумах."
+            },
+            {
+                id: "returns",
+                title: "Возврат",
+                content: "Вы можете оформить возврат в течение 14 дней при сохранении товарного вида и ярлыков."
+            }
+        ]
+    },
+    {
+        id: 2,
+        sku: "ZN-ZIP-001",
+        title: "ZIP HOODIE",
+        price: "6 590 ₽",
+        priceValue: 6590,
+        images: [
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/brown-jacket.png",
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/green-zip.png"
+        ],
+        isNew: false,
+        category: "Zip hoodies",
+        color: "cream",
+        size: "l",
+        sortOrder: 2,
+        defaultSize: "l",
+        availableSizes: [
+            "s",
+            "m",
+            "l",
+            "xl",
+            "xxl"
+        ],
+        availableColors: [
+            {
+                label: "Кремовый",
+                value: "cream",
+                hex: "#f1e9dc"
+            },
+            {
+                label: "Синий лёд",
+                value: "ice-blue",
+                hex: "#8ba7c9"
+            },
+            {
+                label: "Лесной",
+                value: "forest",
+                hex: "#274c3d"
+            },
+            {
+                label: "Черный",
+                value: "black",
+                hex: "#1a1a1a"
+            }
+        ],
+        sections: [
+            {
+                id: "description",
+                title: "Описание",
+                content: "Молния по всей длине, объемный капюшон и контрастный принт ZNVES. Легко комбинируется со спортивными и повседневными образами."
+            },
+            {
+                id: "printing",
+                title: "Нанесение",
+                content: "Шелкография с матовым покрытием, устойчива к истиранию и деформации."
+            },
+            {
+                id: "size-chart",
+                title: "Таблица размеров",
+                content: "XS — 42, S — 44, M — 46, L — 48, XL — 50. Свободная посадка."
+            },
+            {
+                id: "model",
+                title: "Параметры модели",
+                content: "Параметры модели: 90-64-92, рост 178 см. На модели размер L."
+            },
+            {
+                id: "care",
+                title: "Состав и уход",
+                content: "80% хлопок, 20% полиэстер. Машинная стирка при 30°C с мягким порошком."
+            },
+            {
+                id: "delivery",
+                title: "Доставка",
+                content: "Стандартная доставка по России — 2-4 дня. Экспресс доставка доступна в Москве и Санкт-Петербурге."
+            },
+            {
+                id: "returns",
+                title: "Возврат",
+                content: "Возврат или обмен в течение 14 дней с момента получения заказа."
+            }
+        ]
+    },
+    {
+        id: 3,
+        sku: "ZN-JKT-001",
+        title: "JACKET",
+        price: "5 990 ₽",
+        priceValue: 5990,
+        images: [
+            "/images/catalogs/brown-jacket.png",
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/green-zip.png",
+            "/images/catalogs/blue-zip.png"
+        ],
+        isNew: false,
+        category: "Jackets",
+        color: "brown",
+        size: "m",
+        sortOrder: 3,
+        defaultSize: "m",
+        availableSizes: [
+            "xs",
+            "s",
+            "m",
+            "l",
+            "xl"
+        ],
+        availableColors: [
+            {
+                label: "Коричневый",
+                value: "brown",
+                hex: "#644432"
+            },
+            {
+                label: "Хвойный",
+                value: "pine",
+                hex: "#315c3c"
+            },
+            {
+                label: "Темно-синий",
+                value: "navy",
+                hex: "#17233d"
+            }
+        ],
+        sections: [
+            {
+                id: "description",
+                title: "Описание",
+                content: "Легкая куртка с утепленной подкладкой и минималистичным логотипом. Подходит для межсезонья."
+            },
+            {
+                id: "printing",
+                title: "Нанесение",
+                content: "Тиснение на коже и фирменная фурнитура с гравировкой ZNVES."
+            },
+            {
+                id: "size-chart",
+                title: "Таблица размеров",
+                content: "S — 44, M — 46, L — 48, XL — 50. Посадка regular fit."
+            },
+            {
+                id: "model",
+                title: "Параметры модели",
+                content: "Параметры модели: 94-72-98, рост 182 см. На модели размер M."
+            },
+            {
+                id: "care",
+                title: "Состав и уход",
+                content: "Основная ткань: 100% хлопок, подкладка: 100% полиэстер. Сухая чистка."
+            },
+            {
+                id: "delivery",
+                title: "Доставка",
+                content: "Бесплатная доставка при заказе от 10 000 ₽."
+            },
+            {
+                id: "returns",
+                title: "Возврат",
+                content: "Обмен и возврат возможны в течение 14 дней. Обратная доставка за наш счет."
+            }
+        ]
+    },
+    {
+        id: 4,
+        sku: "ZN-HOD-001",
+        title: "HOODIE",
+        price: "5 690 ₽",
+        priceValue: 5690,
+        images: [
+            "/images/catalogs/green-zip.png",
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/brown-jacket.png",
+            "/images/catalogs/blue-zip.png"
+        ],
+        isNew: false,
+        category: "Hoodies",
+        color: "navy",
+        size: "l",
+        sortOrder: 4,
+        defaultSize: "l",
+        availableSizes: [
+            "m",
+            "l",
+            "xl",
+            "xxl"
+        ],
+        availableColors: [
+            {
+                label: "Темно-синий",
+                value: "navy",
+                hex: "#1a2742"
+            },
+            {
+                label: "Графит",
+                value: "graphite",
+                hex: "#2e2f33"
+            },
+            {
+                label: "Зеленый",
+                value: "green",
+                hex: "#2d5b3b"
+            }
+        ],
+        sections: [
+            {
+                id: "description",
+                title: "Описание",
+                content: "Уютное худи с мягким флисом внутри и объемным принтом спереди."
+            },
+            {
+                id: "printing",
+                title: "Нанесение",
+                content: "Аппликация из бархатного материала."
+            },
+            {
+                id: "size-chart",
+                title: "Таблица размеров",
+                content: "S — 44, M — 46, L — 48, XL — 50."
+            },
+            {
+                id: "model",
+                title: "Параметры модели",
+                content: "Параметры модели: 88-62-94, рост 176 см. На модели размер L."
+            },
+            {
+                id: "care",
+                title: "Состав и уход",
+                content: "70% хлопок, 30% полиэстер. Стирка на изнанке при 30°C, гладить через ткань."
+            },
+            {
+                id: "delivery",
+                title: "Доставка",
+                content: "Доставка по России — 3-6 дней, почтой или курьером."
+            },
+            {
+                id: "returns",
+                title: "Возврат",
+                content: "Возврат в течение 14 дней, обмен возможен в шоуруме."
+            }
+        ]
+    },
+    {
+        id: 5,
+        sku: "ZN-PNT-001",
+        title: "PANTS",
+        price: "4 790 ₽",
+        priceValue: 4790,
+        images: [
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/green-zip.png",
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/brown-jacket.png"
+        ],
+        isNew: false,
+        category: "Pants",
+        color: "green",
+        size: "m",
+        sortOrder: 5,
+        defaultSize: "m",
+        availableSizes: [
+            "xs",
+            "s",
+            "m",
+            "l",
+            "xl"
+        ],
+        availableColors: [
+            {
+                label: "Зеленый",
+                value: "green",
+                hex: "#38614c"
+            },
+            {
+                label: "Песочный",
+                value: "sand",
+                hex: "#d1b58b"
+            },
+            {
+                label: "Черный",
+                value: "black",
+                hex: "#151515"
+            }
+        ],
+        sections: [
+            {
+                id: "description",
+                title: "Описание",
+                content: "Карго-брюки прямого кроя с регулируемым поясом и множеством карманов."
+            },
+            {
+                id: "printing",
+                title: "Нанесение",
+                content: "Минималистичный шеврон с логотипом на правом кармане."
+            },
+            {
+                id: "size-chart",
+                title: "Таблица размеров",
+                content: "XS — 42, S — 44, M — 46, L — 48."
+            },
+            {
+                id: "model",
+                title: "Параметры модели",
+                content: "Параметры модели: 90-70-94, рост 180 см. На модели размер M."
+            },
+            {
+                id: "care",
+                title: "Состав и уход",
+                content: "98% хлопок, 2% эластан. Машинная стирка при 30°C, сушка на воздухе."
+            },
+            {
+                id: "delivery",
+                title: "Доставка",
+                content: "Доставка курьером по России и СНГ."
+            },
+            {
+                id: "returns",
+                title: "Возврат",
+                content: "Возврат без проблем в течение 14 дней."
+            }
+        ]
+    },
+    {
+        id: 6,
+        sku: "ZN-JNS-001",
+        title: "JEANS",
+        price: "6 190 ₽",
+        priceValue: 6190,
+        images: [
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png"
+        ],
+        isNew: false,
+        category: "Jeans",
+        color: "navy",
+        size: "l",
+        sortOrder: 6,
+        defaultSize: "l",
+        availableSizes: [
+            "s",
+            "m",
+            "l",
+            "xl"
+        ],
+        availableColors: [
+            {
+                label: "Индиго",
+                value: "navy",
+                hex: "#1b2a41"
+            },
+            {
+                label: "Черный",
+                value: "black",
+                hex: "#161616"
+            }
+        ],
+        sections: [
+            {
+                id: "description",
+                title: "Описание",
+                content: "Деним прямого кроя с минималистичным брендингом и контрастной отстрочкой."
+            },
+            {
+                id: "printing",
+                title: "Нанесение",
+                content: "Патч из натуральной кожи с тиснением ZNVES."
+            },
+            {
+                id: "size-chart",
+                title: "Таблица размеров",
+                content: "Размер в талии соответствует российскому размеру, длина — 32."
+            },
+            {
+                id: "model",
+                title: "Параметры модели",
+                content: "Параметры модели: 82-64-94, рост 174 см. На модели размер L."
+            },
+            {
+                id: "care",
+                title: "Состав и уход",
+                content: "100% хлопок. Стирать наизнанку, не использовать отбеливатели."
+            },
+            {
+                id: "delivery",
+                title: "Доставка",
+                content: "Доступна экспресс-доставка по Москве."
+            },
+            {
+                id: "returns",
+                title: "Возврат",
+                content: "Возврат в течение 14 дней в розничных магазинах."
+            }
+        ]
+    },
+    {
+        id: 7,
+        sku: "ZN-SRT-001",
+        title: "SHORTS",
+        price: "3 990 ₽",
+        priceValue: 3990,
+        images: [
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png"
+        ],
+        isNew: false,
+        category: "Shorts",
+        color: "cream",
+        size: "s",
+        sortOrder: 7,
+        defaultSize: "s",
+        availableSizes: [
+            "xs",
+            "s",
+            "m",
+            "l"
+        ],
+        availableColors: [
+            {
+                label: "Кремовый",
+                value: "cream",
+                hex: "#ede4d4"
+            },
+            {
+                label: "Темно-синий",
+                value: "navy",
+                hex: "#1a2a3a"
+            }
+        ],
+        sections: [
+            {
+                id: "description",
+                title: "Описание",
+                content: "Шорты свободного кроя из мягкого футера с эластичным поясом и карманами."
+            },
+            {
+                id: "printing",
+                title: "Нанесение",
+                content: "Минималистичный логотип на левом бедре."
+            },
+            {
+                id: "size-chart",
+                title: "Таблица размеров",
+                content: "XS — 42, S — 44, M — 46, L — 48."
+            },
+            {
+                id: "model",
+                title: "Параметры модели",
+                content: "Параметры модели: 86-60-90, рост 173 см. На модели размер S."
+            },
+            {
+                id: "care",
+                title: "Состав и уход",
+                content: "80% хлопок, 20% полиэстер. Стирка при 30°C, без отжима."
+            },
+            {
+                id: "delivery",
+                title: "Доставка",
+                content: "Доставка по России и СНГ в течение 3-5 дней."
+            },
+            {
+                id: "returns",
+                title: "Возврат",
+                content: "Возврат в оригинальной упаковке в течение 14 дней."
+            }
+        ]
+    },
+    {
+        id: 8,
+        sku: "ZN-HOD-002",
+        title: "HOODIE",
+        price: "5 990 ₽",
+        priceValue: 5990,
+        images: [
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png"
+        ],
+        isNew: false,
+        category: "Hoodies",
+        color: "green",
+        size: "xl",
+        sortOrder: 8,
+        defaultSize: "xl",
+        availableSizes: [
+            "m",
+            "l",
+            "xl"
+        ],
+        availableColors: [
+            {
+                label: "Зеленый",
+                value: "green",
+                hex: "#3a5f44"
+            },
+            {
+                label: "Черный",
+                value: "black",
+                hex: "#151515"
+            }
+        ],
+        sections: [
+            {
+                id: "description",
+                title: "Описание",
+                content: "Oversize худи с двойным капюшоном и объемной вышивкой ZNVES."
+            },
+            {
+                id: "printing",
+                title: "Нанесение",
+                content: "Трехмерная вышивка, выполненная немецкими нитями Madeira."
+            },
+            {
+                id: "size-chart",
+                title: "Таблица размеров",
+                content: "M — 46, L — 48, XL — 50."
+            },
+            {
+                id: "model",
+                title: "Параметры модели",
+                content: "Параметры модели: 100-78-102, рост 188 см. На модели размер XL."
+            },
+            {
+                id: "care",
+                title: "Состав и уход",
+                content: "75% хлопок, 25% полиэстер. Стирка при 30°C, сушить в расправленном виде."
+            },
+            {
+                id: "delivery",
+                title: "Доставка",
+                content: "Бесплатная доставка при оплате онлайн."
+            },
+            {
+                id: "returns",
+                title: "Возврат",
+                content: "Возврат/обмен в течение 14 дней через службу поддержки."
+            }
+        ]
+    },
+    {
+        id: 9,
+        sku: "ZN-TSH-002",
+        title: "T-SHIRT",
+        price: "4 490 ₽",
+        priceValue: 4490,
+        images: [
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png"
+        ],
+        isNew: false,
+        category: "T-shirts",
+        color: "cream",
+        size: "s",
+        sortOrder: 9,
+        defaultSize: "s",
+        availableSizes: [
+            "xs",
+            "s",
+            "m",
+            "l"
+        ],
+        availableColors: [
+            {
+                label: "Кремовый",
+                value: "cream",
+                hex: "#e8e1d6"
+            },
+            {
+                label: "Серый",
+                value: "gray",
+                hex: "#d1cdcb"
+            }
+        ],
+        sections: [
+            {
+                id: "description",
+                title: "Описание",
+                content: "Базовая футболка из мягкого трикотажа с логотипом ZNVES."
+            },
+            {
+                id: "printing",
+                title: "Нанесение",
+                content: "Принт выполнен методом шелкографии."
+            },
+            {
+                id: "size-chart",
+                title: "Таблица размеров",
+                content: "XS — 42, S — 44, M — 46, L — 48."
+            },
+            {
+                id: "model",
+                title: "Параметры модели",
+                content: "Параметры модели: 84-60-90, рост 172 см. На модели размер S."
+            },
+            {
+                id: "care",
+                title: "Состав и уход",
+                content: "100% хлопок. Стирать при 30°C, не отбеливать."
+            },
+            {
+                id: "delivery",
+                title: "Доставка",
+                content: "Доставка курьером — 2-4 рабочих дня."
+            },
+            {
+                id: "returns",
+                title: "Возврат",
+                content: "Обмен и возврат возможны в течение 14 дней."
+            }
+        ]
+    },
+    {
+        id: 10,
+        sku: "ZN-ZIP-002",
+        title: "ZIP HOODIE",
+        price: "6 790 ₽",
+        priceValue: 6790,
+        images: [
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png"
+        ],
+        isNew: false,
+        category: "Zip hoodies",
+        color: "brown",
+        size: "m",
+        sortOrder: 10,
+        defaultSize: "m",
+        availableSizes: [
+            "s",
+            "m",
+            "l",
+            "xl"
+        ],
+        availableColors: [
+            {
+                label: "Коричневый",
+                value: "brown",
+                hex: "#6b4b34"
+            },
+            {
+                label: "Черный",
+                value: "black",
+                hex: "#181818"
+            }
+        ],
+        sections: [
+            {
+                id: "description",
+                title: "Описание",
+                content: "Зип-худи с контрастной молнией и вышитым логотипом ZNVES на груди."
+            },
+            {
+                id: "printing",
+                title: "Нанесение",
+                content: "Комбинация шелкографии и вышивки."
+            },
+            {
+                id: "size-chart",
+                title: "Таблица размеров",
+                content: "S — 44, M — 46, L — 48, XL — 50."
+            },
+            {
+                id: "model",
+                title: "Параметры модели",
+                content: "Параметры модели: 96-76-100, рост 184 см. На модели размер M."
+            },
+            {
+                id: "care",
+                title: "Состав и уход",
+                content: "80% хлопок, 20% полиэстер. Стирать при 30°C."
+            },
+            {
+                id: "delivery",
+                title: "Доставка",
+                content: "Доставка по России и СНГ. Экспресс в крупных городах."
+            },
+            {
+                id: "returns",
+                title: "Возврат",
+                content: "Возврат в течение 14 дней при сохранении бирок."
+            }
+        ]
+    },
+    {
+        id: 11,
+        sku: "ZN-JKT-002",
+        title: "JACKET",
+        price: "6 590 ₽",
+        priceValue: 6590,
+        images: [
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png"
+        ],
+        isNew: false,
+        category: "Jackets",
+        color: "green",
+        size: "l",
+        sortOrder: 11,
+        defaultSize: "l",
+        availableSizes: [
+            "m",
+            "l",
+            "xl"
+        ],
+        availableColors: [
+            {
+                label: "Хаки",
+                value: "green",
+                hex: "#3a5f44"
+            },
+            {
+                label: "Черный",
+                value: "black",
+                hex: "#151515"
+            }
+        ],
+        sections: [
+            {
+                id: "description",
+                title: "Описание",
+                content: "Парка из влагозащитной ткани с утеплителем и съемным капюшоном."
+            },
+            {
+                id: "printing",
+                title: "Нанесение",
+                content: "Шеврон с логотипом ZNVES на рукаве."
+            },
+            {
+                id: "size-chart",
+                title: "Таблица размеров",
+                content: "M — 46, L — 48, XL — 50."
+            },
+            {
+                id: "model",
+                title: "Параметры модели",
+                content: "Параметры модели: 100-82-104, рост 190 см. На модели размер L."
+            },
+            {
+                id: "care",
+                title: "Состав и уход",
+                content: "Основная ткань: 100% полиэстер. Стирка на деликатном режиме."
+            },
+            {
+                id: "delivery",
+                title: "Доставка",
+                content: "Доступна экспресс-доставка по Москве и Санкт-Петербургу."
+            },
+            {
+                id: "returns",
+                title: "Возврат",
+                content: "Возврат возможен в течение 14 дней."
+            }
+        ]
+    },
+    {
+        id: 12,
+        sku: "ZN-PNT-002",
+        title: "PANTS",
+        price: "4 490 ₽",
+        priceValue: 4490,
+        images: [
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png"
+        ],
+        isNew: false,
+        category: "Pants",
+        color: "brown",
+        size: "s",
+        sortOrder: 12,
+        defaultSize: "s",
+        availableSizes: [
+            "xs",
+            "s",
+            "m",
+            "l"
+        ],
+        availableColors: [
+            {
+                label: "Коричневый",
+                value: "brown",
+                hex: "#6b4b34"
+            },
+            {
+                label: "Черный",
+                value: "black",
+                hex: "#181818"
+            }
+        ],
+        sections: [
+            {
+                id: "description",
+                title: "Описание",
+                content: "Брюки прямого кроя из плотного твила с эластичным поясом и шнурком."
+            },
+            {
+                id: "printing",
+                title: "Нанесение",
+                content: "Маленький логотип на заднем кармане."
+            },
+            {
+                id: "size-chart",
+                title: "Таблица размеров",
+                content: "XS — 42, S — 44, M — 46, L — 48."
+            },
+            {
+                id: "model",
+                title: "Параметры модели",
+                content: "Параметры модели: 86-66-94, рост 170 см. На модели размер S."
+            },
+            {
+                id: "care",
+                title: "Состав и уход",
+                content: "97% хлопок, 3% эластан. Стирка на деликатном режиме при 30°C."
+            },
+            {
+                id: "delivery",
+                title: "Доставка",
+                content: "Доставка почтой или курьером, 3-5 рабочих дней."
+            },
+            {
+                id: "returns",
+                title: "Возврат",
+                content: "Возврат осуществляется в течение 14 дней при сохранении товарного вида."
+            }
+        ]
+    }
+];
+var _catalogProductsData__sections, _catalogProductsData__sections1, _catalogProductsData__sections2, _catalogProductsData__sections3, _catalogProductsData__sections4, _catalogProductsData__sections5, _catalogProductsData__sections6, _catalogProductsData__sections7;
+const newInProductsData = [
+    {
+        id: 101,
+        sku: "ZN-HOD-101",
+        title: "HOODIE",
+        price: "5 990 ₽",
+        priceValue: 5990,
+        images: [
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png"
+        ],
+        isNew: true,
+        category: "Hoodies",
+        color: "green",
+        size: "m",
+        sortOrder: 1,
+        defaultSize: "m",
+        availableSizes: [
+            "xs",
+            "s",
+            "m",
+            "l"
+        ],
+        availableColors: [
+            {
+                label: "Зеленый",
+                value: "green",
+                hex: "#3a5f44"
+            },
+            {
+                label: "Серый",
+                value: "gray",
+                hex: "#d1cdcb"
+            }
+        ],
+        sections: (_catalogProductsData__sections = (_catalogProductsData_ = catalogProductsData[0]) === null || _catalogProductsData_ === void 0 ? void 0 : _catalogProductsData_.sections) !== null && _catalogProductsData__sections !== void 0 ? _catalogProductsData__sections : []
+    },
+    {
+        id: 102,
+        sku: "ZN-ZIP-101",
+        title: "ZIP HOODIE",
+        price: "6 590 ₽",
+        priceValue: 6590,
+        images: [
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png"
+        ],
+        isNew: true,
+        category: "Zip hoodies",
+        color: "cream",
+        size: "l",
+        sortOrder: 2,
+        defaultSize: "l",
+        availableSizes: [
+            "s",
+            "m",
+            "l",
+            "xl"
+        ],
+        availableColors: [
+            {
+                label: "Кремовый",
+                value: "cream",
+                hex: "#eee4d6"
+            },
+            {
+                label: "Темно-серый",
+                value: "dark-gray",
+                hex: "#3a3a3a"
+            }
+        ],
+        sections: (_catalogProductsData__sections1 = (_catalogProductsData_1 = catalogProductsData[1]) === null || _catalogProductsData_1 === void 0 ? void 0 : _catalogProductsData_1.sections) !== null && _catalogProductsData__sections1 !== void 0 ? _catalogProductsData__sections1 : []
+    },
+    {
+        id: 103,
+        sku: "ZN-TSH-101",
+        title: "T-SHIRT",
+        price: "4 990 ₽",
+        priceValue: 4990,
+        images: [
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png"
+        ],
+        isNew: true,
+        category: "T-shirts",
+        color: "navy",
+        size: "s",
+        sortOrder: 3,
+        defaultSize: "s",
+        availableSizes: [
+            "xs",
+            "s",
+            "m",
+            "l"
+        ],
+        availableColors: [
+            {
+                label: "Темно-синий",
+                value: "navy",
+                hex: "#1f2b3d"
+            },
+            {
+                label: "Белый",
+                value: "white",
+                hex: "#f7f7f7"
+            }
+        ],
+        sections: (_catalogProductsData__sections2 = (_catalogProductsData_2 = catalogProductsData[2]) === null || _catalogProductsData_2 === void 0 ? void 0 : _catalogProductsData_2.sections) !== null && _catalogProductsData__sections2 !== void 0 ? _catalogProductsData__sections2 : []
+    },
+    {
+        id: 104,
+        sku: "ZN-JKT-101",
+        title: "JACKET",
+        price: "6 290 ₽",
+        priceValue: 6290,
+        images: [
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png"
+        ],
+        isNew: true,
+        category: "Jackets",
+        color: "brown",
+        size: "m",
+        sortOrder: 4,
+        defaultSize: "m",
+        availableSizes: [
+            "s",
+            "m",
+            "l",
+            "xl"
+        ],
+        availableColors: [
+            {
+                label: "Коричневый",
+                value: "brown",
+                hex: "#6b4b34"
+            },
+            {
+                label: "Черный",
+                value: "black",
+                hex: "#181818"
+            }
+        ],
+        sections: (_catalogProductsData__sections3 = (_catalogProductsData_3 = catalogProductsData[3]) === null || _catalogProductsData_3 === void 0 ? void 0 : _catalogProductsData_3.sections) !== null && _catalogProductsData__sections3 !== void 0 ? _catalogProductsData__sections3 : []
+    },
+    {
+        id: 105,
+        sku: "ZN-TSH-102",
+        title: "T-SHIRT",
+        price: "4 590 ₽",
+        priceValue: 4590,
+        images: [
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png"
+        ],
+        isNew: true,
+        category: "T-shirts",
+        color: "cream",
+        size: "m",
+        sortOrder: 5,
+        defaultSize: "m",
+        availableSizes: [
+            "s",
+            "m",
+            "l",
+            "xl"
+        ],
+        availableColors: [
+            {
+                label: "Кремовый",
+                value: "cream",
+                hex: "#e8e1d6"
+            },
+            {
+                label: "Серый",
+                value: "gray",
+                hex: "#d1cdcb"
+            }
+        ],
+        sections: (_catalogProductsData__sections4 = (_catalogProductsData_4 = catalogProductsData[4]) === null || _catalogProductsData_4 === void 0 ? void 0 : _catalogProductsData_4.sections) !== null && _catalogProductsData__sections4 !== void 0 ? _catalogProductsData__sections4 : []
+    },
+    {
+        id: 106,
+        sku: "ZN-PNT-101",
+        title: "PANTS",
+        price: "4 890 ₽",
+        priceValue: 4890,
+        images: [
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png"
+        ],
+        isNew: true,
+        category: "Pants",
+        color: "green",
+        size: "m",
+        sortOrder: 6,
+        defaultSize: "m",
+        availableSizes: [
+            "xs",
+            "s",
+            "m",
+            "l"
+        ],
+        availableColors: [
+            {
+                label: "Зеленый",
+                value: "green",
+                hex: "#3a5f44"
+            },
+            {
+                label: "Черный",
+                value: "black",
+                hex: "#151515"
+            }
+        ],
+        sections: (_catalogProductsData__sections5 = (_catalogProductsData_5 = catalogProductsData[5]) === null || _catalogProductsData_5 === void 0 ? void 0 : _catalogProductsData_5.sections) !== null && _catalogProductsData__sections5 !== void 0 ? _catalogProductsData__sections5 : []
+    },
+    {
+        id: 107,
+        sku: "ZN-HOD-103",
+        title: "HOODIE",
+        price: "5 790 ₽",
+        priceValue: 5790,
+        images: [
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png"
+        ],
+        isNew: true,
+        category: "Hoodies",
+        color: "navy",
+        size: "xl",
+        sortOrder: 7,
+        defaultSize: "xl",
+        availableSizes: [
+            "m",
+            "l",
+            "xl"
+        ],
+        availableColors: [
+            {
+                label: "Темно-синий",
+                value: "navy",
+                hex: "#1f2b3d"
+            },
+            {
+                label: "Черный",
+                value: "black",
+                hex: "#151515"
+            }
+        ],
+        sections: (_catalogProductsData__sections6 = (_catalogProductsData_6 = catalogProductsData[6]) === null || _catalogProductsData_6 === void 0 ? void 0 : _catalogProductsData_6.sections) !== null && _catalogProductsData__sections6 !== void 0 ? _catalogProductsData__sections6 : []
+    },
+    {
+        id: 108,
+        sku: "ZN-SRT-101",
+        title: "SHORTS",
+        price: "3 790 ₽",
+        priceValue: 3790,
+        images: [
+            "/images/catalogs/blue-zip.png",
+            "/images/catalogs/voyage.png",
+            "/images/catalogs/blue-zip.png"
+        ],
+        isNew: true,
+        category: "Shorts",
+        color: "cream",
+        size: "s",
+        sortOrder: 8,
+        defaultSize: "s",
+        availableSizes: [
+            "xs",
+            "s",
+            "m",
+            "l"
+        ],
+        availableColors: [
+            {
+                label: "Кремовый",
+                value: "cream",
+                hex: "#f0e6d8"
+            },
+            {
+                label: "Темно-синий",
+                value: "navy",
+                hex: "#1c2a3d"
+            }
+        ],
+        sections: (_catalogProductsData__sections7 = (_catalogProductsData_7 = catalogProductsData[7]) === null || _catalogProductsData_7 === void 0 ? void 0 : _catalogProductsData_7.sections) !== null && _catalogProductsData__sections7 !== void 0 ? _catalogProductsData__sections7 : []
+    }
+];
+const catalogProducts = catalogProductsData;
+const newInProducts = newInProductsData;
+const allProducts = [
+    ...catalogProductsData,
+    ...newInProductsData
+];
+const getProductById = (id)=>{
+    return allProducts.find((product)=>product.id === id);
+};
+const toCatalogProduct = (product)=>({
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        priceValue: product.priceValue,
+        images: product.images,
+        isNew: product.isNew,
+        category: product.category,
+        color: product.color,
+        size: product.size,
+        sortOrder: product.sortOrder
+    });
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/components/ProductPage/ProductPageView.module.css [app-client] (css module)", ((__turbopack_context__) => {
+
+__turbopack_context__.v({
+  "accordion": "ProductPageView-module__hPWMdW__accordion",
+  "accordionButton": "ProductPageView-module__hPWMdW__accordionButton",
+  "accordionButtonOpen": "ProductPageView-module__hPWMdW__accordionButtonOpen",
+  "accordionContent": "ProductPageView-module__hPWMdW__accordionContent",
+  "accordionContentInner": "ProductPageView-module__hPWMdW__accordionContentInner",
+  "accordionContentOpen": "ProductPageView-module__hPWMdW__accordionContentOpen",
+  "accordionIcon": "ProductPageView-module__hPWMdW__accordionIcon",
+  "accordionItem": "ProductPageView-module__hPWMdW__accordionItem",
+  "addToCartButton": "ProductPageView-module__hPWMdW__addToCartButton",
+  "breadcrumbs": "ProductPageView-module__hPWMdW__breadcrumbs",
+  "colorList": "ProductPageView-module__hPWMdW__colorList",
+  "colorListItem": "ProductPageView-module__hPWMdW__colorListItem",
+  "colorListItemButton": "ProductPageView-module__hPWMdW__colorListItemButton",
+  "colorListItemButtonSelected": "ProductPageView-module__hPWMdW__colorListItemButtonSelected",
+  "colorListItemDot": "ProductPageView-module__hPWMdW__colorListItemDot",
+  "colorListItemLabel": "ProductPageView-module__hPWMdW__colorListItemLabel",
+  "colorPickerArrow": "ProductPageView-module__hPWMdW__colorPickerArrow",
+  "colorPickerButton": "ProductPageView-module__hPWMdW__colorPickerButton",
+  "colorPickerButtonDot": "ProductPageView-module__hPWMdW__colorPickerButtonDot",
+  "colorPickerButtonText": "ProductPageView-module__hPWMdW__colorPickerButtonText",
+  "colorPickerDot": "ProductPageView-module__hPWMdW__colorPickerDot",
+  "colorPickerWrapper": "ProductPageView-module__hPWMdW__colorPickerWrapper",
+  "colorPickerWrapperOpen": "ProductPageView-module__hPWMdW__colorPickerWrapperOpen",
+  "colorPickerWrapperWhite": "ProductPageView-module__hPWMdW__colorPickerWrapperWhite",
+  "content": "ProductPageView-module__hPWMdW__content",
+  "countAndBuy": "ProductPageView-module__hPWMdW__countAndBuy",
+  "gallery": "ProductPageView-module__hPWMdW__gallery",
+  "imageColumn": "ProductPageView-module__hPWMdW__imageColumn",
+  "imageSlide": "ProductPageView-module__hPWMdW__imageSlide",
+  "imageSlideInner": "ProductPageView-module__hPWMdW__imageSlideInner",
+  "imageSlider": "ProductPageView-module__hPWMdW__imageSlider",
+  "imageViewport": "ProductPageView-module__hPWMdW__imageViewport",
+  "info": "ProductPageView-module__hPWMdW__info",
+  "label": "ProductPageView-module__hPWMdW__label",
+  "main": "ProductPageView-module__hPWMdW__main",
+  "mainImage": "ProductPageView-module__hPWMdW__mainImage",
+  "page": "ProductPageView-module__hPWMdW__page",
+  "price": "ProductPageView-module__hPWMdW__price",
+  "quantityControl": "ProductPageView-module__hPWMdW__quantityControl",
+  "quantityRow": "ProductPageView-module__hPWMdW__quantityRow",
+  "quantityValue": "ProductPageView-module__hPWMdW__quantityValue",
+  "select": "ProductPageView-module__hPWMdW__select",
+  "sizeGuideContent": "ProductPageView-module__hPWMdW__sizeGuideContent",
+  "sizeGuideText": "ProductPageView-module__hPWMdW__sizeGuideText",
+  "sizeGuideTitle": "ProductPageView-module__hPWMdW__sizeGuideTitle",
+  "sizeList": "ProductPageView-module__hPWMdW__sizeList",
+  "sizeListItem": "ProductPageView-module__hPWMdW__sizeListItem",
+  "sizeListItemButton": "ProductPageView-module__hPWMdW__sizeListItemButton",
+  "sizeListItemButtonSelected": "ProductPageView-module__hPWMdW__sizeListItemButtonSelected",
+  "sizeListItemCheckmark": "ProductPageView-module__hPWMdW__sizeListItemCheckmark",
+  "sizeListItemLabel": "ProductPageView-module__hPWMdW__sizeListItemLabel",
+  "sizeListItemPlaceholder": "ProductPageView-module__hPWMdW__sizeListItemPlaceholder",
+  "sizePickerArrow": "ProductPageView-module__hPWMdW__sizePickerArrow",
+  "sizePickerButton": "ProductPageView-module__hPWMdW__sizePickerButton",
+  "sizePickerButtonText": "ProductPageView-module__hPWMdW__sizePickerButtonText",
+  "sizePickerWrapper": "ProductPageView-module__hPWMdW__sizePickerWrapper",
+  "sizePickerWrapperOpen": "ProductPageView-module__hPWMdW__sizePickerWrapperOpen",
+  "sizeSelect": "ProductPageView-module__hPWMdW__sizeSelect",
+  "sizeWeb": "ProductPageView-module__hPWMdW__sizeWeb",
+  "sku": "ProductPageView-module__hPWMdW__sku",
+  "suggestions": "ProductPageView-module__hPWMdW__suggestions",
+  "title": "ProductPageView-module__hPWMdW__title",
+  "titleRow": "ProductPageView-module__hPWMdW__titleRow",
+  "variantGroup": "ProductPageView-module__hPWMdW__variantGroup",
+  "variantGroupRow": "ProductPageView-module__hPWMdW__variantGroupRow",
+  "variantRow": "ProductPageView-module__hPWMdW__variantRow",
+  "variantRowCompact": "ProductPageView-module__hPWMdW__variantRowCompact",
+});
+}),
+"[project]/src/components/ProductCard/ProductCard.module.css [app-client] (css module)", ((__turbopack_context__) => {
+
+__turbopack_context__.v({
+  "addToCartButton": "ProductCard-module__g-pugq__addToCartButton",
+  "imageContainer": "ProductCard-module__g-pugq__imageContainer",
+  "imageWrapper": "ProductCard-module__g-pugq__imageWrapper",
+  "newBadge": "ProductCard-module__g-pugq__newBadge",
+  "productCard": "ProductCard-module__g-pugq__productCard",
+  "productImage": "ProductCard-module__g-pugq__productImage",
+  "productImageLoaded": "ProductCard-module__g-pugq__productImageLoaded",
+  "productImageLoading": "ProductCard-module__g-pugq__productImageLoading",
+  "productImageVisible": "ProductCard-module__g-pugq__productImageVisible",
+  "productInfo": "ProductCard-module__g-pugq__productInfo",
+  "productPrice": "ProductCard-module__g-pugq__productPrice",
+  "productTitle": "ProductCard-module__g-pugq__productTitle",
+  "sliderCard": "ProductCard-module__g-pugq__sliderCard",
+});
+}),
+"[project]/src/components/ProductCard/ProductCard.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$CartContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/contexts/CartContext.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$ToastProvider$2f$ToastProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/ToastProvider/ToastProvider.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$data$2f$products$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/data/products.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/src/components/ProductCard/ProductCard.module.css [app-client] (css module)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+;
+;
+const ProductCard = (param)=>{
+    let { title, price, images, isNew, productId, showAddToCart = true, isSliderCard = false } = param;
+    _s();
+    const { addItem } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$CartContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCart"])();
+    const { showToast } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$ToastProvider$2f$ToastProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"])();
+    const imageList = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "ProductCard.useMemo[imageList]": ()=>{
+            if (images.length === 0) {
+                return [
+                    "/images/catalogs/placeholder.png"
+                ];
+            }
+            return images;
+        }
+    }["ProductCard.useMemo[imageList]"], [
+        images
+    ]);
+    const [currentIndex, setCurrentIndex] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0);
+    const [loadedStates, setLoadedStates] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const containerRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ProductCard.useEffect": ()=>{
+            setLoadedStates(new Array(imageList.length).fill(false));
+        }
+    }["ProductCard.useEffect"], [
+        imageList
+    ]);
+    const markImageLoaded = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "ProductCard.useCallback[markImageLoaded]": (index)=>{
+            setLoadedStates({
+                "ProductCard.useCallback[markImageLoaded]": (prev)=>{
+                    if (prev[index]) {
+                        return prev;
+                    }
+                    const next = [
+                        ...prev
+                    ];
+                    next[index] = true;
+                    return next;
+                }
+            }["ProductCard.useCallback[markImageLoaded]"]);
+        }
+    }["ProductCard.useCallback[markImageLoaded]"], []);
+    const updateIndexFromPointer = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "ProductCard.useCallback[updateIndexFromPointer]": (clientX)=>{
+            const container = containerRef.current;
+            if (!container || imageList.length <= 1) {
+                return;
+            }
+            const rect = container.getBoundingClientRect();
+            const relativeX = clientX - rect.left;
+            const clampedX = Math.max(0, Math.min(relativeX, rect.width - 1));
+            const segmentWidth = rect.width / imageList.length;
+            const newIndex = Math.floor(clampedX / segmentWidth);
+            setCurrentIndex({
+                "ProductCard.useCallback[updateIndexFromPointer]": (prev)=>prev === newIndex ? prev : newIndex
+            }["ProductCard.useCallback[updateIndexFromPointer]"]);
+        }
+    }["ProductCard.useCallback[updateIndexFromPointer]"], [
+        imageList.length
+    ]);
+    const handlePointerMove = (event)=>{
+        if (imageList.length <= 1) {
+            return;
+        }
+        updateIndexFromPointer(event.clientX);
+    };
+    const handlePointerEnter = (event)=>{
+        if (imageList.length <= 1) {
+            return;
+        }
+        updateIndexFromPointer(event.clientX);
+    };
+    const handlePointerLeave = ()=>{
+        setCurrentIndex(0);
+    };
+    const handleAddToCart = (e)=>{
+        var _product_availableColors_;
+        e.preventDefault();
+        e.stopPropagation();
+        if (!productId) {
+            return;
+        }
+        const product = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$data$2f$products$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getProductById"])(productId);
+        if (!product) {
+            return;
+        }
+        const catalogProduct = {
+            id: product.id,
+            title: product.title,
+            price: product.price,
+            priceValue: product.priceValue,
+            images: product.images,
+            isNew: product.isNew,
+            category: product.category,
+            color: product.color,
+            size: product.size,
+            sortOrder: product.sortOrder
+        };
+        addItem(catalogProduct, product.defaultSize, ((_product_availableColors_ = product.availableColors[0]) === null || _product_availableColors_ === void 0 ? void 0 : _product_availableColors_.value) || product.color, 1);
+        showToast("Добавлено в корзину");
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].productCard, " ").concat(isSliderCard ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sliderCard : ""),
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].imageWrapper,
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].imageContainer,
+                    ref: containerRef,
+                    onPointerEnter: handlePointerEnter,
+                    onPointerMove: handlePointerMove,
+                    onPointerLeave: handlePointerLeave,
+                    children: [
+                        imageList.map((image, index)=>{
+                            const isActive = index === currentIndex;
+                            const isLoaded = loadedStates[index];
+                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                src: image,
+                                alt: "".concat(title, " — фото ").concat(index + 1),
+                                fill: true,
+                                sizes: "(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 22vw",
+                                className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].productImage, " swiper-lazy ").concat(isActive ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].productImageVisible : "", " ").concat(isLoaded ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].productImageLoaded : __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].productImageLoading),
+                                loading: index === 0 ? "eager" : "lazy",
+                                onLoad: ()=>markImageLoaded(index),
+                                quality: 80
+                            }, image + index, false, {
+                                fileName: "[project]/src/components/ProductCard/ProductCard.tsx",
+                                lineNumber: 154,
+                                columnNumber: 15
+                            }, ("TURBOPACK compile-time value", void 0));
+                        }),
+                        isNew && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].newBadge,
+                            children: "new"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/ProductCard/ProductCard.tsx",
+                            lineNumber: 173,
+                            columnNumber: 21
+                        }, ("TURBOPACK compile-time value", void 0))
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/ProductCard/ProductCard.tsx",
+                    lineNumber: 143,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0))
+            }, void 0, false, {
+                fileName: "[project]/src/components/ProductCard/ProductCard.tsx",
+                lineNumber: 142,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].productInfo,
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].productTitle,
+                        children: title
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/ProductCard/ProductCard.tsx",
+                        lineNumber: 177,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].productPrice,
+                        children: price
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/ProductCard/ProductCard.tsx",
+                        lineNumber: 178,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    productId && showAddToCart && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        type: "button",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].addToCartButton,
+                        onClick: handleAddToCart,
+                        "aria-label": "Добавить в корзину",
+                        children: "Добавить в корзину"
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/ProductCard/ProductCard.tsx",
+                        lineNumber: 180,
+                        columnNumber: 11
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/ProductCard/ProductCard.tsx",
+                lineNumber: 176,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0))
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/ProductCard/ProductCard.tsx",
+        lineNumber: 137,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_s(ProductCard, "eH7L98xdAJxnr8xohDh9HXYXeBE=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$CartContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCart"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$ToastProvider$2f$ToastProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"]
+    ];
+});
+_c = ProductCard;
+const __TURBOPACK__default__export__ = ProductCard;
+var _c;
+__turbopack_context__.k.register(_c, "ProductCard");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/components/ProductDisplaySection/ProductDisplaySection.module.css [app-client] (css module)", ((__turbopack_context__) => {
+
+__turbopack_context__.v({
+  "arrowButton": "ProductDisplaySection-module__p04fWq__arrowButton",
+  "arrowButtonActive": "ProductDisplaySection-module__p04fWq__arrowButtonActive",
+  "arrowButtonDisabled": "ProductDisplaySection-module__p04fWq__arrowButtonDisabled",
+  "arrowButtonInactive": "ProductDisplaySection-module__p04fWq__arrowButtonInactive",
+  "arrowSvgActive": "ProductDisplaySection-module__p04fWq__arrowSvgActive",
+  "arrowSvgInactive": "ProductDisplaySection-module__p04fWq__arrowSvgInactive",
+  "arrows": "ProductDisplaySection-module__p04fWq__arrows",
+  "arrowsBottom": "ProductDisplaySection-module__p04fWq__arrowsBottom",
+  "emptyState": "ProductDisplaySection-module__p04fWq__emptyState",
+  "header": "ProductDisplaySection-module__p04fWq__header",
+  "headerRight": "ProductDisplaySection-module__p04fWq__headerRight",
+  "isBestseller": "ProductDisplaySection-module__p04fWq__isBestseller",
+  "loading": "ProductDisplaySection-module__p04fWq__loading",
+  "section": "ProductDisplaySection-module__p04fWq__section",
+  "shopArrow": "ProductDisplaySection-module__p04fWq__shopArrow",
+  "shopNow": "ProductDisplaySection-module__p04fWq__shopNow",
+  "slideItem": "ProductDisplaySection-module__p04fWq__slideItem",
+  "slideLink": "ProductDisplaySection-module__p04fWq__slideLink",
+  "slider": "ProductDisplaySection-module__p04fWq__slider",
+  "sliderContainer": "ProductDisplaySection-module__p04fWq__sliderContainer",
+  "sliderSpin": "ProductDisplaySection-module__p04fWq__sliderSpin",
+  "title": "ProductDisplaySection-module__p04fWq__title",
+});
+}),
+"[project]/src/api/home/catalogApi.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+// API для слайдеров на главной странице
+__turbopack_context__.s([
+    "fetchAllCatalogProducts",
+    ()=>fetchAllCatalogProducts,
+    "fetchCatalogProducts",
+    ()=>fetchCatalogProducts,
+    "fetchNewInProducts",
+    ()=>fetchNewInProducts
+]);
+const API_BASE_URL = "http://158.160.115.103:8000/api/catalog/";
+// Кеш для запросов
+const cache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
+// Преобразование API ответа в CatalogProduct
+const transformApiProduct = (apiProduct, index)=>{
+    // Извлекаем базовый URL для изображений
+    const baseUrl = "http://158.160.115.103:8000";
+    // Преобразуем изображения, добавляя базовый URL если нужно
+    const images = apiProduct.images.map((img)=>{
+        if (img.startsWith("http")) {
+            return img;
+        }
+        return img.startsWith("/") ? "".concat(baseUrl).concat(img) : "".concat(baseUrl, "/").concat(img);
+    });
+    // Парсим цену
+    const priceValue = parseFloat(apiProduct.price.replace(/\s/g, "").replace(",", ".")) || 0;
+    const formattedPrice = "".concat(Math.round(priceValue).toLocaleString("ru-RU"), " ₽");
+    // Извлекаем категорию из slug или name
+    const category = extractCategoryFromSlug(apiProduct.slug) || "T-shirts";
+    // Генерируем стабильный ID на основе slug
+    const id = hashString(apiProduct.slug) || index + 1;
+    return {
+        id,
+        slug: apiProduct.slug,
+        title: apiProduct.name,
+        price: formattedPrice,
+        priceValue,
+        images,
+        isNew: apiProduct.is_new,
+        category,
+        color: "green",
+        size: "m",
+        sortOrder: index
+    };
+};
+// Простая функция хеширования для генерации ID из slug
+const hashString = (str)=>{
+    let hash = 0;
+    for(let i = 0; i < str.length; i++){
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+};
+// Извлечение категории из slug
+const extractCategoryFromSlug = (slug)=>{
+    const slugLower = slug.toLowerCase();
+    if (slugLower.includes("pant") || slugLower.includes("брюк")) return "Pants";
+    if (slugLower.includes("jean")) return "Jeans";
+    if (slugLower.includes("t-shirt") || slugLower.includes("футболк")) return "T-shirts";
+    if (slugLower.includes("zip") && slugLower.includes("hood")) return "Zip hoodies";
+    if (slugLower.includes("jacket")) return "Jackets";
+    if (slugLower.includes("hoodie")) return "Hoodies";
+    if (slugLower.includes("short")) return "Shorts";
+    return null;
+};
+const fetchCatalogProducts = async function() {
+    let params = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {};
+    const cacheKey = JSON.stringify(params);
+    const cached = cache.get(cacheKey);
+    // Проверяем кеш
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+        return cached.data;
+    }
+    try {
+        const url = new URL(API_BASE_URL);
+        if (params.category) {
+            url.searchParams.set("category", params.category);
+        }
+        if (params.is_new !== undefined) {
+            url.searchParams.set("is_new", params.is_new.toString());
+        }
+        const response = await fetch(url.toString(), {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            cache: "no-store"
+        });
+        if (!response.ok) {
+            throw new Error("API error: ".concat(response.status, " ").concat(response.statusText));
+        }
+        const data = await response.json();
+        const transformedProducts = data.map((product, index)=>transformApiProduct(product, index));
+        // Сохраняем в кеш
+        cache.set(cacheKey, {
+            data: transformedProducts,
+            timestamp: Date.now()
+        });
+        return transformedProducts;
+    } catch (error) {
+        console.error("Error fetching catalog products:", error);
+        // Возвращаем пустой массив в случае ошибки
+        return [];
+    }
+};
+const fetchNewInProducts = async ()=>{
+    return fetchCatalogProducts({
+        is_new: true
+    });
+};
+const fetchAllCatalogProducts = async ()=>{
+    return fetchCatalogProducts({});
+};
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/hooks/useWindowSize.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "useWindowSize",
+    ()=>useWindowSize
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var _s = __turbopack_context__.k.signature();
+;
+const useWindowSize = ()=>{
+    _s();
+    const [windowSize, setWindowSize] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
+        width: 0,
+        height: 0
+    });
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "useWindowSize.useEffect": ()=>{
+            const handleResize = {
+                "useWindowSize.useEffect.handleResize": ()=>{
+                    setWindowSize({
+                        width: window.innerWidth,
+                        height: window.innerHeight
+                    });
+                }
+            }["useWindowSize.useEffect.handleResize"];
+            handleResize();
+            window.addEventListener("resize", handleResize);
+            return ({
+                "useWindowSize.useEffect": ()=>window.removeEventListener("resize", handleResize)
+            })["useWindowSize.useEffect"];
+        }
+    }["useWindowSize.useEffect"], []);
+    return windowSize;
+};
+_s(useWindowSize, "t3YfNFQwXUtH/YGPNUS56oAAqFg=");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+/* eslint-disable @next/next/no-img-element */ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ProductCard/ProductCard.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/src/components/ProductDisplaySection/ProductDisplaySection.module.css [app-client] (css module)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$api$2f$home$2f$catalogApi$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/api/home/catalogApi.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$swiper$2d$react$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/swiper/swiper-react.mjs [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/swiper/modules/index.mjs [app-client] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$free$2d$mode$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__FreeMode$3e$__ = __turbopack_context__.i("[project]/node_modules/swiper/modules/free-mode.mjs [app-client] (ecmascript) <export default as FreeMode>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$useWindowSize$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/hooks/useWindowSize.ts [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+const ProductDisplaySection = (param)=>{
+    let { title, showShopNow, id, isBestseller = false } = param;
+    _s();
+    const swiperRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const [activeArrow, setActiveArrow] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [maxVisible, setMaxVisible] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(4);
+    const [spaceBetween, setSpaceBetween] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(30);
+    const [isMobile, setIsMobile] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isBeginning, setIsBeginning] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
+    const [isEnd, setIsEnd] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [products, setProducts] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
+    const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
+    const hasPrefetchedProductsRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(false);
+    const hasPrefetchedShopNowRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(false);
+    const { width } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$useWindowSize$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useWindowSize"])();
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ProductDisplaySection.useEffect": ()=>{
+            if (width === 0) return;
+            if (width <= 480) {
+                setMaxVisible(1.5);
+                setSpaceBetween(8);
+                setIsMobile(false);
+            } else if (width <= 768) {
+                setMaxVisible(3);
+                setSpaceBetween(10);
+                setIsMobile(false);
+            } else if (width <= 1200) {
+                setMaxVisible(3);
+                setSpaceBetween(10);
+                setIsMobile(false);
+            } else {
+                setMaxVisible(4);
+                setSpaceBetween(10);
+                setIsMobile(false);
+            }
+        }
+    }["ProductDisplaySection.useEffect"], [
+        width
+    ]);
+    // Загрузка товаров из API
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ProductDisplaySection.useEffect": ()=>{
+            const loadProducts = {
+                "ProductDisplaySection.useEffect.loadProducts": async ()=>{
+                    setIsLoading(true);
+                    try {
+                        if (title === "NEW IN") {
+                            const newInProducts = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$api$2f$home$2f$catalogApi$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchNewInProducts"])();
+                            setProducts(newInProducts);
+                        } else {
+                            const catalogProducts = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$api$2f$home$2f$catalogApi$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchAllCatalogProducts"])();
+                            setProducts(catalogProducts);
+                        }
+                    } catch (error) {
+                        console.error("Error loading products:", error);
+                        setProducts([]);
+                    } finally{
+                        setIsLoading(false);
+                    }
+                }
+            }["ProductDisplaySection.useEffect.loadProducts"];
+            loadProducts();
+        }
+    }["ProductDisplaySection.useEffect"], [
+        title
+    ]);
+    const handlePrev = ()=>{
+        if (!isBeginning && swiperRef.current) {
+            swiperRef.current.slidePrev();
+            setActiveArrow("prev");
+        }
+    };
+    const handleNext = ()=>{
+        if (!isEnd && swiperRef.current) {
+            swiperRef.current.slideNext();
+            setActiveArrow("next");
+        }
+    };
+    const canNavigate = products.length > maxVisible;
+    const shopNowHref = title === "NEW IN" ? "/new-in" : title === "CATALOG" ? "/catalog" : "/catalog";
+    const handleSwiper = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "ProductDisplaySection.useCallback[handleSwiper]": (swiper)=>{
+            swiperRef.current = swiper;
+            setIsBeginning(swiper.isBeginning);
+            setIsEnd(swiper.isEnd);
+        }
+    }["ProductDisplaySection.useCallback[handleSwiper]"], []);
+    const handleSlideChange = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "ProductDisplaySection.useCallback[handleSlideChange]": (swiper)=>{
+            setIsBeginning(swiper.isBeginning);
+            setIsEnd(swiper.isEnd);
+            setActiveArrow(null);
+        }
+    }["ProductDisplaySection.useCallback[handleSlideChange]"], []);
+    const handleBeforeInit = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "ProductDisplaySection.useCallback[handleBeforeInit]": (swiper)=>{
+            const params = swiper.params;
+            params.preloadImages = false;
+            params.lazy = {
+                enabled: true,
+                loadOnTransitionStart: false,
+                loadPrevNext: true,
+                loadPrevNextAmount: 2
+            };
+        }
+    }["ProductDisplaySection.useCallback[handleBeforeInit]"], []);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ProductDisplaySection.useEffect": ()=>{
+            if (hasPrefetchedProductsRef.current) {
+                return;
+            }
+            const prefetchCount = Math.min(products.length, 6);
+            const routesToPrefetch = products.slice(0, prefetchCount).map({
+                "ProductDisplaySection.useEffect.routesToPrefetch": (product)=>"/catalog/".concat(product.slug || product.id)
+            }["ProductDisplaySection.useEffect.routesToPrefetch"]);
+            routesToPrefetch.forEach({
+                "ProductDisplaySection.useEffect": (route)=>{
+                    void router.prefetch(route);
+                }
+            }["ProductDisplaySection.useEffect"]);
+            hasPrefetchedProductsRef.current = true;
+        }
+    }["ProductDisplaySection.useEffect"], [
+        products,
+        router
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ProductDisplaySection.useEffect": ()=>{
+            if (hasPrefetchedShopNowRef.current || !showShopNow) {
+                return;
+            }
+            void router.prefetch(shopNowHref);
+            hasPrefetchedShopNowRef.current = true;
+        }
+    }["ProductDisplaySection.useEffect"], [
+        router,
+        shopNowHref,
+        showShopNow
+    ]);
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+        id: id,
+        className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].section, " ").concat(isBestseller ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].isBestseller : ""),
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].header,
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].title,
+                        children: title
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                        lineNumber: 177,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].headerRight,
+                        children: [
+                            showShopNow && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                href: shopNowHref,
+                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].shopNow,
+                                children: [
+                                    "SHOP NOW",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                        src: "/images/catalogs/shopArrow.png",
+                                        alt: "Arrow Right",
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].shopArrow
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                                        lineNumber: 182,
+                                        columnNumber: 15
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                                lineNumber: 180,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            canNavigate && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrows,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButton, " ").concat(activeArrow === "prev" ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButtonActive : __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButtonInactive, " ").concat(isBeginning ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButtonDisabled : ""),
+                                        onClick: handlePrev,
+                                        "aria-label": "Previous",
+                                        type: "button",
+                                        disabled: isBeginning,
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                            width: "35",
+                                            height: "30",
+                                            viewBox: "0 0 20 20",
+                                            fill: "none",
+                                            stroke: "currentColor",
+                                            className: activeArrow === "prev" ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowSvgActive : __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowSvgInactive,
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                d: "M12 15l-5-5 5-5"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                                                lineNumber: 215,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                                            lineNumber: 203,
+                                            columnNumber: 17
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                                        lineNumber: 192,
+                                        columnNumber: 15
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButton, " ").concat(activeArrow === "next" ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButtonActive : __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButtonInactive, " ").concat(isEnd ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButtonDisabled : ""),
+                                        onClick: handleNext,
+                                        "aria-label": "Next",
+                                        type: "button",
+                                        disabled: isEnd,
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                            width: "35",
+                                            height: "30",
+                                            viewBox: "0 0 20 20",
+                                            fill: "none",
+                                            stroke: "currentColor",
+                                            className: activeArrow === "next" ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowSvgActive : __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowSvgInactive,
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                d: "M8 15l5-5-5-5"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                                                lineNumber: 241,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                                            lineNumber: 229,
+                                            columnNumber: 17
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                                        lineNumber: 218,
+                                        columnNumber: 15
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                                lineNumber: 191,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0))
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                        lineNumber: 178,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                lineNumber: 176,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sliderContainer,
+                children: isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].loading,
+                    children: "Загрузка..."
+                }, void 0, false, {
+                    fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                    lineNumber: 250,
+                    columnNumber: 11
+                }, ("TURBOPACK compile-time value", void 0)) : products.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createElement"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$swiper$2d$react$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Swiper"], {
+                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].slider,
+                    modules: [
+                        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$free$2d$mode$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__FreeMode$3e$__["FreeMode"]
+                    ],
+                    freeMode: {
+                        enabled: true,
+                        momentum: true,
+                        momentumRatio: 0.35,
+                        minimumVelocity: 0.08,
+                        sticky: false
+                    },
+                    resistance: true,
+                    resistanceRatio: 0.85,
+                    spaceBetween,
+                    slidesPerView: maxVisible,
+                    slidesPerGroup: 1,
+                    loop: false,
+                    centeredSlides: isMobile,
+                    speed: 600,
+                    watchSlidesProgress: true,
+                    watchOverflow: true,
+                    onSwiper: handleSwiper,
+                    onSlideChange: handleSlideChange,
+                    onBeforeInit: handleBeforeInit,
+                    lazy: {
+                        enabled: true,
+                        loadOnTransitionStart: false,
+                        loadPrevNext: true,
+                        loadPrevNextAmount: 2
+                    }
+                }, products.map((product)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$swiper$2d$react$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SwiperSlide"], {
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].slideItem,
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                            href: "/catalog/".concat(product.slug || product.id),
+                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].slideLink,
+                            "aria-label": "Перейти к товару ".concat(product.title),
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                title: product.title,
+                                price: product.price,
+                                images: product.images,
+                                isNew: product.isNew,
+                                productId: product.id,
+                                showAddToCart: false,
+                                isSliderCard: true
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                                lineNumber: 291,
+                                columnNumber: 19
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                            lineNumber: 286,
+                            columnNumber: 17
+                        }, ("TURBOPACK compile-time value", void 0))
+                    }, product.id, false, {
+                        fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                        lineNumber: 285,
+                        columnNumber: 15
+                    }, ("TURBOPACK compile-time value", void 0)))) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].emptyState,
+                    children: "Товары не найдены"
+                }, void 0, false, {
+                    fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                    lineNumber: 305,
+                    columnNumber: 11
+                }, ("TURBOPACK compile-time value", void 0))
+            }, void 0, false, {
+                fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                lineNumber: 248,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            canNavigate && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowsBottom,
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButton, " ").concat(activeArrow === "prev" ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButtonActive : __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButtonInactive, " ").concat(isBeginning ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButtonDisabled : ""),
+                        onClick: handlePrev,
+                        "aria-label": "Previous",
+                        type: "button",
+                        disabled: isBeginning,
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                            width: "35",
+                            height: "30",
+                            viewBox: "0 0 20 20",
+                            fill: "none",
+                            stroke: "currentColor",
+                            className: activeArrow === "prev" ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowSvgActive : __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowSvgInactive,
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                d: "M12 15l-5-5 5-5"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                                lineNumber: 333,
+                                columnNumber: 15
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                            lineNumber: 321,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0))
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                        lineNumber: 310,
+                        columnNumber: 11
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButton, " ").concat(activeArrow === "next" ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButtonActive : __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButtonInactive, " ").concat(isEnd ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowButtonDisabled : ""),
+                        onClick: handleNext,
+                        "aria-label": "Next",
+                        type: "button",
+                        disabled: isEnd,
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                            width: "35",
+                            height: "30",
+                            viewBox: "0 0 20 20",
+                            fill: "none",
+                            stroke: "currentColor",
+                            className: activeArrow === "next" ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowSvgActive : __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].arrowSvgInactive,
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                d: "M8 15l5-5-5-5"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                                lineNumber: 359,
+                                columnNumber: 15
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                            lineNumber: 347,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0))
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                        lineNumber: 336,
+                        columnNumber: 11
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+                lineNumber: 309,
+                columnNumber: 9
+            }, ("TURBOPACK compile-time value", void 0))
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
+        lineNumber: 172,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_s(ProductDisplaySection, "4qZKLe4F1Kvv9QxABz4n0glGJ9w=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$useWindowSize$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useWindowSize"]
+    ];
+});
+_c = ProductDisplaySection;
+const __TURBOPACK__default__export__ = ProductDisplaySection;
+var _c;
+__turbopack_context__.k.register(_c, "ProductDisplaySection");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/components/ProductPage/ProductPageView.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Header$2f$Header$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/Header/Header.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/Footer/Footer.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$CartContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/contexts/CartContext.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$ToastProvider$2f$ToastProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/ToastProvider/ToastProvider.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$data$2f$products$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/data/products.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/src/components/ProductPage/ProductPageView.module.css [app-client] (css module)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$useWindowSize$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/hooks/useWindowSize.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$swiper$2d$react$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/swiper/swiper-react.mjs [app-client] (ecmascript)");
+// @ts-ignore
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/swiper/modules/index.mjs [app-client] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$pagination$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Pagination$3e$__ = __turbopack_context__.i("[project]/node_modules/swiper/modules/pagination.mjs [app-client] (ecmascript) <export default as Pagination>");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+const ProductPageView = (param)=>{
+    let { product } = param;
+    var _product_availableColors_;
+    _s();
+    const { addItem } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$CartContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCart"])();
+    const { showToast } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$ToastProvider$2f$ToastProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"])();
+    const [selectedSize, setSelectedSize] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(product.defaultSize);
+    var _product_availableColors__value;
+    const [selectedColor, setSelectedColor] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])((_product_availableColors__value = (_product_availableColors_ = product.availableColors[0]) === null || _product_availableColors_ === void 0 ? void 0 : _product_availableColors_.value) !== null && _product_availableColors__value !== void 0 ? _product_availableColors__value : "");
+    const [isColorListOpen, setIsColorListOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const colorPickerRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const [isSizeListOpen, setIsSizeListOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const sizePickerRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ProductPageView.useEffect": ()=>{
+            const handleClickOutside = {
+                "ProductPageView.useEffect.handleClickOutside": (event)=>{
+                    if (colorPickerRef.current && !colorPickerRef.current.contains(event.target)) {
+                        setIsColorListOpen(false);
+                    }
+                    if (sizePickerRef.current && !sizePickerRef.current.contains(event.target)) {
+                        setIsSizeListOpen(false);
+                    }
+                }
+            }["ProductPageView.useEffect.handleClickOutside"];
+            if (isColorListOpen || isSizeListOpen) {
+                document.addEventListener("mousedown", handleClickOutside);
+            }
+            return ({
+                "ProductPageView.useEffect": ()=>{
+                    document.removeEventListener("mousedown", handleClickOutside);
+                }
+            })["ProductPageView.useEffect"];
+        }
+    }["ProductPageView.useEffect"], [
+        isColorListOpen,
+        isSizeListOpen
+    ]);
+    const [isSizeGuideOpen, setIsSizeGuideOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [openSection, setOpenSection] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [selectedSection, setSelectedSection] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const contentRefs = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])({});
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ProductPageView.useEffect": ()=>{
+            if (!product.availableColors.some({
+                "ProductPageView.useEffect": (color)=>color.value === selectedColor
+            }["ProductPageView.useEffect"])) {
+                var _product_availableColors_;
+                var _product_availableColors__value;
+                setSelectedColor((_product_availableColors__value = (_product_availableColors_ = product.availableColors[0]) === null || _product_availableColors_ === void 0 ? void 0 : _product_availableColors_.value) !== null && _product_availableColors__value !== void 0 ? _product_availableColors__value : "");
+            }
+        }
+    }["ProductPageView.useEffect"], [
+        product.availableColors,
+        selectedColor
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ProductPageView.useEffect": ()=>{
+            if (!product.availableSizes.includes(selectedSize)) {
+                var _product_availableSizes_;
+                setSelectedSize((_product_availableSizes_ = product.availableSizes[0]) !== null && _product_availableSizes_ !== void 0 ? _product_availableSizes_ : "");
+            }
+        }
+    }["ProductPageView.useEffect"], [
+        product.availableSizes,
+        selectedSize
+    ]);
+    const handleToggleSection = (id)=>{
+        setSelectedSection(id);
+        setOpenSection((prev)=>prev === id ? null : id);
+    };
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ProductPageView.useEffect": ()=>{
+            if (selectedSection !== null && !product.sections.some({
+                "ProductPageView.useEffect": (section)=>section.id === selectedSection
+            }["ProductPageView.useEffect"])) {
+                setSelectedSection(null);
+            }
+        }
+    }["ProductPageView.useEffect"], [
+        product.sections,
+        selectedSection
+    ]);
+    const adjustSectionHeights = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "ProductPageView.useCallback[adjustSectionHeights]": ()=>{
+            product.sections.forEach({
+                "ProductPageView.useCallback[adjustSectionHeights]": (section)=>{
+                    const element = contentRefs.current[section.id];
+                    if (!element) {
+                        return;
+                    }
+                    if (openSection === section.id) {
+                        element.style.maxHeight = "".concat(element.scrollHeight, "px");
+                    } else {
+                        element.style.maxHeight = "0px";
+                    }
+                }
+            }["ProductPageView.useCallback[adjustSectionHeights]"]);
+        }
+    }["ProductPageView.useCallback[adjustSectionHeights]"], [
+        openSection,
+        product.sections
+    ]);
+    const { width } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$useWindowSize$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useWindowSize"])();
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ProductPageView.useEffect": ()=>{
+            adjustSectionHeights();
+        }
+    }["ProductPageView.useEffect"], [
+        adjustSectionHeights,
+        width
+    ]);
+    const colorOptions = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "ProductPageView.useMemo[colorOptions]": ()=>product.availableColors
+    }["ProductPageView.useMemo[colorOptions]"], [
+        product.availableColors
+    ]);
+    const selectedColorOption = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "ProductPageView.useMemo[selectedColorOption]": ()=>{
+            var _colorOptions_find, _ref;
+            return (_ref = (_colorOptions_find = colorOptions.find({
+                "ProductPageView.useMemo[selectedColorOption]": (option)=>option.value === selectedColor
+            }["ProductPageView.useMemo[selectedColorOption]"])) !== null && _colorOptions_find !== void 0 ? _colorOptions_find : colorOptions[0]) !== null && _ref !== void 0 ? _ref : {
+                hex: "#d1cdcb"
+            };
+        }
+    }["ProductPageView.useMemo[selectedColorOption]"], [
+        colorOptions,
+        selectedColor
+    ]);
+    const sizeGuideSection = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "ProductPageView.useMemo[sizeGuideSection]": ()=>{
+            return product.sections.find({
+                "ProductPageView.useMemo[sizeGuideSection]": (section)=>section.id === "size-chart"
+            }["ProductPageView.useMemo[sizeGuideSection]"]);
+        }
+    }["ProductPageView.useMemo[sizeGuideSection]"], [
+        product.sections
+    ]);
+    const colorSelectStyle = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "ProductPageView.useMemo[colorSelectStyle]": ()=>{
+            var _selectedColorOption_hex;
+            return {
+                "--color-dot": (_selectedColorOption_hex = selectedColorOption.hex) !== null && _selectedColorOption_hex !== void 0 ? _selectedColorOption_hex : "#d1cdcb"
+            };
+        }
+    }["ProductPageView.useMemo[colorSelectStyle]"], [
+        selectedColorOption
+    ]);
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].page,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Header$2f$Header$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                variant: "green"
+            }, void 0, false, {
+                fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                lineNumber: 148,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].main,
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].content,
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].gallery,
+                            "aria-live": "polite",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].imageViewport,
+                                children: width && width < 1025 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$swiper$2d$react$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Swiper"], {
+                                    slidesPerView: 1,
+                                    spaceBetween: 20,
+                                    // @ts-ignore
+                                    pagination: {
+                                        clickable: true
+                                    },
+                                    modules: [
+                                        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$pagination$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Pagination$3e$__["Pagination"]
+                                    ],
+                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].imageSlider,
+                                    children: product.images.map((image, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$swiper$2d$react$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SwiperSlide"], {
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].imageSlide,
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].imageSlideInner,
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                        src: image,
+                                                        alt: "".concat(product.title, " — фото ").concat(index + 1),
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].mainImage
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                        lineNumber: 166,
+                                                        columnNumber: 27
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                    lineNumber: 165,
+                                                    columnNumber: 25
+                                                }, ("TURBOPACK compile-time value", void 0))
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                lineNumber: 164,
+                                                columnNumber: 23
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        }, image + index, false, {
+                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                            lineNumber: 163,
+                                            columnNumber: 21
+                                        }, ("TURBOPACK compile-time value", void 0)))
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                    lineNumber: 154,
+                                    columnNumber: 17
+                                }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].imageColumn,
+                                    children: product.images.map((image, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].imageSlide,
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].imageSlideInner,
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                    src: image,
+                                                    alt: "".concat(product.title, " — фото ").concat(index + 1),
+                                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].mainImage
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                    lineNumber: 181,
+                                                    columnNumber: 25
+                                                }, ("TURBOPACK compile-time value", void 0))
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                lineNumber: 180,
+                                                columnNumber: 23
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        }, image + index, false, {
+                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                            lineNumber: 179,
+                                            columnNumber: 21
+                                        }, ("TURBOPACK compile-time value", void 0)))
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                    lineNumber: 177,
+                                    columnNumber: 17
+                                }, ("TURBOPACK compile-time value", void 0))
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                lineNumber: 152,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                            lineNumber: 151,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].info,
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].titleRow,
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].title,
+                                            children: product.title
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                            lineNumber: 195,
+                                            columnNumber: 15
+                                        }, ("TURBOPACK compile-time value", void 0)),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].price,
+                                            children: product.price
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                            lineNumber: 196,
+                                            columnNumber: 15
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                    lineNumber: 194,
+                                    columnNumber: 13
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].variantGroup,
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].variantGroupRow,
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].variantRow, " ").concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].variantRowCompact),
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].label,
+                                                            children: "Цвет"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                            lineNumber: 204,
+                                                            columnNumber: 19
+                                                        }, ("TURBOPACK compile-time value", void 0)),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].colorPickerWrapper, " ").concat(isColorListOpen ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].colorPickerWrapperOpen : "", " ").concat(selectedColorOption.hex === "#ffffff" || selectedColorOption.hex === "#fff" ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].colorPickerWrapperWhite : ""),
+                                                            ref: colorPickerRef,
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                    type: "button",
+                                                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizePickerButton,
+                                                                    onClick: ()=>setIsColorListOpen((prev)=>!prev),
+                                                                    "aria-label": "Выбрать цвет",
+                                                                    style: colorSelectStyle,
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].colorPickerButtonDot
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                            lineNumber: 223,
+                                                                            columnNumber: 23
+                                                                        }, ("TURBOPACK compile-time value", void 0)),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].colorPickerButtonText,
+                                                                            children: selectedColorOption.label
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                            lineNumber: 224,
+                                                                            columnNumber: 23
+                                                                        }, ("TURBOPACK compile-time value", void 0)),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                                            width: "14",
+                                                                            height: "9",
+                                                                            viewBox: "0 0 14 9",
+                                                                            fill: "none",
+                                                                            xmlns: "http://www.w3.org/2000/svg",
+                                                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].colorPickerArrow,
+                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                                                d: "M1 1l6 6 6-6",
+                                                                                stroke: "#525252",
+                                                                                strokeWidth: "2",
+                                                                                strokeLinecap: "round"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                                lineNumber: 235,
+                                                                                columnNumber: 25
+                                                                            }, ("TURBOPACK compile-time value", void 0))
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                            lineNumber: 227,
+                                                                            columnNumber: 23
+                                                                        }, ("TURBOPACK compile-time value", void 0))
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                    lineNumber: 216,
+                                                                    columnNumber: 21
+                                                                }, ("TURBOPACK compile-time value", void 0)),
+                                                                isColorListOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].colorList,
+                                                                    children: colorOptions.map((color)=>{
+                                                                        const isSelected = selectedColor === color.value;
+                                                                        var _color_hex;
+                                                                        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].colorListItem,
+                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                                type: "button",
+                                                                                className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].colorListItemButton, " ").concat(isSelected ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].colorListItemButtonSelected : ""),
+                                                                                onClick: ()=>{
+                                                                                    setSelectedColor(color.value);
+                                                                                    setIsColorListOpen(false);
+                                                                                },
+                                                                                "aria-label": "Выбрать цвет ".concat(color.label),
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].colorListItemDot,
+                                                                                        style: {
+                                                                                            backgroundColor: (_color_hex = color.hex) !== null && _color_hex !== void 0 ? _color_hex : "#d1cdcb",
+                                                                                            border: color.hex === "#ffffff" || color.hex === "#fff" ? "1px solid #d4d1cb" : "1px solid #ffffff80"
+                                                                                        }
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                                        lineNumber: 265,
+                                                                                        columnNumber: 33
+                                                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].colorListItemLabel,
+                                                                                        children: color.label
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                                        lineNumber: 276,
+                                                                                        columnNumber: 33
+                                                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                                lineNumber: 252,
+                                                                                columnNumber: 31
+                                                                            }, ("TURBOPACK compile-time value", void 0))
+                                                                        }, color.value, false, {
+                                                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                            lineNumber: 248,
+                                                                            columnNumber: 29
+                                                                        }, ("TURBOPACK compile-time value", void 0));
+                                                                    })
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                    lineNumber: 244,
+                                                                    columnNumber: 23
+                                                                }, ("TURBOPACK compile-time value", void 0))
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                            lineNumber: 205,
+                                                            columnNumber: 19
+                                                        }, ("TURBOPACK compile-time value", void 0))
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                    lineNumber: 201,
+                                                    columnNumber: 17
+                                                }, ("TURBOPACK compile-time value", void 0)),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].variantRow, " ").concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].variantRowCompact),
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].label,
+                                                            children: "Размер"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                            lineNumber: 290,
+                                                            columnNumber: 19
+                                                        }, ("TURBOPACK compile-time value", void 0)),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizePickerWrapper, " ").concat(isSizeListOpen ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizePickerWrapperOpen : ""),
+                                                            ref: sizePickerRef,
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                    type: "button",
+                                                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizePickerButton,
+                                                                    onClick: ()=>setIsSizeListOpen((prev)=>!prev),
+                                                                    "aria-label": "Выбрать размер",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizePickerButtonText,
+                                                                            children: selectedSize.toUpperCase()
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                            lineNumber: 303,
+                                                                            columnNumber: 23
+                                                                        }, ("TURBOPACK compile-time value", void 0)),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                                            width: "14",
+                                                                            height: "9",
+                                                                            viewBox: "0 0 14 9",
+                                                                            fill: "none",
+                                                                            xmlns: "http://www.w3.org/2000/svg",
+                                                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizePickerArrow,
+                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                                                d: "M1 1l6 6 6-6",
+                                                                                stroke: "#525252",
+                                                                                strokeWidth: "2",
+                                                                                strokeLinecap: "round"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                                lineNumber: 314,
+                                                                                columnNumber: 25
+                                                                            }, ("TURBOPACK compile-time value", void 0))
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                            lineNumber: 306,
+                                                                            columnNumber: 23
+                                                                        }, ("TURBOPACK compile-time value", void 0))
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                    lineNumber: 297,
+                                                                    columnNumber: 21
+                                                                }, ("TURBOPACK compile-time value", void 0)),
+                                                                isSizeListOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizeList,
+                                                                    children: product.availableSizes.map((size)=>{
+                                                                        const isSelected = selectedSize === size;
+                                                                        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizeListItem,
+                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                                type: "button",
+                                                                                className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizeListItemButton, " ").concat(isSelected ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizeListItemButtonSelected : ""),
+                                                                                onClick: ()=>{
+                                                                                    setSelectedSize(size);
+                                                                                    setIsSizeListOpen(false);
+                                                                                },
+                                                                                "aria-label": "Выбрать размер ".concat(size),
+                                                                                children: [
+                                                                                    isSelected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                                                        width: "16",
+                                                                                        height: "16",
+                                                                                        viewBox: "0 0 16 16",
+                                                                                        fill: "none",
+                                                                                        xmlns: "http://www.w3.org/2000/svg",
+                                                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizeListItemCheckmark,
+                                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                                                            d: "M13 4L6 11L3 8",
+                                                                                            stroke: "#525252",
+                                                                                            strokeWidth: "2",
+                                                                                            strokeLinecap: "round",
+                                                                                            strokeLinejoin: "round"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                                            lineNumber: 350,
+                                                                                            columnNumber: 37
+                                                                                        }, ("TURBOPACK compile-time value", void 0))
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                                        lineNumber: 342,
+                                                                                        columnNumber: 35
+                                                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                                                    !isSelected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizeListItemPlaceholder
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                                        lineNumber: 360,
+                                                                                        columnNumber: 35
+                                                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizeListItemLabel,
+                                                                                        children: size.toUpperCase()
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                                        lineNumber: 364,
+                                                                                        columnNumber: 33
+                                                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                                lineNumber: 328,
+                                                                                columnNumber: 31
+                                                                            }, ("TURBOPACK compile-time value", void 0))
+                                                                        }, size, false, {
+                                                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                            lineNumber: 327,
+                                                                            columnNumber: 29
+                                                                        }, ("TURBOPACK compile-time value", void 0));
+                                                                    })
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                    lineNumber: 323,
+                                                                    columnNumber: 23
+                                                                }, ("TURBOPACK compile-time value", void 0))
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                            lineNumber: 291,
+                                                            columnNumber: 19
+                                                        }, ("TURBOPACK compile-time value", void 0))
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                    lineNumber: 287,
+                                                    columnNumber: 17
+                                                }, ("TURBOPACK compile-time value", void 0))
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                            lineNumber: 200,
+                                            columnNumber: 15
+                                        }, ("TURBOPACK compile-time value", void 0)),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].countAndBuy,
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                type: "button",
+                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].addToCartButton,
+                                                onClick: ()=>{
+                                                    const catalogProduct = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$data$2f$products$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toCatalogProduct"])(product);
+                                                    addItem(catalogProduct, selectedSize, selectedColor, 1);
+                                                    showToast("Добавлено в корзину");
+                                                },
+                                                children: "Добавить в корзину"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                lineNumber: 377,
+                                                columnNumber: 17
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                            lineNumber: 376,
+                                            columnNumber: 15
+                                        }, ("TURBOPACK compile-time value", void 0)),
+                                        isSizeGuideOpen && sizeGuideSection && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizeGuideContent,
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizeGuideTitle,
+                                                    children: sizeGuideSection.title
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                    lineNumber: 392,
+                                                    columnNumber: 19
+                                                }, ("TURBOPACK compile-time value", void 0)),
+                                                sizeGuideSection.content.split("\n").map((paragraph, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].sizeGuideText,
+                                                        children: paragraph
+                                                    }, index, false, {
+                                                        fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                        lineNumber: 398,
+                                                        columnNumber: 23
+                                                    }, ("TURBOPACK compile-time value", void 0)))
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                            lineNumber: 391,
+                                            columnNumber: 17
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                    lineNumber: 199,
+                                    columnNumber: 13
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].accordion,
+                                    children: product.sections.map((section)=>{
+                                        const isOpen = openSection === section.id;
+                                        const isSelected = selectedSection === section.id;
+                                        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].accordionItem,
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                    type: "button",
+                                                    className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].accordionButton, " ").concat(isOpen ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].accordionButtonSelected : "", " ").concat(isOpen ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].accordionButtonOpen : ""),
+                                                    onClick: ()=>handleToggleSection(section.id),
+                                                    "aria-expanded": isOpen,
+                                                    children: [
+                                                        section.title,
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].accordionIcon,
+                                                            src: "/images/catalogs/diogonal.png",
+                                                            alt: "accordion-icon",
+                                                            width: 36,
+                                                            height: 36
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                            lineNumber: 421,
+                                                            columnNumber: 23
+                                                        }, ("TURBOPACK compile-time value", void 0))
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                    lineNumber: 412,
+                                                    columnNumber: 21
+                                                }, ("TURBOPACK compile-time value", void 0)),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    ref: (node)=>{
+                                                        contentRefs.current[section.id] = node;
+                                                    },
+                                                    className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].accordionContent, " ").concat(isOpen ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].accordionContentOpen : ""),
+                                                    "aria-hidden": !isOpen,
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].accordionContentInner,
+                                                        children: section.content.split("\n").map((paragraph, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                children: paragraph
+                                                            }, index, false, {
+                                                                fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                                lineNumber: 440,
+                                                                columnNumber: 27
+                                                            }, ("TURBOPACK compile-time value", void 0)))
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                        lineNumber: 438,
+                                                        columnNumber: 23
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                                    lineNumber: 429,
+                                                    columnNumber: 21
+                                                }, ("TURBOPACK compile-time value", void 0))
+                                            ]
+                                        }, section.id, true, {
+                                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                            lineNumber: 411,
+                                            columnNumber: 19
+                                        }, ("TURBOPACK compile-time value", void 0));
+                                    })
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                                    lineNumber: 406,
+                                    columnNumber: 13
+                                }, ("TURBOPACK compile-time value", void 0))
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                            lineNumber: 193,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0))
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                    lineNumber: 150,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0))
+            }, void 0, false, {
+                fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                lineNumber: 149,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].suggestions,
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                    title: "BESTSELLER",
+                    showShopNow: false,
+                    isBestseller: true
+                }, void 0, false, {
+                    fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                    lineNumber: 452,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0))
+            }, void 0, false, {
+                fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                lineNumber: 451,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+                lineNumber: 458,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0))
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/ProductPage/ProductPageView.tsx",
+        lineNumber: 147,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_s(ProductPageView, "j60l11ZECYzILbtiiYOkkJSBnFI=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$CartContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCart"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$ToastProvider$2f$ToastProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$useWindowSize$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useWindowSize"]
+    ];
+});
+_c = ProductPageView;
+const __TURBOPACK__default__export__ = ProductPageView;
+var _c;
+__turbopack_context__.k.register(_c, "ProductPageView");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/api/product/productApi.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+// API для страницы товара
+__turbopack_context__.s([
+    "fetchProductBySlug",
+    ()=>fetchProductBySlug
+]);
+const API_BASE_URL = "http://158.160.115.103:8000/api/catalog/";
+// Кеш для запросов
+const cache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
+// Преобразование API ответа в ProductDetail
+const transformApiProduct = (apiProduct)=>{
+    var _availableColors_;
+    const baseUrl = "http://158.160.115.103:8000";
+    // Преобразуем изображения, добавляя базовый URL если нужно
+    const images = apiProduct.images.map((img)=>{
+        if (img.startsWith("http")) {
+            return img;
+        }
+        return img.startsWith("/") ? "".concat(baseUrl).concat(img) : "".concat(baseUrl, "/").concat(img);
+    });
+    // Парсим цену
+    const priceValue = parseFloat(apiProduct.price.replace(/\s/g, "").replace(",", ".")) || 0;
+    const formattedPrice = "".concat(Math.round(priceValue).toLocaleString("ru-RU"), " ₽");
+    // Преобразуем размеры
+    const availableSizes = apiProduct.sizes.map((size)=>size.slug);
+    const defaultSize = availableSizes[0] || "m";
+    // Преобразуем цвета
+    const availableColors = apiProduct.colors.map((color)=>({
+            label: color.value,
+            value: color.slug,
+            hex: color.hex
+        }));
+    // Определяем категорию из slug
+    const category = extractCategoryFromSlug(apiProduct.slug) || "T-shirts";
+    // Генерируем ID из slug
+    const id = hashString(apiProduct.slug);
+    // Создаем секции для аккордеона
+    const sections = [
+        {
+            id: "description",
+            title: "Описание",
+            content: apiProduct.description || "Описание товара отсутствует."
+        }
+    ];
+    return {
+        id,
+        slug: apiProduct.slug,
+        title: apiProduct.name,
+        price: formattedPrice,
+        priceValue: Math.round(priceValue),
+        images,
+        isNew: apiProduct.is_new,
+        category,
+        color: ((_availableColors_ = availableColors[0]) === null || _availableColors_ === void 0 ? void 0 : _availableColors_.value) || "green",
+        size: defaultSize,
+        sortOrder: 0,
+        sku: apiProduct.slug,
+        defaultSize,
+        availableSizes,
+        availableColors,
+        sections
+    };
+};
+// Извлечение категории из slug
+const extractCategoryFromSlug = (slug)=>{
+    const slugLower = slug.toLowerCase();
+    if (slugLower.includes("pant") || slugLower.includes("брюк")) return "Pants";
+    if (slugLower.includes("jean")) return "Jeans";
+    if (slugLower.includes("t-shirt") || slugLower.includes("футболк")) return "T-shirts";
+    if (slugLower.includes("zip") && slugLower.includes("hood")) return "Zip hoodies";
+    if (slugLower.includes("jacket")) return "Jackets";
+    if (slugLower.includes("hoodie")) return "Hoodies";
+    if (slugLower.includes("short")) return "Shorts";
+    return null;
+};
+// Простая функция хеширования для генерации ID из slug
+const hashString = (str)=>{
+    let hash = 0;
+    for(let i = 0; i < str.length; i++){
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+};
+const fetchProductBySlug = async (slug)=>{
+    const cacheKey = slug;
+    const cached = cache.get(cacheKey);
+    // Проверяем кеш
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+        return cached.data;
+    }
+    try {
+        const url = "".concat(API_BASE_URL).concat(slug, "/");
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            cache: "no-store"
+        });
+        if (!response.ok) {
+            if (response.status === 404) {
+                return null;
+            }
+            throw new Error("API error: ".concat(response.status, " ").concat(response.statusText));
+        }
+        const data = await response.json();
+        const transformedProduct = transformApiProduct(data);
+        // Сохраняем в кеш
+        cache.set(cacheKey, {
+            data: transformedProduct,
+            timestamp: Date.now()
+        });
+        return transformedProduct;
+    } catch (error) {
+        console.error("Error fetching product by slug:", error);
+        return null;
+    }
+};
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/app/catalog/[slug]/ProductPageClient.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ProductPage/ProductPageView.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$api$2f$product$2f$productApi$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/api/product/productApi.ts [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+const ProductPageClient = (param)=>{
+    let { slug } = param;
+    _s();
+    const [product, setProduct] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ProductPageClient.useEffect": ()=>{
+            const loadProduct = {
+                "ProductPageClient.useEffect.loadProduct": async ()=>{
+                    setIsLoading(true);
+                    try {
+                        const productData = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$api$2f$product$2f$productApi$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchProductBySlug"])(slug);
+                        if (!productData) {
+                            (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["notFound"])();
+                        }
+                        setProduct(productData);
+                    } catch (error) {
+                        console.error("Error loading product:", error);
+                        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["notFound"])();
+                    } finally{
+                        setIsLoading(false);
+                    }
+                }
+            }["ProductPageClient.useEffect.loadProduct"];
+            loadProduct();
+        }
+    }["ProductPageClient.useEffect"], [
+        slug
+    ]);
+    if (isLoading) {
+        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            style: {
+                padding: "100px 20px",
+                textAlign: "center"
+            },
+            children: "Загрузка..."
+        }, void 0, false, {
+            fileName: "[project]/src/app/catalog/[slug]/ProductPageClient.tsx",
+            lineNumber: 39,
+            columnNumber: 7
+        }, ("TURBOPACK compile-time value", void 0));
+    }
+    if (!product) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["notFound"])();
+    }
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductPage$2f$ProductPageView$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+        product: product
+    }, void 0, false, {
+        fileName: "[project]/src/app/catalog/[slug]/ProductPageClient.tsx",
+        lineNumber: 49,
+        columnNumber: 10
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_s(ProductPageClient, "rnAB90UnsrDjQcwbGUySdziVjCE=");
+_c = ProductPageClient;
+const __TURBOPACK__default__export__ = ProductPageClient;
+var _c;
+__turbopack_context__.k.register(_c, "ProductPageClient");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/app/catalog/[slug]/page.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__,
+    "dynamicParams",
+    ()=>dynamicParams,
+    "generateStaticParams",
+    ()=>generateStaticParams
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$catalog$2f5b$slug$5d2f$ProductPageClient$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/catalog/[slug]/ProductPageClient.tsx [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+const generateStaticParams = async ()=>{
+    return [];
+};
+const dynamicParams = true;
+const ProductPage = ()=>{
+    _s();
+    const params = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useParams"])();
+    const slug = params === null || params === void 0 ? void 0 : params.slug;
+    if (!slug) {
+        return null;
+    }
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$catalog$2f5b$slug$5d2f$ProductPageClient$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+        slug: slug
+    }, void 0, false, {
+        fileName: "[project]/src/app/catalog/[slug]/page.tsx",
+        lineNumber: 24,
+        columnNumber: 10
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_s(ProductPage, "+jVsTcECDRo3yq2d7EQxlN9Ixog=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useParams"]
+    ];
+});
+_c = ProductPage;
+const __TURBOPACK__default__export__ = ProductPage;
+var _c;
+__turbopack_context__.k.register(_c, "ProductPage");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+]);
+
+//# sourceMappingURL=src_b308ea24._.js.map

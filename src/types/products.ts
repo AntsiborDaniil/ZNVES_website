@@ -1,5 +1,6 @@
 export type CatalogProduct = {
     id: number;
+    slug?: string; // Добавляем slug для ссылок на товары
     title: string;
     price: string;
     priceValue: number;
@@ -25,6 +26,7 @@ export type ProductColorOption = {
 
 export type ProductDetail = CatalogProduct & {
     sku: string;
+    slug?: string; // Добавляем slug для ссылок
     defaultSize: string;
     availableSizes: string[];
     availableColors: ProductColorOption[];

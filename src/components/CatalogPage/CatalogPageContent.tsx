@@ -14,8 +14,18 @@ import ProductCard from "../ProductCard/ProductCard";
 import Link from "next/link";
 import Image from "next/image";
 import type { CatalogProduct } from "../../types/products";
-import { fetchCatalogProductsByCategory, normalizeCategoryForApi } from "../../api/catalog/catalogApi";
-import { fetchNewInProducts, normalizeCategoryForApi as normalizeCategoryForNewInApi } from "../../api/new-in/newInApi";
+import {
+  fetchCatalogProductsByCategory,
+  normalizeCategoryForApi,
+} from "../../api/catalog/catalogApi";
+import {
+  fetchNewInProducts,
+  normalizeCategoryForApi as normalizeCategoryForNewInApi,
+} from "../../api/new-in/newInApi";
+
+type CatalogPageContentProps = {
+  title: string;
+};
 
 const categories = [
   "All",
@@ -255,14 +265,22 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
         if (title === "NEW IN") {
           // Для страницы NEW IN загружаем только новые товары
           const normalizedCategory = getNormalizedCategory();
-          const categoryForApi = normalizedCategory === "All" ? undefined : normalizeCategoryForNewInApi(normalizedCategory);
+          const categoryForApi =
+            normalizedCategory === "All"
+              ? undefined
+              : normalizeCategoryForNewInApi(normalizedCategory);
           const newInProducts = await fetchNewInProducts(categoryForApi);
           setProducts(newInProducts);
         } else {
           // Для страницы CATALOG загружаем все товары с учетом категории
           const normalizedCategory = getNormalizedCategory();
-          const categoryForApi = normalizedCategory === "All" ? undefined : normalizeCategoryForApi(normalizedCategory);
-          const catalogProducts = await fetchCatalogProductsByCategory(categoryForApi);
+          const categoryForApi =
+            normalizedCategory === "All"
+              ? undefined
+              : normalizeCategoryForApi(normalizedCategory);
+          const catalogProducts = await fetchCatalogProductsByCategory(
+            categoryForApi
+          );
           setProducts(catalogProducts);
         }
       } catch (error) {
@@ -537,7 +555,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
               {filteredProducts.map((product) => (
                 <Link
                   key={product.id}
-                  href={`/catalog/${product.id}`}
+                  href={`/catalog/${product.slug || product.id}`}
                   className={styles.catalogCardLink}
                   aria-label={`Открыть товар ${product.title}`}
                 >
@@ -555,8 +573,8 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
 
             {filteredProducts.length === 0 && (
               <p className={styles.emptyState}>
-                Нет товаров, соответствующих выбранным фильтрам. Попробуйте изменить
-                параметры.
+                Нет товаров, соответствующих выбранным фильтрам. Попробуйте
+                изменить параметры.
               </p>
             )}
           </>

@@ -34,6 +34,7 @@ const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProd
 
   return {
     id,
+    slug: apiProduct.slug,
     title: apiProduct.name,
     price: formattedPrice,
     priceValue,

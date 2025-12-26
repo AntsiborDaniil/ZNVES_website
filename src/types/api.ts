@@ -13,3 +13,11 @@ export type CatalogApiParams = {
   is_new?: boolean;
 };
 
+// Реэкспорт типов для детальной страницы товара
+export type {
+  ApiProductDetail,
+  ApiProductSize,
+  ApiProductColor,
+  ApiWarehouseItem,
+} from "../api/product/productApi";
+

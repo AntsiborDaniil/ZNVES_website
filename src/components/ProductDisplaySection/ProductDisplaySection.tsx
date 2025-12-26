@@ -150,7 +150,7 @@ const ProductDisplaySection = ({
     const prefetchCount = Math.min(products.length, 6);
     const routesToPrefetch = products
       .slice(0, prefetchCount)
-      .map((product) => `/catalog/${product.id}`);
+      .map((product) => `/catalog/${product.slug || product.id}`);
 
     routesToPrefetch.forEach((route) => {
       void router.prefetch(route);
@@ -284,7 +284,7 @@ const ProductDisplaySection = ({
             products.map((product) => (
               <SwiperSlide key={product.id} className={styles.slideItem}>
                 <Link
-                  href={`/catalog/${product.id}`}
+                  href={`/catalog/${product.slug || product.id}`}
                   className={styles.slideLink}
                   aria-label={`Перейти к товару ${product.title}`}
                 >

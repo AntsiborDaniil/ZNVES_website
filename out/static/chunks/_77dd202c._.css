@@ -2182,10 +2182,6 @@
   padding: 140px 66px;
 }
 
-.ProductCard-module__g-pugq__imageWrapper:hover {
-  padding: 0;
-}
-
 .ProductCard-module__g-pugq__productCard:hover {
   padding: 0;
   transform: none;

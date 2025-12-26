@@ -2736,6 +2736,7 @@ const transformApiProduct = (apiProduct, index)=>{
     const id = hashString(apiProduct.slug) || index + 1;
     return {
         id,
+        slug: apiProduct.slug,
         title: apiProduct.name,
         price: formattedPrice,
         priceValue,
@@ -2857,6 +2858,7 @@ const transformApiProduct = (apiProduct, index)=>{
     const id = hashString(apiProduct.slug) || index + 1;
     return {
         id,
+        slug: apiProduct.slug,
         title: apiProduct.name,
         price: formattedPrice,
         priceValue,
@@ -3094,7 +3096,7 @@ const FilterDropdown = ({ label, value, options, onChange })=>{
                         children: displayText
                     }, void 0, false, {
                         fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                        lineNumber: 132,
+                        lineNumber: 142,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3102,13 +3104,13 @@ const FilterDropdown = ({ label, value, options, onChange })=>{
                         "aria-hidden": "true"
                     }, void 0, false, {
                         fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                        lineNumber: 133,
+                        lineNumber: 143,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                lineNumber: 124,
+                lineNumber: 134,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -3128,24 +3130,24 @@ const FilterDropdown = ({ label, value, options, onChange })=>{
                             children: option.label
                         }, void 0, false, {
                             fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                            lineNumber: 140,
+                            lineNumber: 150,
                             columnNumber: 15
                         }, ("TURBOPACK compile-time value", void 0))
                     }, option.value, false, {
                         fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                        lineNumber: 139,
+                        lineNumber: 149,
                         columnNumber: 13
                     }, ("TURBOPACK compile-time value", void 0));
                 })
             }, void 0, false, {
                 fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                lineNumber: 135,
+                lineNumber: 145,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-        lineNumber: 118,
+        lineNumber: 128,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -3408,7 +3410,7 @@ const CatalogPageContent = ({ title })=>{
                             children: title
                         }, void 0, false, {
                             fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                            lineNumber: 444,
+                            lineNumber: 462,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3425,23 +3427,23 @@ const CatalogPageContent = ({ title })=>{
                                 height: 24
                             }, void 0, false, {
                                 fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                                lineNumber: 453,
+                                lineNumber: 471,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                            lineNumber: 445,
+                            lineNumber: 463,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                    lineNumber: 443,
+                    lineNumber: 461,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                lineNumber: 442,
+                lineNumber: 460,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3464,13 +3466,13 @@ const CatalogPageContent = ({ title })=>{
                                 children: category
                             }, category, false, {
                                 fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                                lineNumber: 476,
+                                lineNumber: 494,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0));
                         })
                     }, void 0, false, {
                         fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                        lineNumber: 464,
+                        lineNumber: 482,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3487,18 +3489,18 @@ const CatalogPageContent = ({ title })=>{
                             height: 44
                         }, void 0, false, {
                             fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                            lineNumber: 497,
+                            lineNumber: 515,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                        lineNumber: 489,
+                        lineNumber: 507,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                lineNumber: 463,
+                lineNumber: 481,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             isFiltersOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3514,7 +3516,7 @@ const CatalogPageContent = ({ title })=>{
                             onChange: handleColorChange
                         }, void 0, false, {
                             fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                            lineNumber: 509,
+                            lineNumber: 527,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(FilterDropdown, {
@@ -3524,7 +3526,7 @@ const CatalogPageContent = ({ title })=>{
                             onChange: handleSizeChange
                         }, void 0, false, {
                             fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                            lineNumber: 515,
+                            lineNumber: 533,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(FilterDropdown, {
@@ -3534,18 +3536,18 @@ const CatalogPageContent = ({ title })=>{
                             onChange: handleOrderChange
                         }, void 0, false, {
                             fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                            lineNumber: 521,
+                            lineNumber: 539,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                    lineNumber: 508,
+                    lineNumber: 526,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                lineNumber: 507,
+                lineNumber: 525,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -3555,14 +3557,14 @@ const CatalogPageContent = ({ title })=>{
                     children: "Загрузка..."
                 }, void 0, false, {
                     fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                    lineNumber: 533,
+                    lineNumber: 551,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$CatalogPage$2f$CatalogPage$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].productsGrid,
                             children: filteredProducts.map((product)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                    href: `/catalog/${product.id}`,
+                                    href: `/catalog/${product.slug || product.id}`,
                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$CatalogPage$2f$CatalogPage$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].catalogCardLink,
                                     "aria-label": `Открыть товар ${product.title}`,
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3574,17 +3576,17 @@ const CatalogPageContent = ({ title })=>{
                                         showAddToCart: false
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                                        lineNumber: 544,
+                                        lineNumber: 562,
                                         columnNumber: 19
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, product.id, false, {
                                     fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                                    lineNumber: 538,
+                                    lineNumber: 556,
                                     columnNumber: 17
                                 }, ("TURBOPACK compile-time value", void 0)))
                         }, void 0, false, {
                             fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                            lineNumber: 536,
+                            lineNumber: 554,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         filteredProducts.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3592,14 +3594,14 @@ const CatalogPageContent = ({ title })=>{
                             children: "Нет товаров, соответствующих выбранным фильтрам. Попробуйте изменить параметры."
                         }, void 0, false, {
                             fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                            lineNumber: 557,
+                            lineNumber: 575,
                             columnNumber: 15
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true)
             }, void 0, false, {
                 fileName: "[project]/src/components/CatalogPage/CatalogPageContent.tsx",
-                lineNumber: 531,
+                lineNumber: 549,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]

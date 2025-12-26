@@ -6,6 +6,7 @@ import styles from "./MobileCartItem.module.css";
 
 export interface MobileCartItemProps {
     productId: number;
+    productSlug?: string;
     productTitle: string;
     productImage: string;
     colorLabel: string;
@@ -21,6 +22,7 @@ export interface MobileCartItemProps {
 
 const MobileCartItem = ({
     productId,
+    productSlug,
     productTitle,
     productImage,
     colorLabel,
@@ -33,6 +35,7 @@ const MobileCartItem = ({
     onQuantityIncrease,
     formatPrice,
 }: MobileCartItemProps) => {
+    const productLink = productSlug || productId;
     return (
         <div className={styles.cartItem}>
             <button
@@ -50,7 +53,7 @@ const MobileCartItem = ({
             </button>
 
             <Link
-                href={`/catalog/${productId}`}
+                href={`/catalog/${productLink}`}
                 className={styles.itemImageLink}
             >
                 <div className={styles.itemImageWrapper}>
@@ -66,7 +69,7 @@ const MobileCartItem = ({
 
             <div className={styles.itemInfo}>
                 <Link
-                    href={`/catalog/${productId}`}
+                    href={`/catalog/${productLink}`}
                     className={styles.itemTitle}
                 >
                     {productTitle}

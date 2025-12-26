@@ -79,13 +79,14 @@ const CatalogGridCard = ({ product }: CatalogGridCardProps) => {
       return;
     }
 
-    void router.prefetch(`/catalog/${product.id}`);
+    const productSlug = product.slug || product.id;
+    void router.prefetch(`/catalog/${productSlug}`);
     hasPrefetchedRef.current = true;
-  }, [router, product.id]);
+  }, [router, product.id, product.slug]);
 
   return (
     <Link
-      href={`/catalog/${product.id}`}
+      href={`/catalog/${product.slug || product.id}`}
       className={styles.catalogCardLink}
       aria-label={`Открыть товар ${product.title}`}
       onPointerEnter={prefetchProduct}

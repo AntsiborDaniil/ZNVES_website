@@ -28,7 +28,7 @@ const CartItem = ({
   return (
     <div className={styles.cartItem}>
       <Link
-        href={`/catalog/${item.productId}`}
+        href={`/catalog/${item.product.slug || item.productId}`}
         className={styles.cartItemImageLink}
       >
         <Image
@@ -44,7 +44,7 @@ const CartItem = ({
           <div className={styles.cartItemInfoTop}>
             <h2 className={styles.cartItemCategory}>{item.product.category}</h2>
             <Link
-              href={`/catalog/${item.productId}`}
+              href={`/catalog/${item.product.slug || item.productId}`}
               className={styles.cartItemTitle}
             >
               {item.product.title}
@@ -107,7 +107,7 @@ const CartItem = ({
       <div className={styles.mobile}>
         <div className={styles.mobileHeader}>
           <Link
-            href={`/catalog/${item.productId}`}
+            href={`/catalog/${item.product.slug || item.productId}`}
             className={styles.mobileLink}
           >
             <Image
