@@ -23,6 +23,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
+import { fetchProductImagesByColor } from "../../api/product/productApi";
 
 type ProductPageViewProps = {
   product: ProductDetail;
@@ -35,6 +36,8 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
   const [selectedColor, setSelectedColor] = useState<string>(
     product.availableColors[0]?.value ?? ""
   );
+  const [currentImages, setCurrentImages] = useState<string[]>(product.images);
+  const [isLoadingImages, setIsLoadingImages] = useState(false);
   const [isColorListOpen, setIsColorListOpen] = useState(false);
   const colorPickerRef = useRef<HTMLDivElement>(null);
   const [isSizeListOpen, setIsSizeListOpen] = useState(false);
@@ -83,6 +86,40 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
       setSelectedSize(product.availableSizes[0] ?? "");
     }
   }, [product.availableSizes, selectedSize]);
+
+  // Загрузка изображений при изменении цвета
+  useEffect(() => {
+    const loadImagesByColor = async () => {
+      if (!product.slug || !selectedColor) {
+        // Если нет slug или цвета, используем базовые изображения
+        setCurrentImages(product.images);
+        return;
+      }
+
+      setIsLoadingImages(true);
+      try {
+        const colorImages = await fetchProductImagesByColor(
+          product.slug,
+          selectedColor
+        );
+        
+        // Если получили изображения, используем их, иначе используем базовые
+        if (colorImages.length > 0) {
+          setCurrentImages(colorImages);
+        } else {
+          setCurrentImages(product.images);
+        }
+      } catch (error) {
+        console.error("Error loading images by color:", error);
+        // В случае ошибки используем базовые изображения
+        setCurrentImages(product.images);
+      } finally {
+        setIsLoadingImages(false);
+      }
+    };
+
+    loadImagesByColor();
+  }, [product.slug, selectedColor, product.images]);
 
   const handleToggleSection = (id: string) => {
     setSelectedSection(id);
@@ -159,7 +196,7 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
                   modules={[Pagination]}
                   className={styles.imageSlider}
                 >
-                  {product.images.map((image, index) => (
+                  {currentImages.map((image, index) => (
                     <SwiperSlide key={image + index}>
                       <div className={styles.imageSlide}>
                         <div className={styles.imageSlideInner}>
@@ -175,7 +212,7 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
                 </Swiper>
               ) : (
                 <div className={styles.imageColumn}>
-                  {product.images.map((image, index) => (
+                  {currentImages.map((image, index) => (
                     <div key={image + index} className={styles.imageSlide}>
                       <div className={styles.imageSlideInner}>
                         <img

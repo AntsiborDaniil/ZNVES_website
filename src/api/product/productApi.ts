@@ -175,3 +175,62 @@ export const fetchProductBySlug = async (
   }
 };
 
+// Кеш для изображений по цвету
+const colorImagesCache = new Map<string, { data: string[]; timestamp: number }>();
+const COLOR_IMAGES_CACHE_DURATION = 5 * 60 * 1000; // 5 минут
+
+// Функция для получения изображений товара по цвету
+export const fetchProductImagesByColor = async (
+  productSlug: string,
+  colorSlug: string
+): Promise<string[]> => {
+  const cacheKey = `${productSlug}-${colorSlug}`;
+  const cached = colorImagesCache.get(cacheKey);
+  
+  // Проверяем кеш
+  if (cached && Date.now() - cached.timestamp < COLOR_IMAGES_CACHE_DURATION) {
+    return cached.data;
+  }
+
+  try {
+    const url = `${API_BASE_URL}${productSlug}/${colorSlug}/`;
+    const baseUrl = "http://158.160.115.103:8000";
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return [];
+      }
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+
+    const imagePaths: string[] = await response.json();
+    
+    // Преобразуем пути изображений, добавляя базовый URL если нужно
+    const images = imagePaths.map((img) => {
+      if (img.startsWith("http")) {
+        return img;
+      }
+      return img.startsWith("/") ? `${baseUrl}${img}` : `${baseUrl}/${img}`;
+    });
+
+    // Сохраняем в кеш
+    colorImagesCache.set(cacheKey, {
+      data: images,
+      timestamp: Date.now(),
+    });
+
+    return images;
+  } catch (error) {
+    console.error("Error fetching product images by color:", error);
+    return [];
+  }
+};
+
