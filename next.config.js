@@ -24,6 +24,7 @@ const cspDirectives = {
     "https://*.tile.openstreetmap.org",
     "https://*.2gis.com",
     "https://widgets.2gis.com",
+    "http://158.160.115.103:8000",
   ],
   "font-src": ["'self'", "data:"],
   "connect-src": [
@@ -36,6 +37,7 @@ const cspDirectives = {
     "https://nominatim.openstreetmap.org",
     "https://*.2gis.com",
     "https://widgets.2gis.com",
+    "http://158.160.115.103:8000",
   ],
   "frame-src": [
     "'self'",
@@ -77,8 +79,20 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: 'export',
+  distDir: 'out',
+  compress: true,
+  poweredByHeader: false,
   images: {
-    qualities: [75, 80, 85, 90, 95, 100],
+    unoptimized: true, // Для статического экспорта
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
   },
   async headers() {
     return [

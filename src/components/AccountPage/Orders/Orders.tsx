@@ -468,7 +468,6 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
       {/* Остальные заказы - под деталями выбранного */}
       {otherOrders.length > 0 && (
         <div className={styles.otherOrdersSection}>
-          <h2 className={styles.otherOrdersTitle}>Другие заказы</h2>
           <div className={styles.ordersList}>
             {otherOrders.map((order) => (
               <div

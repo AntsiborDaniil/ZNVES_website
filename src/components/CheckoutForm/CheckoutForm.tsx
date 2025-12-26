@@ -879,9 +879,35 @@ const CheckoutForm = ({
                 <div className={styles.paymentButtonContent}>
                   <Image
                     src="/images/checkout/sbp.png"
-                    alt="Сбербанк"
+                    alt="СБП"
                     width={54}
                     height={30}
+                    className={styles.paymentButtonIcon}
+                  />
+                </div>
+              </label>
+              <label className={styles.paymentButton}>
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="card"
+                  checked={formData.paymentMethod === "card"}
+                  onChange={handleInputChange}
+                  className={styles.radioInput}
+                />
+                <div className={styles.paymentButtonContent}>
+                  <Image
+                    src="/images/checkout/card.png"
+                    alt="Картой онлайн"
+                    width={86}
+                    height={24}
+                    className={styles.paymentButtonIcon}
+                  />
+                  <Image
+                    src="/images/checkout/cardText.png"
+                    alt="Онлайн"
+                    width={86}
+                    height={16}
                     className={styles.paymentButtonIcon}
                   />
                 </div>
@@ -920,32 +946,6 @@ const CheckoutForm = ({
                     alt="Долями"
                     width={73}
                     height={14}
-                    className={styles.paymentButtonIcon}
-                  />
-                </div>
-              </label>
-              <label className={styles.paymentButton}>
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="card"
-                  checked={formData.paymentMethod === "card"}
-                  onChange={handleInputChange}
-                  className={styles.radioInput}
-                />
-                <div className={styles.paymentButtonContent}>
-                  <Image
-                    src="/images/checkout/card.png"
-                    alt="Картой онлайн"
-                    width={86}
-                    height={24}
-                    className={styles.paymentButtonIcon}
-                  />
-                  <Image
-                    src="/images/checkout/cardText.png"
-                    alt="Онлайн"
-                    width={86}
-                    height={16}
                     className={styles.paymentButtonIcon}
                   />
                 </div>
@@ -1088,24 +1088,24 @@ const CheckoutForm = ({
                     );
                   })}
                 </div>
-                <div className={styles.summaryRow}>
-                  <span className={styles.summaryLabel}>Доставка:</span>
-                  <span className={styles.summaryValue}>
-                    {formData.deliveryMethod === "pickup"
-                      ? "Бесплатно"
-                      : formatPrice(
-                          deliveryPrices[
-                            formData.deliveryMethod as keyof typeof deliveryPrices
-                          ] || 0
-                        )}
-                  </span>
-                </div>
-                <div className={styles.summaryRow}>
-                  <span className={styles.summaryLabel}>Товаров на:</span>
-                  <span className={styles.summaryValue}>
-                    {formatPrice(getTotalPrice())}
-                  </span>
-                </div>
+              </div>
+              <div className={styles.summaryRow}>
+                <span className={styles.summaryLabel}>Доставка:</span>
+                <span className={styles.summaryValue}>
+                  {formData.deliveryMethod === "pickup"
+                    ? "Бесплатно"
+                    : formatPrice(
+                        deliveryPrices[
+                          formData.deliveryMethod as keyof typeof deliveryPrices
+                        ] || 0
+                      )}
+                </span>
+              </div>
+              <div className={styles.summaryRow}>
+                <span className={styles.summaryLabel}>Товаров на:</span>
+                <span className={styles.summaryValue}>
+                  {formatPrice(getTotalPrice())}
+                </span>
               </div>
               <div className={styles.orderSummaryBlock}>
                 <div className={styles.orderSummary}>

@@ -13,12 +13,14 @@
 .productCard:hover,
 .productCard:focus-visible {
   transform: none;
+  padding: 0;
 }
 
 .imageContainer {
   position: relative;
   width: 100%;
   aspect-ratio: 1;
+  overflow: hidden;
 }
 
 .productImage {
@@ -27,6 +29,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   opacity: 0;
   transition: opacity 0.45s ease;
 }
@@ -204,13 +207,13 @@
   .productTitle {
     margin-top: 5px;
     font-weight: 400;
-    font-size: 13;
+    font-size: 13px;
     line-height: 13.88px;
   }
 
   .productPrice {
     font-weight: 400;
-    font-size: 13;
+    font-size: 13px;
     line-height: 13.88px;
   }
 

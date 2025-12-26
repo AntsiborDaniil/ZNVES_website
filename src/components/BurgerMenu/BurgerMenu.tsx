@@ -204,8 +204,8 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
               <Image
                 src="/images/burger/cabinet.png"
                 alt=""
-                width={12}
-                height={12}
+                width={14}
+                height={16}
                 className={styles.menuIcon}
               />
               ЛИЧНЫЙ КАБИНЕТ
@@ -220,8 +220,8 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
               <Image
                 src="/images/burger/cart.png"
                 alt=""
-                width={13}
-                height={13}
+                width={14}
+                height={14}
                 className={styles.menuIcon}
               />
               КОРЗИНА

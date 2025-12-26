@@ -54,7 +54,7 @@
 
 .rightIcons {
   display: flex;
-  gap: 15px;
+  gap: 25px;
   align-items: center;
   justify-self: end;
 }
@@ -66,13 +66,13 @@
   }
 
   .rightIcons {
-    gap: 15px;
+    gap: 20px;
   }
 }
 
 @media (max-width: 1024px) {
   .header {
-    padding: 13px 18px 15px 18px;
+    padding: 13px 10px 15px 10px;
   }
 
   .logoImage {

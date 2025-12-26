@@ -43,7 +43,7 @@ const OrderSuccessModal = ({
         <h2 className={styles.modalTitle}>Спасибо за Ваш заказ!</h2>
         <div className={styles.orderNumber}>№{orderNumber}</div>
         <p className={styles.modalText}>
-          Отследить ваш заказ Вы можете в личном кабинете
+          Отследить ваш заказ Вы можете <br/>в личном кабинете
         </p>
         <div className={styles.modalButtons}>
           <button

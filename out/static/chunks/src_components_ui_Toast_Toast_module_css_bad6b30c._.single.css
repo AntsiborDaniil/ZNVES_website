@@ -1,0 +1,88 @@
+/* [project]/src/components/ui/Toast/Toast.module.css [app-client] (css) */
+.Toast-module__9WWWZG__toast {
+  color: #f2f0ec;
+  z-index: 1000;
+  background-color: #525252;
+  border-radius: 12px;
+  max-width: 400px;
+  padding: 16px 24px;
+  animation: .3s ease-out Toast-module__9WWWZG__slideIn;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+}
+
+.Toast-module__9WWWZG__toastClosing {
+  animation: .3s ease-in forwards Toast-module__9WWWZG__slideOut;
+}
+
+.Toast-module__9WWWZG__toastMessage {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+@keyframes Toast-module__9WWWZG__slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes Toast-module__9WWWZG__slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@media (max-width: 480px) {
+  .Toast-module__9WWWZG__toast {
+    max-width: none;
+    animation: .3s ease-out Toast-module__9WWWZG__slideInMobile;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+  }
+
+  .Toast-module__9WWWZG__toastClosing {
+    animation: .3s ease-in forwards Toast-module__9WWWZG__slideOutMobile;
+  }
+}
+
+@keyframes Toast-module__9WWWZG__slideInMobile {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes Toast-module__9WWWZG__slideOutMobile {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+/*# sourceMappingURL=src_components_ui_Toast_Toast_module_css_bad6b30c._.single.css.map*/

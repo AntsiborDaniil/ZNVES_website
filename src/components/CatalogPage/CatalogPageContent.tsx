@@ -14,11 +14,8 @@ import ProductCard from "../ProductCard/ProductCard";
 import Link from "next/link";
 import Image from "next/image";
 import type { CatalogProduct } from "../../types/products";
-
-type CatalogPageContentProps = {
-  title: string;
-  products: CatalogProduct[];
-};
+import { fetchCatalogProductsByCategory, normalizeCategoryForApi } from "../../api/catalog/catalogApi";
+import { fetchNewInProducts, normalizeCategoryForApi as normalizeCategoryForNewInApi } from "../../api/new-in/newInApi";
 
 const categories = [
   "All",
@@ -159,7 +156,7 @@ const FilterDropdown = ({
   );
 };
 
-const CatalogPageContent = ({ title, products }: CatalogPageContentProps) => {
+const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -168,6 +165,9 @@ const CatalogPageContent = ({ title, products }: CatalogPageContentProps) => {
   const colorParam = searchParams?.get("color");
   const sizeParam = searchParams?.get("size");
   const orderParam = searchParams?.get("order");
+
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const getNormalizedCategory = useCallback(() => {
     if (!categoryParam) return "All";
@@ -246,6 +246,40 @@ const CatalogPageContent = ({ title, products }: CatalogPageContentProps) => {
   const handleMouseLeave = () => {
     setIsDragging(false);
   };
+
+  // Загрузка товаров из API с debounce
+  useEffect(() => {
+    const loadProducts = async () => {
+      setIsLoading(true);
+      try {
+        if (title === "NEW IN") {
+          // Для страницы NEW IN загружаем только новые товары
+          const normalizedCategory = getNormalizedCategory();
+          const categoryForApi = normalizedCategory === "All" ? undefined : normalizeCategoryForNewInApi(normalizedCategory);
+          const newInProducts = await fetchNewInProducts(categoryForApi);
+          setProducts(newInProducts);
+        } else {
+          // Для страницы CATALOG загружаем все товары с учетом категории
+          const normalizedCategory = getNormalizedCategory();
+          const categoryForApi = normalizedCategory === "All" ? undefined : normalizeCategoryForApi(normalizedCategory);
+          const catalogProducts = await fetchCatalogProductsByCategory(categoryForApi);
+          setProducts(catalogProducts);
+        }
+      } catch (error) {
+        console.error("Error loading products:", error);
+        setProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Debounce для оптимизации запросов
+    const timeoutId = setTimeout(() => {
+      loadProducts();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [title, categoryParam, getNormalizedCategory]);
 
   // Обновляем состояние из URL при изменении параметров
   useEffect(() => {
@@ -495,31 +529,37 @@ const CatalogPageContent = ({ title, products }: CatalogPageContentProps) => {
       )}
 
       <section className={styles.productsSection}>
-        <div className={styles.productsGrid}>
-          {filteredProducts.map((product) => (
-            <Link
-              key={product.id}
-              href={`/catalog/${product.id}`}
-              className={styles.catalogCardLink}
-              aria-label={`Открыть товар ${product.title}`}
-            >
-              <ProductCard
-                title={product.title}
-                price={product.price}
-                images={product.images}
-                isNew={product.isNew}
-                productId={product.id}
-                showAddToCart={false}
-              />
-            </Link>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className={styles.emptyState}>Загрузка...</div>
+        ) : (
+          <>
+            <div className={styles.productsGrid}>
+              {filteredProducts.map((product) => (
+                <Link
+                  key={product.id}
+                  href={`/catalog/${product.id}`}
+                  className={styles.catalogCardLink}
+                  aria-label={`Открыть товар ${product.title}`}
+                >
+                  <ProductCard
+                    title={product.title}
+                    price={product.price}
+                    images={product.images}
+                    isNew={product.isNew}
+                    productId={product.id}
+                    showAddToCart={false}
+                  />
+                </Link>
+              ))}
+            </div>
 
-        {filteredProducts.length === 0 && (
-          <p className={styles.emptyState}>
-            Нет товаров, соответствующих выбранным фильтрам. Попробуйте изменить
-            параметры.
-          </p>
+            {filteredProducts.length === 0 && (
+              <p className={styles.emptyState}>
+                Нет товаров, соответствующих выбранным фильтрам. Попробуйте изменить
+                параметры.
+              </p>
+            )}
+          </>
         )}
       </section>
     </>

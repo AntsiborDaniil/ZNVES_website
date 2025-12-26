@@ -1,6 +1,6 @@
 .accountPage {
   min-height: 100vh;
-  margin-top: 51px;
+  margin-top: 46px;
   background-color: #f2f0ec;
   display: flex;
   flex-direction: column;
@@ -499,7 +499,7 @@
   }
 
   .accountPage {
-    margin-top: 51px;
+    margin-top: 46px;
   }
 
   .main {

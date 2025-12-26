@@ -3,7 +3,6 @@
     border: none;
     cursor: pointer;
     color: #1a1a1a;
-    padding: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -23,10 +22,7 @@
     justify-content: center;
 }
 
-.cartImage {
-    width: 13px;
-    height: 13px;
-}
+
 
 .cartBadge {
     position: absolute;
@@ -48,10 +44,7 @@
 
 
 @media (max-width: 1440px) {
-    .cartImage {
-        width: 13px;
-        height: 13px;
-    }
+
 
     .cartBadge {
         min-width: 12px;
@@ -61,10 +54,6 @@
 }
 
 @media (max-width: 480px) {
-    .cartImage {
-        width: 13px;
-        height: 13px;
-    }
 
     .cartBadge {
         min-width: 8px;

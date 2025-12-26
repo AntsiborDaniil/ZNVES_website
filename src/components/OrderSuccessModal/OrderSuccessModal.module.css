@@ -16,7 +16,7 @@
   background-color: #f2f0ec;
   border-radius: 3px;
   padding: 70px 34px 26px 34px;
-  max-width: 520px;
+  max-width: 650px;
   width: 100%;
   position: relative;
   border: 1px solid #bcb4a5;
@@ -142,8 +142,8 @@
   }
 
   .modalContent {
-    padding: 48px 20px;
-    max-width: 100%;
+    padding: 50px 20px 20px;
+    min-width: 300px;
   }
 
   .closeButton {
@@ -190,7 +190,7 @@
 
   .modalContent {
     padding: 40px 28px;
-    max-width: 480px;
+    max-width: 600px;
   }
 
   .modalTitle {
@@ -223,7 +223,7 @@
 @media (min-width: 769px) and (max-width: 1024px) {
   .modalContent {
     padding: 60px 32px 24px 32px;
-    max-width: 500px;
+    max-width: 620px;
   }
 
   .modalTitle {
@@ -247,14 +247,14 @@
 @media (min-width: 1025px) and (max-width: 1280px) {
   .modalContent {
     padding: 65px 34px 26px 34px;
-    max-width: 520px;
+    max-width: 640px;
   }
 }
 
-/* Больше 1280px - модалка не растет, остается 520px */
+/* Больше 1280px - модалка не растет, остается 650px */
 @media (min-width: 1281px) {
   .modalContent {
     padding: 70px 34px 26px 34px;
-    max-width: 520px;
+    max-width: 650px;
   }
 }

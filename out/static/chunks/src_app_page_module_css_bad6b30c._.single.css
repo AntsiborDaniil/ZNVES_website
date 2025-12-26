@@ -1,0 +1,41 @@
+/* [project]/src/app/page.module.css [app-client] (css) */
+.page-module___8aEwW__app {
+  background-color: #f2f0ec;
+  flex-direction: column;
+  min-height: 100vh;
+  display: flex;
+}
+
+.page-module___8aEwW__productDisplaySections {
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 30px;
+  margin-bottom: 100px;
+  display: flex;
+}
+
+@media (max-width: 1440px) {
+  .page-module___8aEwW__productDisplaySections {
+    gap: 10px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-module___8aEwW__productDisplaySections {
+    gap: 0;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-module___8aEwW__productDisplaySections {
+    gap: 0;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+}
+
+/*# sourceMappingURL=src_app_page_module_css_bad6b30c._.single.css.map*/

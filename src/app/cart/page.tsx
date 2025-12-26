@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, useRef } from "react";
 import styles from "./page.module.css";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -20,6 +20,7 @@ const CartPageContent = () => {
   const searchParams = useSearchParams();
   const { width } = useWindowSize();
   const isMobile = width > 0 && width <= 1024;
+  const checkoutFormRef = useRef<HTMLDivElement>(null);
 
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -34,11 +35,44 @@ const CartPageContent = () => {
     }).format(price);
   };
 
+  const smoothScrollToElement = (
+    element: HTMLElement,
+    duration: number = 1200
+  ) => {
+    const targetPosition =
+      element.getBoundingClientRect().top + window.pageYOffset;
+    const startPosition = window.pageYOffset;
+    const distance = targetPosition - startPosition;
+    let startTime: number | null = null;
+
+    const animation = (currentTime: number) => {
+      if (startTime === null) startTime = currentTime;
+      const timeElapsed = currentTime - startTime;
+      const progress = Math.min(timeElapsed / duration, 1);
+
+      // Используем easing функцию для более плавной анимации
+      const ease =
+        progress < 0.5
+          ? 2 * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+      window.scrollTo(0, startPosition + distance * ease);
+
+      if (timeElapsed < duration) {
+        requestAnimationFrame(animation);
+      }
+    };
+
+    requestAnimationFrame(animation);
+  };
+
+  // Очищаем корзину только после закрытия модалки, чтобы модалка показывалась поверх корзины
   useEffect(() => {
-    if (showSuccessModal && items.length > 0) {
+    if (!showSuccessModal && orderNumber && items.length > 0) {
+      // Модалка закрыта, заказ был оформлен - очищаем корзину
       clearCart();
     }
-  }, [showSuccessModal, items.length, clearCart]);
+  }, [showSuccessModal, orderNumber, items.length, clearCart]);
 
   // Автоматически открываем форму при редиректе с checkout
   useEffect(() => {
@@ -47,6 +81,12 @@ const CartPageContent = () => {
       setShowCheckoutForm(true);
       // Удаляем параметр из URL
       router.replace("/cart", { scroll: false });
+      // Прокручиваем к форме оформления после небольшой задержки для рендеринга
+      setTimeout(() => {
+        if (checkoutFormRef.current) {
+          smoothScrollToElement(checkoutFormRef.current, 1200);
+        }
+      }, 100);
     }
   }, [searchParams, isMobile, router]);
 
@@ -68,12 +108,19 @@ const CartPageContent = () => {
   const handleCheckoutClick = () => {
     if (isMobile) {
       setShowCheckoutForm(true);
+      // Прокручиваем к форме оформления после небольшой задержки для рендеринга
+      setTimeout(() => {
+        if (checkoutFormRef.current) {
+          smoothScrollToElement(checkoutFormRef.current, 1200);
+        }
+      }, 100);
     } else {
       router.push("/checkout");
     }
   };
 
-  if (items.length === 0) {
+  // Не показываем пустую корзину, если модалка открыта
+  if (items.length === 0 && !showSuccessModal) {
     return (
       <div className={styles.cart}>
         <Header variant="green" />
@@ -103,7 +150,16 @@ const CartPageContent = () => {
           <Link href="/catalog" className={styles.backLink}>
             Вернуться в каталог
           </Link>
-          <h1 className={styles.cartTitle}>Корзина</h1>
+          <div className={styles.cartTitleWrapper}>
+            <h1 className={styles.cartTitle}>Корзина</h1>
+            <button
+              type="button"
+              className={styles.clearCartButtonMobile}
+              onClick={clearCart}
+            >
+              Очистить корзину
+            </button>
+          </div>
           <div className={styles.mainContentWrapper}>
             <div className={styles.cartItemsWrapper}>
               {items.map((item, index) => {
@@ -143,39 +199,50 @@ const CartPageContent = () => {
                 );
               })}
             </div>
-            <div className={styles.summary}>
-              <div className={styles.summaryRow}>
-                <span className={styles.summaryLabel}>Итого</span>
-                <span className={styles.summaryTotal}>
-                  {formatPrice(getTotalPrice())}
-                </span>
-              </div>
-              <div className={styles.promoSection}>
-                <input
-                  id="promo-code"
-                  type="text"
-                  className={styles.promoInput}
-                  placeholder="Промокод"
-                />
+            <div className={styles.summaryWrapper}>
+              <div className={styles.summary}>
+                <div className={styles.summaryRow}>
+                  <span className={styles.summaryLabel}>Итого</span>
+                  <span className={styles.summaryTotal}>
+                    {formatPrice(getTotalPrice())}
+                  </span>
+                </div>
+                <div className={styles.promoSection}>
+                  <input
+                    id="promo-code"
+                    type="text"
+                    className={styles.promoInput}
+                    placeholder="Промокод"
+                  />
+                </div>
+                <button
+                  type="button"
+                  className={`${styles.checkoutButton} ${
+                    showCheckoutForm && isMobile
+                      ? styles.checkoutButtonActive
+                      : ""
+                  }`}
+                  onClick={handleCheckoutClick}
+                  disabled={showCheckoutForm && isMobile}
+                >
+                  Перейти к оформлению
+                </button>
               </div>
               <button
                 type="button"
-                className={`${styles.checkoutButton} ${
-                  showCheckoutForm && isMobile
-                    ? styles.checkoutButtonActive
-                    : ""
-                }`}
-                onClick={handleCheckoutClick}
-                disabled={showCheckoutForm && isMobile}
+                className={styles.clearCartButton}
+                onClick={clearCart}
               >
-                Перейти к оформлению
+                Очистить корзину
               </button>
             </div>
             {showCheckoutForm && isMobile && (
-              <CheckoutForm
-                onOrderSubmit={handleOrderSubmit}
-                showRightColumn={false}
-              />
+              <div ref={checkoutFormRef} id="checkout-form">
+                <CheckoutForm
+                  onOrderSubmit={handleOrderSubmit}
+                  showRightColumn={false}
+                />
+              </div>
             )}
           </div>
         </div>

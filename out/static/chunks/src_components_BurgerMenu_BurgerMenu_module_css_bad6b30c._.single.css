@@ -1,0 +1,434 @@
+/* [project]/src/components/BurgerMenu/BurgerMenu.module.css [app-client] (css) */
+.BurgerMenu-module__YlH9FW__burgerMenu {
+  position: relative;
+}
+
+.BurgerMenu-module__YlH9FW__overlay {
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1000;
+  background: rgba(0, 0, 0, .41);
+  transition: opacity .35s;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.BurgerMenu-module__YlH9FW__overlayOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.BurgerMenu-module__YlH9FW__burgerButton {
+  cursor: pointer;
+  z-index: 1001;
+  background: none;
+  border: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  display: flex;
+}
+
+.BurgerMenu-module__YlH9FW__burgerButton span {
+  background-color: #fff7df;
+  border-radius: 999px;
+  width: 19px;
+  height: 2px;
+  font-weight: 400;
+  display: block;
+}
+
+.BurgerMenu-module__YlH9FW__menu {
+  z-index: 1001;
+  background-color: #1f4c38;
+  flex-direction: column;
+  width: min(360px, 80vw);
+  padding: 0;
+  transition: transform .4s cubic-bezier(.77, 0, .175, 1);
+  display: flex;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: auto;
+  overflow-y: auto;
+  transform: translateX(-100%);
+  box-shadow: 8px 0 24px rgba(0, 0, 0, .2);
+}
+
+.BurgerMenu-module__YlH9FW__menuOpen {
+  transform: translateX(0);
+}
+
+.BurgerMenu-module__YlH9FW__closeButton {
+  cursor: pointer;
+  background: none;
+  border: none;
+  justify-content: center;
+  align-self: flex-start;
+  align-items: center;
+  padding: 20px 24px;
+  line-height: 1;
+  transition: opacity .2s;
+  display: flex;
+}
+
+.BurgerMenu-module__YlH9FW__closeButton:hover {
+  opacity: .8;
+}
+
+.BurgerMenu-module__YlH9FW__menuContent {
+  flex-direction: column;
+  align-content: space-between;
+  gap: 26px;
+  height: 100%;
+  padding: 10px 21px 30px;
+  display: flex;
+}
+
+.BurgerMenu-module__YlH9FW__menuSection {
+  flex-direction: column;
+  gap: 12px;
+  display: flex;
+}
+
+.BurgerMenu-module__YlH9FW__menuSectionNavigation, .BurgerMenu-module__YlH9FW__menuSectionAccount {
+  flex-direction: column;
+  gap: 6px;
+  display: flex;
+}
+
+.BurgerMenu-module__YlH9FW__menuHeader {
+  color: #fff7df;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 20px;
+  font-weight: 300;
+  text-decoration: none;
+  transition: color .2s;
+}
+
+.BurgerMenu-module__YlH9FW__menuHeaderButton {
+  cursor: pointer;
+  color: #fff7df;
+  font-weight: 300;
+  font-style: Regular;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  text-transform: uppercase;
+  font-size: 20px;
+}
+
+.BurgerMenu-module__YlH9FW__menuHeader:hover {
+  color: rgba(255, 247, 223, .5);
+}
+
+.BurgerMenu-module__YlH9FW__menuHeader:focus-visible {
+  color: rgba(255, 247, 223, .5);
+}
+
+.BurgerMenu-module__YlH9FW__menuHeaderActive {
+  color: #fff7df;
+}
+
+.BurgerMenu-module__YlH9FW__catalogSubmenu {
+  color: #fff7df;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 0 0 9px;
+  padding: 0;
+  list-style: none;
+  animation: .3s ease-out forwards BurgerMenu-module__YlH9FW__slideDown;
+  display: flex;
+  overflow: hidden;
+}
+
+@keyframes BurgerMenu-module__YlH9FW__slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+
+.BurgerMenu-module__YlH9FW__catalogItem {
+  opacity: 0;
+  padding: 0;
+  animation: .3s ease-out forwards BurgerMenu-module__YlH9FW__fadeInItem;
+}
+
+.BurgerMenu-module__YlH9FW__catalogItem:first-child {
+  animation-delay: 50ms;
+}
+
+.BurgerMenu-module__YlH9FW__catalogItem:nth-child(2) {
+  animation-delay: .1s;
+}
+
+.BurgerMenu-module__YlH9FW__catalogItem:nth-child(3) {
+  animation-delay: .15s;
+}
+
+.BurgerMenu-module__YlH9FW__catalogItem:nth-child(4) {
+  animation-delay: .2s;
+}
+
+.BurgerMenu-module__YlH9FW__catalogItem:nth-child(5) {
+  animation-delay: .25s;
+}
+
+.BurgerMenu-module__YlH9FW__catalogItem:nth-child(6) {
+  animation-delay: .3s;
+}
+
+.BurgerMenu-module__YlH9FW__catalogItem:nth-child(7) {
+  animation-delay: .35s;
+}
+
+.BurgerMenu-module__YlH9FW__catalogItem:nth-child(8) {
+  animation-delay: .4s;
+}
+
+@keyframes BurgerMenu-module__YlH9FW__fadeInItem {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.BurgerMenu-module__YlH9FW__catalogLink {
+  color: #fff7df;
+  letter-spacing: 0%;
+  text-transform: none;
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 22.6px;
+  text-decoration: none;
+  transition: color .2s;
+  display: block;
+}
+
+.BurgerMenu-module__YlH9FW__catalogLink:hover {
+  color: rgba(255, 247, 223, .5);
+}
+
+.BurgerMenu-module__YlH9FW__catalogLink:focus-visible {
+  color: rgba(255, 247, 223, .5);
+}
+
+.BurgerMenu-module__YlH9FW__catalogLinkActive {
+  color: rgba(255, 247, 223, .5);
+  font-weight: 300;
+  position: relative;
+}
+
+.BurgerMenu-module__YlH9FW__catalogLinkActive:before {
+  content: "";
+  background-color: #fff;
+  border-radius: 2px;
+  width: 4px;
+  height: 16px;
+  position: absolute;
+  top: 50%;
+  left: -20px;
+  transform: translateY(-50%);
+}
+
+.BurgerMenu-module__YlH9FW__menuItemWithIcon {
+  color: #fff7df;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  text-transform: uppercase;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 24.8px;
+  text-decoration: none;
+  transition: color .2s;
+  display: flex;
+}
+
+.BurgerMenu-module__YlH9FW__menuItemWithIcon:hover {
+  color: rgba(255, 247, 223, .5);
+}
+
+.BurgerMenu-module__YlH9FW__menuItemWithIcon:focus-visible {
+  color: rgba(255, 247, 223, .5);
+}
+
+.BurgerMenu-module__YlH9FW__menuItemActive {
+  color: rgba(255, 247, 223, .5);
+}
+
+.BurgerMenu-module__YlH9FW__menuIcon {
+  opacity: .9;
+}
+
+.BurgerMenu-module__YlH9FW__socialSection {
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 32px;
+  display: flex;
+}
+
+.BurgerMenu-module__YlH9FW__socialLink {
+  color: #fff7df;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  text-transform: none;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 14.4px;
+  text-decoration: none;
+  transition: color .2s;
+}
+
+.BurgerMenu-module__YlH9FW__socialLink:hover {
+  color: #fff;
+}
+
+.BurgerMenu-module__YlH9FW__socialLink:focus-visible {
+  color: #fff;
+}
+
+@media (max-width: 1440px) {
+  .BurgerMenu-module__YlH9FW__burgerButton {
+    gap: 2px;
+  }
+
+  .BurgerMenu-module__YlH9FW__burgerButton span {
+    width: 18.6px;
+    height: 2px;
+  }
+
+  .BurgerMenu-module__YlH9FW__menuHeader, .BurgerMenu-module__YlH9FW__menuHeaderButton {
+    font-size: 20px;
+    line-height: 24.8px;
+  }
+
+  .BurgerMenu-module__YlH9FW__catalogSubmenu {
+    gap: 2px;
+    margin-left: 9px;
+  }
+
+  .BurgerMenu-module__YlH9FW__catalogLink {
+    font-size: 12px;
+    line-height: 18.6px;
+  }
+
+  .BurgerMenu-module__YlH9FW__menuItemWithIcon {
+    gap: 7px;
+    font-size: 18px;
+    line-height: 24.8px;
+  }
+
+  .BurgerMenu-module__YlH9FW__menuIcon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .BurgerMenu-module__YlH9FW__socialSection {
+    gap: 4px;
+  }
+
+  .BurgerMenu-module__YlH9FW__socialLink {
+    font-size: 14px;
+    line-height: 14.4px;
+  }
+
+  .BurgerMenu-module__YlH9FW__closeButton {
+    padding: 24px 16px 17px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .BurgerMenu-module__YlH9FW__burgerButton {
+    gap: 2px;
+  }
+
+  .BurgerMenu-module__YlH9FW__burgerButton span {
+    width: 19px;
+    height: 2px;
+  }
+
+  .BurgerMenu-module__YlH9FW__menuOpen {
+    width: 280px;
+  }
+
+  .BurgerMenu-module__YlH9FW__menuContent {
+    padding: 10px 16px 40px 28px;
+  }
+
+  .BurgerMenu-module__YlH9FW__menuHeader {
+    font-size: 18px;
+    line-height: 24.8px;
+  }
+
+  .BurgerMenu-module__YlH9FW__menuSection {
+    gap: 6px;
+  }
+
+  .BurgerMenu-module__YlH9FW__menuHeaderButton {
+    font-size: 18px;
+    line-height: 24.8px;
+  }
+
+  .BurgerMenu-module__YlH9FW__catalogSubmenu {
+    gap: 2px;
+    margin-left: 12px;
+  }
+
+  .BurgerMenu-module__YlH9FW__catalogLink {
+    font-size: 12px;
+    line-height: 18.6px;
+  }
+
+  .BurgerMenu-module__YlH9FW__menuItemWithIcon {
+    gap: 10px;
+    font-size: 16px;
+    line-height: 24.8px;
+  }
+
+  .BurgerMenu-module__YlH9FW__menuIcon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .BurgerMenu-module__YlH9FW__socialSection {
+    gap: 4px;
+  }
+
+  .BurgerMenu-module__YlH9FW__socialLink {
+    font-size: 12px;
+    line-height: 14.4px;
+  }
+
+  .BurgerMenu-module__YlH9FW__closeButton {
+    padding: 15px 16px 27px;
+  }
+}
+
+/*# sourceMappingURL=src_components_BurgerMenu_BurgerMenu_module_css_bad6b30c._.single.css.map*/

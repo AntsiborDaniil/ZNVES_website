@@ -1,6 +1,6 @@
 .cart {
   min-height: 100vh;
-  margin-top: 51px;
+  margin-top: 46px;
   background-color: #f2f0ec;
   display: flex;
   flex-direction: column;
@@ -36,13 +36,24 @@
   flex-direction: column;
 }
 
+.cartTitleWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 .cartTitle {
   font-weight: 400;
   font-size: 32px;
   line-height: 32.94px;
   letter-spacing: 0px;
   color: #525252;
-  margin-bottom: 20px;
+  margin: 0;
+}
+
+.clearCartButtonMobile {
+  display: none;
 }
 
 .mainContentWrapper {
@@ -60,23 +71,49 @@
   gap: 16px;
 }
 
-.summary {
+.summaryWrapper {
   width: 356px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 120px;
+  height: fit-content;
+}
+
+.summary {
   background-color: #f8f8f8;
   border-radius: 3px;
   padding: 24px 20px;
   display: flex;
   flex-direction: column;
-  height: fit-content;
-  position: sticky;
-  top: 120px;
 }
 
 .summaryRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.clearCartButton {
+  background: none;
+  border: none;
+  color: #525252c9;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 32.94px;
+  letter-spacing: 0px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.clearCartButton:hover {
+  color: #1f1f1f;
+  text-decoration: underline;
 }
 
 .summaryLabel {
@@ -104,10 +141,10 @@
   width: 100%;
   padding: 8px 12px 8px 0px;
   border: none;
-  border-bottom: 0.8px solid #B2B2B2;
+  border-bottom: 0.8px solid #b2b2b2;
   background-color: transparent;
   font-size: 16px;
-  color: #B2B2B2;
+  color: #b2b2b2;
   font-family: inherit;
   margin-top: 29px;
   margin-bottom: 15px;
@@ -159,15 +196,14 @@
   color: #525252 !important;
 }
 
-
 @media (max-width: 1440px) {
-    .main {
-        padding: 20px 32px 100px 32px;
-    }
-    
-    .cartItemsWrapper {
-        gap: 12px;
-    }
+  .main {
+    padding: 20px 32px 100px 32px;
+  }
+
+  .cartItemsWrapper {
+    gap: 12px;
+  }
 
   .summary {
     padding: 24px 20px;
@@ -206,76 +242,106 @@
 }
 
 @media (max-width: 1280px) {
-    .main {
-        padding: 20px 20px 90px 20px;
-    }
+  .main {
+    padding: 20px 20px 90px 20px;
+  }
 
-    .summary {
-        width: 300px;
-    }
+  .summaryWrapper {
+    width: 300px;
+  }
 
-    .summaryLabel {
-        font-size: 20px;
-    }
+  .summaryLabel {
+    font-size: 20px;
+  }
 
-    .summaryTotal {
-        font-size: 20px;
-    }
+  .summaryTotal {
+    font-size: 20px;
+  }
 
-    .promoInput {
-        font-size: 14px;
-        margin-top: 33px;
-        margin-bottom: 15px;
-        padding: 4px 16px 6px 0px;
-    }
+  .promoInput {
+    font-size: 14px;
+    margin-top: 33px;
+    margin-bottom: 15px;
+    padding: 4px 16px 6px 0px;
+  }
 
-    .checkoutButton {
-        font-size: 14px;
-        height: 46px;
-        padding-top: 0.95px;
-        padding-right: 15.17px;
-        padding-bottom: 0.95px;
-        padding-left: 15.17px;
-    }
+  .checkoutButton {
+    font-size: 14px;
+    height: 46px;
+    padding-top: 0.95px;
+    padding-right: 15.17px;
+    padding-bottom: 0.95px;
+    padding-left: 15.17px;
+  }
 }
 
 @media (max-width: 1024px) {
-    .mainContentWrapper {
-        flex-direction: column;
-        gap: 20px;
-    }
+  .mainContentWrapper {
+    flex-direction: column;
+    gap: 20px;
+  }
 
-    .summary {
-        width: 100%;
-        position: static;
-    }
+  .summaryWrapper {
+    width: 100%;
+    position: static;
+  }
 
-    .cartTitle {
-        font-size: 29px;
-        line-height: 32.94px;
-    }
+  .summary {
+    width: 100%;
+  }
 
-    .backLink {
-        font-size: 13px;
-    }
+  .cartTitle {
+    font-size: 29px;
+    line-height: 32.94px;
+  }
 
-    /* Убеждаемся, что CheckoutForm занимает всю ширину */
-    .mainContentWrapper > div:last-child {
-        width: 100%;
-    }
+  .backLink {
+    font-size: 13px;
+  }
+
+  .clearCartButton {
+    display: none;
+  }
+
+  .clearCartButtonMobile {
+    display: block;
+    background: none;
+    border: none;
+    color: #525252c9;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 32.94px;
+    letter-spacing: 0px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .clearCartButtonMobile:hover {
+    color: #1f1f1f;
+    text-decoration: underline;
+  }
+
+  /* Убеждаемся, что CheckoutForm занимает всю ширину */
+  .mainContentWrapper > div:last-child {
+    width: 100%;
+  }
 }
 /* @media (max-width: 1300px) {
   .mainContentWrapper {
      flex-direction: column; 
   }
 
-  .summary {
-    width: 100%;
-    position: static;
-  }
+   .summaryWrapper {
+     width: 100%;
+     position: static;
+   }
+
+   .summary {
+     width: 100%;
+   }
 } */
-
-
 
 .emptyCart {
   display: flex;
@@ -328,14 +394,18 @@
 }
 
 @media (max-width: 900px) {
-    .mainContentWrapper {
-        flex-direction: column;
-    }
+  .mainContentWrapper {
+    flex-direction: column;
+  }
 
-    .summary {
-        width: 100%;
-        position: static;
-    }
+  .summaryWrapper {
+    width: 100%;
+    position: static;
+  }
+
+  .summary {
+    width: 100%;
+  }
 
   .emptyCart {
     padding: 60px 16px;
@@ -357,22 +427,20 @@
     padding: 14px 32px;
     font-size: 15px;
   }
-
-
 }
 
 @media (max-width: 480px) {
-    .main {
-        padding: 20px 16px 51px 16px;
-    }
+  .main {
+    padding: 20px 16px 51px 16px;
+  }
 
-    .summary {
-        padding: 20px;
-    }
+  .summary {
+    padding: 20px;
+  }
 
-    .backLink {
-        margin-bottom: 20px;
-    }
+  .backLink {
+    margin-bottom: 20px;
+  }
 }
 
 /* Мобильная форма оформления заказа */

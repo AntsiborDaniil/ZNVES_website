@@ -41,7 +41,6 @@
 
 .orderCardActive {
   background-color: #5252520f;
-  border: 1px solid #525252;
 }
 
 .orderCardActive:hover {
@@ -116,7 +115,7 @@
   font-size: 16px;
   line-height: 28px;
   letter-spacing: 0%;
-  color: #d12a15;
+  color: #999999;
 }
 
 .orderCardState {

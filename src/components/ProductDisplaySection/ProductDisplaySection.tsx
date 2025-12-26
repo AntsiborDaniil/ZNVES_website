@@ -13,12 +13,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ProductCard from "../ProductCard/ProductCard";
 import styles from "./ProductDisplaySection.module.css";
-import {
-  catalogProducts as catalogProductsData,
-  newInProducts as newInProductsData,
-  toCatalogProduct,
-} from "../../data/products";
 import type { CatalogProduct } from "../../types/products";
+import { fetchNewInProducts, fetchAllCatalogProducts } from "../../api/home/catalogApi";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode } from "swiper/modules";
 import "swiper/css";
@@ -35,12 +31,6 @@ type ProductDisplaySectionProps = {
   isBestseller?: boolean;
 };
 
-const homepageNewInProducts: CatalogProduct[] =
-  newInProductsData.map(toCatalogProduct);
-
-const homepageCatalogProducts: CatalogProduct[] =
-  catalogProductsData.map(toCatalogProduct);
-
 const ProductDisplaySection = ({
   title,
   showShopNow,
@@ -54,6 +44,8 @@ const ProductDisplaySection = ({
   const [isMobile, setIsMobile] = useState(false);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const hasPrefetchedProductsRef = useRef(false);
   const hasPrefetchedShopNowRef = useRef(false);
@@ -81,8 +73,27 @@ const ProductDisplaySection = ({
     }
   }, [width]);
 
-  const products = useMemo<CatalogProduct[]>(() => {
-    return title === "NEW IN" ? homepageNewInProducts : homepageCatalogProducts;
+  // Загрузка товаров из API
+  useEffect(() => {
+    const loadProducts = async () => {
+      setIsLoading(true);
+      try {
+        if (title === "NEW IN") {
+          const newInProducts = await fetchNewInProducts();
+          setProducts(newInProducts);
+        } else {
+          const catalogProducts = await fetchAllCatalogProducts();
+          setProducts(catalogProducts);
+        }
+      } catch (error) {
+        console.error("Error loading products:", error);
+        setProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProducts();
   }, [title]);
 
   const handlePrev = () => {
@@ -235,57 +246,63 @@ const ProductDisplaySection = ({
         </div>
       </div>
       <div className={styles.sliderContainer}>
-        {createElement(
-          Swiper as any,
-          {
-            className: styles.slider,
-            modules: [FreeMode],
-            freeMode: {
-              enabled: true,
-              momentum: true,
-              momentumRatio: 0.35,
-              minimumVelocity: 0.08,
-              sticky: false,
+        {isLoading ? (
+          <div className={styles.loading}>Загрузка...</div>
+        ) : products.length > 0 ? (
+          createElement(
+            Swiper as any,
+            {
+              className: styles.slider,
+              modules: [FreeMode],
+              freeMode: {
+                enabled: true,
+                momentum: true,
+                momentumRatio: 0.35,
+                minimumVelocity: 0.08,
+                sticky: false,
+              },
+              resistance: true,
+              resistanceRatio: 0.85,
+              spaceBetween,
+              slidesPerView: maxVisible,
+              slidesPerGroup: 1,
+              loop: false,
+              centeredSlides: isMobile,
+              speed: 600,
+              watchSlidesProgress: true,
+              watchOverflow: true,
+              onSwiper: handleSwiper,
+              onSlideChange: handleSlideChange,
+              onBeforeInit: handleBeforeInit,
+              lazy: {
+                enabled: true,
+                loadOnTransitionStart: false,
+                loadPrevNext: true,
+                loadPrevNextAmount: 2,
+              },
             },
-            resistance: true,
-            resistanceRatio: 0.85,
-            spaceBetween,
-            slidesPerView: maxVisible,
-            slidesPerGroup: 1,
-            loop: false,
-            centeredSlides: isMobile,
-            speed: 600,
-            watchSlidesProgress: true,
-            watchOverflow: true,
-            onSwiper: handleSwiper,
-            onSlideChange: handleSlideChange,
-            onBeforeInit: handleBeforeInit,
-            lazy: {
-              enabled: true,
-              loadOnTransitionStart: false,
-              loadPrevNext: true,
-              loadPrevNextAmount: 2,
-            },
-          },
-          products.map((product) => (
-            <SwiperSlide key={product.id} className={styles.slideItem}>
-              <Link
-                href={`/catalog/${product.id}`}
-                className={styles.slideLink}
-                aria-label={`Перейти к товару ${product.title}`}
-              >
-                <ProductCard
-                  title={product.title}
-                  price={product.price}
-                  images={product.images}
-                  isNew={product.isNew}
-                  productId={product.id}
-                  showAddToCart={false}
-                  isSliderCard={true}
-                />
-              </Link>
-            </SwiperSlide>
-          ))
+            products.map((product) => (
+              <SwiperSlide key={product.id} className={styles.slideItem}>
+                <Link
+                  href={`/catalog/${product.id}`}
+                  className={styles.slideLink}
+                  aria-label={`Перейти к товару ${product.title}`}
+                >
+                  <ProductCard
+                    title={product.title}
+                    price={product.price}
+                    images={product.images}
+                    isNew={product.isNew}
+                    productId={product.id}
+                    showAddToCart={false}
+                    isSliderCard={true}
+                  />
+                </Link>
+              </SwiperSlide>
+            ))
+          )
+        ) : (
+          <div className={styles.emptyState}>Товары не найдены</div>
         )}
       </div>
       {canNavigate && (
