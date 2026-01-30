@@ -3,7 +3,7 @@
 import type { ProductDetail } from "../../types/products";
 import type { ProductColorOption } from "../../types/products";
 
-const API_BASE_URL = "http://158.160.115.103:8000/api/catalog/";
+const API_BASE_URL = "http://62.84.115.11:8000/api/catalog/";
 
 // Типы для API ответа
 export type ApiProductSize = {
@@ -38,11 +38,17 @@ export type ApiProductDetail = {
 
 // Кеш для запросов
 const cache = new Map<string, { data: ProductDetail; timestamp: number }>();
+const rawCache = new Map<string, { data: ApiProductDetail; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
+
+// Дедупликация одновременных запросов по одному slug
+const inFlightRaw = new Map<string, Promise<ApiProductDetail | null>>();
+const inFlightBySlug = new Map<string, Promise<ProductDetail | null>>();
+const inFlightImages = new Map<string, Promise<string[]>>();
 
 // Преобразование API ответа в ProductDetail
 const transformApiProduct = (apiProduct: ApiProductDetail): ProductDetail => {
-  const baseUrl = "http://158.160.115.103:8000";
+  const baseUrl = "http://62.84.115.11:8000";
   
   // Преобразуем изображения, добавляя базовый URL если нужно
   const images = apiProduct.images.map((img) => {
@@ -128,109 +134,113 @@ const hashString = (str: string): number => {
   return Math.abs(hash);
 };
 
-// Функция для получения товара по slug
-export const fetchProductBySlug = async (
-  slug: string
-): Promise<ProductDetail | null> => {
-  const cacheKey = slug;
-  const cached = cache.get(cacheKey);
-  
-  // Проверяем кеш
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    return cached.data;
+const fetchProductBySlugInternal = async (slug: string): Promise<ProductDetail | null> => {
+  const url = `${API_BASE_URL}${slug}/`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    if (response.status === 404) return null;
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
   }
+  const data: ApiProductDetail = await response.json();
+  const transformedProduct = transformApiProduct(data);
+  cache.set(slug, { data: transformedProduct, timestamp: Date.now() });
+  return transformedProduct;
+};
 
-  try {
-    const url = `${API_BASE_URL}${slug}/`;
+/** Получение товара по slug с кешем и дедупликацией одновременных запросов */
+export const fetchProductBySlug = async (slug: string): Promise<ProductDetail | null> => {
+  const cached = cache.get(slug);
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) return cached.data;
 
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    });
+  let promise = inFlightBySlug.get(slug);
+  if (!promise) {
+    promise = fetchProductBySlugInternal(slug).finally(() => inFlightBySlug.delete(slug));
+    inFlightBySlug.set(slug, promise);
+  }
+  return promise;
+};
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null;
+/** Сырой ответ каталога по slug (warehouse_items и т.д.) — для чекаута, с кешем и дедупликацией */
+export const fetchCatalogProductRaw = async (slug: string): Promise<ApiProductDetail | null> => {
+  const cached = rawCache.get(slug);
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) return cached.data;
+
+  let promise = inFlightRaw.get(slug);
+  if (!promise) {
+    promise = (async () => {
+      try {
+        const url = `${API_BASE_URL}${slug}/`;
+        const response = await fetch(url, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          if (response.status === 404) return null;
+          throw new Error(`API error: ${response.status}`);
+        }
+        const data: ApiProductDetail = await response.json();
+        rawCache.set(slug, { data, timestamp: Date.now() });
+        return data;
+      } finally {
+        inFlightRaw.delete(slug);
       }
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data: ApiProductDetail = await response.json();
-    
-    const transformedProduct = transformApiProduct(data);
-
-    // Сохраняем в кеш
-    cache.set(cacheKey, {
-      data: transformedProduct,
-      timestamp: Date.now(),
-    });
-
-    return transformedProduct;
-  } catch (error) {
-    console.error("Error fetching product by slug:", error);
-    return null;
+    })();
+    inFlightRaw.set(slug, promise);
   }
+  return promise;
 };
 
 // Кеш для изображений по цвету
 const colorImagesCache = new Map<string, { data: string[]; timestamp: number }>();
 const COLOR_IMAGES_CACHE_DURATION = 5 * 60 * 1000; // 5 минут
 
-// Функция для получения изображений товара по цвету
+const fetchProductImagesByColorInternal = async (
+  productSlug: string,
+  colorSlug: string
+): Promise<string[]> => {
+  const url = `${API_BASE_URL}${productSlug}/${colorSlug}/`;
+  const baseUrl = "http://62.84.115.11:8000";
+  const response = await fetch(url, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    if (response.status === 404) return [];
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
+  const imagePaths: string[] = await response.json();
+  const images = imagePaths.map((img) =>
+    img.startsWith("http") ? img : img.startsWith("/") ? `${baseUrl}${img}` : `${baseUrl}/${img}`
+  );
+  colorImagesCache.set(`${productSlug}-${colorSlug}`, { data: images, timestamp: Date.now() });
+  return images;
+};
+
+/** Изображения товара по цвету — кеш и дедупликация одновременных запросов */
 export const fetchProductImagesByColor = async (
   productSlug: string,
   colorSlug: string
 ): Promise<string[]> => {
   const cacheKey = `${productSlug}-${colorSlug}`;
   const cached = colorImagesCache.get(cacheKey);
-  
-  // Проверяем кеш
-  if (cached && Date.now() - cached.timestamp < COLOR_IMAGES_CACHE_DURATION) {
-    return cached.data;
-  }
+  if (cached && Date.now() - cached.timestamp < COLOR_IMAGES_CACHE_DURATION) return cached.data;
 
-  try {
-    const url = `${API_BASE_URL}${productSlug}/${colorSlug}/`;
-    const baseUrl = "http://158.160.115.103:8000";
-
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      if (response.status === 404) {
+  let promise = inFlightImages.get(cacheKey);
+  if (!promise) {
+    promise = fetchProductImagesByColorInternal(productSlug, colorSlug)
+      .catch((err) => {
+        console.error("Error fetching product images by color:", err);
         return [];
-      }
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
-    }
-
-    const imagePaths: string[] = await response.json();
-    
-    // Преобразуем пути изображений, добавляя базовый URL если нужно
-    const images = imagePaths.map((img) => {
-      if (img.startsWith("http")) {
-        return img;
-      }
-      return img.startsWith("/") ? `${baseUrl}${img}` : `${baseUrl}/${img}`;
-    });
-
-    // Сохраняем в кеш
-    colorImagesCache.set(cacheKey, {
-      data: images,
-      timestamp: Date.now(),
-    });
-
-    return images;
-  } catch (error) {
-    console.error("Error fetching product images by color:", error);
-    return [];
+      })
+      .finally(() => inFlightImages.delete(cacheKey));
+    inFlightImages.set(cacheKey, promise);
   }
+  return promise;
 };
 

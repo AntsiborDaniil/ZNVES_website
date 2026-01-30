@@ -177,6 +177,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                   className={`${styles.orderCardArrow} ${
                     isDetailsOpen ? styles.orderCardArrowRotated : ""
                   }`}
+                  loading="lazy"
                 />
               </div>
               <div className={styles.orderCardDetails}>
@@ -212,6 +213,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                             width={60}
                             height={60}
                             className={styles.orderCardThumbnailImage}
+                            loading="lazy"
                           />
                         </div>
                       ))}
@@ -244,6 +246,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                         alt="Заказ"
                         width={20}
                         height={20}
+                        loading="lazy"
                       />
                     </div>
                     <div className={styles.orderInfo}>
@@ -277,6 +280,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                       alt="Заказ"
                       width={20}
                       height={23}
+                      loading="lazy"
                     />
                   </div>
                   <div className={styles.buyerSectionText}>
@@ -321,6 +325,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                       alt="Заказ"
                       width={21.5}
                       height={19.65}
+                      loading="lazy"
                     />
                   </div>
                   <div className={styles.paymentSectionText}>
@@ -340,6 +345,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                               alt="СБП"
                               width={18}
                               height={18}
+                              loading="lazy"
                             />
                           )}
                         </div>
@@ -361,6 +367,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                       alt="Заказ"
                       width={23}
                       height={18.4}
+                      loading="lazy"
                     />
                   </div>
                   <div className={styles.deliverySectionText}>
@@ -410,6 +417,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                           alt={product.name}
                           width={104}
                           height={149}
+                          loading="lazy"
                         />
                         <div className={styles.productDetails}>
                           <div className={styles.upper}>
@@ -498,6 +506,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                       width={41}
                       height={39}
                       className={styles.orderCardArrow}
+                      loading="lazy"
                     />
                   </div>
                   <div className={styles.orderCardDetails}>
@@ -534,6 +543,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                               width={60}
                               height={60}
                               className={styles.orderCardThumbnailImage}
+                              loading="lazy"
                             />
                           </div>
                         ))}

@@ -164,7 +164,7 @@ const ProductCard = ({
                     ? styles.productImageLoaded
                     : styles.productImageLoading
                 }`}
-                loading={index === 0 ? "eager" : "lazy"}
+                loading="lazy"
                 onLoad={() => markImageLoaded(index)}
                 quality={80}
               />

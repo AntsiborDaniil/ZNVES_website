@@ -115,6 +115,7 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
             alt="Закрыть"
             width={27}
             height={27}
+            loading="lazy"
           />
         </button>
 
@@ -205,8 +206,9 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
                 src="/images/burger/cabinet.png"
                 alt=""
                 width={14}
-                height={16}
+                height={14}
                 className={styles.menuIcon}
+                loading="lazy"
               />
               ЛИЧНЫЙ КАБИНЕТ
             </Link>
@@ -223,6 +225,7 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
                 width={14}
                 height={14}
                 className={styles.menuIcon}
+                loading="lazy"
               />
               КОРЗИНА
             </Link>

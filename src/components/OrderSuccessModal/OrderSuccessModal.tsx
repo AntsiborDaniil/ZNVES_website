@@ -38,6 +38,7 @@ const OrderSuccessModal = ({
             alt="Закрыть"
             width={24}
             height={24}
+            loading="lazy"
           />
         </button>
         <h2 className={styles.modalTitle}>Спасибо за Ваш заказ!</h2>

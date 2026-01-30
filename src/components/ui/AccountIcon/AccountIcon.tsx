@@ -2,13 +2,19 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../../contexts/AuthContext";
 import styles from "./AccountIcon.module.css";
 
 const AccountIcon = () => {
   const router = useRouter();
+  const { isAuthenticated, redirectToBot } = useAuth();
 
   const handleClick = () => {
-    router.push("/account");
+    if (!isAuthenticated) {
+      redirectToBot();
+    } else {
+      router.push("/account");
+    }
   };
 
   return (
@@ -24,6 +30,7 @@ const AccountIcon = () => {
         width={12}
         height={12}
         className={styles.accountImage}
+        loading="lazy"
       />
     </button>
   );

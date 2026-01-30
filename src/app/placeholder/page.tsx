@@ -24,7 +24,7 @@ const PlaceholderPage = () => {
                         className={styles.logo}
                         width={160}
                         height={76}
-                        priority
+                        loading="lazy"
                     />
                     <span className={styles.badge}>Скоро запуск</span>
                 </div>

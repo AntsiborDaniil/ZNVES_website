@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./AuthHeader.module.css";
@@ -62,11 +63,12 @@ const AuthHeader = ({ title, theme = "default" }: AuthHeaderProps) => {
                 aria-label="Назад"
                 type="button"
             >
-                <img
+                <Image
                     src="/images/login/arrow-back.png"
                     alt="Назад"
                     width={57}
                     height={57}
+                    loading="lazy"
                 />
             </button>
             <h1 className={styles.title}>{title}</h1>
@@ -76,11 +78,12 @@ const AuthHeader = ({ title, theme = "default" }: AuthHeaderProps) => {
                 aria-label="Закрыть"
                 type="button"
             >
-                <img
+                <Image
                     src="/images/login/cancel-btn.png"
                     alt="Закрыть"
                     width={57}
                     height={57}
+                    loading="lazy"
                 />
             </button>
         </header>

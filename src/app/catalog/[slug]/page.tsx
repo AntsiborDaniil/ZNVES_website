@@ -12,7 +12,7 @@ type ProductPageProps = {
 export const generateStaticParams = async () => {
   try {
     // Пытаемся получить все товары из API для генерации страниц
-    const API_BASE_URL = "http://158.160.115.103:8000/api/catalog/";
+    const API_BASE_URL = "http://62.84.115.11:8000/api/catalog/";
     const response = await fetch(`${API_BASE_URL}`, {
       method: "GET",
       headers: {

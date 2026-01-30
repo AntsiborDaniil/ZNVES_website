@@ -18,6 +18,7 @@ const CartIcon = () => {
           width={12}
           height={11.5}
           className={styles.cartImage}
+          loading="lazy"
         />
         {totalItems > 0 && (
           <span className={styles.cartBadge}>{totalItems}</span>

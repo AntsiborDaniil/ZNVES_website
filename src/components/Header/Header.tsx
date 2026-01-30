@@ -54,7 +54,7 @@ const Header = ({ variant = "transparent" }: HeaderProps) => {
           width={125}
           height={60}
           className={styles.logoImage}
-          priority
+          loading="lazy"
         />
       </Link>
       <div className={styles.rightIcons}>

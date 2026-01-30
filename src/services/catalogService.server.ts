@@ -16,7 +16,7 @@ type CatalogApiParams = {
 
 // Получаем базовый URL из переменной окружения
 const getApiBaseUrl = (): string => {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://158.160.115.103:8000";
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://62.84.115.11:8000";
 };
 
 // Форматирование цены

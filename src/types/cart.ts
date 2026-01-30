@@ -6,6 +6,8 @@ export type CartItem = {
     color: string;
     quantity: number;
     product: CatalogProduct;
+    /** UUID warehouse_product из POST /api/cart/ — для positions[].id в заказе */
+    warehouseProduct?: string;
 };
 
 export type CartContextType = {
@@ -15,7 +17,7 @@ export type CartContextType = {
         size: string,
         color: string,
         quantity?: number
-    ) => void;
+    ) => Promise<void>;
     removeItem: (productId: number, size: string, color: string) => void;
     updateQuantity: (
         productId: number,

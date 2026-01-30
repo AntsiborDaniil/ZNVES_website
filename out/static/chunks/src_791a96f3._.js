@@ -567,6 +567,7 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/contexts/AuthContext.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/src/components/ui/AccountIcon/AccountIcon.module.css [app-client] (css module)");
 ;
 var _s = __turbopack_context__.k.signature();
@@ -574,11 +575,17 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
+;
 const AccountIcon = ()=>{
     _s();
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
+    const { isAuthenticated, redirectToBot } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"])();
     const handleClick = ()=>{
-        router.push("/account");
+        if (!isAuthenticated) {
+            redirectToBot();
+        } else {
+            router.push("/account");
+        }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
         className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].accountIcon,
@@ -593,18 +600,19 @@ const AccountIcon = ()=>{
             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].accountImage
         }, void 0, false, {
             fileName: "[project]/src/components/ui/AccountIcon/AccountIcon.tsx",
-            lineNumber: 21,
+            lineNumber: 27,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0))
     }, void 0, false, {
         fileName: "[project]/src/components/ui/AccountIcon/AccountIcon.tsx",
-        lineNumber: 15,
+        lineNumber: 21,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
-_s(AccountIcon, "fN7XvhJ+p5oE6+Xlo0NJmXpxjC8=", false, function() {
+_s(AccountIcon, "P+qUZf5z9Rh+PPuXWL28TsS4pMQ=", false, function() {
     return [
-        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"]
     ];
 });
 _c = AccountIcon;
@@ -3600,6 +3608,7 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$CartContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/contexts/CartContext.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/contexts/AuthContext.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$data$2f$products$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/data/products.ts [app-client] (ecmascript)");
@@ -3615,10 +3624,12 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
+;
 const CheckoutForm = (param)=>{
     let { onOrderSubmit, showRightColumn = true, className = "" } = param;
     _s();
     const { items, getTotalPrice, clearCart } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$CartContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCart"])();
+    const { redirectToBot } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"])();
     const [formData, setFormData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
         firstName: "",
         lastName: "",
@@ -3876,12 +3887,13 @@ const CheckoutForm = (param)=>{
                                     children: "Оформление заказа"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 288,
+                                    lineNumber: 290,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].telegramButton,
                                     type: "button",
+                                    onClick: redirectToBot,
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].telegramIcon,
@@ -3892,31 +3904,31 @@ const CheckoutForm = (param)=>{
                                                 height: 32
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                lineNumber: 291,
+                                                lineNumber: 297,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 290,
+                                            lineNumber: 296,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: "Подключить Telegram"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 298,
+                                            lineNumber: 304,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 289,
+                                    lineNumber: 291,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                            lineNumber: 287,
+                            lineNumber: 289,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3927,7 +3939,7 @@ const CheckoutForm = (param)=>{
                                     children: "Личные данные"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 303,
+                                    lineNumber: 309,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3942,7 +3954,7 @@ const CheckoutForm = (param)=>{
                                                     children: "Имя"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 306,
+                                                    lineNumber: 312,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -3955,13 +3967,13 @@ const CheckoutForm = (param)=>{
                                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 309,
+                                                    lineNumber: 315,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 305,
+                                            lineNumber: 311,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3973,7 +3985,7 @@ const CheckoutForm = (param)=>{
                                                     children: "Фамилия"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 320,
+                                                    lineNumber: 326,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -3986,19 +3998,19 @@ const CheckoutForm = (param)=>{
                                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 323,
+                                                    lineNumber: 329,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 319,
+                                            lineNumber: 325,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 304,
+                                    lineNumber: 310,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4013,7 +4025,7 @@ const CheckoutForm = (param)=>{
                                                     children: "Телефон"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 336,
+                                                    lineNumber: 342,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -4026,13 +4038,13 @@ const CheckoutForm = (param)=>{
                                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 339,
+                                                    lineNumber: 345,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 335,
+                                            lineNumber: 341,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4044,7 +4056,7 @@ const CheckoutForm = (param)=>{
                                                     children: "Email"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 350,
+                                                    lineNumber: 356,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -4057,25 +4069,25 @@ const CheckoutForm = (param)=>{
                                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 353,
+                                                    lineNumber: 359,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 349,
+                                            lineNumber: 355,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 334,
+                                    lineNumber: 340,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                            lineNumber: 302,
+                            lineNumber: 308,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4086,7 +4098,7 @@ const CheckoutForm = (param)=>{
                                     children: "Вариант доставки"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 367,
+                                    lineNumber: 373,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4104,7 +4116,7 @@ const CheckoutForm = (param)=>{
                                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].radioInput
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 370,
+                                                    lineNumber: 376,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4115,7 +4127,7 @@ const CheckoutForm = (param)=>{
                                                             children: "СДЕК"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 379,
+                                                            lineNumber: 385,
                                                             columnNumber: 19
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4129,29 +4141,29 @@ const CheckoutForm = (param)=>{
                                                                     height: 10
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                    lineNumber: 389,
+                                                                    lineNumber: 395,
                                                                     columnNumber: 25
                                                                 }, ("TURBOPACK compile-time value", void 0))
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                lineNumber: 388,
+                                                                lineNumber: 394,
                                                                 columnNumber: 23
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 380,
+                                                            lineNumber: 386,
                                                             columnNumber: 19
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 378,
+                                                    lineNumber: 384,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 369,
+                                            lineNumber: 375,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -4166,7 +4178,7 @@ const CheckoutForm = (param)=>{
                                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].radioInput
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 401,
+                                                    lineNumber: 407,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4177,7 +4189,7 @@ const CheckoutForm = (param)=>{
                                                             children: "ЯНДЕКС.КУРЬЕР"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 410,
+                                                            lineNumber: 416,
                                                             columnNumber: 19
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4191,41 +4203,41 @@ const CheckoutForm = (param)=>{
                                                                     height: 10
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                    lineNumber: 420,
+                                                                    lineNumber: 426,
                                                                     columnNumber: 25
                                                                 }, ("TURBOPACK compile-time value", void 0))
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                lineNumber: 419,
+                                                                lineNumber: 425,
                                                                 columnNumber: 23
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 411,
+                                                            lineNumber: 417,
                                                             columnNumber: 19
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 409,
+                                                    lineNumber: 415,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 400,
+                                            lineNumber: 406,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 368,
+                                    lineNumber: 374,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                            lineNumber: 366,
+                            lineNumber: 372,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4236,7 +4248,7 @@ const CheckoutForm = (param)=>{
                                     children: "Доставка"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 435,
+                                    lineNumber: 441,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4254,7 +4266,7 @@ const CheckoutForm = (param)=>{
                                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].radioInput
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 439,
+                                                    lineNumber: 445,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4267,12 +4279,12 @@ const CheckoutForm = (param)=>{
                                                                 children: "Пункт выдачи"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                lineNumber: 449,
+                                                                lineNumber: 455,
                                                                 columnNumber: 23
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 448,
+                                                            lineNumber: 454,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4283,7 +4295,7 @@ const CheckoutForm = (param)=>{
                                                                     children: "Послезавтра"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                    lineNumber: 454,
+                                                                    lineNumber: 460,
                                                                     columnNumber: 23
                                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4291,13 +4303,13 @@ const CheckoutForm = (param)=>{
                                                                     children: "бесплатно"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                    lineNumber: 457,
+                                                                    lineNumber: 463,
                                                                     columnNumber: 23
                                                                 }, ("TURBOPACK compile-time value", void 0))
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 453,
+                                                            lineNumber: 459,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4311,29 +4323,29 @@ const CheckoutForm = (param)=>{
                                                                     height: 10
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                    lineNumber: 470,
+                                                                    lineNumber: 476,
                                                                     columnNumber: 27
                                                                 }, ("TURBOPACK compile-time value", void 0))
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                lineNumber: 469,
+                                                                lineNumber: 475,
                                                                 columnNumber: 25
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 461,
+                                                            lineNumber: 467,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 447,
+                                                    lineNumber: 453,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 438,
+                                            lineNumber: 444,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         formData.deliveryType === "yandex" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -4350,7 +4362,7 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].radioInput
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 485,
+                                                            lineNumber: 491,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4363,12 +4375,12 @@ const CheckoutForm = (param)=>{
                                                                         children: "Пункт выдачи"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                        lineNumber: 495,
+                                                                        lineNumber: 501,
                                                                         columnNumber: 25
                                                                     }, ("TURBOPACK compile-time value", void 0))
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                    lineNumber: 494,
+                                                                    lineNumber: 500,
                                                                     columnNumber: 23
                                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4379,7 +4391,7 @@ const CheckoutForm = (param)=>{
                                                                             children: "Послезавтра"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                            lineNumber: 500,
+                                                                            lineNumber: 506,
                                                                             columnNumber: 25
                                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4387,13 +4399,13 @@ const CheckoutForm = (param)=>{
                                                                             children: "бесплатно"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                            lineNumber: 503,
+                                                                            lineNumber: 509,
                                                                             columnNumber: 25
                                                                         }, ("TURBOPACK compile-time value", void 0))
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                    lineNumber: 499,
+                                                                    lineNumber: 505,
                                                                     columnNumber: 23
                                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4407,29 +4419,29 @@ const CheckoutForm = (param)=>{
                                                                             height: 10
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                            lineNumber: 516,
+                                                                            lineNumber: 522,
                                                                             columnNumber: 29
                                                                         }, ("TURBOPACK compile-time value", void 0))
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                        lineNumber: 515,
+                                                                        lineNumber: 521,
                                                                         columnNumber: 27
                                                                     }, ("TURBOPACK compile-time value", void 0))
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                    lineNumber: 507,
+                                                                    lineNumber: 513,
                                                                     columnNumber: 23
                                                                 }, ("TURBOPACK compile-time value", void 0))
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 493,
+                                                            lineNumber: 499,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 484,
+                                                    lineNumber: 490,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -4444,7 +4456,7 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].radioInput
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 528,
+                                                            lineNumber: 534,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4457,12 +4469,12 @@ const CheckoutForm = (param)=>{
                                                                         children: "Курьером"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                        lineNumber: 538,
+                                                                        lineNumber: 544,
                                                                         columnNumber: 25
                                                                     }, ("TURBOPACK compile-time value", void 0))
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                    lineNumber: 537,
+                                                                    lineNumber: 543,
                                                                     columnNumber: 23
                                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4473,7 +4485,7 @@ const CheckoutForm = (param)=>{
                                                                             children: "6-7 дней"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                            lineNumber: 543,
+                                                                            lineNumber: 549,
                                                                             columnNumber: 25
                                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4484,13 +4496,13 @@ const CheckoutForm = (param)=>{
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                            lineNumber: 546,
+                                                                            lineNumber: 552,
                                                                             columnNumber: 25
                                                                         }, ("TURBOPACK compile-time value", void 0))
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                    lineNumber: 542,
+                                                                    lineNumber: 548,
                                                                     columnNumber: 23
                                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4504,29 +4516,29 @@ const CheckoutForm = (param)=>{
                                                                             height: 10
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                            lineNumber: 561,
+                                                                            lineNumber: 567,
                                                                             columnNumber: 29
                                                                         }, ("TURBOPACK compile-time value", void 0))
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                        lineNumber: 560,
+                                                                        lineNumber: 566,
                                                                         columnNumber: 27
                                                                     }, ("TURBOPACK compile-time value", void 0))
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                    lineNumber: 552,
+                                                                    lineNumber: 558,
                                                                     columnNumber: 23
                                                                 }, ("TURBOPACK compile-time value", void 0))
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 536,
+                                                            lineNumber: 542,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 527,
+                                                    lineNumber: 533,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
@@ -4534,13 +4546,13 @@ const CheckoutForm = (param)=>{
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 436,
+                                    lineNumber: 442,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                            lineNumber: 434,
+                            lineNumber: 440,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4551,7 +4563,7 @@ const CheckoutForm = (param)=>{
                                     children: "Данные о доставке"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 578,
+                                    lineNumber: 584,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -4568,20 +4580,20 @@ const CheckoutForm = (param)=>{
                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].checkbox
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 583,
+                                            lineNumber: 589,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: "Получатель отличается от покупателя"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 590,
+                                            lineNumber: 596,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 579,
+                                    lineNumber: 585,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 formData.differentRecipient && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -4598,7 +4610,7 @@ const CheckoutForm = (param)=>{
                                                             children: "Имя получателя"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 596,
+                                                            lineNumber: 602,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -4611,13 +4623,13 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 599,
+                                                            lineNumber: 605,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 595,
+                                                    lineNumber: 601,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4629,7 +4641,7 @@ const CheckoutForm = (param)=>{
                                                             children: "Фамилия получателя"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 610,
+                                                            lineNumber: 616,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -4642,19 +4654,19 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 613,
+                                                            lineNumber: 619,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 609,
+                                                    lineNumber: 615,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 594,
+                                            lineNumber: 600,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4669,7 +4681,7 @@ const CheckoutForm = (param)=>{
                                                             children: "Телефон получателя"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 626,
+                                                            lineNumber: 632,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -4682,13 +4694,13 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 629,
+                                                            lineNumber: 635,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 625,
+                                                    lineNumber: 631,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4700,7 +4712,7 @@ const CheckoutForm = (param)=>{
                                                             children: "Email получателя"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 640,
+                                                            lineNumber: 646,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -4713,19 +4725,19 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 643,
+                                                            lineNumber: 649,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 639,
+                                                    lineNumber: 645,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 624,
+                                            lineNumber: 630,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
@@ -4744,7 +4756,7 @@ const CheckoutForm = (param)=>{
                                                             children: "Город"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 660,
+                                                            lineNumber: 666,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -4757,13 +4769,13 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 663,
+                                                            lineNumber: 669,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 659,
+                                                    lineNumber: 665,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4775,7 +4787,7 @@ const CheckoutForm = (param)=>{
                                                             children: "Почтовый индекс"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 674,
+                                                            lineNumber: 680,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -4788,19 +4800,19 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 677,
+                                                            lineNumber: 683,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 673,
+                                                    lineNumber: 679,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 658,
+                                            lineNumber: 664,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4817,7 +4829,7 @@ const CheckoutForm = (param)=>{
                                                         children: "Адрес пункта выдачи"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 693,
+                                                        lineNumber: 699,
                                                         columnNumber: 21
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -4831,18 +4843,18 @@ const CheckoutForm = (param)=>{
                                                         readOnly: true
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 696,
+                                                        lineNumber: 702,
                                                         columnNumber: 21
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                lineNumber: 689,
+                                                lineNumber: 695,
                                                 columnNumber: 19
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 688,
+                                            lineNumber: 694,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
@@ -4861,7 +4873,7 @@ const CheckoutForm = (param)=>{
                                                             children: "Город"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 714,
+                                                            lineNumber: 720,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -4874,13 +4886,13 @@ const CheckoutForm = (param)=>{
                                                             readOnly: true
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 717,
+                                                            lineNumber: 723,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 713,
+                                                    lineNumber: 719,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4892,7 +4904,7 @@ const CheckoutForm = (param)=>{
                                                             children: "Улица"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 728,
+                                                            lineNumber: 734,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -4905,19 +4917,19 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 731,
+                                                            lineNumber: 737,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 727,
+                                                    lineNumber: 733,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 712,
+                                            lineNumber: 718,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4932,7 +4944,7 @@ const CheckoutForm = (param)=>{
                                                             children: "Дом"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 744,
+                                                            lineNumber: 750,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -4945,13 +4957,13 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 747,
+                                                            lineNumber: 753,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 743,
+                                                    lineNumber: 749,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4963,7 +4975,7 @@ const CheckoutForm = (param)=>{
                                                             children: "Квартира"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 758,
+                                                            lineNumber: 764,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -4976,19 +4988,19 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 761,
+                                                            lineNumber: 767,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 757,
+                                                    lineNumber: 763,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 742,
+                                            lineNumber: 748,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5003,7 +5015,7 @@ const CheckoutForm = (param)=>{
                                                             children: "Этаж"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 774,
+                                                            lineNumber: 780,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -5016,13 +5028,13 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 777,
+                                                            lineNumber: 783,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 773,
+                                                    lineNumber: 779,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5034,7 +5046,7 @@ const CheckoutForm = (param)=>{
                                                             children: "Подъезд"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 788,
+                                                            lineNumber: 794,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -5047,19 +5059,19 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 791,
+                                                            lineNumber: 797,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 787,
+                                                    lineNumber: 793,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 772,
+                                            lineNumber: 778,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5073,7 +5085,7 @@ const CheckoutForm = (param)=>{
                                                         children: "Домофон"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 804,
+                                                        lineNumber: 810,
                                                         columnNumber: 21
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -5086,18 +5098,18 @@ const CheckoutForm = (param)=>{
                                                         className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].input
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 807,
+                                                        lineNumber: 813,
                                                         columnNumber: 21
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                lineNumber: 803,
+                                                lineNumber: 809,
                                                 columnNumber: 19
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 802,
+                                            lineNumber: 808,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
@@ -5105,7 +5117,7 @@ const CheckoutForm = (param)=>{
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                            lineNumber: 577,
+                            lineNumber: 583,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5116,7 +5128,7 @@ const CheckoutForm = (param)=>{
                                     children: formData.deliveryMethod === "pickup" ? "Пункт получения" : "Адрес доставки"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 823,
+                                    lineNumber: 829,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5138,12 +5150,12 @@ const CheckoutForm = (param)=>{
                                         readOnly: true
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                        lineNumber: 829,
+                                        lineNumber: 835,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 828,
+                                    lineNumber: 834,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5156,18 +5168,18 @@ const CheckoutForm = (param)=>{
                                         deliveryType: formData.deliveryType
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                        lineNumber: 857,
+                                        lineNumber: 863,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 856,
+                                    lineNumber: 862,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                            lineNumber: 822,
+                            lineNumber: 828,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5178,7 +5190,7 @@ const CheckoutForm = (param)=>{
                                     children: "Способ оплаты"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 868,
+                                    lineNumber: 874,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5196,7 +5208,7 @@ const CheckoutForm = (param)=>{
                                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].radioInput
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 871,
+                                                    lineNumber: 877,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5209,18 +5221,18 @@ const CheckoutForm = (param)=>{
                                                         className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].paymentButtonIcon
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 880,
+                                                        lineNumber: 886,
                                                         columnNumber: 19
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 879,
+                                                    lineNumber: 885,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 870,
+                                            lineNumber: 876,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -5235,7 +5247,7 @@ const CheckoutForm = (param)=>{
                                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].radioInput
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 890,
+                                                    lineNumber: 896,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5249,7 +5261,7 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].paymentButtonIcon
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 899,
+                                                            lineNumber: 905,
                                                             columnNumber: 19
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -5260,19 +5272,19 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].paymentButtonIcon
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 906,
+                                                            lineNumber: 912,
                                                             columnNumber: 19
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 898,
+                                                    lineNumber: 904,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 889,
+                                            lineNumber: 895,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -5287,7 +5299,7 @@ const CheckoutForm = (param)=>{
                                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].radioInput
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 916,
+                                                    lineNumber: 922,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5300,18 +5312,18 @@ const CheckoutForm = (param)=>{
                                                         className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].paymentButtonIcon
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 925,
+                                                        lineNumber: 931,
                                                         columnNumber: 19
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 924,
+                                                    lineNumber: 930,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 915,
+                                            lineNumber: 921,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -5326,7 +5338,7 @@ const CheckoutForm = (param)=>{
                                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].radioInput
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 935,
+                                                    lineNumber: 941,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5339,30 +5351,30 @@ const CheckoutForm = (param)=>{
                                                         className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].paymentButtonIcon
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 944,
+                                                        lineNumber: 950,
                                                         columnNumber: 19
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 943,
+                                                    lineNumber: 949,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 934,
+                                            lineNumber: 940,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 869,
+                                    lineNumber: 875,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                            lineNumber: 867,
+                            lineNumber: 873,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         !showRightColumn && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -5379,7 +5391,7 @@ const CheckoutForm = (param)=>{
                                                     children: "Итого"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 961,
+                                                    lineNumber: 967,
                                                     columnNumber: 21
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5387,18 +5399,18 @@ const CheckoutForm = (param)=>{
                                                     children: formatPrice(calculateTotal())
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 962,
+                                                    lineNumber: 968,
                                                     columnNumber: 21
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 960,
+                                            lineNumber: 966,
                                             columnNumber: 19
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                        lineNumber: 959,
+                                        lineNumber: 965,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -5409,7 +5421,7 @@ const CheckoutForm = (param)=>{
                                         children: "Оформить заказ"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                        lineNumber: 967,
+                                        lineNumber: 973,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5426,7 +5438,7 @@ const CheckoutForm = (param)=>{
                                                         className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].checkbox
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 977,
+                                                        lineNumber: 983,
                                                         columnNumber: 21
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5439,19 +5451,19 @@ const CheckoutForm = (param)=>{
                                                                 children: "публичной оферты"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                lineNumber: 986,
+                                                                lineNumber: 992,
                                                                 columnNumber: 23
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 984,
+                                                        lineNumber: 990,
                                                         columnNumber: 21
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                lineNumber: 976,
+                                                lineNumber: 982,
                                                 columnNumber: 19
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -5465,7 +5477,7 @@ const CheckoutForm = (param)=>{
                                                         className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].checkbox
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 995,
+                                                        lineNumber: 1001,
                                                         columnNumber: 21
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5478,38 +5490,38 @@ const CheckoutForm = (param)=>{
                                                                 children: "политику конфиденциальности"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                lineNumber: 1004,
+                                                                lineNumber: 1010,
                                                                 columnNumber: 23
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 1002,
+                                                        lineNumber: 1008,
                                                         columnNumber: 21
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                lineNumber: 994,
+                                                lineNumber: 1000,
                                                 columnNumber: 19
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                        lineNumber: 975,
+                                        lineNumber: 981,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                lineNumber: 958,
+                                lineNumber: 964,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                    lineNumber: 286,
+                    lineNumber: 288,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 showRightColumn && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5523,7 +5535,7 @@ const CheckoutForm = (param)=>{
                                     children: "Ваши товары"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 1017,
+                                    lineNumber: 1023,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -5532,13 +5544,13 @@ const CheckoutForm = (param)=>{
                                     children: "изменить"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 1018,
+                                    lineNumber: 1024,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                            lineNumber: 1016,
+                            lineNumber: 1022,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5565,12 +5577,12 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].orderImage
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 1038,
+                                                            lineNumber: 1044,
                                                             columnNumber: 27
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 1037,
+                                                        lineNumber: 1043,
                                                         columnNumber: 25
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5588,13 +5600,13 @@ const CheckoutForm = (param)=>{
                                                                                 children: item.product.title
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                                lineNumber: 1056,
+                                                                                lineNumber: 1062,
                                                                                 columnNumber: 31
                                                                             }, ("TURBOPACK compile-time value", void 0))
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                        lineNumber: 1051,
+                                                                        lineNumber: 1057,
                                                                         columnNumber: 29
                                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5608,7 +5620,7 @@ const CheckoutForm = (param)=>{
                                                                                         children: "Цвет"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                                        lineNumber: 1062,
+                                                                                        lineNumber: 1068,
                                                                                         columnNumber: 33
                                                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5616,13 +5628,13 @@ const CheckoutForm = (param)=>{
                                                                                         children: colorLabel
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                                        lineNumber: 1065,
+                                                                                        lineNumber: 1071,
                                                                                         columnNumber: 33
                                                                                     }, ("TURBOPACK compile-time value", void 0))
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                                lineNumber: 1061,
+                                                                                lineNumber: 1067,
                                                                                 columnNumber: 31
                                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5633,7 +5645,7 @@ const CheckoutForm = (param)=>{
                                                                                         children: "Размер"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                                        lineNumber: 1070,
+                                                                                        lineNumber: 1076,
                                                                                         columnNumber: 33
                                                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5641,25 +5653,25 @@ const CheckoutForm = (param)=>{
                                                                                         children: item.size
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                                        lineNumber: 1073,
+                                                                                        lineNumber: 1079,
                                                                                         columnNumber: 33
                                                                                     }, ("TURBOPACK compile-time value", void 0))
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                                lineNumber: 1069,
+                                                                                lineNumber: 1075,
                                                                                 columnNumber: 31
                                                                             }, ("TURBOPACK compile-time value", void 0))
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                        lineNumber: 1060,
+                                                                        lineNumber: 1066,
                                                                         columnNumber: 29
                                                                     }, ("TURBOPACK compile-time value", void 0))
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                lineNumber: 1050,
+                                                                lineNumber: 1056,
                                                                 columnNumber: 27
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5667,30 +5679,30 @@ const CheckoutForm = (param)=>{
                                                                 children: formatPrice(item.product.priceValue * item.quantity)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                lineNumber: 1081,
+                                                                lineNumber: 1087,
                                                                 columnNumber: 27
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 1049,
+                                                        lineNumber: 1055,
                                                         columnNumber: 25
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, "".concat(item.productId, "-").concat(item.size, "-").concat(item.color, "-").concat(index), true, {
                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                lineNumber: 1033,
+                                                lineNumber: 1039,
                                                 columnNumber: 23
                                             }, ("TURBOPACK compile-time value", void 0));
                                         })
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                        lineNumber: 1024,
+                                        lineNumber: 1030,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 1023,
+                                    lineNumber: 1029,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5701,7 +5713,7 @@ const CheckoutForm = (param)=>{
                                             children: "Доставка:"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 1093,
+                                            lineNumber: 1099,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5709,13 +5721,13 @@ const CheckoutForm = (param)=>{
                                             children: formData.deliveryMethod === "pickup" ? "Бесплатно" : formatPrice(deliveryPrices[formData.deliveryMethod] || 0)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 1094,
+                                            lineNumber: 1100,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 1092,
+                                    lineNumber: 1098,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5726,7 +5738,7 @@ const CheckoutForm = (param)=>{
                                             children: "Товаров на:"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 1105,
+                                            lineNumber: 1111,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5734,13 +5746,13 @@ const CheckoutForm = (param)=>{
                                             children: formatPrice(getTotalPrice())
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 1106,
+                                            lineNumber: 1112,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 1104,
+                                    lineNumber: 1110,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5756,7 +5768,7 @@ const CheckoutForm = (param)=>{
                                                         children: "Итого"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 1113,
+                                                        lineNumber: 1119,
                                                         columnNumber: 21
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5764,18 +5776,18 @@ const CheckoutForm = (param)=>{
                                                         children: formatPrice(calculateTotal())
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                        lineNumber: 1114,
+                                                        lineNumber: 1120,
                                                         columnNumber: 21
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                lineNumber: 1112,
+                                                lineNumber: 1118,
                                                 columnNumber: 19
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 1111,
+                                            lineNumber: 1117,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -5786,7 +5798,7 @@ const CheckoutForm = (param)=>{
                                             children: "Оформить заказ"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 1119,
+                                            lineNumber: 1125,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5803,7 +5815,7 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].checkbox
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 1129,
+                                                            lineNumber: 1135,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5816,19 +5828,19 @@ const CheckoutForm = (param)=>{
                                                                     children: "публичной оферты"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                    lineNumber: 1138,
+                                                                    lineNumber: 1144,
                                                                     columnNumber: 23
                                                                 }, ("TURBOPACK compile-time value", void 0))
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 1136,
+                                                            lineNumber: 1142,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 1128,
+                                                    lineNumber: 1134,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -5842,7 +5854,7 @@ const CheckoutForm = (param)=>{
                                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$checkout$2f$page$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].checkbox
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 1147,
+                                                            lineNumber: 1153,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5855,60 +5867,61 @@ const CheckoutForm = (param)=>{
                                                                     children: "политику конфиденциальности"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                                    lineNumber: 1156,
+                                                                    lineNumber: 1162,
                                                                     columnNumber: 23
                                                                 }, ("TURBOPACK compile-time value", void 0))
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                            lineNumber: 1154,
+                                                            lineNumber: 1160,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                                    lineNumber: 1146,
+                                                    lineNumber: 1152,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                            lineNumber: 1127,
+                                            lineNumber: 1133,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                                    lineNumber: 1110,
+                                    lineNumber: 1116,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                            lineNumber: 1022,
+                            lineNumber: 1028,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-                    lineNumber: 1015,
+                    lineNumber: 1021,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0))
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-            lineNumber: 285,
+            lineNumber: 287,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0))
     }, void 0, false, {
         fileName: "[project]/src/components/CheckoutForm/CheckoutForm.tsx",
-        lineNumber: 284,
+        lineNumber: 286,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
-_s(CheckoutForm, "mcG1vvW8b4Tp/2CSQ3GW4kbnNZU=", false, function() {
+_s(CheckoutForm, "ItGdMs3/31HikXRnOp/ZhQV5zt8=", false, function() {
     return [
-        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$CartContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCart"]
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$CartContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCart"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"]
     ];
 });
 _c = CheckoutForm;

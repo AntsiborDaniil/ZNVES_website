@@ -71,9 +71,9 @@
 }
 
 .mainImage {
-  width: 600px;
+  width: 100%;
   height: auto;
-
+  display: block;
   object-fit: contain;
 }
 

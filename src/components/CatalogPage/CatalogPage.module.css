@@ -207,8 +207,8 @@
 }
 
 .filters {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   padding: 20px;
   background-color: #f8f8f8;
@@ -223,8 +223,7 @@
   position: relative;
   list-style: none;
   z-index: 10000;
-  flex: 1;
-  min-width: 200px;
+  min-width: 0;
 }
 
 .filterButton {
@@ -543,12 +542,10 @@
   .filters {
     padding: 16px;
     gap: 12px;
-    flex-direction: row;
-    flex-wrap: wrap;
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .filterDropdown {
-    flex: 1 1 calc(33.333% - 8px);
     min-width: 0;
   }
 

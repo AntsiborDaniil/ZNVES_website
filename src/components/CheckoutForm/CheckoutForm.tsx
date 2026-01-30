@@ -2,9 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "../../contexts/CartContext";
+import { useAuth } from "../../contexts/AuthContext";
 import Image from "next/image";
 import Link from "next/link";
 import { getProductById } from "../../data/products";
+import { createOrder, getPaymentUrl, getYandexPaymentUrl, type OrderRequest } from "../../api/order/orderApi";
+import { fetchCatalogProductRaw, type ApiProductDetail } from "../../api/product/productApi";
 import Map from "../Map/Map";
 import styles from "../../app/checkout/page.module.css";
 
@@ -20,6 +23,7 @@ const CheckoutForm = ({
   className = "",
 }: CheckoutFormProps) => {
   const { items, getTotalPrice, clearCart } = useCart();
+  const { redirectToBot } = useAuth();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -49,6 +53,25 @@ const CheckoutForm = ({
   const [mapSearchValue, setMapSearchValue] = useState("");
   const isUpdatingFromMapRef = useRef(false);
   const lastGeocodedAddressRef = useRef<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pvzCode, setPvzCode] = useState<string>(""); // Для CDEK
+  const [pvzId, setPvzId] = useState<string>(""); // Для Яндекс
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
+  
+  // Refs для полей формы
+  const firstNameRef = useRef<HTMLInputElement>(null);
+  const lastNameRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const deliveryFirstNameRef = useRef<HTMLInputElement>(null);
+  const deliveryLastNameRef = useRef<HTMLInputElement>(null);
+  const deliveryPhoneRef = useRef<HTMLInputElement>(null);
+  const deliveryEmailRef = useRef<HTMLInputElement>(null);
+  const cityRef = useRef<HTMLInputElement>(null);
+  const streetRef = useRef<HTMLInputElement>(null);
+  const houseRef = useRef<HTMLInputElement>(null);
+  const pvzAddressRef = useRef<HTMLInputElement>(null);
+  const mapSectionRef = useRef<HTMLDivElement>(null);
 
   // Устанавливаем город "Москва" при выборе курьерской доставки
   useEffect(() => {
@@ -90,6 +113,15 @@ const CheckoutForm = ({
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
+    // Убираем ошибку при изменении поля
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+
     // При смене типа доставки сбрасываем метод доставки на pickup
     if (name === "deliveryType") {
       setFormData((prev) => ({
@@ -97,6 +129,15 @@ const CheckoutForm = ({
         deliveryType: value,
         deliveryMethod: "pickup",
       }));
+      // Сбрасываем ошибки доставки при смене типа
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.pvzAddress;
+        delete newErrors.city;
+        delete newErrors.street;
+        delete newErrors.house;
+        return newErrors;
+      });
     } else if (name === "deliveryMethod" && value === "yandex") {
       // При выборе курьерской доставки устанавливаем город "Москва"
       setFormData((prev) => ({
@@ -104,6 +145,29 @@ const CheckoutForm = ({
         deliveryMethod: value,
         city: "Москва",
       }));
+      // Сбрасываем ошибки доставки при смене метода
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.pvzAddress;
+        delete newErrors.city;
+        delete newErrors.street;
+        delete newErrors.house;
+        return newErrors;
+      });
+    } else if (name === "deliveryMethod") {
+      setFormData((prev) => ({
+        ...prev,
+        deliveryMethod: value,
+      }));
+      // Сбрасываем ошибки доставки при смене метода
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.pvzAddress;
+        delete newErrors.city;
+        delete newErrors.street;
+        delete newErrors.house;
+        return newErrors;
+      });
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -118,6 +182,8 @@ const CheckoutForm = ({
     house?: string;
     fullAddress?: string;
     pvzAddress?: string;
+    pvzCode?: string; // Для CDEK
+    pvzId?: string; // Для Яндекс
   }) => {
     const fullAddress =
       addressData.fullAddress ||
@@ -132,6 +198,16 @@ const CheckoutForm = ({
     lastGeocodedAddressRef.current = fullAddress;
     isUpdatingFromMapRef.current = true;
 
+    // Убираем ошибки при выборе адреса
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.pvzAddress;
+      delete newErrors.city;
+      delete newErrors.street;
+      delete newErrors.house;
+      return newErrors;
+    });
+
     // Если выбран пункт выдачи, сохраняем адрес ПВЗ
     if (formData.deliveryMethod === "pickup") {
       setFormData((prev) => ({
@@ -139,6 +215,14 @@ const CheckoutForm = ({
         pvzAddress: addressData.pvzAddress || fullAddress || "",
         city: addressData.city || prev.city,
       }));
+      
+      // Сохраняем pvz_code и pvz_id если они есть
+      if (addressData.pvzCode) {
+        setPvzCode(addressData.pvzCode);
+      }
+      if (addressData.pvzId) {
+        setPvzId(addressData.pvzId);
+      }
     } else {
       // Для курьерской доставки сохраняем полный адрес
       const newAddress = {
@@ -197,86 +281,428 @@ const CheckoutForm = ({
     return `${day}.${month}.${year}`;
   };
 
-  const handleSubmitOrder = () => {
+  // Функция для преобразования строки в UUID-подобный формат
+  const stringToUUID = (str: string): string => {
+    // Простая функция для генерации UUID-подобной строки из строки
+    const hash = str.split("").reduce((acc, char) => {
+      const hash = ((acc << 5) - acc) + char.charCodeAt(0);
+      return hash & hash;
+    }, 0);
+    
+    // Форматируем как UUID
+    const hex = Math.abs(hash).toString(16).padStart(8, "0");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32).padEnd(12, "0")}`;
+  };
+
+  // Функция валидации формы
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, boolean> = {};
+
+    // Валидация личных данных
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = true;
+    }
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = true;
+    }
+    if (!formData.phone.trim()) {
+      newErrors.phone = true;
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = true;
+    }
+
+    // Валидация данных получателя, если отличается от покупателя
+    if (formData.differentRecipient) {
+      if (!formData.deliveryFirstName.trim()) {
+        newErrors.deliveryFirstName = true;
+      }
+      if (!formData.deliveryLastName.trim()) {
+        newErrors.deliveryLastName = true;
+      }
+      if (!formData.deliveryPhone.trim()) {
+        newErrors.deliveryPhone = true;
+      }
+      if (!formData.deliveryEmail.trim()) {
+        newErrors.deliveryEmail = true;
+      }
+    }
+
+    // Валидация данных доставки
+    if (formData.deliveryMethod === "pickup") {
+      // Для ПВЗ нужно проверить, что выбран пункт выдачи
+      if (formData.deliveryType === "cdek" && !pvzCode) {
+        newErrors.pvzAddress = true;
+      } else if (formData.deliveryType === "yandex" && !pvzId) {
+        newErrors.pvzAddress = true;
+      }
+    } else if (formData.deliveryMethod === "yandex") {
+      // Для курьерской доставки нужны город, улица и дом
+      if (!formData.city.trim()) {
+        newErrors.city = true;
+      }
+      if (!formData.street.trim()) {
+        newErrors.street = true;
+      }
+      if (!formData.house.trim()) {
+        newErrors.house = true;
+      }
+    }
+
+    setErrors(newErrors);
+
+    // Если есть ошибки, скроллим к первой
+    if (Object.keys(newErrors).length > 0) {
+      const errorFields = Object.keys(newErrors);
+      const firstError = errorFields[0];
+      
+      // Скроллим к полю или секции карты с плавной анимацией
+      setTimeout(() => {
+        let targetElement: HTMLElement | null = null;
+        
+        switch (firstError) {
+          case "firstName":
+            targetElement = firstNameRef.current as HTMLElement | null;
+            break;
+          case "lastName":
+            targetElement = lastNameRef.current as HTMLElement | null;
+            break;
+          case "phone":
+            targetElement = phoneRef.current as HTMLElement | null;
+            break;
+          case "email":
+            targetElement = emailRef.current as HTMLElement | null;
+            break;
+          case "deliveryFirstName":
+            targetElement = deliveryFirstNameRef.current as HTMLElement | null;
+            break;
+          case "deliveryLastName":
+            targetElement = deliveryLastNameRef.current as HTMLElement | null;
+            break;
+          case "deliveryPhone":
+            targetElement = deliveryPhoneRef.current as HTMLElement | null;
+            break;
+          case "deliveryEmail":
+            targetElement = deliveryEmailRef.current as HTMLElement | null;
+            break;
+          case "city":
+            targetElement = cityRef.current as HTMLElement | null;
+            break;
+          case "street":
+            targetElement = streetRef.current as HTMLElement | null;
+            break;
+          case "house":
+            targetElement = houseRef.current as HTMLElement | null;
+            break;
+          case "pvzAddress":
+            targetElement = (pvzAddressRef.current || mapSectionRef.current) as HTMLElement | null;
+            break;
+        }
+
+        if (targetElement) {
+          // Получаем позицию элемента с учетом отступа
+          const elementPosition = targetElement.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - 150; // Отступ 150px сверху
+          
+          // Плавный скролл с использованием requestAnimationFrame для максимальной плавности
+          const startPosition = window.pageYOffset;
+          const distance = offsetPosition - startPosition;
+          const duration = 800; // Длительность анимации в миллисекундах
+          let start: number | null = null;
+
+          const animateScroll = (currentTime: number) => {
+            if (start === null) start = currentTime;
+            const timeElapsed = currentTime - start;
+            const progress = Math.min(timeElapsed / duration, 1);
+            
+            // Используем easing функцию для более плавной анимации
+            const ease = (t: number) => t < 0.5 
+              ? 2 * t * t 
+              : -1 + (4 - 2 * t) * t;
+            
+            window.scrollTo({
+              top: startPosition + distance * ease(progress),
+              behavior: "auto"
+            });
+
+            if (timeElapsed < duration) {
+              requestAnimationFrame(animateScroll);
+            } else {
+              // После завершения скролла фокусируемся на поле
+              if (targetElement instanceof HTMLInputElement) {
+                targetElement.focus();
+                // Добавляем небольшое выделение для привлечения внимания
+                targetElement.style.transition = "box-shadow 0.3s ease";
+                targetElement.style.boxShadow = "0 0 0 3px rgba(220, 53, 69, 0.3)";
+                setTimeout(() => {
+                  if (targetElement instanceof HTMLInputElement) {
+                    targetElement.style.boxShadow = "";
+                  }
+                }, 1000);
+              }
+            }
+          };
+
+          requestAnimationFrame(animateScroll);
+        }
+      }, 150);
+
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmitOrder = async () => {
     if (!formData.agreeToOffer || !formData.agreeToPrivacy) {
       return;
     }
 
-    const newOrderNumber = generateOrderNumber();
-    const orderDate = new Date();
-
-    // Формируем данные заказа
-    const orderData = {
-      id: newOrderNumber,
-      date: formatDate(orderDate),
-      status: "не оплачен",
-      buyer: {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone || formData.email,
-      },
-      delivery: {
-        firstName: formData.deliveryFirstName || formData.firstName,
-        lastName: formData.deliveryLastName || formData.lastName,
-        email: formData.deliveryEmail || formData.email,
-        phone: formData.deliveryPhone || formData.phone || formData.email,
-        city: formData.city,
-        street: formData.street,
-        house: formData.house,
-        apartment: formData.apartment,
-        floor: formData.floor,
-        entrance: formData.entrance,
-        intercom: formData.intercom,
-        pickupCity: formData.pickupCity,
-        postalCode: formData.postalCode,
-        pvzAddress: formData.pvzAddress,
-        type: formData.deliveryType,
-        method: formData.deliveryMethod,
-      },
-      payment: {
-        method: formData.paymentMethod,
-        amount: formatPrice(calculateTotal()),
-      },
-      products: items.map((item) => {
-        const fullProduct = getProductById(item.productId);
-        const colorLabel =
-          fullProduct?.availableColors.find((c) => c.value === item.color)
-            ?.label || item.color;
-
-        return {
-          id: item.productId,
-          name: item.product.title,
-          category: fullProduct?.category || item.product.category || "",
-          color: colorLabel,
-          size: item.size,
-          quantity: item.quantity,
-          price: formatPrice(item.product.priceValue * item.quantity),
-          priceValue: item.product.priceValue * item.quantity,
-          image: item.product.images[0] || "/images/catalogs/placeholder.png",
-        };
-      }),
-      total: {
-        itemsCount: items.reduce((sum, item) => sum + item.quantity, 0),
-        totalAmount: formatPrice(calculateTotal()),
-        totalAmountValue: calculateTotal(),
-      },
-    };
-
-    // Сохраняем заказ в sessionStorage
-    if (typeof window !== "undefined") {
-      try {
-        const existingOrders = sessionStorage.getItem("znves:orders");
-        const orders = existingOrders ? JSON.parse(existingOrders) : [];
-        orders.push(orderData);
-        sessionStorage.setItem("znves:orders", JSON.stringify(orders));
-      } catch (error) {
-        console.error("Failed to save order to sessionStorage:", error);
-      }
+    if (isSubmitting) {
+      return;
     }
 
-    if (onOrderSubmit) {
-      onOrderSubmit(newOrderNumber);
+    // Валидация формы
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Определяем delivery_service на основе deliveryType и deliveryMethod
+      let deliveryService: "cdek" | "yandex" | "yandex_courier";
+      if (formData.deliveryType === "cdek") {
+        deliveryService = "cdek";
+      } else if (formData.deliveryType === "yandex" && formData.deliveryMethod === "yandex") {
+        deliveryService = "yandex_courier";
+      } else {
+        deliveryService = "yandex";
+      }
+
+      // Формируем полный адрес
+      const fullAddress = formData.deliveryMethod === "pickup" 
+        ? formData.pvzAddress || ""
+        : [
+            formData.city,
+            formData.street,
+            formData.house,
+            formData.apartment && `кв. ${formData.apartment}`,
+            formData.floor && `${formData.floor} этаж`,
+            formData.entrance && `подъезд ${formData.entrance}`,
+            formData.intercom && `домофон ${formData.intercom}`,
+          ]
+            .filter(Boolean)
+            .join(", ");
+
+      // positions[].id: warehouse_product из корзины или из каталога (один запрос на slug)
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      const slugsFromItems = items
+        .filter((item) => !item.warehouseProduct)
+        .map((item) => getProductById(item.productId)?.slug)
+        .filter((s): s is string => !!s);
+      const uniqueSlugs = Array.from(new Set(slugsFromItems));
+      const slugToProduct: Record<string, ApiProductDetail | null> = {};
+      await Promise.all(
+        uniqueSlugs.map(async (slug) => {
+          const data = await fetchCatalogProductRaw(slug);
+          if (data) slugToProduct[slug] = data;
+        })
+      );
+
+      const positions = items.map((item) => {
+        if (item.warehouseProduct) {
+          return { id: item.warehouseProduct, quantity: item.quantity };
+        }
+        const fullProduct = getProductById(item.productId);
+        if (!fullProduct?.slug) {
+          return {
+            id: stringToUUID(`product-${item.productId}-${item.color}-${item.size}`),
+            quantity: item.quantity,
+          };
+        }
+        const productData = slugToProduct[fullProduct.slug];
+        if (productData?.warehouse_items?.length) {
+          const warehouseItem = productData.warehouse_items.find(
+            (wi: { color?: string; color_slug?: string; size?: string; size_slug?: string }) =>
+              (wi.color === item.color || wi.color_slug === item.color) &&
+              (wi.size === item.size || wi.size_slug === item.size)
+          );
+          const rawId = (warehouseItem as { uuid?: string; id?: string })?.uuid ?? warehouseItem?.id;
+          const idStr = rawId != null ? String(rawId).trim() : null;
+          if (idStr && uuidRegex.test(idStr)) {
+            return { id: idStr, quantity: item.quantity };
+          }
+        }
+        return {
+          id: stringToUUID(`${fullProduct.slug}-${item.color}-${item.size}`),
+          quantity: item.quantity,
+        };
+      });
+
+      // Формируем данные заказа для API
+      const orderRequest: OrderRequest = {
+        total_amount: calculateTotal().toFixed(2),
+        payment_type: "prepayment",
+        delivery_service: deliveryService,
+        customer_data: {
+          full_name: `${formData.firstName} ${formData.lastName}`.trim(),
+          email: formData.email,
+          phone: formData.phone,
+        },
+        positions,
+      };
+
+      // Добавляем данные доставки в зависимости от типа
+      if (deliveryService === "cdek") {
+        // Для CDEK обязательно заполняем cdek_delivery_data
+        orderRequest.cdek_delivery_data = {
+          pvz_code: pvzCode || "DEFAULT",
+          full_address: fullAddress,
+        };
+      } else if (deliveryService === "yandex") {
+        // Для yandex (ПВЗ) обязательно заполняем yandex_delivery_data со всеми полями, включая pvz_id
+        orderRequest.yandex_delivery_data = {
+          pvz_id: pvzId || "",
+          full_address: fullAddress,
+        };
+      } else if (deliveryService === "yandex_courier") {
+        // Для yandex_courier обязательно заполняем yandex_delivery_data (pvz_id не нужен)
+        orderRequest.yandex_delivery_data = {
+          full_address: fullAddress,
+        };
+      }
+
+      console.log("Submitting order:", orderRequest);
+
+      // Создаем заказ
+      const orderResponse = await createOrder(orderRequest);
+      console.log("Order created:", orderResponse);
+
+      // Сохраняем order_id для дальнейшего использования
+      const orderId = orderResponse.id;
+
+      // Обработка оплаты в зависимости от выбранного способа
+      if (formData.paymentMethod === "card" || formData.paymentMethod === "sberbank") {
+        // Оплата картой или СБП - используем ручку /api/order/{order_id}/pay/
+        try {
+          const paymentResponse = await getPaymentUrl(orderId);
+          console.log("Payment URL:", paymentResponse);
+          
+          // Используем confirmation_url или payment_url для обратной совместимости
+          const paymentUrl = paymentResponse.confirmation_url || paymentResponse.payment_url;
+          
+          if (paymentUrl) {
+            // Перенаправляем на страницу оплаты
+            window.location.href = paymentUrl;
+            return;
+          }
+        } catch (error) {
+          console.error("Failed to get payment URL:", error);
+          // Продолжаем с сохранением заказа в sessionStorage
+        }
+      } else if (formData.paymentMethod === "yandexpay") {
+        // Яндекс Pay - используем ручку /api/order/{order_id}/pay/yandex/
+        try {
+          const paymentResponse = await getYandexPaymentUrl(orderId);
+          console.log("Yandex Payment URL:", paymentResponse);
+          
+          // Используем confirmation_url или payment_url для обратной совместимости
+          const paymentUrl = paymentResponse.confirmation_url || paymentResponse.payment_url;
+          
+          if (paymentUrl) {
+            // Перенаправляем на страницу оплаты Яндекс Pay
+            window.location.href = paymentUrl;
+            return;
+          }
+        } catch (error) {
+          console.error("Failed to get Yandex payment URL:", error);
+          // Продолжаем с сохранением заказа в sessionStorage
+        }
+      }
+
+      // Сохраняем заказ в sessionStorage для отображения в личном кабинете
+      const newOrderNumber = orderResponse.id.toString();
+      const orderDate = new Date();
+
+      // Формируем данные заказа для отображения
+      const orderData = {
+        id: newOrderNumber,
+        date: formatDate(orderDate),
+        status: "не оплачен",
+        buyer: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone || formData.email,
+        },
+        delivery: {
+          firstName: formData.deliveryFirstName || formData.firstName,
+          lastName: formData.deliveryLastName || formData.lastName,
+          email: formData.deliveryEmail || formData.email,
+          phone: formData.deliveryPhone || formData.phone || formData.email,
+          city: formData.city,
+          street: formData.street,
+          house: formData.house,
+          apartment: formData.apartment,
+          floor: formData.floor,
+          entrance: formData.entrance,
+          intercom: formData.intercom,
+          pickupCity: formData.pickupCity,
+          postalCode: formData.postalCode,
+          pvzAddress: formData.pvzAddress,
+          type: formData.deliveryType,
+          method: formData.deliveryMethod,
+        },
+        payment: {
+          method: formData.paymentMethod,
+          amount: formatPrice(calculateTotal()),
+        },
+        products: items.map((item) => {
+          const fullProduct = getProductById(item.productId);
+          const colorLabel =
+            fullProduct?.availableColors.find((c) => c.value === item.color)
+              ?.label || item.color;
+
+          return {
+            id: item.productId,
+            name: item.product.title,
+            category: fullProduct?.category || item.product.category || "",
+            color: colorLabel,
+            size: item.size,
+            quantity: item.quantity,
+            price: formatPrice(item.product.priceValue * item.quantity),
+            priceValue: item.product.priceValue * item.quantity,
+            image: item.product.images[0] || "/images/catalogs/placeholder.png",
+          };
+        }),
+        total: {
+          itemsCount: items.reduce((sum, item) => sum + item.quantity, 0),
+          totalAmount: formatPrice(calculateTotal()),
+          totalAmountValue: calculateTotal(),
+        },
+      };
+
+      // Сохраняем заказ в sessionStorage
+      if (typeof window !== "undefined") {
+        try {
+          const existingOrders = sessionStorage.getItem("znves:orders");
+          const orders = existingOrders ? JSON.parse(existingOrders) : [];
+          orders.push(orderData);
+          sessionStorage.setItem("znves:orders", JSON.stringify(orders));
+        } catch (error) {
+          console.error("Failed to save order to sessionStorage:", error);
+        }
+      }
+
+      if (onOrderSubmit) {
+        onOrderSubmit(newOrderNumber);
+      }
+    } catch (error) {
+      console.error("Failed to submit order:", error);
+      alert("Ошибка при оформлении заказа. Пожалуйста, попробуйте еще раз.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -286,13 +712,18 @@ const CheckoutForm = ({
         <div className={styles.leftColumn}>
           <div className={styles.telegramSection}>
             <h1 className={styles.title}>Оформление заказа</h1>
-            <button className={styles.telegramButton} type="button">
+            <button
+              className={styles.telegramButton}
+              type="button"
+              onClick={redirectToBot}
+            >
               <div className={styles.telegramIcon}>
                 <Image
                   src="/images/checkout/telegram.png"
                   alt="Telegram"
                   width={32}
                   height={32}
+                  loading="lazy"
                 />
               </div>
               <span>Подключить Telegram</span>
@@ -313,7 +744,8 @@ const CheckoutForm = ({
                   placeholder="Введите имя"
                   value={formData.firstName}
                   onChange={handleInputChange}
-                  className={styles.input}
+                  className={`${styles.input} ${errors.firstName ? styles.inputError : ""}`}
+                  ref={firstNameRef}
                 />
               </div>
               <div className={styles.inputWrapper}>
@@ -327,7 +759,8 @@ const CheckoutForm = ({
                   placeholder="Введите фамилию"
                   value={formData.lastName}
                   onChange={handleInputChange}
-                  className={styles.input}
+                  className={`${styles.input} ${errors.lastName ? styles.inputError : ""}`}
+                  ref={lastNameRef}
                 />
               </div>
             </div>
@@ -343,7 +776,8 @@ const CheckoutForm = ({
                   placeholder="+7 (___) ___-__-__"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className={styles.input}
+                  className={`${styles.input} ${errors.phone ? styles.inputError : ""}`}
+                  ref={phoneRef}
                 />
               </div>
               <div className={styles.inputWrapper}>
@@ -357,7 +791,8 @@ const CheckoutForm = ({
                   placeholder="Введите email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={styles.input}
+                  className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
+                  ref={emailRef}
                 />
               </div>
             </div>
@@ -391,6 +826,7 @@ const CheckoutForm = ({
                           alt="checkmark"
                           width={11.64}
                           height={10}
+                          loading="lazy"
                         />
                       </span>
                     )}
@@ -422,6 +858,7 @@ const CheckoutForm = ({
                           alt="checkmark"
                           width={11.64}
                           height={10}
+                          loading="lazy"
                         />
                       </span>
                     )}
@@ -472,6 +909,7 @@ const CheckoutForm = ({
                             alt="checkmark"
                             width={11.64}
                             height={10}
+                            loading="lazy"
                           />
                         </span>
                       )}
@@ -518,6 +956,7 @@ const CheckoutForm = ({
                               alt="checkmark"
                               width={11.64}
                               height={10}
+                              loading="lazy"
                             />
                           </span>
                         )}
@@ -563,6 +1002,7 @@ const CheckoutForm = ({
                               alt="checkmark"
                               width={11.64}
                               height={10}
+                              loading="lazy"
                             />
                           </span>
                         )}
@@ -603,7 +1043,8 @@ const CheckoutForm = ({
                       placeholder="Введите имя"
                       value={formData.deliveryFirstName}
                       onChange={handleInputChange}
-                      className={styles.input}
+                      className={`${styles.input} ${errors.deliveryFirstName ? styles.inputError : ""}`}
+                      ref={deliveryFirstNameRef}
                     />
                   </div>
                   <div className={styles.inputWrapper}>
@@ -617,7 +1058,8 @@ const CheckoutForm = ({
                       placeholder="Введите фамилию"
                       value={formData.deliveryLastName}
                       onChange={handleInputChange}
-                      className={styles.input}
+                      className={`${styles.input} ${errors.deliveryLastName ? styles.inputError : ""}`}
+                      ref={deliveryLastNameRef}
                     />
                   </div>
                 </div>
@@ -633,7 +1075,8 @@ const CheckoutForm = ({
                       placeholder="+7 (___) ___-__-__"
                       value={formData.deliveryPhone}
                       onChange={handleInputChange}
-                      className={styles.input}
+                      className={`${styles.input} ${errors.deliveryPhone ? styles.inputError : ""}`}
+                      ref={deliveryPhoneRef}
                     />
                   </div>
                   <div className={styles.inputWrapper}>
@@ -647,7 +1090,8 @@ const CheckoutForm = ({
                       placeholder="Введите email"
                       value={formData.deliveryEmail}
                       onChange={handleInputChange}
-                      className={styles.input}
+                      className={`${styles.input} ${errors.deliveryEmail ? styles.inputError : ""}`}
+                      ref={deliveryEmailRef}
                     />
                   </div>
                 </div>
@@ -700,8 +1144,9 @@ const CheckoutForm = ({
                       placeholder="Выберите пункт выдачи на карте"
                       value={formData.pvzAddress}
                       onChange={handleInputChange}
-                      className={styles.input}
+                      className={`${styles.input} ${errors.pvzAddress ? styles.inputError : ""}`}
                       readOnly
+                      ref={pvzAddressRef}
                     />
                   </div>
                 </div>
@@ -720,8 +1165,9 @@ const CheckoutForm = ({
                       name="city"
                       placeholder="Москва"
                       value="Москва"
-                      className={styles.input}
+                      className={`${styles.input} ${errors.city ? styles.inputError : ""}`}
                       readOnly
+                      ref={cityRef}
                     />
                   </div>
                   <div className={styles.inputWrapper}>
@@ -735,7 +1181,8 @@ const CheckoutForm = ({
                       placeholder="Введите улицу"
                       value={formData.street}
                       onChange={handleInputChange}
-                      className={styles.input}
+                      className={`${styles.input} ${errors.street ? styles.inputError : ""}`}
+                      ref={streetRef}
                     />
                   </div>
                 </div>
@@ -751,7 +1198,8 @@ const CheckoutForm = ({
                       placeholder="Введите дом"
                       value={formData.house}
                       onChange={handleInputChange}
-                      className={styles.input}
+                      className={`${styles.input} ${errors.house ? styles.inputError : ""}`}
+                      ref={houseRef}
                     />
                   </div>
                   <div className={styles.inputWrapper}>
@@ -819,7 +1267,7 @@ const CheckoutForm = ({
             )}
           </div>
 
-          <div className={styles.section}>
+          <div className={styles.section} ref={mapSectionRef}>
             <h2 className={styles.sectionTitle}>
               {formData.deliveryMethod === "pickup"
                 ? "Пункт получения"
@@ -883,6 +1331,7 @@ const CheckoutForm = ({
                     width={54}
                     height={30}
                     className={styles.paymentButtonIcon}
+                    loading="lazy"
                   />
                 </div>
               </label>
@@ -902,6 +1351,7 @@ const CheckoutForm = ({
                     width={86}
                     height={24}
                     className={styles.paymentButtonIcon}
+                    loading="lazy"
                   />
                   <Image
                     src="/images/checkout/cardText.png"
@@ -909,6 +1359,7 @@ const CheckoutForm = ({
                     width={86}
                     height={16}
                     className={styles.paymentButtonIcon}
+                    loading="lazy"
                   />
                 </div>
               </label>
@@ -928,6 +1379,7 @@ const CheckoutForm = ({
                     width={60}
                     height={20}
                     className={styles.paymentButtonIcon}
+                    loading="lazy"
                   />
                 </div>
               </label>
@@ -947,6 +1399,7 @@ const CheckoutForm = ({
                     width={73}
                     height={14}
                     className={styles.paymentButtonIcon}
+                    loading="lazy"
                   />
                 </div>
               </label>
@@ -967,10 +1420,10 @@ const CheckoutForm = ({
                 <button
                   type="button"
                   className={`${styles.submitButton} ${styles.submitButtonRight}`}
-                  disabled={!formData.agreeToOffer || !formData.agreeToPrivacy}
+                  disabled={!formData.agreeToOffer || !formData.agreeToPrivacy || isSubmitting}
                   onClick={handleSubmitOrder}
                 >
-                  Оформить заказ
+                  {isSubmitting ? "Оформление..." : "Оформить заказ"}
                 </button>
                 <div className={styles.checkboxes}>
                   <label className={styles.checkboxLabel}>
@@ -1044,6 +1497,7 @@ const CheckoutForm = ({
                             width={82}
                             height={82}
                             className={styles.orderImage}
+                            loading="lazy"
                           />
                         </div>
                         <div className={styles.orderItemInfo}>
@@ -1119,10 +1573,10 @@ const CheckoutForm = ({
                 <button
                   type="button"
                   className={`${styles.submitButton} ${styles.submitButtonRight}`}
-                  disabled={!formData.agreeToOffer || !formData.agreeToPrivacy}
+                  disabled={!formData.agreeToOffer || !formData.agreeToPrivacy || isSubmitting}
                   onClick={handleSubmitOrder}
                 >
-                  Оформить заказ
+                  {isSubmitting ? "Оформление..." : "Оформить заказ"}
                 </button>
                 <div className={styles.checkboxes}>
                   <label className={styles.checkboxLabel}>

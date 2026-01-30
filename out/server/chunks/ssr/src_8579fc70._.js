@@ -347,7 +347,7 @@ const BurgerMenu = ({ isOpen, onToggle })=>{
                                                 src: "/images/burger/cabinet.png",
                                                 alt: "",
                                                 width: 14,
-                                                height: 16,
+                                                height: 14,
                                                 className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].menuIcon
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
@@ -514,16 +514,23 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$AuthContext$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/contexts/AuthContext.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/src/components/ui/AccountIcon/AccountIcon.module.css [app-ssr] (css module)");
 "use client";
 ;
 ;
 ;
 ;
+;
 const AccountIcon = ()=>{
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRouter"])();
+    const { isAuthenticated, redirectToBot } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$AuthContext$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useAuth"])();
     const handleClick = ()=>{
-        router.push("/account");
+        if (!isAuthenticated) {
+            redirectToBot();
+        } else {
+            router.push("/account");
+        }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
         className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].accountIcon,
@@ -538,12 +545,12 @@ const AccountIcon = ()=>{
             className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].accountImage
         }, void 0, false, {
             fileName: "[project]/src/components/ui/AccountIcon/AccountIcon.tsx",
-            lineNumber: 21,
+            lineNumber: 27,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0))
     }, void 0, false, {
         fileName: "[project]/src/components/ui/AccountIcon/AccountIcon.tsx",
-        lineNumber: 15,
+        lineNumber: 21,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -2716,13 +2723,13 @@ __turbopack_context__.s([
     "normalizeCategoryForApi",
     ()=>normalizeCategoryForApi
 ]);
-const API_BASE_URL = "http://158.160.115.103:8000/api/catalog/";
+const API_BASE_URL = "http://62.84.115.11:8000/api/catalog/";
 // Кеш для запросов
 const cache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
 // Преобразование API ответа в CatalogProduct
 const transformApiProduct = (apiProduct, index)=>{
-    const baseUrl = "http://158.160.115.103:8000";
+    const baseUrl = "http://62.84.115.11:8000";
     const images = apiProduct.images.map((img)=>{
         if (img.startsWith("http")) {
             return img;
@@ -2838,13 +2845,13 @@ __turbopack_context__.s([
     "normalizeCategoryForApi",
     ()=>normalizeCategoryForApi
 ]);
-const API_BASE_URL = "http://158.160.115.103:8000/api/catalog/";
+const API_BASE_URL = "http://62.84.115.11:8000/api/catalog/";
 // Кеш для запросов
 const cache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
 // Преобразование API ответа в CatalogProduct
 const transformApiProduct = (apiProduct, index)=>{
-    const baseUrl = "http://158.160.115.103:8000";
+    const baseUrl = "http://62.84.115.11:8000";
     const images = apiProduct.images.map((img)=>{
         if (img.startsWith("http")) {
             return img;

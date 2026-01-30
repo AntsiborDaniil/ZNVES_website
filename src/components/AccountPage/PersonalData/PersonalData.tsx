@@ -215,6 +215,7 @@ const PersonalData = () => {
               alt="Показать пароль"
               width={20}
               height={20}
+              loading="lazy"
             />
           )}
         </button>

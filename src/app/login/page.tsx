@@ -124,6 +124,7 @@ const LoginPage = () => {
                                             className={
                                                 styles.passwordToggleImage
                                             }
+                                            loading="lazy"
                                         />
                                     )}
                                 </button>

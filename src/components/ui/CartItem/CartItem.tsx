@@ -37,6 +37,7 @@ const CartItem = ({
           alt={item.product.title}
           width={127}
           height={170}
+          loading="lazy"
         />
       </Link>
       <div className={styles.cartItemInfoWrapper}>
@@ -79,6 +80,7 @@ const CartItem = ({
                 alt="cancel"
                 width={24}
                 height={24}
+                loading="lazy"
               />
             </button>
             <div className={styles.quantityControls}>
@@ -116,6 +118,7 @@ const CartItem = ({
               alt={item.product.title}
               width={127}
               height={170}
+              loading="lazy"
             />
           </Link>
           <div className={styles.mobileContent}>
@@ -153,6 +156,7 @@ const CartItem = ({
                 alt="cancel"
                 width={24}
                 height={24}
+                loading="lazy"
               />
             </button>
             <div className={styles.quantityControls}>

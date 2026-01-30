@@ -20,6 +20,7 @@ const Footer = () => {
             alt="logo"
             width={65}
             height={31}
+            loading="lazy"
           />
           <h1 className={styles.subText}>
             Подпишитесь на получение рассылки рекламно-информационных материалов

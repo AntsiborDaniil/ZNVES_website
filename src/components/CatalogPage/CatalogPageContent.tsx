@@ -473,6 +473,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
               alt="Фильтры"
               width={24}
               height={24}
+              loading="lazy"
             />
           </button>
         </div>
@@ -517,6 +518,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
             alt="Фильтры"
             width={44}
             height={44}
+            loading="lazy"
           />
         </button>
       </div>

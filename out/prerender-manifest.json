@@ -1,1 +1,11 @@
-{"version":4,"routes":{"/catalog/t-shirt_embargo":{},"/catalog/t-shirt_embargo1":{},"/catalog/t-shirt_embargo2":{},"/catalog/t-shirt_embargo3":{},"/catalog/hoodie_mark":{},"/catalog/hoodie_mark1":{},"/catalog/hoodie_mark2":{},"/catalog/hoodie_mark3":{},"/catalog/zip_hoodie_mark":{},"/catalog/zip_hoodie_mark1":{},"/catalog/zip_hoodie_mark2":{},"/catalog/zip_hoodie_mark3":{}},"dynamicRoutes":{"/catalog/[slug]":{"dataRoute":null,"dataRouteRegex":null,"fallback":null,"fallbackRevalidate":false,"fallbackSourceRoute":"/catalog/[slug]","routeRegex":"^\\/catalog\\/([^/]+?)(?:\\/)?$","allowHeader":[]}},"notFoundRoutes":[],"preview":{"previewModeId":"6dab2c9141dc3451c9f20ed2ea2403cc","previewModeSigningKey":"b437f456149a87476d084ca5ca866b644ff5e6772f506f32cc0d215bf65619dc","previewModeEncryptionKey":"eb67bf37ca3942277e65eb69cc3120fd2ff03f747a20feb242a18b7393124d7b"}}
+{
+  "version": 4,
+  "routes": {},
+  "dynamicRoutes": {},
+  "notFoundRoutes": [],
+  "preview": {
+    "previewModeId": "8802b055e4cecbb972ead0367aef2b31",
+    "previewModeSigningKey": "ee80431aec8b764d03d04d3f4286a80e93b8d1e8b6bda31beb89a06e0f40a9de",
+    "previewModeEncryptionKey": "df8f1d57d895a5363abf92e421eb6400105cf9768f207a2dfdb3de65b9a33aaf"
+  }
+}

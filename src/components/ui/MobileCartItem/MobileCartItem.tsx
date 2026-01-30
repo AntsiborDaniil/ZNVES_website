@@ -49,6 +49,7 @@ const MobileCartItem = ({
                     alt="Удалить товар"
                     width={24}
                     height={24}
+                    loading="lazy"
                 />
             </button>
 
@@ -63,6 +64,7 @@ const MobileCartItem = ({
                         fill
                         className={styles.itemImage}
                         sizes="(max-width: 480px) 100vw, 200px"
+                        loading="lazy"
                     />
                 </div>
             </Link>

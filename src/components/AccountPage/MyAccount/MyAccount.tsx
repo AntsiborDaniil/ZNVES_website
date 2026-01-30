@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useAuth } from "../../../contexts/AuthContext";
 import styles from "./MyAccount.module.css";
 
 interface OrderData {
@@ -19,6 +20,7 @@ type MyAccountProps = {
 };
 
 const MyAccount = ({ onNavigate }: MyAccountProps) => {
+  const { isAuthenticated, redirectToBot } = useAuth();
   const [lastOrder, setLastOrder] = useState<OrderData | null>(null);
 
   useEffect(() => {
@@ -47,10 +49,18 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
   }, []);
 
   const handlePersonalDataClick = () => {
+    if (!isAuthenticated) {
+      redirectToBot();
+      return;
+    }
     onNavigate?.("profile");
   };
 
   const handleOrdersClick = () => {
+    if (!isAuthenticated) {
+      redirectToBot();
+      return;
+    }
     if (lastOrder) {
       onNavigate?.("orders", lastOrder.id);
     } else {
@@ -86,6 +96,7 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
               width={41}
               height={39}
               className={styles.thumbnailImageArrow}
+              loading="lazy"
             />
           </div>
           <div className={styles.cardInfo}>
@@ -122,6 +133,7 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
                 width={41}
                 height={39}
                 className={styles.thumbnailImageArrow}
+                loading="lazy"
               />
             </div>
             <div className={styles.orderDetailsContainer}>
@@ -153,6 +165,7 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
                         width={60}
                         height={60}
                         className={styles.thumbnailImage}
+                        loading="lazy"
                       />
                     </div>
                   ))}
@@ -191,6 +204,7 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
                 width={41}
                 height={39}
                 className={styles.thumbnailImageArrow}
+                loading="lazy"
               />
             </div>
           </div>

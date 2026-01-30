@@ -227,7 +227,8 @@ const BurgerMenu = ({ isOpen, onToggle })=>{
                             src: "/images/burger/burgerCancel.png",
                             alt: "Закрыть",
                             width: 27,
-                            height: 27
+                            height: 27,
+                            loading: "lazy"
                         }, void 0, false, {
                             fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
                             lineNumber: 113,
@@ -253,12 +254,12 @@ const BurgerMenu = ({ isOpen, onToggle })=>{
                                             children: "NEW IN"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                            lineNumber: 124,
+                                            lineNumber: 125,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                        lineNumber: 123,
+                                        lineNumber: 124,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -271,7 +272,7 @@ const BurgerMenu = ({ isOpen, onToggle })=>{
                                                 children: "CATALOG"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                                lineNumber: 136,
+                                                lineNumber: 137,
                                                 columnNumber: 15
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             isCatalogOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -309,30 +310,30 @@ const BurgerMenu = ({ isOpen, onToggle })=>{
                                                             children: category.label
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                                            lineNumber: 179,
+                                                            lineNumber: 180,
                                                             columnNumber: 25
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     }, category.href, false, {
                                                         fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                                        lineNumber: 178,
+                                                        lineNumber: 179,
                                                         columnNumber: 23
                                                     }, ("TURBOPACK compile-time value", void 0));
                                                 })
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                                lineNumber: 146,
+                                                lineNumber: 147,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                        lineNumber: 135,
+                                        lineNumber: 136,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                lineNumber: 122,
+                                lineNumber: 123,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -347,18 +348,19 @@ const BurgerMenu = ({ isOpen, onToggle })=>{
                                                 src: "/images/burger/cabinet.png",
                                                 alt: "",
                                                 width: 14,
-                                                height: 16,
-                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].menuIcon
+                                                height: 14,
+                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].menuIcon,
+                                                loading: "lazy"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                                lineNumber: 204,
+                                                lineNumber: 205,
                                                 columnNumber: 15
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             "ЛИЧНЫЙ КАБИНЕТ"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                        lineNumber: 197,
+                                        lineNumber: 198,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -371,23 +373,24 @@ const BurgerMenu = ({ isOpen, onToggle })=>{
                                                 alt: "",
                                                 width: 14,
                                                 height: 14,
-                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].menuIcon
+                                                className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BurgerMenu$2f$BurgerMenu$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].menuIcon,
+                                                loading: "lazy"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                                lineNumber: 220,
+                                                lineNumber: 222,
                                                 columnNumber: 15
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             "КОРЗИНА"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                        lineNumber: 213,
+                                        lineNumber: 215,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                lineNumber: 196,
+                                lineNumber: 197,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -399,18 +402,18 @@ const BurgerMenu = ({ isOpen, onToggle })=>{
                                         children: link.label
                                     }, link.href, false, {
                                         fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                        lineNumber: 233,
+                                        lineNumber: 236,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0)))
                             }, void 0, false, {
                                 fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                                lineNumber: 231,
+                                lineNumber: 234,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/BurgerMenu/BurgerMenu.tsx",
-                        lineNumber: 121,
+                        lineNumber: 122,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
@@ -469,7 +472,8 @@ const CartIcon = ()=>{
                     alt: "Корзина",
                     width: 12,
                     height: 11.5,
-                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$CartIcon$2f$CartIcon$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].cartImage
+                    className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$CartIcon$2f$CartIcon$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].cartImage,
+                    loading: "lazy"
                 }, void 0, false, {
                     fileName: "[project]/src/components/ui/CartIcon/CartIcon.tsx",
                     lineNumber: 15,
@@ -480,7 +484,7 @@ const CartIcon = ()=>{
                     children: totalItems
                 }, void 0, false, {
                     fileName: "[project]/src/components/ui/CartIcon/CartIcon.tsx",
-                    lineNumber: 23,
+                    lineNumber: 24,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0))
             ]
@@ -514,16 +518,23 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$AuthContext$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/contexts/AuthContext.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/src/components/ui/AccountIcon/AccountIcon.module.css [app-ssr] (css module)");
 "use client";
 ;
 ;
 ;
 ;
+;
 const AccountIcon = ()=>{
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRouter"])();
+    const { isAuthenticated, redirectToBot } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$AuthContext$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useAuth"])();
     const handleClick = ()=>{
-        router.push("/account");
+        if (!isAuthenticated) {
+            redirectToBot();
+        } else {
+            router.push("/account");
+        }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
         className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].accountIcon,
@@ -535,15 +546,16 @@ const AccountIcon = ()=>{
             alt: "Личный кабинет",
             width: 12,
             height: 12,
-            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].accountImage
+            className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$AccountIcon$2f$AccountIcon$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].accountImage,
+            loading: "lazy"
         }, void 0, false, {
             fileName: "[project]/src/components/ui/AccountIcon/AccountIcon.tsx",
-            lineNumber: 21,
+            lineNumber: 27,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0))
     }, void 0, false, {
         fileName: "[project]/src/components/ui/AccountIcon/AccountIcon.tsx",
-        lineNumber: 15,
+        lineNumber: 21,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -649,7 +661,7 @@ const Header = ({ variant = "transparent" })=>{
                     width: 125,
                     height: 60,
                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Header$2f$Header$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].logoImage,
-                    priority: true
+                    loading: "lazy"
                 }, void 0, false, {
                     fileName: "[project]/src/components/Header/Header.tsx",
                     lineNumber: 51,
@@ -769,6 +781,7 @@ const HeroSection = ()=>{
                         alt: "Hero Background",
                         fill: true,
                         priority: true,
+                        fetchPriority: "high",
                         className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$HeroSection$2f$HeroSection$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].heroBackgroundImage,
                         sizes: "100vw",
                         quality: 85
@@ -781,13 +794,13 @@ const HeroSection = ()=>{
                         src: "/images/hero-background-2.png",
                         alt: "Hero Background overlay",
                         fill: true,
-                        priority: true,
+                        loading: "lazy",
                         className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$HeroSection$2f$HeroSection$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].heroBackgroundImage2,
                         sizes: "100vw",
                         quality: 85
                     }, void 0, false, {
                         fileName: "[project]/src/components/HeroSection/HeroSection.tsx",
-                        lineNumber: 28,
+                        lineNumber: 29,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -795,12 +808,13 @@ const HeroSection = ()=>{
                         alt: "Hero Background Mobile",
                         fill: true,
                         priority: true,
+                        fetchPriority: "high",
                         className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$HeroSection$2f$HeroSection$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].heroBackgroundImageMobile,
                         sizes: "100vw",
                         quality: 85
                     }, void 0, false, {
                         fileName: "[project]/src/components/HeroSection/HeroSection.tsx",
-                        lineNumber: 37,
+                        lineNumber: 38,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
@@ -2219,7 +2233,7 @@ const ProductCard = ({ title, price, images, isNew, productId, showAddToCart = t
                                 fill: true,
                                 sizes: "(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 22vw",
                                 className: `${__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].productImage} swiper-lazy ${isActive ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].productImageVisible : ""} ${isLoaded ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].productImageLoaded : __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].productImageLoading}`,
-                                loading: index === 0 ? "eager" : "lazy",
+                                loading: "lazy",
                                 onLoad: ()=>markImageLoaded(index),
                                 quality: 80
                             }, image + index, false, {
@@ -2331,14 +2345,14 @@ __turbopack_context__.s([
     "fetchNewInProducts",
     ()=>fetchNewInProducts
 ]);
-const API_BASE_URL = "http://158.160.115.103:8000/api/catalog/";
+const API_BASE_URL = "http://62.84.115.11:8000/api/catalog/";
 // Кеш для запросов
 const cache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
 // Преобразование API ответа в CatalogProduct
 const transformApiProduct = (apiProduct, index)=>{
     // Извлекаем базовый URL для изображений
-    const baseUrl = "http://158.160.115.103:8000";
+    const baseUrl = "http://62.84.115.11:8000";
     // Преобразуем изображения, добавляя базовый URL если нужно
     const images = apiProduct.images.map((img)=>{
         if (img.startsWith("http")) {
@@ -2473,7 +2487,8 @@ __turbopack_context__.s([
     ()=>__TURBOPACK__default__export__
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
-/* eslint-disable @next/next/no-img-element */ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductCard$2f$ProductCard$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ProductCard/ProductCard.tsx [app-ssr] (ecmascript)");
@@ -2484,6 +2499,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$mo
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$free$2d$mode$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__FreeMode$3e$__ = __turbopack_context__.i("[project]/node_modules/swiper/modules/free-mode.mjs [app-ssr] (ecmascript) <export default as FreeMode>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$useWindowSize$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/hooks/useWindowSize.ts [app-ssr] (ecmascript)");
 "use client";
+;
 ;
 ;
 ;
@@ -2637,10 +2653,13 @@ const ProductDisplaySection = ({ title, showShopNow, id, isBestseller = false })
                                 className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].shopNow,
                                 children: [
                                     "SHOP NOW",
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                                         src: "/images/catalogs/shopArrow.png",
                                         alt: "Arrow Right",
-                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].shopArrow
+                                        width: 24,
+                                        height: 24,
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].shopArrow,
+                                        loading: "lazy"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
                                         lineNumber: 182,
@@ -2672,17 +2691,17 @@ const ProductDisplaySection = ({ title, showShopNow, id, isBestseller = false })
                                                 d: "M12 15l-5-5 5-5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                                                lineNumber: 215,
+                                                lineNumber: 218,
                                                 columnNumber: 19
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                                            lineNumber: 203,
+                                            lineNumber: 206,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                                        lineNumber: 192,
+                                        lineNumber: 195,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2702,23 +2721,23 @@ const ProductDisplaySection = ({ title, showShopNow, id, isBestseller = false })
                                                 d: "M8 15l5-5-5-5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                                                lineNumber: 241,
+                                                lineNumber: 244,
                                                 columnNumber: 19
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                                            lineNumber: 229,
+                                            lineNumber: 232,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                                        lineNumber: 218,
+                                        lineNumber: 221,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                                lineNumber: 191,
+                                lineNumber: 194,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
@@ -2740,7 +2759,7 @@ const ProductDisplaySection = ({ title, showShopNow, id, isBestseller = false })
                     children: "Загрузка..."
                 }, void 0, false, {
                     fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                    lineNumber: 250,
+                    lineNumber: 253,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0)) : products.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createElement"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$swiper$2d$react$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Swiper"], {
                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].slider,
@@ -2789,29 +2808,29 @@ const ProductDisplaySection = ({ title, showShopNow, id, isBestseller = false })
                                 isSliderCard: true
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                                lineNumber: 291,
+                                lineNumber: 294,
                                 columnNumber: 19
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                            lineNumber: 286,
+                            lineNumber: 289,
                             columnNumber: 17
                         }, ("TURBOPACK compile-time value", void 0))
                     }, product.id, false, {
                         fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                        lineNumber: 285,
+                        lineNumber: 288,
                         columnNumber: 15
                     }, ("TURBOPACK compile-time value", void 0)))) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ProductDisplaySection$2f$ProductDisplaySection$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].emptyState,
                     children: "Товары не найдены"
                 }, void 0, false, {
                     fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                    lineNumber: 305,
+                    lineNumber: 308,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                lineNumber: 248,
+                lineNumber: 251,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             canNavigate && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2834,17 +2853,17 @@ const ProductDisplaySection = ({ title, showShopNow, id, isBestseller = false })
                                 d: "M12 15l-5-5 5-5"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                                lineNumber: 333,
+                                lineNumber: 336,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                            lineNumber: 321,
+                            lineNumber: 324,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                        lineNumber: 310,
+                        lineNumber: 313,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2864,23 +2883,23 @@ const ProductDisplaySection = ({ title, showShopNow, id, isBestseller = false })
                                 d: "M8 15l5-5-5-5"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                                lineNumber: 359,
+                                lineNumber: 362,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                            lineNumber: 347,
+                            lineNumber: 350,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                        lineNumber: 336,
+                        lineNumber: 339,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/ProductDisplaySection/ProductDisplaySection.tsx",
-                lineNumber: 309,
+                lineNumber: 312,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         ]
@@ -2961,7 +2980,8 @@ const Footer = ()=>{
                                 className: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2f$Footer$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].logo,
                                 alt: "logo",
                                 width: 65,
-                                height: 31
+                                height: 31,
+                                loading: "lazy"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/Footer/Footer.tsx",
                                 lineNumber: 17,
@@ -2972,7 +2992,7 @@ const Footer = ()=>{
                                 children: "Подпишитесь на получение рассылки рекламно-информационных материалов"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                lineNumber: 24,
+                                lineNumber: 25,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2984,7 +3004,7 @@ const Footer = ()=>{
                                         placeholder: "Введите ваш email"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                        lineNumber: 28,
+                                        lineNumber: 29,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2993,13 +3013,13 @@ const Footer = ()=>{
                                         children: "Подписаться"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                        lineNumber: 33,
+                                        lineNumber: 34,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                lineNumber: 27,
+                                lineNumber: 28,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -3013,13 +3033,13 @@ const Footer = ()=>{
                                         children: "Политикой конфиденциальности"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                        lineNumber: 40,
+                                        lineNumber: 41,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                lineNumber: 37,
+                                lineNumber: 38,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
@@ -3048,7 +3068,7 @@ const Footer = ()=>{
                                                         children: "MENU"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                        lineNumber: 54,
+                                                        lineNumber: 55,
                                                         columnNumber: 17
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3056,13 +3076,13 @@ const Footer = ()=>{
                                                         children: isMenuOpen ? "−" : "+"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                        lineNumber: 55,
+                                                        lineNumber: 56,
                                                         columnNumber: 17
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                lineNumber: 48,
+                                                lineNumber: 49,
                                                 columnNumber: 15
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -3074,7 +3094,7 @@ const Footer = ()=>{
                                                         children: "Личный кабинет"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                        lineNumber: 64,
+                                                        lineNumber: 65,
                                                         columnNumber: 19
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3083,19 +3103,19 @@ const Footer = ()=>{
                                                         children: "Корзина"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                        lineNumber: 67,
+                                                        lineNumber: 68,
                                                         columnNumber: 19
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                lineNumber: 59,
+                                                lineNumber: 60,
                                                 columnNumber: 15
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                        lineNumber: 47,
+                                        lineNumber: 48,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3112,7 +3132,7 @@ const Footer = ()=>{
                                                         children: "CATALOG"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                        lineNumber: 79,
+                                                        lineNumber: 80,
                                                         columnNumber: 17
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3120,13 +3140,13 @@ const Footer = ()=>{
                                                         children: isCatalogOpen ? "−" : "+"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                        lineNumber: 80,
+                                                        lineNumber: 81,
                                                         columnNumber: 17
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                lineNumber: 73,
+                                                lineNumber: 74,
                                                 columnNumber: 15
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3141,7 +3161,7 @@ const Footer = ()=>{
                                                                 children: "New in"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                                lineNumber: 94,
+                                                                lineNumber: 95,
                                                                 columnNumber: 21
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3150,7 +3170,7 @@ const Footer = ()=>{
                                                                 children: "T-shirt"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                                lineNumber: 97,
+                                                                lineNumber: 98,
                                                                 columnNumber: 21
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3159,7 +3179,7 @@ const Footer = ()=>{
                                                                 children: "Hoodies"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                                lineNumber: 101,
+                                                                lineNumber: 102,
                                                                 columnNumber: 21
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3168,13 +3188,13 @@ const Footer = ()=>{
                                                                 children: "Zip hoodies"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                                lineNumber: 104,
+                                                                lineNumber: 105,
                                                                 columnNumber: 21
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                        lineNumber: 89,
+                                                        lineNumber: 90,
                                                         columnNumber: 17
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -3186,7 +3206,7 @@ const Footer = ()=>{
                                                                 children: "Jeans"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                                lineNumber: 116,
+                                                                lineNumber: 117,
                                                                 columnNumber: 21
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3195,7 +3215,7 @@ const Footer = ()=>{
                                                                 children: "Pants"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                                lineNumber: 119,
+                                                                lineNumber: 120,
                                                                 columnNumber: 21
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3204,7 +3224,7 @@ const Footer = ()=>{
                                                                 children: "Shorts"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                                lineNumber: 122,
+                                                                lineNumber: 123,
                                                                 columnNumber: 21
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3213,25 +3233,25 @@ const Footer = ()=>{
                                                                 children: "Jackets"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                                lineNumber: 125,
+                                                                lineNumber: 126,
                                                                 columnNumber: 21
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                        lineNumber: 111,
+                                                        lineNumber: 112,
                                                         columnNumber: 17
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                lineNumber: 84,
+                                                lineNumber: 85,
                                                 columnNumber: 15
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                        lineNumber: 72,
+                                        lineNumber: 73,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3248,7 +3268,7 @@ const Footer = ()=>{
                                                         children: "CONTACT"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                        lineNumber: 138,
+                                                        lineNumber: 139,
                                                         columnNumber: 17
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3256,13 +3276,13 @@ const Footer = ()=>{
                                                         children: isContactOpen ? "−" : "+"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                        lineNumber: 139,
+                                                        lineNumber: 140,
                                                         columnNumber: 17
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                lineNumber: 132,
+                                                lineNumber: 133,
                                                 columnNumber: 15
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -3276,7 +3296,7 @@ const Footer = ()=>{
                                                         children: "Telegram"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                        lineNumber: 148,
+                                                        lineNumber: 149,
                                                         columnNumber: 19
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3287,25 +3307,25 @@ const Footer = ()=>{
                                                         children: "Instagram*"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                        lineNumber: 156,
+                                                        lineNumber: 157,
                                                         columnNumber: 19
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                                lineNumber: 143,
+                                                lineNumber: 144,
                                                 columnNumber: 15
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                        lineNumber: 131,
+                                        lineNumber: 132,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                lineNumber: 46,
+                                lineNumber: 47,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3317,7 +3337,7 @@ const Footer = ()=>{
                                         children: "Публичная оферта"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                        lineNumber: 168,
+                                        lineNumber: 169,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3326,19 +3346,19 @@ const Footer = ()=>{
                                         children: "Политика конфиденциальности"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                                        lineNumber: 171,
+                                        lineNumber: 172,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                lineNumber: 167,
+                                lineNumber: 168,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                        lineNumber: 45,
+                        lineNumber: 46,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
@@ -3355,7 +3375,7 @@ const Footer = ()=>{
                         children: "© 2025 Все права защищены"
                     }, void 0, false, {
                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                        lineNumber: 178,
+                        lineNumber: 179,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3364,20 +3384,20 @@ const Footer = ()=>{
                             "* Instagram принадлежит компании Meta, признанной экстремистской организацией ",
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                                lineNumber: 181,
+                                lineNumber: 182,
                                 columnNumber: 24
                             }, ("TURBOPACK compile-time value", void 0)),
                             " и запрещенной в РФ"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/Footer/Footer.tsx",
-                        lineNumber: 179,
+                        lineNumber: 180,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/Footer/Footer.tsx",
-                lineNumber: 177,
+                lineNumber: 178,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]

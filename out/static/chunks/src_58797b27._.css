@@ -1559,6 +1559,11 @@
   outline: none;
 }
 
+.page-module__XjuLyG__inputError, .page-module__XjuLyG__inputError:focus {
+  background-color: #fff5f5 !important;
+  border-color: #dc3545 !important;
+}
+
 .page-module__XjuLyG__input::placeholder, textarea.page-module__XjuLyG__input::placeholder {
   color: #7a7a79;
   font-weight: 400;

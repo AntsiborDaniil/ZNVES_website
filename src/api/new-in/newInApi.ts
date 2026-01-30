@@ -3,7 +3,7 @@
 import type { ApiProduct } from "../../types/api";
 import type { CatalogProduct } from "../../types/products";
 
-const API_BASE_URL = "http://158.160.115.103:8000/api/catalog/";
+const API_BASE_URL = "http://62.84.115.11:8000/api/catalog/";
 
 // Кеш для запросов
 const cache = new Map<string, { data: CatalogProduct[]; timestamp: number }>();
@@ -11,7 +11,7 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
 
 // Преобразование API ответа в CatalogProduct
 const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProduct => {
-  const baseUrl = "http://158.160.115.103:8000";
+  const baseUrl = "http://62.84.115.11:8000";
   
   const images = apiProduct.images.map((img) => {
     if (img.startsWith("http")) {

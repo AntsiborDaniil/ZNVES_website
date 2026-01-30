@@ -118,7 +118,7 @@ const CatalogGridCard = ({ product }: CatalogGridCardProps) => {
                       ? styles.catalogCardImageLoaded
                       : styles.catalogCardImageLoading
                   }`}
-                  loading={index === 0 ? "eager" : "lazy"}
+                  loading="lazy"
                   onLoad={() => markImageLoaded(index)}
                   quality={80}
                 />

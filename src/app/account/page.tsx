@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "../../contexts/AuthContext";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import PersonalData from "../../components/AccountPage/PersonalData/PersonalData";
@@ -10,12 +12,54 @@ import Orders from "../../components/AccountPage/Orders/Orders";
 import styles from "./page.module.css";
 
 const AccountPage = () => {
+  const router = useRouter();
+  const { isAuthenticated, isLoading, redirectToBot } = useAuth();
   const [activeTab, setActiveTab] = useState<"account" | "profile" | "orders">(
     "account"
   );
   const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>(
     undefined
   );
+
+  // Проверяем авторизацию при загрузке страницы
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      redirectToBot();
+    }
+  }, [isAuthenticated, isLoading, redirectToBot]);
+
+  // Проверяем авторизацию при возврате из бота (фокус окна)
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    const handleFocus = () => {
+      // Проверяем авторизацию при возврате на страницу
+      if (!isAuthenticated) {
+        redirectToBot();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && !isAuthenticated) {
+        redirectToBot();
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isAuthenticated, isLoading, redirectToBot]);
+
+  // Показываем загрузку или ничего, если не авторизован
+  if (isLoading || !isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className={styles.accountPage}>

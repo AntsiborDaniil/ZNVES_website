@@ -21,6 +21,7 @@ const HeroSection = () => {
           alt="Hero Background"
           fill
           priority
+          fetchPriority="high"
           className={styles.heroBackgroundImage}
           sizes="100vw"
           quality={85}
@@ -29,7 +30,7 @@ const HeroSection = () => {
           src="/images/hero-background-2.png"
           alt="Hero Background overlay"
           fill
-          priority
+          loading="lazy"
           className={styles.heroBackgroundImage2}
           sizes="100vw"
           quality={85}
@@ -39,6 +40,7 @@ const HeroSection = () => {
           alt="Hero Background Mobile"
           fill
           priority
+          fetchPriority="high"
           className={styles.heroBackgroundImageMobile}
           sizes="100vw"
           quality={85}

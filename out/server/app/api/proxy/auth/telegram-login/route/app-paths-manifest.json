@@ -1,0 +1,3 @@
+{
+  "/api/proxy/auth/telegram-login/route": "app/api/proxy/auth/telegram-login/route.js"
+}

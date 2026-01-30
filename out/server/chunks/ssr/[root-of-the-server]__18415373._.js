@@ -58,7 +58,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$catalog$2f5b$s
 const generateStaticParams = async ()=>{
     try {
         // Пытаемся получить все товары из API для генерации страниц
-        const API_BASE_URL = "http://158.160.115.103:8000/api/catalog/";
+        const API_BASE_URL = "http://62.84.115.11:8000/api/catalog/";
         const response = await fetch(`${API_BASE_URL}`, {
             method: "GET",
             headers: {

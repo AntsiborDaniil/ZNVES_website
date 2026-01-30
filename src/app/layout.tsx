@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import "./globals.css";
 import NavigationTracker from "../components/NavigationTracker/NavigationTracker";
 import { CartProvider } from "../contexts/CartContext";
+import { AuthProvider } from "../contexts/AuthContext";
 import { ToastProvider } from "../components/ui/ToastProvider/ToastProvider";
 
 const inter = Inter({
@@ -43,15 +44,30 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ru">
+      <head>
+        <link
+          rel="preload"
+          href="/images/hero-background.png"
+          as="image"
+        />
+        <link
+          rel="preload"
+          href="/images/heroMobile.png"
+          as="image"
+          media="(max-width: 768px)"
+        />
+      </head>
       <body
         className={`${roboto.variable} ${inter.variable} ${montserrat.variable} ${plusJakarta.variable}`}
       >
-        <CartProvider>
-          <ToastProvider>
-            <NavigationTracker />
-            {children}
-          </ToastProvider>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <ToastProvider>
+              <NavigationTracker />
+              {children}
+            </ToastProvider>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

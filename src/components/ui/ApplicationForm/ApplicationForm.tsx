@@ -182,6 +182,7 @@ const ApplicationForm = ({
                                     width={20}
                                     height={20}
                                     className={styles.passwordToggleImage}
+                                    loading="lazy"
                                 />
                             )}
                         </button>
@@ -243,6 +244,7 @@ const ApplicationForm = ({
                                     width={20}
                                     height={20}
                                     className={styles.passwordToggleImage}
+                                    loading="lazy"
                                 />
                             )}
                         </button>

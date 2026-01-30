@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
 import {
   createElement,
   useCallback,
@@ -9,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ProductCard from "../ProductCard/ProductCard";
@@ -179,10 +179,13 @@ const ProductDisplaySection = ({
           {showShopNow && (
             <Link href={shopNowHref} className={styles.shopNow}>
               SHOP NOW
-              <img
+              <Image
                 src="/images/catalogs/shopArrow.png"
                 alt="Arrow Right"
+                width={24}
+                height={24}
                 className={styles.shopArrow}
+                loading="lazy"
               />
             </Link>
           )}

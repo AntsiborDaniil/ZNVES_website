@@ -1134,8 +1134,9 @@
 
 .ProductPageView-module__hPWMdW__mainImage {
   object-fit: contain;
-  width: 600px;
+  width: 100%;
   height: auto;
+  display: block;
 }
 
 .ProductPageView-module__hPWMdW__info {

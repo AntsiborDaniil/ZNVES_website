@@ -219,18 +219,17 @@
   background-color: #f8f8f8;
   border: .6px solid rgba(82, 82, 82, .2);
   border-radius: 3px;
-  flex-wrap: wrap;
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   padding: 20px;
-  display: flex;
+  display: grid;
   position: relative;
   box-shadow: 0 2px 5px rgba(82, 82, 82, .2);
 }
 
 .CatalogPage-module__qOurpW__filterDropdown {
   z-index: 10000;
-  flex: 1;
-  min-width: 200px;
+  min-width: 0;
   list-style: none;
   position: relative;
 }
@@ -554,13 +553,12 @@
   }
 
   .CatalogPage-module__qOurpW__filters {
-    flex-flow: wrap;
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
     padding: 16px;
   }
 
   .CatalogPage-module__qOurpW__filterDropdown {
-    flex: calc(33.333% - 8px);
     min-width: 0;
   }
 

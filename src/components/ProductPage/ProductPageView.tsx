@@ -204,6 +204,8 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
                             src={image}
                             alt={`${product.title} — фото ${index + 1}`}
                             className={styles.mainImage}
+                            loading={index === 0 ? "eager" : "lazy"}
+                            decoding="async"
                           />
                         </div>
                       </div>
@@ -219,6 +221,8 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
                           src={image}
                           alt={`${product.title} — фото ${index + 1}`}
                           className={styles.mainImage}
+                          loading={index === 0 ? "eager" : "lazy"}
+                          decoding="async"
                         />
                       </div>
                     </div>
