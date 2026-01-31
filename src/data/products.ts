@@ -993,6 +993,7 @@ export const getProductById = (id: number): ProductDetail | undefined => {
 
 export const toCatalogProduct = (product: ProductDetail): CatalogProduct => ({
     id: product.id,
+    slug: product.slug,
     title: product.title,
     price: product.price,
     priceValue: product.priceValue,

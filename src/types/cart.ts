@@ -1,12 +1,13 @@
 import type { CatalogProduct } from "./products";
 
 export type CartItem = {
-    productId: number;
+    /** UUID warehouse_item из API или numeric id — для positions[].id в заказе используется UUID */
+    productId: number | string;
     size: string;
     color: string;
     quantity: number;
     product: CatalogProduct;
-    /** UUID warehouse_product из POST /api/cart/ — для positions[].id в заказе */
+    /** @deprecated используйте productId когда это UUID */
     warehouseProduct?: string;
 };
 
@@ -16,11 +17,12 @@ export type CartContextType = {
         product: CatalogProduct,
         size: string,
         color: string,
-        quantity?: number
+        quantity?: number,
+        warehouseProductId?: string
     ) => Promise<void>;
-    removeItem: (productId: number, size: string, color: string) => void;
+    removeItem: (productId: number | string, size: string, color: string) => void;
     updateQuantity: (
-        productId: number,
+        productId: number | string,
         size: string,
         color: string,
         quantity: number

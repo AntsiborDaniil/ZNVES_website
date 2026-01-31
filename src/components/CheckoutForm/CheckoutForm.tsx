@@ -281,19 +281,6 @@ const CheckoutForm = ({
     return `${day}.${month}.${year}`;
   };
 
-  // Функция для преобразования строки в UUID-подобный формат
-  const stringToUUID = (str: string): string => {
-    // Простая функция для генерации UUID-подобной строки из строки
-    const hash = str.split("").reduce((acc, char) => {
-      const hash = ((acc << 5) - acc) + char.charCodeAt(0);
-      return hash & hash;
-    }, 0);
-    
-    // Форматируем как UUID
-    const hex = Math.abs(hash).toString(16).padStart(8, "0");
-    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32).padEnd(12, "0")}`;
-  };
-
   // Функция валидации формы
   const validateForm = (): boolean => {
     const newErrors: Record<string, boolean> = {};
@@ -495,11 +482,18 @@ const CheckoutForm = ({
             .filter(Boolean)
             .join(", ");
 
-      // positions[].id: warehouse_product из корзины или из каталога (один запрос на slug)
+      // positions[].id: productId (UUID warehouse_item) или fallback по slug
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      const hasValidUuid = (id: unknown) =>
+        typeof id === "string" && uuidRegex.test(id);
       const slugsFromItems = items
-        .filter((item) => !item.warehouseProduct)
-        .map((item) => getProductById(item.productId)?.slug)
+        .filter((item) => !hasValidUuid(item.productId) && !item.warehouseProduct)
+        .map(
+          (item) =>
+            (typeof item.productId === "number"
+              ? getProductById(item.productId)?.slug
+              : null) ?? item.product?.slug
+        )
         .filter((s): s is string => !!s);
       const uniqueSlugs = Array.from(new Set(slugsFromItems));
       const slugToProduct: Record<string, ApiProductDetail | null> = {};
@@ -510,35 +504,59 @@ const CheckoutForm = ({
         })
       );
 
-      const positions = items.map((item) => {
-        if (item.warehouseProduct) {
-          return { id: item.warehouseProduct, quantity: item.quantity };
-        }
-        const fullProduct = getProductById(item.productId);
-        if (!fullProduct?.slug) {
-          return {
-            id: stringToUUID(`product-${item.productId}-${item.color}-${item.size}`),
-            quantity: item.quantity,
-          };
-        }
-        const productData = slugToProduct[fullProduct.slug];
-        if (productData?.warehouse_items?.length) {
-          const warehouseItem = productData.warehouse_items.find(
-            (wi: { color?: string; color_slug?: string; size?: string; size_slug?: string }) =>
-              (wi.color === item.color || wi.color_slug === item.color) &&
-              (wi.size === item.size || wi.size_slug === item.size)
-          );
-          const rawId = (warehouseItem as { uuid?: string; id?: string })?.uuid ?? warehouseItem?.id;
-          const idStr = rawId != null ? String(rawId).trim() : null;
-          if (idStr && uuidRegex.test(idStr)) {
-            return { id: idStr, quantity: item.quantity };
+      const positions: Array<{ id: string; quantity: number } | null> = items.map(
+        (item) => {
+          const uuidFromCart =
+            hasValidUuid(item.productId)
+              ? item.productId
+              : item.warehouseProduct;
+          if (uuidFromCart) {
+            return { id: uuidFromCart as string, quantity: item.quantity };
           }
+          const fullProduct =
+            typeof item.productId === "number"
+              ? getProductById(item.productId)
+              : undefined;
+          const productSlug = fullProduct?.slug ?? item.product?.slug;
+          if (!productSlug) {
+            console.warn("[Order] Нет slug для позиции:", item);
+            return null;
+          }
+          const productData = slugToProduct[productSlug];
+          if (productData?.warehouse_items?.length) {
+            const warehouseItem = productData.warehouse_items.find(
+              (wi: { color?: string; color_slug?: string; size?: string; size_slug?: string }) =>
+                (wi.color === item.color || wi.color_slug === item.color) &&
+                (wi.size === item.size || wi.size_slug === item.size)
+            );
+            const rawId =
+              (warehouseItem as { uuid?: string; id?: string })?.uuid ??
+              warehouseItem?.id;
+            const idStr = rawId != null ? String(rawId).trim() : null;
+            if (idStr && uuidRegex.test(idStr)) {
+              return { id: idStr, quantity: item.quantity };
+            }
+          }
+          console.warn(
+            "[Order] Не найден warehouse_item UUID для:",
+            productSlug,
+            item.color,
+            item.size
+          );
+          return null;
         }
-        return {
-          id: stringToUUID(`${fullProduct.slug}-${item.color}-${item.size}`),
-          quantity: item.quantity,
-        };
-      });
+      );
+
+      const validPositions = positions.filter(
+        (p): p is { id: string; quantity: number } => p !== null
+      );
+      if (validPositions.length !== items.length) {
+        alert(
+          "Некоторые товары не могут быть заказаны. Удалите их из корзины и добавьте заново со страницы товара (с выбором цвета и размера)."
+        );
+        setIsSubmitting(false);
+        return;
+      }
 
       // Формируем данные заказа для API
       const orderRequest: OrderRequest = {
@@ -550,7 +568,7 @@ const CheckoutForm = ({
           email: formData.email,
           phone: formData.phone,
         },
-        positions,
+        positions: validPositions,
       };
 
       // Добавляем данные доставки в зависимости от типа
@@ -574,7 +592,6 @@ const CheckoutForm = ({
       }
 
       console.log("Submitting order:", orderRequest);
-
       // Создаем заказ
       const orderResponse = await createOrder(orderRequest);
       console.log("Order created:", orderResponse);
@@ -659,7 +676,10 @@ const CheckoutForm = ({
           amount: formatPrice(calculateTotal()),
         },
         products: items.map((item) => {
-          const fullProduct = getProductById(item.productId);
+          const fullProduct =
+            typeof item.productId === "number"
+              ? getProductById(item.productId)
+              : undefined;
           const colorLabel =
             fullProduct?.availableColors.find((c) => c.value === item.color)
               ?.label || item.color;
@@ -1476,7 +1496,10 @@ const CheckoutForm = ({
               <div className={styles.orderItemsBlock}>
                 <div className={styles.orderItems}>
                   {items.map((item, index) => {
-                    const fullProduct = getProductById(item.productId);
+                    const fullProduct =
+                      typeof item.productId === "number"
+                        ? getProductById(item.productId)
+                        : undefined;
                     const colorLabel =
                       fullProduct?.availableColors.find(
                         (c) => c.value === item.color

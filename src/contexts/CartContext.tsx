@@ -62,14 +62,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       product: CatalogProduct,
       size: string,
       color: string,
-      quantity: number = 1
+      quantity: number = 1,
+      warehouseProductId?: string
     ) => {
       setItems((prevItems) => {
+        // UUID warehouse_item — главный id; иначе product.id
+        const itemId: number | string =
+          warehouseProductId ?? product.id;
+
         const existingIndex = prevItems.findIndex(
           (item) =>
-            item.productId === product.id &&
-            item.size === size &&
-            item.color === color
+            item.productId === itemId && item.size === size && item.color === color
         );
 
         if (existingIndex >= 0) {
@@ -78,26 +81,30 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             ...updated[existingIndex],
             quantity: updated[existingIndex].quantity + quantity,
           };
+          if (warehouseProductId) {
+            console.log("[Cart] UUID в productId (localStorage):", warehouseProductId);
+          }
           return updated;
         }
 
-        return [
-          ...prevItems,
-          {
-            productId: product.id,
-            size,
-            color,
-            quantity,
-            product,
-          },
-        ];
+        const newItem: CartItem = {
+          productId: itemId,
+          size,
+          color,
+          quantity,
+          product,
+        };
+        if (warehouseProductId) {
+          console.log("[Cart] UUID в productId (localStorage):", warehouseProductId);
+        }
+        return [...prevItems, newItem];
       });
     },
     []
   );
 
   const removeItem = useCallback(
-    (productId: number, size: string, color: string) => {
+    (productId: number | string, size: string, color: string) => {
       setItems((prevItems) =>
         prevItems.filter(
           (item) =>
@@ -113,7 +120,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const updateQuantity = useCallback(
-    (productId: number, size: string, color: string, quantity: number) => {
+    (productId: number | string, size: string, color: string, quantity: number) => {
       if (quantity <= 0) {
         removeItem(productId, size, color);
         return;

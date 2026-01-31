@@ -19,8 +19,10 @@ export type ApiProductColor = {
 
 export type ApiWarehouseItem = {
   id: string;
-  color: string;
-  size: string;
+  color?: string;
+  color_slug?: string;
+  size?: string;
+  size_slug?: string;
   quantity: number;
 };
 
@@ -162,6 +164,19 @@ export const fetchProductBySlug = async (slug: string): Promise<ProductDetail | 
     inFlightBySlug.set(slug, promise);
   }
   return promise;
+};
+
+/** Получение товара с warehouse_items для страницы и добавления в корзину */
+export const fetchProductWithWarehouse = async (
+  slug: string
+): Promise<{ product: ProductDetail; warehouseItems: ApiWarehouseItem[] } | null> => {
+  const raw = await fetchCatalogProductRaw(slug);
+  if (!raw) return null;
+  const product = transformApiProduct(raw);
+  return {
+    product,
+    warehouseItems: raw.warehouse_items || [],
+  };
 };
 
 /** Сырой ответ каталога по slug (warehouse_items и т.д.) — для чекаута, с кешем и дедупликацией */

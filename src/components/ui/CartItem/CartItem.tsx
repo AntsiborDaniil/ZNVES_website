@@ -45,7 +45,7 @@ const CartItem = ({
           <div className={styles.cartItemInfoTop}>
             <h2 className={styles.cartItemCategory}>{item.product.category}</h2>
             <Link
-              href={`/catalog/${item.product.slug || item.productId}`}
+              href={`/catalog/${item.product.slug || (typeof item.productId === "number" ? item.productId : "")}`}
               className={styles.cartItemTitle}
             >
               {item.product.title}
@@ -109,7 +109,7 @@ const CartItem = ({
       <div className={styles.mobile}>
         <div className={styles.mobileHeader}>
           <Link
-            href={`/catalog/${item.product.slug || item.productId}`}
+            href={`/catalog/${item.product.slug || (typeof item.productId === "number" ? item.productId : "")}`}
             className={styles.mobileLink}
           >
             <Image

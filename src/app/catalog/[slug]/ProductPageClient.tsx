@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import ProductPageView from "../../../components/ProductPage/ProductPageView";
-import { fetchProductBySlug } from "../../../api/product/productApi";
+import { fetchProductWithWarehouse } from "../../../api/product/productApi";
 import type { ProductDetail } from "../../../types/products";
+import type { ApiWarehouseItem } from "../../../api/product/productApi";
 
 type ProductPageClientProps = {
   slug: string;
@@ -12,17 +13,19 @@ type ProductPageClientProps = {
 
 const ProductPageClient = ({ slug }: ProductPageClientProps) => {
   const [product, setProduct] = useState<ProductDetail | null>(null);
+  const [warehouseItems, setWarehouseItems] = useState<ApiWarehouseItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadProduct = async () => {
       setIsLoading(true);
       try {
-        const productData = await fetchProductBySlug(slug);
-        if (!productData) {
+        const data = await fetchProductWithWarehouse(slug);
+        if (!data) {
           notFound();
         }
-        setProduct(productData);
+        setProduct(data.product);
+        setWarehouseItems(data.warehouseItems);
       } catch (error) {
         console.error("Error loading product:", error);
         notFound();
@@ -46,7 +49,9 @@ const ProductPageClient = ({ slug }: ProductPageClientProps) => {
     notFound();
   }
 
-  return <ProductPageView product={product} />;
+  return (
+    <ProductPageView product={product} warehouseItems={warehouseItems} />
+  );
 };
 
 export default ProductPageClient;

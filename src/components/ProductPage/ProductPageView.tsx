@@ -23,13 +23,20 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
-import { fetchProductImagesByColor } from "../../api/product/productApi";
+import {
+  fetchProductImagesByColor,
+  type ApiWarehouseItem,
+} from "../../api/product/productApi";
 
 type ProductPageViewProps = {
   product: ProductDetail;
+  warehouseItems?: ApiWarehouseItem[];
 };
 
-const ProductPageView = ({ product }: ProductPageViewProps) => {
+const ProductPageView = ({
+  product,
+  warehouseItems = [],
+}: ProductPageViewProps) => {
   const { addItem } = useCart();
   const { showToast } = useToast();
   const [selectedSize, setSelectedSize] = useState<string>(product.defaultSize);
@@ -420,7 +427,33 @@ const ProductPageView = ({ product }: ProductPageViewProps) => {
                   className={styles.addToCartButton}
                   onClick={() => {
                     const catalogProduct = toCatalogProduct(product);
-                    addItem(catalogProduct, selectedSize, selectedColor, 1);
+                    const colorSlug = (selectedColor || "").toLowerCase();
+                    const sizeSlug = (selectedSize || "").toLowerCase();
+                    const warehouseItem = warehouseItems.find((wi) => {
+                      const wiColor = (wi.color ?? wi.color_slug ?? "").toLowerCase();
+                      const wiSize = (wi.size ?? wi.size_slug ?? "").toLowerCase();
+                      return wiColor === colorSlug && wiSize === sizeSlug;
+                    });
+                    const warehouseProductId = warehouseItem?.id;
+                    if (!warehouseProductId) {
+                      console.warn(
+                        "[Add to Cart] warehouse_item не найден! color:",
+                        selectedColor,
+                        "size:",
+                        selectedSize,
+                        "| доступные warehouseItems:",
+                        warehouseItems
+                      );
+                    } else {
+                      console.log("[Add to Cart] UUID в корзину:", warehouseProductId);
+                    }
+                    addItem(
+                      catalogProduct,
+                      selectedSize,
+                      selectedColor,
+                      1,
+                      warehouseProductId
+                    );
                     showToast("Добавлено в корзину");
                   }}
                 >
