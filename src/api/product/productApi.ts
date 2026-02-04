@@ -27,9 +27,10 @@ export type ApiWarehouseItem = {
 };
 
 export type ApiProductDetail = {
-  slug: string;
+  slug?: string;
   name: string;
-  price: string;
+  /** Цена: число (руб) или строка */
+  price: string | number;
   description: string;
   is_new: boolean;
   images: string[];
@@ -48,40 +49,41 @@ const inFlightRaw = new Map<string, Promise<ApiProductDetail | null>>();
 const inFlightBySlug = new Map<string, Promise<ProductDetail | null>>();
 const inFlightImages = new Map<string, Promise<string[]>>();
 
-// Преобразование API ответа в ProductDetail
-const transformApiProduct = (apiProduct: ApiProductDetail): ProductDetail => {
+// Преобразование API ответа в ProductDetail (только данные с ручки, без доп. опций)
+const transformApiProduct = (
+  apiProduct: ApiProductDetail,
+  slugFromUrl?: string
+): ProductDetail => {
   const baseUrl = "http://62.84.115.11:8000";
-  
-  // Преобразуем изображения, добавляя базовый URL если нужно
-  const images = apiProduct.images.map((img) => {
-    if (img.startsWith("http")) {
-      return img;
-    }
+  const slug = apiProduct.slug ?? slugFromUrl ?? "";
+
+  const images = (apiProduct.images ?? []).map((img) => {
+    if (typeof img !== "string") return "";
+    if (img.startsWith("http")) return img;
     return img.startsWith("/") ? `${baseUrl}${img}` : `${baseUrl}/${img}`;
   });
 
-  // Парсим цену
-  const priceValue = parseFloat(apiProduct.price.replace(/\s/g, "").replace(",", ".")) || 0;
+  const priceValue =
+    typeof apiProduct.price === "number"
+      ? apiProduct.price
+      : parseFloat(String(apiProduct.price ?? "").replace(/\s/g, "").replace(",", ".")) || 0;
   const formattedPrice = `${Math.round(priceValue).toLocaleString("ru-RU")} ₽`;
 
-  // Преобразуем размеры
-  const availableSizes = apiProduct.sizes.map((size) => size.slug);
-  const defaultSize = availableSizes[0] || "m";
+  // Только размеры с ручки
+  const availableSizes = (apiProduct.sizes ?? []).map((size) => size.slug);
+  const defaultSize = availableSizes[0] ?? "";
 
-  // Преобразуем цвета
-  const availableColors: ProductColorOption[] = apiProduct.colors.map((color) => ({
+  // Только цвета с ручки
+  const availableColors: ProductColorOption[] = (apiProduct.colors ?? []).map((color) => ({
     label: color.value,
     value: color.slug,
     hex: color.hex,
   }));
+  const defaultColor = availableColors[0]?.value ?? "";
 
-  // Определяем категорию из slug
-  const category = extractCategoryFromSlug(apiProduct.slug) || "T-shirts";
+  const category = extractCategoryFromSlug(slug) || "T-shirts";
+  const id = hashString(slug || apiProduct.name);
 
-  // Генерируем ID из slug
-  const id = hashString(apiProduct.slug);
-
-  // Создаем секции для аккордеона
   const sections = [
     {
       id: "description",
@@ -92,17 +94,17 @@ const transformApiProduct = (apiProduct: ApiProductDetail): ProductDetail => {
 
   return {
     id,
-    slug: apiProduct.slug,
+    slug,
     title: apiProduct.name,
     price: formattedPrice,
     priceValue: Math.round(priceValue),
     images,
-    isNew: apiProduct.is_new,
+    isNew: apiProduct.is_new ?? false,
     category,
-    color: availableColors[0]?.value || "green",
+    color: defaultColor,
     size: defaultSize,
     sortOrder: 0,
-    sku: apiProduct.slug,
+    sku: slug || apiProduct.name,
     defaultSize,
     availableSizes,
     availableColors,
@@ -148,7 +150,7 @@ const fetchProductBySlugInternal = async (slug: string): Promise<ProductDetail |
     throw new Error(`API error: ${response.status} ${response.statusText}`);
   }
   const data: ApiProductDetail = await response.json();
-  const transformedProduct = transformApiProduct(data);
+  const transformedProduct = transformApiProduct(data, slug);
   cache.set(slug, { data: transformedProduct, timestamp: Date.now() });
   return transformedProduct;
 };
@@ -172,7 +174,7 @@ export const fetchProductWithWarehouse = async (
 ): Promise<{ product: ProductDetail; warehouseItems: ApiWarehouseItem[] } | null> => {
   const raw = await fetchCatalogProductRaw(slug);
   if (!raw) return null;
-  const product = transformApiProduct(raw);
+  const product = transformApiProduct(raw, slug);
   return {
     product,
     warehouseItems: raw.warehouse_items || [],

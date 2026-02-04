@@ -1,6 +1,49 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import {
+  getCdekPvzByCity,
+  getCdekPvzByCoords,
+  getFallbackPvzForCity,
+  getFallbackPvzByCoords,
+  filterPvzByBounds,
+  sortPvzByDistance,
+  type CdekPvzPoint,
+  type MapBounds,
+} from "../../api/delivery/cdekApi";
+import {
+  getYandexPvzByCity,
+  getYandexPvzByCoords,
+  getFallbackYandexPvzForCity,
+  getFallbackYandexPvzByCoords,
+  filterYandexPvzByBounds,
+  sortYandexPvzByDistance,
+  type YandexPvzPoint,
+} from "../../api/delivery/yandexApi";
+
+/** Метка-пин зелёная, внутри — изображение СДЭК из /images/cdek.svg */
+const CDEK_MARKER_ICON =
+  "data:image/svg+xml," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="60" viewBox="0 0 48 60">' +
+      '<path d="M24 0C10.7 0 0 10.7 0 24c0 14 24 36 24 36s24-22 24-36C48 10.7 37.3 0 24 0z" fill="#19B248" stroke="#fff" stroke-width="2"/>' +
+      '<circle cx="24" cy="22" r="12" fill="#fff"/>' +
+      '<image xlink:href="/images/cdek.svg" x="11" y="9" width="26" height="26" preserveAspectRatio="xMidYMid meet"/>' +
+      "</svg>"
+  );
+const CDEK_MARKER_SIZE: [number, number] = [48, 60];
+
+/** Метка-пин для ПВЗ Яндекса (красный пин, внутри /images/yandex.svg) */
+const YANDEX_MARKER_ICON =
+  "data:image/svg+xml," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="60" viewBox="0 0 48 60">' +
+      '<path d="M24 0C10.7 0 0 10.7 0 24c0 14 24 36 24 36s24-22 24-36C48 10.7 37.3 0 24 0z" fill="#FC3F1D" stroke="#fff" stroke-width="2"/>' +
+      '<circle cx="24" cy="22" r="12" fill="#fff"/>' +
+      '<image xlink:href="/images/yandex.svg" x="11" y="9" width="26" height="26" preserveAspectRatio="xMidYMid meet"/>' +
+      "</svg>"
+  );
+const YANDEX_MARKER_SIZE: [number, number] = [48, 60];
 
 type AddressData = {
   city?: string;
@@ -8,6 +51,8 @@ type AddressData = {
   house?: string;
   fullAddress?: string;
   pvzAddress?: string;
+  pvzCode?: string;
+  pvzId?: string;
 };
 
 type MapProps = {
@@ -42,10 +87,23 @@ const Map = ({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
+  const pvzMarkersRef = useRef<any[]>([]);
+  const userMarkerRef = useRef<any>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [isYmapsLoaded, setIsYmapsLoaded] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
   const geocodeDebounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isGeocodingRef = useRef(false);
+  const isCdekMode =
+    deliveryType === "cdek" && deliveryMethod === "pickup";
+  const isYandexMode =
+    deliveryType === "yandex" && deliveryMethod === "pickup";
+  const deliveryTypeRef = useRef(deliveryType);
+  const deliveryMethodRef = useRef(deliveryMethod);
+  useEffect(() => {
+    deliveryTypeRef.current = deliveryType;
+    deliveryMethodRef.current = deliveryMethod;
+  }, [deliveryType, deliveryMethod]);
 
   // Загрузка Yandex Maps API
   useEffect(() => {
@@ -508,10 +566,16 @@ const Map = ({
           }
         };
 
-        // Обработчик клика на карту
-        // Добавляем только после полной загрузки карты
+        // Обработчик клика на карту (в режиме СДЭК выбор только по маркерам ПВЗ)
         const handleMapClick = (e: any) => {
           try {
+            if (
+              (deliveryTypeRef.current === "cdek" ||
+                deliveryTypeRef.current === "yandex") &&
+              deliveryMethodRef.current === "pickup"
+            ) {
+              return;
+            }
             // Закрываем все открытые balloon'ы при клике на карту
             try {
               if (map.balloon && map.balloon.isOpen && map.balloon.isOpen()) {
@@ -578,6 +642,7 @@ const Map = ({
         };
 
         mapInstanceRef.current = map;
+        setMapReady(true);
         console.log("[Map] Карта успешно инициализирована");
       } catch (error) {
         console.error("[Map] Ошибка инициализации карты:", error);
@@ -587,9 +652,22 @@ const Map = ({
     initMap();
 
     return () => {
+      setMapReady(false);
       console.log("[Map] Cleanup - удаление карты");
       if (mapInstanceRef.current) {
         try {
+          pvzMarkersRef.current.forEach((m) => {
+            try {
+              mapInstanceRef.current.geoObjects.remove(m);
+            } catch {}
+          });
+          pvzMarkersRef.current = [];
+          if (userMarkerRef.current) {
+            try {
+              mapInstanceRef.current.geoObjects.remove(userMarkerRef.current);
+            } catch {}
+            userMarkerRef.current = null;
+          }
           mapInstanceRef.current.destroy();
         } catch (error) {
           console.error("[Map] Ошибка при удалении карты:", error);
@@ -598,12 +676,315 @@ const Map = ({
         markerRef.current = null;
       }
     };
-  }, [isMounted, isYmapsLoaded]); // Убрали onAddressSelect из зависимостей
+  }, [isMounted, isYmapsLoaded]);
 
-  // Геокодирование адреса из searchValue с debounce
+  const pvzLoadThrottleRef = useRef(0);
+
+  // Загрузка и отображение ПВЗ СДЭК или Яндекса с оптимизацией (throttle/debounce, только метки в видимой области)
+  useEffect(() => {
+    const isPickupMode = isCdekMode || isYandexMode;
+    if (!mapReady || !isYmapsLoaded || !mapInstanceRef.current || !isPickupMode) {
+      if (mapInstanceRef.current && !isPickupMode) {
+        pvzMarkersRef.current.forEach((m) => {
+          try {
+            mapInstanceRef.current.geoObjects.remove(m);
+          } catch {}
+        });
+        pvzMarkersRef.current = [];
+        if (userMarkerRef.current) {
+          try {
+            mapInstanceRef.current.geoObjects.remove(userMarkerRef.current);
+          } catch {}
+          userMarkerRef.current = null;
+        }
+      }
+      return;
+    }
+
+    const map = mapInstanceRef.current;
+    const ymaps = window.ymaps;
+    if (!ymaps) return;
+
+    const removePvzMarkers = () => {
+      pvzMarkersRef.current.forEach((m) => {
+        try {
+          map.geoObjects.remove(m);
+        } catch {}
+      });
+      pvzMarkersRef.current = [];
+      if (userMarkerRef.current) {
+        try {
+          map.geoObjects.remove(userMarkerRef.current);
+        } catch {}
+        userMarkerRef.current = null;
+      }
+    };
+
+    let cancelled = false;
+    const THROTTLE_MS = 400;
+
+    const getCityFromCoords = async (
+      lat: number,
+      lon: number
+    ): Promise<string> => {
+      try {
+        const res = await ymaps.geocode([lat, lon], { results: 1 });
+        const first = res.geoObjects.get(0);
+        if (!first) return "Москва";
+        const meta =
+          first.properties.get("metaDataProperty")
+            ?.GeocoderMetaData?.Address?.Components || [];
+        const locality = meta.find(
+          (c: any) => c.kind === "locality" || c.kind === "area"
+        );
+        return locality?.name || "Москва";
+      } catch {
+        return "Москва";
+      }
+    };
+
+    const loadPvzForVisibleBounds = async () => {
+      if (cancelled || !mapInstanceRef.current) return;
+      const mapInstance = mapInstanceRef.current;
+      let bounds: MapBounds;
+      try {
+        bounds = mapInstance.getBounds();
+      } catch {
+        return;
+      }
+      const [[south, west], [north, east]] = bounds;
+      const centerLat = (south + north) / 2;
+      const centerLon = (west + east) / 2;
+
+      const cityName = await getCityFromCoords(centerLat, centerLon);
+      if (cancelled || !mapInstanceRef.current) return;
+
+      if (isCdekMode) {
+        let pointsByCoords: CdekPvzPoint[] = [];
+        try {
+          pointsByCoords = await getCdekPvzByCoords(centerLat, centerLon, cityName);
+        } catch {
+          // ignore
+        }
+        let pointsByCity: CdekPvzPoint[] = [];
+        try {
+          pointsByCity = await getCdekPvzByCity(cityName);
+          if (pointsByCity.length === 0) {
+            pointsByCity = sortPvzByDistance(
+              getFallbackPvzForCity(cityName).length > 0
+                ? getFallbackPvzForCity(cityName)
+                : getFallbackPvzByCoords(centerLat, centerLon),
+              centerLat,
+              centerLon
+            );
+          }
+        } catch (err) {
+          console.warn("[Map] СДЭК ПВЗ:", err);
+        }
+        const byCode: Record<string, CdekPvzPoint> = {};
+        [...pointsByCoords, ...pointsByCity].forEach((p) => {
+          if (p?.code) byCode[p.code] = p;
+        });
+        const points: CdekPvzPoint[] = Object.values(byCode);
+        let pointsToShow = filterPvzByBounds(points, bounds);
+        if (pointsToShow.length === 0 && points.length > 0) {
+          pointsToShow = sortPvzByDistance(points, centerLat, centerLon).slice(0, 30);
+        }
+
+        pvzMarkersRef.current.forEach((m) => {
+          try {
+            mapInstance.geoObjects.remove(m);
+          } catch {}
+        });
+        pvzMarkersRef.current = [];
+
+        pointsToShow.forEach((pvz) => {
+          const loc = pvz.location as { lat?: number; latitude?: number; lon?: number; longitude?: number };
+          const lat = loc?.lat ?? loc?.latitude;
+          const lon = loc?.lon ?? loc?.longitude;
+          if (typeof lat !== "number" || typeof lon !== "number") return;
+          const coords: [number, number] = [lat, lon];
+          const marker = new ymaps.Placemark(
+            coords,
+            {
+              balloonContentHeader: pvz.name,
+              balloonContentBody: `<p>${pvz.address}</p><p>${pvz.work_time || ""}</p>`,
+              balloonContentFooter: pvz.code,
+            },
+            {
+              iconLayout: "default#image",
+              iconImageHref: CDEK_MARKER_ICON,
+              iconImageSize: CDEK_MARKER_SIZE,
+              iconImageOffset: [-CDEK_MARKER_SIZE[0] / 2, -CDEK_MARKER_SIZE[1]],
+            }
+          );
+          marker.events.add("click", () => {
+            if (onAddressSelect) {
+              onAddressSelect({
+                fullAddress: pvz.address,
+                pvzAddress: pvz.address,
+                pvzCode: pvz.code,
+                city: cityName,
+              });
+            }
+          });
+          mapInstance.geoObjects.add(marker);
+          pvzMarkersRef.current.push(marker);
+        });
+      } else if (isYandexMode) {
+        let pointsByCoords: YandexPvzPoint[] = [];
+        try {
+          pointsByCoords = await getYandexPvzByCoords(centerLat, centerLon, cityName);
+        } catch {
+          // ignore
+        }
+        let pointsByCity: YandexPvzPoint[] = [];
+        try {
+          pointsByCity = await getYandexPvzByCity(cityName);
+          if (pointsByCity.length === 0) {
+            pointsByCity = sortYandexPvzByDistance(
+              getFallbackYandexPvzForCity(cityName).length > 0
+                ? getFallbackYandexPvzForCity(cityName)
+                : getFallbackYandexPvzByCoords(centerLat, centerLon),
+              centerLat,
+              centerLon
+            );
+          }
+        } catch (err) {
+          console.warn("[Map] Яндекс ПВЗ:", err);
+        }
+        const byId: Record<string, YandexPvzPoint> = {};
+        [...pointsByCoords, ...pointsByCity].forEach((p) => {
+          if (p?.id) byId[p.id] = p;
+        });
+        const points: YandexPvzPoint[] = Object.values(byId);
+        let pointsToShow = filterYandexPvzByBounds(points, bounds);
+        if (pointsToShow.length === 0 && points.length > 0) {
+          pointsToShow = sortYandexPvzByDistance(points, centerLat, centerLon).slice(0, 30);
+        }
+
+        pvzMarkersRef.current.forEach((m) => {
+          try {
+            mapInstance.geoObjects.remove(m);
+          } catch {}
+        });
+        pvzMarkersRef.current = [];
+
+        pointsToShow.forEach((pvz) => {
+          const loc = pvz.location as { lat?: number; latitude?: number; lon?: number; longitude?: number };
+          const lat = loc?.lat ?? loc?.latitude;
+          const lon = loc?.lon ?? loc?.longitude;
+          if (typeof lat !== "number" || typeof lon !== "number") return;
+          const coords: [number, number] = [lat, lon];
+          const marker = new ymaps.Placemark(
+            coords,
+            {
+              balloonContentHeader: pvz.name,
+              balloonContentBody: `<p>${pvz.address}</p><p>${pvz.work_time || ""}</p>`,
+              balloonContentFooter: pvz.id,
+            },
+            {
+              iconLayout: "default#image",
+              iconImageHref: YANDEX_MARKER_ICON,
+              iconImageSize: YANDEX_MARKER_SIZE,
+              iconImageOffset: [-YANDEX_MARKER_SIZE[0] / 2, -YANDEX_MARKER_SIZE[1]],
+            }
+          );
+          marker.events.add("click", () => {
+            if (onAddressSelect) {
+              onAddressSelect({
+                fullAddress: pvz.address,
+                pvzAddress: pvz.address,
+                pvzId: pvz.id,
+                city: cityName,
+              });
+            }
+          });
+          mapInstance.geoObjects.add(marker);
+          pvzMarkersRef.current.push(marker);
+        });
+      }
+    };
+
+    const scheduleLoadPvz = () => {
+      if (cancelled) return;
+      const now = Date.now();
+      if (now - pvzLoadThrottleRef.current < THROTTLE_MS) return;
+      pvzLoadThrottleRef.current = now;
+      loadPvzForVisibleBounds();
+    };
+
+    const onBoundsChange = () => {
+      if (!isPickupMode || cancelled) return;
+      scheduleLoadPvz();
+    };
+
+    const onActionEnd = () => {
+      if (!isPickupMode || cancelled) return;
+      scheduleLoadPvz();
+    };
+
+    let userLat = 55.7558;
+    let userLon = 37.6173;
+
+    const initPickupAndSubscribe = async () => {
+      if (navigator.geolocation) {
+        const pos = await new Promise<GeolocationPosition | null>((resolve) => {
+          navigator.geolocation.getCurrentPosition(
+            (p) => resolve(p),
+            () => resolve(null),
+            { timeout: 8000, maximumAge: 300000 }
+          );
+        });
+        if (pos && !cancelled) {
+          userLat = pos.coords.latitude;
+          userLon = pos.coords.longitude;
+        }
+      }
+
+      if (cancelled || !mapInstanceRef.current) return;
+
+      if (markerRef.current) {
+        try {
+          map.geoObjects.remove(markerRef.current);
+        } catch {}
+        markerRef.current = null;
+      }
+
+      const userMarker = new ymaps.Placemark(
+        [userLat, userLon],
+        { balloonContent: "Вы здесь" },
+        { preset: "islands#blueCircleIcon", iconColor: "#0a5840" }
+      );
+      map.geoObjects.add(userMarker);
+      userMarkerRef.current = userMarker;
+
+      map.setCenter([userLat, userLon], 12);
+      map.events.add("boundschange", onBoundsChange);
+      map.events.add("actionend", onActionEnd);
+      await loadPvzForVisibleBounds();
+    };
+
+    initPickupAndSubscribe();
+
+    return () => {
+      cancelled = true;
+      map.events.remove("boundschange", onBoundsChange);
+      map.events.remove("actionend", onActionEnd);
+      removePvzMarkers();
+    };
+  }, [mapReady, isYmapsLoaded, isCdekMode, isYandexMode, onAddressSelect]);
+
+  // Геокодирование адреса из searchValue с debounce (в режиме СДЭК не подменяем карту)
   useEffect(() => {
     if (!isMounted || !isYmapsLoaded || !mapInstanceRef.current) {
       console.log("[Map] Геокодирование пропущено - карта не готова");
+      return;
+    }
+    if (
+      (deliveryType === "cdek" || deliveryType === "yandex") &&
+      deliveryMethod === "pickup"
+    ) {
       return;
     }
     if (!searchValue || searchValue.trim().length < 3) {
@@ -772,7 +1153,7 @@ const Map = ({
         clearTimeout(geocodeDebounceTimerRef.current);
       }
     };
-  }, [isMounted, isYmapsLoaded, searchValue]); // Убрали onAddressSelect из зависимостей
+  }, [isMounted, isYmapsLoaded, searchValue, deliveryType, deliveryMethod]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -825,18 +1206,12 @@ const Map = ({
         /* Скрываем "Открыть в Яндекс.Картах" */
         [class*="open-in-maps"],
         [class*="open-in-yandex"],
-        /* Скрываем все ссылки в нижней части карты */
-        .ymaps-2-1-79-ground-pane ~ div a,
-        .ymaps-2-1-79-map a[href*="maps"],
-        /* Более агрессивное скрытие всех ссылок внизу карты */
-        div[class*="ymaps"] > div[class*="copyrights"] a,
-        div[class*="ymaps"] > div[class*="copyrights"],
-        /* Скрываем все элементы в нижней панели карты */
-        .ymaps-2-1-79-map > div:last-child a,
-        .ymaps-2-1-79-map > div:last-child button,
-        /* Скрываем все ссылки и кнопки в нижней части */
-        [class*="ymaps-2-1-79"] a[href],
-        [class*="ymaps-2-1-79"] button {
+        /* Скрываем только copyrights и ссылки внизу карты; НЕ трогаем слой маркеров (placemark/overlay) */
+        .ymaps-2-1-79-map a[href*="yandex.ru/maps"],
+        .ymaps-2-1-79-map a[href*="yandex.com/maps"],
+        div[class*="ymaps"][class*="copyrights"] a,
+        div[class*="ymaps"][class*="copyrights"] button,
+        div[class*="ymaps"][class*="copyrights"] {
           display: none !important;
         }
         

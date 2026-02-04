@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
 import Image from "next/image";
@@ -17,13 +18,25 @@ interface CheckoutFormProps {
   className?: string;
 }
 
+const ORDER_ERROR_STORAGE_KEY = "znves:orderError";
+
 const CheckoutForm = ({
   onOrderSubmit,
   showRightColumn = true,
   className = "",
 }: CheckoutFormProps) => {
+  const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCart();
   const { redirectToBot } = useAuth();
+
+  const redirectToCartWithError = (message: string) => {
+    if (typeof window !== "undefined") {
+      try {
+        sessionStorage.setItem(ORDER_ERROR_STORAGE_KEY, message);
+      } catch {}
+    }
+    router.push("/cart");
+  };
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -83,10 +96,10 @@ const CheckoutForm = ({
     }
   }, [formData.deliveryMethod]);
 
-  // Цены доставки
+  // Цены доставки (сейчас всегда 0)
   const deliveryPrices = {
     pickup: 0,
-    yandex: 300,
+    yandex: 0,
   };
 
   // Расчет итоговой суммы
@@ -187,11 +200,16 @@ const CheckoutForm = ({
   }) => {
     const fullAddress =
       addressData.fullAddress ||
+      addressData.pvzAddress ||
       [addressData.street, addressData.house, addressData.city]
         .filter(Boolean)
         .join(", ");
 
-    if (lastGeocodedAddressRef.current === fullAddress) {
+    const isPvzSelection = !!(addressData.pvzCode || addressData.pvzId);
+    if (
+      !isPvzSelection &&
+      lastGeocodedAddressRef.current === fullAddress
+    ) {
       return;
     }
 
@@ -208,15 +226,17 @@ const CheckoutForm = ({
       return newErrors;
     });
 
-    // Если выбран пункт выдачи, сохраняем адрес ПВЗ
+    // Если выбран пункт выдачи, сохраняем адрес ПВЗ и подставляем в инпут
     if (formData.deliveryMethod === "pickup") {
+      const pvzAddr = addressData.pvzAddress || fullAddress || "";
       setFormData((prev) => ({
         ...prev,
-        pvzAddress: addressData.pvzAddress || fullAddress || "",
+        pvzAddress: pvzAddr,
         city: addressData.city || prev.city,
       }));
-      
-      // Сохраняем pvz_code и pvz_id если они есть
+      if (pvzAddr) {
+        setMapSearchValue(pvzAddr);
+      }
       if (addressData.pvzCode) {
         setPvzCode(addressData.pvzCode);
       }
@@ -551,10 +571,10 @@ const CheckoutForm = ({
         (p): p is { id: string; quantity: number } => p !== null
       );
       if (validPositions.length !== items.length) {
-        alert(
+        setIsSubmitting(false);
+        redirectToCartWithError(
           "Некоторые товары не могут быть заказаны. Удалите их из корзины и добавьте заново со страницы товара (с выбором цвета и размера)."
         );
-        setIsSubmitting(false);
         return;
       }
 
@@ -601,9 +621,13 @@ const CheckoutForm = ({
 
       // Обработка оплаты в зависимости от выбранного способа
       if (formData.paymentMethod === "card" || formData.paymentMethod === "sberbank") {
-        // Оплата картой или СБП - используем ручку /api/order/{order_id}/pay/
+        // Оплата картой или СБП — передаём URL возврата на сайт после оплаты
+        const origin = typeof window !== "undefined" ? window.location.origin : "";
         try {
-          const paymentResponse = await getPaymentUrl(orderId);
+          const paymentResponse = await getPaymentUrl(orderId, {
+            return_url: `${origin}/checkout?payment=success`,
+            cancel_url: `${origin}/checkout?payment=error`,
+          });
           console.log("Payment URL:", paymentResponse);
           
           // Используем confirmation_url или payment_url для обратной совместимости
@@ -618,23 +642,28 @@ const CheckoutForm = ({
           console.error("Failed to get payment URL:", error);
           // Продолжаем с сохранением заказа в sessionStorage
         }
-      } else if (formData.paymentMethod === "yandexpay") {
-        // Яндекс Pay - используем ручку /api/order/{order_id}/pay/yandex/
+      } else if (formData.paymentMethod === "yandexpay" || formData.paymentMethod === "installment") {
+        // Яндекс Pay и Долями — передаём URL возврата на сайт после оплаты
+        const origin = typeof window !== "undefined" ? window.location.origin : "";
         try {
-          const paymentResponse = await getYandexPaymentUrl(orderId);
+          const paymentResponse = await getYandexPaymentUrl(orderId, {
+            return_url: `${origin}/checkout?payment=success`,
+            cancel_url: `${origin}/checkout?payment=error`,
+          });
           console.log("Yandex Payment URL:", paymentResponse);
           
-          // Используем confirmation_url или payment_url для обратной совместимости
           const paymentUrl = paymentResponse.confirmation_url || paymentResponse.payment_url;
           
           if (paymentUrl) {
-            // Перенаправляем на страницу оплаты Яндекс Pay
             window.location.href = paymentUrl;
             return;
           }
         } catch (error) {
           console.error("Failed to get Yandex payment URL:", error);
-          // Продолжаем с сохранением заказа в sessionStorage
+          alert(
+            "Ошибка оплаты. Попробуйте оплатить картой или СБП, либо свяжитесь с поддержкой."
+          );
+          return;
         }
       }
 
@@ -720,7 +749,10 @@ const CheckoutForm = ({
       }
     } catch (error) {
       console.error("Failed to submit order:", error);
-      alert("Ошибка при оформлении заказа. Пожалуйста, попробуйте еще раз.");
+      const message =
+        error instanceof Error ? error.message : "Ошибка при оформлении заказа. Пожалуйста, попробуйте еще раз.";
+      setIsSubmitting(false);
+      redirectToCartWithError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -1002,10 +1034,8 @@ const CheckoutForm = ({
                         <span className={styles.deliveryButtonSubtext}>
                           6-7 дней
                         </span>
-                        <span
-                          className={`${styles.deliveryButtonPrice} ${styles.deliveryButtonPriceCourier}`}
-                        >
-                          от {formatPrice(deliveryPrices.yandex)}
+                        <span className={styles.deliveryButtonPrice}>
+                          бесплатно
                         </span>
                       </div>
                       <div
@@ -1568,15 +1598,7 @@ const CheckoutForm = ({
               </div>
               <div className={styles.summaryRow}>
                 <span className={styles.summaryLabel}>Доставка:</span>
-                <span className={styles.summaryValue}>
-                  {formData.deliveryMethod === "pickup"
-                    ? "Бесплатно"
-                    : formatPrice(
-                        deliveryPrices[
-                          formData.deliveryMethod as keyof typeof deliveryPrices
-                        ] || 0
-                      )}
-                </span>
+                <span className={styles.summaryValue}>Бесплатно</span>
               </div>
               <div className={styles.summaryRow}>
                 <span className={styles.summaryLabel}>Товаров на:</span>

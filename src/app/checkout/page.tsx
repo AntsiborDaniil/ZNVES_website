@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "../../contexts/CartContext";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
@@ -11,12 +11,14 @@ import CheckoutForm from "../../components/CheckoutForm/CheckoutForm";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import styles from "./page.module.css";
 
-const CheckoutPage = () => {
+const CheckoutPageContent = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { items, clearCart } = useCart();
   const { width } = useWindowSize();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [paymentReturnStatus, setPaymentReturnStatus] = useState<"success" | "error" | null>(null);
 
   // Очищаем корзину после показа модалки
   useEffect(() => {
@@ -40,6 +42,15 @@ const CheckoutPage = () => {
     router.push("/catalog");
   };
 
+  // Обработка возврата после оплаты (return_url с платёжной страницы)
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    if (payment === "success" || payment === "error") {
+      setPaymentReturnStatus(payment);
+      router.replace("/checkout", { scroll: false });
+    }
+  }, [searchParams, router]);
+
   // Редирект на страницу корзины при ширине <= 1024px
   useEffect(() => {
     if (width > 0 && width <= 1024) {
@@ -47,8 +58,8 @@ const CheckoutPage = () => {
     }
   }, [width, router]);
 
-  // Показываем пустую корзину только если модалка не открыта
-  if (items.length === 0 && !showSuccessModal) {
+  // Показываем пустую корзину только если модалка не открыта и не возврат с оплаты
+  if (items.length === 0 && !showSuccessModal && !paymentReturnStatus) {
     return (
       <div className={styles.checkoutPage}>
         <Header variant="green" />
@@ -72,12 +83,46 @@ const CheckoutPage = () => {
     <div className={styles.checkoutPage}>
       <Header variant="green" />
       <main className={styles.main}>
-        <div className={styles.wrapper}>
-          <Link href="/catalog" className={styles.backLink}>
-            Вернуться в каталог
-          </Link>
-          <CheckoutForm onOrderSubmit={handleOrderSubmit} />
-        </div>
+        {paymentReturnStatus === "success" && (
+          <div className={styles.paymentReturnBlock}>
+            <p className={styles.paymentReturnTitle}>Оплата прошла успешно</p>
+            <p className={styles.paymentReturnText}>
+              Заказ оплачен. Подробности можно посмотреть в личном кабинете.
+            </p>
+            <div className={styles.paymentReturnActions}>
+              <Link href="/account" className={styles.shopButton}>
+                Личный кабинет
+              </Link>
+              <Link href="/catalog" className={styles.backLink}>
+                В каталог
+              </Link>
+            </div>
+          </div>
+        )}
+        {paymentReturnStatus === "error" && (
+          <div className={styles.paymentReturnBlock}>
+            <p className={styles.paymentReturnTitle}>Оплата не выполнена</p>
+            <p className={styles.paymentReturnText}>
+              Оплата была отменена или произошла ошибка. Можно попробовать оформить заказ снова.
+            </p>
+            <div className={styles.paymentReturnActions}>
+              <Link href="/cart" className={styles.shopButton}>
+                Вернуться в корзину
+              </Link>
+              <Link href="/catalog" className={styles.backLink}>
+                В каталог
+              </Link>
+            </div>
+          </div>
+        )}
+        {!paymentReturnStatus && (
+          <div className={styles.wrapper}>
+            <Link href="/catalog" className={styles.backLink}>
+              Вернуться в каталог
+            </Link>
+            <CheckoutForm onOrderSubmit={handleOrderSubmit} />
+          </div>
+        )}
       </main>
       <Footer />
       {showSuccessModal && (
@@ -90,5 +135,11 @@ const CheckoutPage = () => {
     </div>
   );
 };
+
+const CheckoutPage = () => (
+  <Suspense fallback={null}>
+    <CheckoutPageContent />
+  </Suspense>
+);
 
 export default CheckoutPage;

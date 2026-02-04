@@ -81,15 +81,28 @@ export const createOrder = async (
   }
 };
 
+export interface PaymentUrlRequest {
+  /** URL, на который вернуть пользователя после успешной оплаты */
+  return_url?: string;
+  /** URL при отмене/ошибке оплаты */
+  cancel_url?: string;
+}
+
 /**
- * Получает ссылку на оплату через Юкассу (для карты или СБП)
+ * Получает ссылку на оплату через Юкассу (для карты или СБП).
+ * return_url и cancel_url передаются бэкенду, чтобы после оплаты вернуть пользователя на сайт.
  */
 export const getPaymentUrl = async (
-  orderId: number
+  orderId: number,
+  options?: PaymentUrlRequest
 ): Promise<PaymentResponse> => {
   try {
     const url = `${ORDER_API_URL}${orderId}/pay/`;
     console.log("Getting payment URL for order:", orderId, url);
+
+    const body: Record<string, string> = {};
+    if (options?.return_url) body.return_url = options.return_url;
+    if (options?.cancel_url) body.cancel_url = options.cancel_url;
 
     const response = await fetch(url, {
       method: "POST",
@@ -98,6 +111,7 @@ export const getPaymentUrl = async (
       },
       credentials: "include",
       mode: "cors",
+      body: Object.keys(body).length > 0 ? JSON.stringify(body) : undefined,
     });
 
     if (!response.ok) {
@@ -120,15 +134,30 @@ export const getPaymentUrl = async (
   }
 };
 
+export interface YandexPayRequest {
+  /** URL успешной оплаты (onSuccess) */
+  return_url?: string;
+  /** URL при ошибке (onError) */
+  cancel_url?: string;
+}
+
 /**
- * Получает ссылку на оплату через Яндекс Pay
+ * Получает ссылку на оплату через Яндекс Pay.
+ * Yandex Pay API требует redirectUrls (onSuccess, onError) — передаём их в body.
  */
 export const getYandexPaymentUrl = async (
-  orderId: number
+  orderId: number,
+  options?: YandexPayRequest
 ): Promise<PaymentResponse> => {
   try {
     const url = `${ORDER_API_URL}${orderId}/pay/yandex/`;
-    console.log("Getting Yandex payment URL for order:", orderId, url);
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : "";
+    const body = {
+      return_url: options?.return_url ?? `${origin}/checkout?payment=success`,
+      cancel_url: options?.cancel_url ?? `${origin}/checkout?payment=error`,
+    };
+    console.log("Getting Yandex payment URL for order:", orderId, "body:", body);
 
     const response = await fetch(url, {
       method: "POST",
@@ -137,6 +166,7 @@ export const getYandexPaymentUrl = async (
       },
       credentials: "include",
       mode: "cors",
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {

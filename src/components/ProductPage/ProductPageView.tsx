@@ -246,6 +246,7 @@ const ProductPageView = ({
 
             <div className={styles.variantGroup}>
               <div className={styles.variantGroupRow}>
+                {colorOptions.length > 0 && (
                 <div
                   className={`${styles.variantRow} ${styles.variantRowCompact}`}
                 >
@@ -332,6 +333,8 @@ const ProductPageView = ({
                     )}
                   </div>
                 </div>
+                )}
+                {product.availableSizes.length > 0 && (
                 <div
                   className={`${styles.variantRow} ${styles.variantRowCompact}`}
                 >
@@ -420,6 +423,7 @@ const ProductPageView = ({
                     )}
                   </div>
                 </div>
+                )}
               </div>
               <div className={styles.countAndBuy}>
                 <button

@@ -8,11 +8,16 @@
 .imageWrapper {
   padding: 140px 66px;
   background-color: #5252520f;
+  transition: padding 0.25s ease;
 }
 
 .productCard:hover,
 .productCard:focus-visible {
   transform: none;
+}
+
+.productCard:hover .imageWrapper,
+.productCard:focus-visible .imageWrapper {
   padding: 0;
 }
 
@@ -183,10 +188,6 @@
   .productCard {
     width: 100%;
     max-width: none;
-  }
-
-  .imageContainer {
-    margin-bottom: 10px;
   }
 
   .imageWrapper {

@@ -11,6 +11,7 @@ import { useCart } from "../../contexts/CartContext";
 import { getProductById } from "../../data/products";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import OrderSuccessModal from "../../components/OrderSuccessModal/OrderSuccessModal";
+import CartOrderErrorModal from "../../components/CartOrderErrorModal/CartOrderErrorModal";
 import CheckoutForm from "../../components/CheckoutForm/CheckoutForm";
 
 const CartPageContent = () => {
@@ -25,6 +26,7 @@ const CartPageContent = () => {
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [orderError, setOrderError] = useState<string | null>(null);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ru-RU", {
@@ -74,6 +76,18 @@ const CartPageContent = () => {
     }
   }, [showSuccessModal, orderNumber, items.length, clearCart]);
 
+  // Показываем модалку ошибки, если редирект с checkout из-за ошибки заказа
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const storedError = sessionStorage.getItem("znves:orderError");
+      if (storedError) {
+        sessionStorage.removeItem("znves:orderError");
+        setOrderError(storedError);
+      }
+    } catch {}
+  }, []);
+
   // Автоматически открываем форму при редиректе с checkout
   useEffect(() => {
     const autoCheckout = searchParams.get("autoCheckout");
@@ -105,6 +119,10 @@ const CartPageContent = () => {
     router.push("/catalog");
   };
 
+  const handleCloseErrorModal = () => {
+    setOrderError(null);
+  };
+
   const handleCheckoutClick = () => {
     if (isMobile) {
       setShowCheckoutForm(true);
@@ -119,8 +137,8 @@ const CartPageContent = () => {
     }
   };
 
-  // Не показываем пустую корзину, если модалка открыта
-  if (items.length === 0 && !showSuccessModal) {
+  // Не показываем пустую корзину, если модалка открыта или показываем ошибку заказа
+  if (items.length === 0 && !showSuccessModal && !orderError) {
     return (
       <div className={styles.cart}>
         <Header variant="green" />
@@ -253,6 +271,12 @@ const CartPageContent = () => {
           orderNumber={orderNumber}
           onClose={handleCloseModal}
           onGoToAccount={handleGoToAccount}
+        />
+      )}
+      {orderError && (
+        <CartOrderErrorModal
+          message={orderError}
+          onClose={handleCloseErrorModal}
         />
       )}
     </div>
