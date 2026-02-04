@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -9,7 +9,8 @@ import Link from "next/link";
 import { getProductById } from "../../data/products";
 import { createOrder, getPaymentUrl, getYandexPaymentUrl, type OrderRequest } from "../../api/order/orderApi";
 import { fetchCatalogProductRaw, type ApiProductDetail } from "../../api/product/productApi";
-import Map from "../Map/Map";
+import Map, { type PvzListOption } from "../Map/Map";
+import { getAddressSuggestions, type AddressSuggestion } from "../../api/delivery/addressSuggestApi";
 import styles from "../../app/checkout/page.module.css";
 
 interface CheckoutFormProps {
@@ -19,6 +20,40 @@ interface CheckoutFormProps {
 }
 
 const ORDER_ERROR_STORAGE_KEY = "znves:orderError";
+
+/** Фильтрация ПВЗ: сначала по городу, затем по адресу, затем по деталям (название) */
+function filterPvzByCityAddressDetails(
+  options: PvzListOption[],
+  query: string
+): PvzListOption[] {
+  const q = (query || "")
+    .trim()
+    .replace(/^г\.\s*/i, "")
+    .trim()
+    .toLowerCase();
+  if (!q) return options;
+  const tokens = q
+    .split(/[\s,]+/)
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean);
+  if (tokens.length === 0) return options;
+
+  return options.filter((opt) => {
+    const city = (opt.city ?? "").toLowerCase();
+    const address = (opt.address ?? "").toLowerCase();
+    const name = (opt.name ?? "").toLowerCase();
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
+      if (i === 0) {
+        if (!city.includes(token) && !address.includes(token) && !name.includes(token))
+          return false;
+      } else {
+        if (!address.includes(token) && !name.includes(token)) return false;
+      }
+    }
+    return true;
+  });
+}
 
 const CheckoutForm = ({
   onOrderSubmit,
@@ -64,6 +99,14 @@ const CheckoutForm = ({
     differentRecipient: false,
   });
   const [mapSearchValue, setMapSearchValue] = useState("");
+  const [pvzOptions, setPvzOptions] = useState<PvzListOption[]>([]);
+  const filteredPvzOptions = useMemo(
+    () => filterPvzByCityAddressDetails(pvzOptions, mapSearchValue),
+    [pvzOptions, mapSearchValue]
+  );
+  const [addressSuggestions, setAddressSuggestions] = useState<AddressSuggestion[]>([]);
+  const [selectedPvzCoords, setSelectedPvzCoords] = useState<[number, number] | null>(null);
+  const addressSuggestTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isUpdatingFromMapRef = useRef(false);
   const lastGeocodedAddressRef = useRef<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,6 +128,7 @@ const CheckoutForm = ({
   const houseRef = useRef<HTMLInputElement>(null);
   const pvzAddressRef = useRef<HTMLInputElement>(null);
   const mapSectionRef = useRef<HTMLDivElement>(null);
+  const pvzDropdownRef = useRef<HTMLDivElement>(null);
 
   // Устанавливаем город "Москва" при выборе курьерской доставки
   useEffect(() => {
@@ -142,6 +186,7 @@ const CheckoutForm = ({
         deliveryType: value,
         deliveryMethod: "pickup",
       }));
+      setSelectedPvzCoords(null);
       // Сбрасываем ошибки доставки при смене типа
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -158,6 +203,7 @@ const CheckoutForm = ({
         deliveryMethod: value,
         city: "Москва",
       }));
+      setSelectedPvzCoords(null);
       // Сбрасываем ошибки доставки при смене метода
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -172,6 +218,7 @@ const CheckoutForm = ({
         ...prev,
         deliveryMethod: value,
       }));
+      setSelectedPvzCoords(null);
       // Сбрасываем ошибки доставки при смене метода
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -197,6 +244,8 @@ const CheckoutForm = ({
     pvzAddress?: string;
     pvzCode?: string; // Для CDEK
     pvzId?: string; // Для Яндекс
+    lat?: number;
+    lon?: number;
   }) => {
     const fullAddress =
       addressData.fullAddress ||
@@ -226,7 +275,8 @@ const CheckoutForm = ({
       return newErrors;
     });
 
-    // Если выбран пункт выдачи, сохраняем адрес ПВЗ и подставляем в инпут
+    // Если выбран пункт выдачи, сохраняем адрес ПВЗ в форму (инпут «Адрес пункта выдачи»).
+    // mapSearchValue не меняем — карта не должна центрироваться/телепортироваться при выборе ПВЗ.
     if (formData.deliveryMethod === "pickup") {
       const pvzAddr = addressData.pvzAddress || fullAddress || "";
       setFormData((prev) => ({
@@ -234,14 +284,14 @@ const CheckoutForm = ({
         pvzAddress: pvzAddr,
         city: addressData.city || prev.city,
       }));
-      if (pvzAddr) {
-        setMapSearchValue(pvzAddr);
-      }
       if (addressData.pvzCode) {
         setPvzCode(addressData.pvzCode);
       }
       if (addressData.pvzId) {
         setPvzId(addressData.pvzId);
+      }
+      if (typeof addressData.lat === "number" && typeof addressData.lon === "number") {
+        setSelectedPvzCoords([addressData.lat, addressData.lon]);
       }
     } else {
       // Для курьерской доставки сохраняем полный адрес
@@ -257,7 +307,8 @@ const CheckoutForm = ({
       }));
     }
 
-    if (fullAddress && fullAddress !== mapSearchValue) {
+    // Обновляем поиск по карте только для курьерской доставки; при выборе ПВЗ не трогаем — избегаем «телепорта» карты
+    if (!addressData.pvzCode && !addressData.pvzId && fullAddress && fullAddress !== mapSearchValue) {
       setMapSearchValue(fullAddress);
     }
 
@@ -268,7 +319,95 @@ const CheckoutForm = ({
 
   const handleMapSearchChange = (value: string) => {
     setMapSearchValue(value);
+    setFormData((prev) =>
+      prev.deliveryMethod === "pickup" ? { ...prev, pvzAddress: value } : prev
+    );
   };
+
+  const handlePvzOptionSelect = (opt: PvzListOption) => {
+    handleAddressSelect({
+      pvzAddress: opt.address,
+      pvzCode: opt.code,
+      pvzId: opt.id,
+      city: opt.city,
+      fullAddress: opt.address,
+      lat: opt.lat,
+      lon: opt.lon,
+    });
+    if (typeof opt.lat === "number" && typeof opt.lon === "number") {
+      setSelectedPvzCoords([opt.lat, opt.lon]);
+    }
+    setPvzOptions([]);
+  };
+
+  const closePvzOptions = () => setPvzOptions([]);
+  const closeAddressSuggestions = () => setAddressSuggestions([]);
+
+  const handleAddressSuggestionSelect = (suggestion: AddressSuggestion) => {
+    const value = suggestion.value || suggestion.displayName;
+    setFormData((prev) => ({ ...prev, pvzAddress: value }));
+    setMapSearchValue(value);
+    setAddressSuggestions([]);
+  };
+
+  // Запрос подсказок адресов по вводу в «Адрес пункта выдачи» (debounce)
+  useEffect(() => {
+    if (formData.deliveryMethod !== "pickup") return;
+    const query = formData.pvzAddress.trim();
+    if (query.length < 2) {
+      setAddressSuggestions([]);
+      return;
+    }
+    if (addressSuggestTimerRef.current) {
+      clearTimeout(addressSuggestTimerRef.current);
+      addressSuggestTimerRef.current = null;
+    }
+    addressSuggestTimerRef.current = setTimeout(() => {
+      addressSuggestTimerRef.current = null;
+      getAddressSuggestions(query).then((list) => {
+        setAddressSuggestions(list);
+      });
+    }, 300);
+    return () => {
+      if (addressSuggestTimerRef.current) {
+        clearTimeout(addressSuggestTimerRef.current);
+        addressSuggestTimerRef.current = null;
+      }
+    };
+  }, [formData.pvzAddress, formData.deliveryMethod]);
+
+  // Закрытие списков по Escape
+  useEffect(() => {
+    const hasOpen = filteredPvzOptions.length > 0 || addressSuggestions.length > 0;
+    if (!hasOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closePvzOptions();
+        closeAddressSuggestions();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [filteredPvzOptions.length, addressSuggestions.length]);
+
+  // Закрытие списков по клику вне блока
+  useEffect(() => {
+    const hasOpen = filteredPvzOptions.length > 0 || addressSuggestions.length > 0;
+    if (!hasOpen) return;
+    const onPointerDown = (e: MouseEvent | TouchEvent) => {
+      const el = pvzDropdownRef.current;
+      if (el && !el.contains(e.target as Node)) {
+        closePvzOptions();
+        closeAddressSuggestions();
+      }
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("touchstart", onPointerDown, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("touchstart", onPointerDown);
+    };
+  }, [filteredPvzOptions.length, addressSuggestions.length]);
 
   useEffect(() => {
     if (isUpdatingFromMapRef.current) {
@@ -1181,23 +1320,53 @@ const CheckoutForm = ({
                 </div>
                 <div className={styles.infoInputs}>
                   <div
-                    className={styles.inputWrapper}
+                    ref={pvzDropdownRef}
+                    className={styles.pvzAddressDropdownWrap}
                     style={{ width: "100%" }}
                   >
-                    <label htmlFor="pvzAddress" className={styles.label}>
-                      Адрес пункта выдачи
-                    </label>
-                    <input
-                      type="text"
-                      id="pvzAddress"
-                      name="pvzAddress"
-                      placeholder="Выберите пункт выдачи на карте"
-                      value={formData.pvzAddress}
-                      onChange={handleInputChange}
-                      className={`${styles.input} ${errors.pvzAddress ? styles.inputError : ""}`}
-                      readOnly
-                      ref={pvzAddressRef}
-                    />
+                    <div
+                      className={styles.inputWrapper}
+                      style={{ width: "100%" }}
+                    >
+                      <label htmlFor="pvzAddress" className={styles.label}>
+                        Адрес пункта выдачи
+                      </label>
+                      <input
+                        type="text"
+                        id="pvzAddress"
+                        name="pvzAddress"
+                        placeholder="Введите город или адрес для поиска пункта выдачи"
+                        value={formData.pvzAddress}
+                        onChange={(e) => {
+                          handleInputChange(e);
+                          setMapSearchValue(e.target.value);
+                        }}
+                        className={`${styles.input} ${errors.pvzAddress ? styles.inputError : ""}`}
+                        ref={pvzAddressRef}
+                      />
+                    </div>
+                    {filteredPvzOptions.length > 0 && (
+                      <ul className={styles.pvzOptionsList} role="listbox">
+                        {filteredPvzOptions.map((opt, idx) => (
+                          <li
+                            key={opt.code ?? opt.id ?? `pvz-${idx}`}
+                            className={styles.pvzOptionItem}
+                            role="option"
+                            onClick={() => handlePvzOptionSelect(opt)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                handlePvzOptionSelect(opt);
+                              }
+                            }}
+                            tabIndex={0}
+                          >
+                            <span className={styles.pvzOptionName}>{opt.name}</span>
+                            <span className={styles.pvzOptionAddress}>{opt.address}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
               </>
@@ -1348,16 +1517,17 @@ const CheckoutForm = ({
                 onChange={(e) => {
                   handleMapSearchChange(e.target.value);
                 }}
-                readOnly
               />
             </div>
             <div className={styles.checkoutMapContainer}>
               <Map
                 onAddressSelect={handleAddressSelect}
+                onPvzListLoaded={setPvzOptions}
                 searchValue={mapSearchValue}
                 onSearchChange={handleMapSearchChange}
                 deliveryMethod={formData.deliveryMethod}
                 deliveryType={formData.deliveryType}
+                selectedPvzCoords={selectedPvzCoords}
               />
             </div>
           </div>

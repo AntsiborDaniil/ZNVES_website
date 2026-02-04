@@ -82,7 +82,7 @@ export const getCdekPvzByCity = async (
       cache: "no-store",
     });
     if (!res.ok) {
-      if (res.status === 404) return [];
+      if (res.status === 404) return getFallbackPvzForCity(city);
       throw new Error(`СДЭК ПВЗ: ${res.status}`);
     }
     const data = await res.json();

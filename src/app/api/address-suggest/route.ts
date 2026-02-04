@@ -1,0 +1,93 @@
+import { NextRequest, NextResponse } from "next/server";
+
+const SUGGEST_URL = "https://suggest-maps.yandex.ru/v1/suggest";
+const GEOCODER_URL = "https://geocode-maps.yandex.ru/v1/";
+
+function normalizeSuggestItem(item: any): { displayName: string; value: string } | null {
+  const displayName =
+    item?.title?.text ??
+    (typeof item?.title === "string" ? item.title : "") ??
+    item?.displayName ??
+    "";
+  const value =
+    item?.subtitle?.text ??
+    (typeof item?.subtitle === "string" ? item.subtitle : "") ??
+    item?.address?.formatted_address ??
+    item?.value ??
+    displayName;
+  const d = String(displayName || value);
+  const v = String(value || displayName);
+  return d || v ? { displayName: d || v, value: v || d } : null;
+}
+
+async function fetchGeocoderSuggestions(apiKey: string, query: string): Promise<{ displayName: string; value: string }[]> {
+  const url = new URL(GEOCODER_URL);
+  url.searchParams.set("apikey", apiKey);
+  url.searchParams.set("geocode", query);
+  url.searchParams.set("format", "json");
+  url.searchParams.set("lang", "ru_RU");
+  url.searchParams.set("results", "10");
+
+  const res = await fetch(url.toString(), { next: { revalidate: 0 } });
+  if (!res.ok) return [];
+
+  const data = await res.json();
+  const members = data?.response?.GeoObjectCollection?.featureMember ?? [];
+  return members
+    .map((m: any) => {
+      const geo = m?.GeoObject;
+      if (!geo) return null;
+      const name = geo?.name ?? "";
+      const text = geo?.metaDataProperty?.GeocoderMetaData?.text ?? name;
+      return name || text ? { displayName: String(name), value: String(text || name) } : null;
+    })
+    .filter(Boolean);
+}
+
+export async function GET(request: NextRequest) {
+  const q = request.nextUrl.searchParams.get("q");
+  const query = q ? String(q).trim() : "";
+  if (query.length < 2) {
+    return NextResponse.json({ suggestions: [] });
+  }
+
+  const apiKey =
+    process.env.YANDEX_SUGGEST_API_KEY ||
+    process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY ||
+    "";
+  if (!apiKey) {
+    return NextResponse.json({ suggestions: [] });
+  }
+
+  let suggestions: { displayName: string; value: string }[] = [];
+
+  try {
+    const suggestUrl = new URL(SUGGEST_URL);
+    suggestUrl.searchParams.set("apikey", apiKey);
+    suggestUrl.searchParams.set("text", query);
+    suggestUrl.searchParams.set("results", "10");
+    suggestUrl.searchParams.set("lang", "ru_RU");
+    suggestUrl.searchParams.set("types", "geo,street,locality,area,house");
+    suggestUrl.searchParams.set("highlight", "0");
+
+    const res = await fetch(suggestUrl.toString(), { next: { revalidate: 0 } });
+    if (res.ok) {
+      const data = await res.json();
+      const rawList = data?.results ?? data?.suggestions ?? Array.isArray(data) ? data : [];
+      const parsed = rawList.map(normalizeSuggestItem).filter(Boolean) as { displayName: string; value: string }[];
+      if (parsed.length > 0) suggestions = parsed;
+    }
+  } catch {
+    // ignore
+  }
+
+  if (suggestions.length === 0) {
+    try {
+      suggestions = await fetchGeocoderSuggestions(apiKey, query);
+    } catch {
+      // ignore
+    }
+  }
+
+  return NextResponse.json({ suggestions });
+}
