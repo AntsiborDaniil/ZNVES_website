@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -99,14 +99,19 @@ const CheckoutForm = ({
     differentRecipient: false,
   });
   const [mapSearchValue, setMapSearchValue] = useState("");
+  const [pvzAddressInputValue, setPvzAddressInputValue] = useState("");
+  const pvzAddressDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const pvzAddressThrottleRef = useRef(0);
+  const pvzAddressLatestRef = useRef("");
   const [pvzOptions, setPvzOptions] = useState<PvzListOption[]>([]);
   const filteredPvzOptions = useMemo(
-    () => filterPvzByCityAddressDetails(pvzOptions, mapSearchValue),
-    [pvzOptions, mapSearchValue]
+    () => filterPvzByCityAddressDetails(pvzOptions, pvzAddressInputValue),
+    [pvzOptions, pvzAddressInputValue]
   );
   const [addressSuggestions, setAddressSuggestions] = useState<AddressSuggestion[]>([]);
   const [selectedPvzCoords, setSelectedPvzCoords] = useState<[number, number] | null>(null);
   const addressSuggestTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const addressSuggestThrottleRef = useRef(0);
   const isUpdatingFromMapRef = useRef(false);
   const lastGeocodedAddressRef = useRef<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -236,7 +241,7 @@ const CheckoutForm = ({
     }
   };
 
-  const handleAddressSelect = (addressData: {
+  const handleAddressSelect = useCallback((addressData: {
     city?: string;
     street?: string;
     house?: string;
@@ -284,6 +289,12 @@ const CheckoutForm = ({
         pvzAddress: pvzAddr,
         city: addressData.city || prev.city,
       }));
+      setPvzAddressInputValue(pvzAddr);
+      pvzAddressLatestRef.current = pvzAddr;
+      if (pvzAddressDebounceRef.current) {
+        clearTimeout(pvzAddressDebounceRef.current);
+        pvzAddressDebounceRef.current = null;
+      }
       if (addressData.pvzCode) {
         setPvzCode(addressData.pvzCode);
       }
@@ -315,13 +326,48 @@ const CheckoutForm = ({
     setTimeout(() => {
       isUpdatingFromMapRef.current = false;
     }, 1000);
-  };
+  }, [formData.deliveryMethod, mapSearchValue]);
 
   const handleMapSearchChange = (value: string) => {
     setMapSearchValue(value);
     setFormData((prev) =>
       prev.deliveryMethod === "pickup" ? { ...prev, pvzAddress: value } : prev
     );
+  };
+
+  const PVZ_INPUT_DEBOUNCE_MS = 500;
+  const PVZ_INPUT_THROTTLE_MS = 400;
+
+  const flushPvzAddressDebounce = () => {
+    if (pvzAddressDebounceRef.current) {
+      clearTimeout(pvzAddressDebounceRef.current);
+      pvzAddressDebounceRef.current = null;
+    }
+    const value = pvzAddressLatestRef.current;
+    setFormData((prev) =>
+      prev.deliveryMethod === "pickup" ? { ...prev, pvzAddress: value } : prev
+    );
+    setMapSearchValue(value);
+  };
+
+  // Debounce: новый ввод отменяет предыдущий таймер; через 500ms уходит только последнее значение (не очередь запросов).
+  const schedulePvzAddressSync = (typedValue: string) => {
+    pvzAddressLatestRef.current = typedValue;
+    if (pvzAddressDebounceRef.current) {
+      clearTimeout(pvzAddressDebounceRef.current);
+      pvzAddressDebounceRef.current = null;
+    }
+    pvzAddressDebounceRef.current = setTimeout(() => {
+      pvzAddressDebounceRef.current = null;
+      const value = pvzAddressLatestRef.current;
+      const now = Date.now();
+      if (now - pvzAddressThrottleRef.current < PVZ_INPUT_THROTTLE_MS) return;
+      pvzAddressThrottleRef.current = now;
+      setFormData((prev) =>
+        prev.deliveryMethod === "pickup" ? { ...prev, pvzAddress: value } : prev
+      );
+      setMapSearchValue(value);
+    }, PVZ_INPUT_DEBOUNCE_MS);
   };
 
   const handlePvzOptionSelect = (opt: PvzListOption) => {
@@ -347,10 +393,18 @@ const CheckoutForm = ({
     const value = suggestion.value || suggestion.displayName;
     setFormData((prev) => ({ ...prev, pvzAddress: value }));
     setMapSearchValue(value);
+    setPvzAddressInputValue(value);
+    pvzAddressLatestRef.current = value;
+    if (pvzAddressDebounceRef.current) {
+      clearTimeout(pvzAddressDebounceRef.current);
+      pvzAddressDebounceRef.current = null;
+    }
     setAddressSuggestions([]);
   };
 
-  // Запрос подсказок адресов по вводу в «Адрес пункта выдачи» (debounce)
+  // Запрос подсказок адресов по вводу в «Адрес пункта выдачи» (debounce 500ms + throttle 400ms)
+  const ADDRESS_SUGGEST_DEBOUNCE_MS = 500;
+  const ADDRESS_SUGGEST_THROTTLE_MS = 400;
   useEffect(() => {
     if (formData.deliveryMethod !== "pickup") return;
     const query = formData.pvzAddress.trim();
@@ -364,10 +418,13 @@ const CheckoutForm = ({
     }
     addressSuggestTimerRef.current = setTimeout(() => {
       addressSuggestTimerRef.current = null;
+      const now = Date.now();
+      if (now - addressSuggestThrottleRef.current < ADDRESS_SUGGEST_THROTTLE_MS) return;
+      addressSuggestThrottleRef.current = now;
       getAddressSuggestions(query).then((list) => {
         setAddressSuggestions(list);
       });
-    }, 300);
+    }, ADDRESS_SUGGEST_DEBOUNCE_MS);
     return () => {
       if (addressSuggestTimerRef.current) {
         clearTimeout(addressSuggestTimerRef.current);
@@ -626,9 +683,12 @@ const CheckoutForm = ({
         deliveryService = "yandex";
       }
 
-      // Формируем полный адрес
-      const fullAddress = formData.deliveryMethod === "pickup" 
-        ? formData.pvzAddress || ""
+      // Формируем полный адрес (для ПВЗ учитываем ещё не применённый debounce)
+      const effectivePvzAddress = formData.deliveryMethod === "pickup"
+        ? (pvzAddressLatestRef.current || formData.pvzAddress || "")
+        : "";
+      const fullAddress = formData.deliveryMethod === "pickup"
+        ? effectivePvzAddress
         : [
             formData.city,
             formData.street,
@@ -835,7 +895,7 @@ const CheckoutForm = ({
           intercom: formData.intercom,
           pickupCity: formData.pickupCity,
           postalCode: formData.postalCode,
-          pvzAddress: formData.pvzAddress,
+          pvzAddress: formData.deliveryMethod === "pickup" ? (pvzAddressLatestRef.current || formData.pvzAddress) : formData.pvzAddress,
           type: formData.deliveryType,
           method: formData.deliveryMethod,
         },
@@ -1336,11 +1396,13 @@ const CheckoutForm = ({
                         id="pvzAddress"
                         name="pvzAddress"
                         placeholder="Введите город или адрес для поиска пункта выдачи"
-                        value={formData.pvzAddress}
+                        value={pvzAddressInputValue}
                         onChange={(e) => {
-                          handleInputChange(e);
-                          setMapSearchValue(e.target.value);
+                          const v = e.target.value;
+                          setPvzAddressInputValue(v);
+                          schedulePvzAddressSync(v);
                         }}
+                        onBlur={flushPvzAddressDebounce}
                         className={`${styles.input} ${errors.pvzAddress ? styles.inputError : ""}`}
                         ref={pvzAddressRef}
                       />
@@ -1505,8 +1567,7 @@ const CheckoutForm = ({
                 }
                 value={
                   formData.deliveryMethod === "pickup"
-                    ? formData.pvzAddress ||
-                      mapSearchValue ||
+                    ? pvzAddressInputValue ||
                       "Выберите пункт выдачи на карте"
                     : mapSearchValue ||
                       [formData.city, formData.street, formData.house]
@@ -1515,7 +1576,13 @@ const CheckoutForm = ({
                       "Выберите адрес на карте"
                 }
                 onChange={(e) => {
-                  handleMapSearchChange(e.target.value);
+                  const v = e.target.value;
+                  if (formData.deliveryMethod === "pickup") {
+                    setPvzAddressInputValue(v);
+                    schedulePvzAddressSync(v);
+                  } else {
+                    handleMapSearchChange(v);
+                  }
                 }}
               />
             </div>

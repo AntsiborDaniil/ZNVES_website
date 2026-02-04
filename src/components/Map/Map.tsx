@@ -679,11 +679,18 @@ const Map = ({
   }, [isMounted, isYmapsLoaded]);
 
   const pvzLoadThrottleRef = useRef(0);
+  const pvzBoundsDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const lastBoundsLoadRef = useRef<{ centerLat: number; centerLon: number; zoom: number; timestamp: number } | null>(null);
+  type PvzCacheEntry = { points: CdekPvzPoint[] | YandexPvzPoint[]; cityName: string; timestamp: number };
+  const pvzBoundsCacheRef = useRef<Record<string, PvzCacheEntry>>({});
+  const pvzBoundsCacheOrderRef = useRef<string[]>([]);
   const pvzSearchThrottleRef = useRef(0);
   const pvzSearchDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const pvzSearchAbortRef = useRef<AbortController | null>(null);
 
-  // Запрос ПВЗ по вводу в инпут «Адрес пункта выдачи» (debounce + throttle).
-  // Запускаем поиск даже без готовой карты — чтобы выпадающий список ПВЗ показывался сразу при вводе (например «г.Москва»).
+  // Запрос ПВЗ по вводу: debounce/throttle НЕ копят запросы — каждый новый ввод отменяет предыдущий таймер и (при новом поиске) отменяет предыдущий fetch.
+  const PVZ_SEARCH_THROTTLE_MS = 400;
+  const PVZ_SEARCH_DEBOUNCE_MS = 500;
   useEffect(() => {
     if (!isYmapsLoaded || (!isCdekMode && !isYandexMode)) {
       return;
@@ -694,26 +701,28 @@ const Map = ({
     const ymaps = window.ymaps;
     if (!ymaps) return;
 
-    const SEARCH_THROTTLE_MS = 400;
-    const SEARCH_DEBOUNCE_MS = 500;
+    pvzSearchAbortRef.current?.abort();
+    const controller = new AbortController();
+    pvzSearchAbortRef.current = controller;
+    const signal = controller.signal;
 
     const now = Date.now();
-    if (now - pvzSearchThrottleRef.current < SEARCH_THROTTLE_MS) {
+    if (now - pvzSearchThrottleRef.current < PVZ_SEARCH_THROTTLE_MS) {
       if (pvzSearchDebounceRef.current) clearTimeout(pvzSearchDebounceRef.current);
       pvzSearchDebounceRef.current = setTimeout(() => {
         pvzSearchDebounceRef.current = null;
-        runSearchByQuery();
-      }, SEARCH_DEBOUNCE_MS);
+        runSearchByQuery(signal);
+      }, PVZ_SEARCH_DEBOUNCE_MS);
       return;
     }
     pvzSearchThrottleRef.current = now;
     if (pvzSearchDebounceRef.current) clearTimeout(pvzSearchDebounceRef.current);
     pvzSearchDebounceRef.current = setTimeout(() => {
       pvzSearchDebounceRef.current = null;
-      runSearchByQuery();
-    }, SEARCH_DEBOUNCE_MS);
+      runSearchByQuery(signal);
+    }, PVZ_SEARCH_DEBOUNCE_MS);
 
-    async function runSearchByQuery() {
+    async function runSearchByQuery(abortSignal: AbortSignal) {
       if (!ymaps) return;
       const mapInstance = mapInstanceRef.current;
       let centerLat = 55.7558;
@@ -723,6 +732,7 @@ const Map = ({
 
       try {
         const res = await ymaps.geocode(geocodeQuery, { results: 1 });
+        if (abortSignal.aborted) return;
         const first = res.geoObjects.get(0);
         if (first) {
           const coords = first.geometry.getCoordinates();
@@ -745,21 +755,24 @@ const Map = ({
         let pointsByCity: CdekPvzPoint[] = [];
         let pointsByCoords: CdekPvzPoint[] = [];
         try {
-          pointsByCity = await getCdekPvzByCity(cityName);
+          pointsByCity = await getCdekPvzByCity(cityName, abortSignal);
         } catch {
           // ignore
         }
+        if (abortSignal.aborted) return;
         try {
-          pointsByCoords = await getCdekPvzByCoords(centerLat, centerLon, cityName);
+          pointsByCoords = await getCdekPvzByCoords(centerLat, centerLon, cityName, abortSignal);
         } catch {
           // ignore
         }
+        if (abortSignal.aborted) return;
         const byCode: Record<string, CdekPvzPoint> = {};
         [...pointsByCoords, ...pointsByCity].forEach((p) => {
           if (p?.code) byCode[p.code] = p;
         });
         const points = Object.values(byCode);
 
+        if (abortSignal.aborted) return;
         if (onPvzListLoaded) {
           onPvzListLoaded(
             points.map((p) => {
@@ -777,6 +790,7 @@ const Map = ({
             })
           );
         }
+        if (abortSignal.aborted) return;
         if (mapInstance) {
           pvzMarkersRef.current.forEach((m) => {
             try {
@@ -818,21 +832,24 @@ const Map = ({
         let pointsByCity: YandexPvzPoint[] = [];
         let pointsByCoords: YandexPvzPoint[] = [];
         try {
-          pointsByCity = await getYandexPvzByCity(cityName);
+          pointsByCity = await getYandexPvzByCity(cityName, abortSignal);
         } catch {
           // ignore
         }
+        if (abortSignal.aborted) return;
         try {
-          pointsByCoords = await getYandexPvzByCoords(centerLat, centerLon, cityName);
+          pointsByCoords = await getYandexPvzByCoords(centerLat, centerLon, cityName, abortSignal);
         } catch {
           // ignore
         }
+        if (abortSignal.aborted) return;
         const byId: Record<string, YandexPvzPoint> = {};
         [...pointsByCoords, ...pointsByCity].forEach((p) => {
           if (p?.id) byId[p.id] = p;
         });
         const points = Object.values(byId);
 
+        if (abortSignal.aborted) return;
         if (onPvzListLoaded) {
           onPvzListLoaded(
             points.map((p) => {
@@ -850,6 +867,7 @@ const Map = ({
             })
           );
         }
+        if (abortSignal.aborted) return;
         if (mapInstance) {
           pvzMarkersRef.current.forEach((m) => {
             try {
@@ -891,6 +909,8 @@ const Map = ({
     }
 
     return () => {
+      pvzSearchAbortRef.current?.abort();
+      pvzSearchAbortRef.current = null;
       if (pvzSearchDebounceRef.current) {
         clearTimeout(pvzSearchDebounceRef.current);
         pvzSearchDebounceRef.current = null;
@@ -939,7 +959,12 @@ const Map = ({
     };
 
     let cancelled = false;
-    const THROTTLE_MS = 400;
+    const THROTTLE_MS = 600;
+    const BOUNDS_DEBOUNCE_MS = 500;
+    const BOUNDS_MIN_MOVE_DEG = 0.02;
+    const ZOOM_SKIP_THRESHOLD = 1;
+    const CACHE_TTL_MS = 5 * 60 * 1000;
+    const CACHE_GRID_PRECISION = 50;
 
     const getCityFromCoords = async (
       lat: number,
@@ -965,8 +990,10 @@ const Map = ({
       if (cancelled || !mapInstanceRef.current) return;
       const mapInstance = mapInstanceRef.current;
       let bounds: MapBounds;
+      let currentZoom = 12;
       try {
         bounds = mapInstance.getBounds();
+        if (typeof mapInstance.getZoom === "function") currentZoom = mapInstance.getZoom();
       } catch {
         return;
       }
@@ -974,8 +1001,68 @@ const Map = ({
       const centerLat = (south + north) / 2;
       const centerLon = (west + east) / 2;
 
+      const last = lastBoundsLoadRef.current;
+      if (last) {
+        const distLat = Math.abs(centerLat - last.centerLat);
+        const distLon = Math.abs(centerLon - last.centerLon);
+        const zoomDiff = Math.abs(currentZoom - last.zoom);
+        if (distLat < BOUNDS_MIN_MOVE_DEG && distLon < BOUNDS_MIN_MOVE_DEG && zoomDiff <= ZOOM_SKIP_THRESHOLD) {
+          return;
+        }
+      }
+
       const cityName = await getCityFromCoords(centerLat, centerLon);
       if (cancelled || !mapInstanceRef.current) return;
+
+      const cacheKey = `${isCdekMode ? "cdek" : "yandex"}_${cityName}_${Math.round(centerLat * CACHE_GRID_PRECISION)}_${Math.round(centerLon * CACHE_GRID_PRECISION)}`;
+      const now = Date.now();
+      const cached = pvzBoundsCacheRef.current[cacheKey];
+      if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+        if (cancelled || !mapInstanceRef.current) return;
+        const points = cached.points;
+        const pointsToShow = isCdekMode
+          ? filterPvzByBounds(points as CdekPvzPoint[], bounds)
+          : filterYandexPvzByBounds(points as YandexPvzPoint[], bounds);
+        const pts = pointsToShow.length > 0 ? pointsToShow : (isCdekMode ? sortPvzByDistance(points as CdekPvzPoint[], centerLat, centerLon) : sortYandexPvzByDistance(points as YandexPvzPoint[], centerLat, centerLon)).slice(0, 30);
+        pvzMarkersRef.current.forEach((m) => {
+          try {
+            mapInstance.geoObjects.remove(m);
+          } catch {}
+        });
+        pvzMarkersRef.current = [];
+        (pts as (CdekPvzPoint | YandexPvzPoint)[]).forEach((pvz) => {
+          const loc = (pvz as any).location;
+          const lat = loc?.lat ?? loc?.latitude;
+          const lon = loc?.lon ?? loc?.longitude;
+          if (typeof lat !== "number" || typeof lon !== "number") return;
+          const marker = new ymaps.Placemark(
+            [lat, lon],
+            {
+              balloonContentHeader: (pvz as any).name,
+              balloonContentBody: `<p>${(pvz as any).address}</p><p>${(pvz as any).work_time || ""}</p>`,
+              balloonContentFooter: (pvz as any).code ?? (pvz as any).id,
+            },
+            { preset: isCdekMode ? CDEK_MARKER_PRESET : YANDEX_MARKER_PRESET }
+          );
+          marker.events.add("click", () => {
+            if (onAddressSelect) {
+              onAddressSelect({
+                fullAddress: (pvz as any).address,
+                pvzAddress: (pvz as any).address,
+                pvzCode: (pvz as any).code,
+                pvzId: (pvz as any).id,
+                city: cached.cityName,
+                lat,
+                lon,
+              });
+            }
+          });
+          mapInstance.geoObjects.add(marker);
+          pvzMarkersRef.current.push(marker);
+        });
+        lastBoundsLoadRef.current = { centerLat, centerLon, zoom: currentZoom, timestamp: now };
+        return;
+      }
 
       if (isCdekMode) {
         let pointsByCoords: CdekPvzPoint[] = [];
@@ -1004,6 +1091,16 @@ const Map = ({
           if (p?.code) byCode[p.code] = p;
         });
         const points: CdekPvzPoint[] = Object.values(byCode);
+        const cache = pvzBoundsCacheRef.current;
+        const order = pvzBoundsCacheOrderRef.current;
+        if (Object.keys(cache).length > 50 && order.length > 0) {
+          const oldestKey = order.shift();
+          if (oldestKey) delete cache[oldestKey];
+        }
+        cache[cacheKey] = { points, cityName, timestamp: Date.now() };
+        const idx = order.indexOf(cacheKey);
+        if (idx >= 0) order.splice(idx, 1);
+        order.push(cacheKey);
         let pointsToShow = filterPvzByBounds(points, bounds);
         if (pointsToShow.length === 0 && points.length > 0) {
           pointsToShow = sortPvzByDistance(points, centerLat, centerLon).slice(0, 30);
@@ -1046,6 +1143,7 @@ const Map = ({
           mapInstance.geoObjects.add(marker);
           pvzMarkersRef.current.push(marker);
         });
+        lastBoundsLoadRef.current = { centerLat, centerLon, zoom: currentZoom, timestamp: Date.now() };
       } else if (isYandexMode) {
         let pointsByCoords: YandexPvzPoint[] = [];
         try {
@@ -1073,6 +1171,16 @@ const Map = ({
           if (p?.id) byId[p.id] = p;
         });
         const points: YandexPvzPoint[] = Object.values(byId);
+        const cacheY = pvzBoundsCacheRef.current;
+        const orderY = pvzBoundsCacheOrderRef.current;
+        if (Object.keys(cacheY).length > 50 && orderY.length > 0) {
+          const oldestKey = orderY.shift();
+          if (oldestKey) delete cacheY[oldestKey];
+        }
+        cacheY[cacheKey] = { points, cityName, timestamp: Date.now() };
+        const idxY = orderY.indexOf(cacheKey);
+        if (idxY >= 0) orderY.splice(idxY, 1);
+        orderY.push(cacheKey);
         let pointsToShow = filterYandexPvzByBounds(points, bounds);
         if (pointsToShow.length === 0 && points.length > 0) {
           pointsToShow = sortYandexPvzByDistance(points, centerLat, centerLon).slice(0, 30);
@@ -1115,6 +1223,7 @@ const Map = ({
           mapInstance.geoObjects.add(marker);
           pvzMarkersRef.current.push(marker);
         });
+        lastBoundsLoadRef.current = { centerLat, centerLon, zoom: currentZoom, timestamp: Date.now() };
       }
     };
 
@@ -1126,20 +1235,35 @@ const Map = ({
       loadPvzForVisibleBounds();
     };
 
-    const onBoundsChange = () => {
+    const scheduleLoadPvzDebounced = () => {
       if (!isPickupMode || cancelled) return;
-      scheduleLoadPvz();
+      if (pvzBoundsDebounceRef.current) clearTimeout(pvzBoundsDebounceRef.current);
+      pvzBoundsDebounceRef.current = setTimeout(() => {
+        pvzBoundsDebounceRef.current = null;
+        scheduleLoadPvz();
+      }, BOUNDS_DEBOUNCE_MS);
     };
 
     const onActionEnd = () => {
       if (!isPickupMode || cancelled) return;
-      scheduleLoadPvz();
+      scheduleLoadPvzDebounced();
     };
 
-    let userLat = 55.7558;
-    let userLon = 37.6173;
+    const defaultCenterLat = 55.7558;
+    const defaultCenterLon = 37.6173;
 
     const initPickupAndSubscribe = async () => {
+      if (cancelled || !mapInstanceRef.current) return;
+
+      if (markerRef.current) {
+        try {
+          map.geoObjects.remove(markerRef.current);
+        } catch {}
+        markerRef.current = null;
+      }
+
+      let userLat = defaultCenterLat;
+      let userLon = defaultCenterLon;
       if (navigator.geolocation) {
         const pos = await new Promise<GeolocationPosition | null>((resolve) => {
           navigator.geolocation.getCurrentPosition(
@@ -1156,13 +1280,6 @@ const Map = ({
 
       if (cancelled || !mapInstanceRef.current) return;
 
-      if (markerRef.current) {
-        try {
-          map.geoObjects.remove(markerRef.current);
-        } catch {}
-        markerRef.current = null;
-      }
-
       const userMarker = new ymaps.Placemark(
         [userLat, userLon],
         { balloonContent: "Вы здесь" },
@@ -1175,9 +1292,8 @@ const Map = ({
       if (selectedPvzCoords && selectedPvzCoords.length === 2) {
         map.setCenter(selectedPvzCoords, 12);
       } else if (!hasSearchQuery) {
-        map.setCenter([userLat, userLon], 12);
+        map.setCenter([defaultCenterLat, defaultCenterLon], 12);
       }
-      map.events.add("boundschange", onBoundsChange);
       map.events.add("actionend", onActionEnd);
       await loadPvzForVisibleBounds();
     };
@@ -1186,7 +1302,10 @@ const Map = ({
 
     return () => {
       cancelled = true;
-      map.events.remove("boundschange", onBoundsChange);
+      if (pvzBoundsDebounceRef.current) {
+        clearTimeout(pvzBoundsDebounceRef.current);
+        pvzBoundsDebounceRef.current = null;
+      }
       map.events.remove("actionend", onActionEnd);
       removePvzMarkers();
     };

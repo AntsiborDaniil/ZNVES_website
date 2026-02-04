@@ -70,9 +70,11 @@ function extractPvzList(data: any): CdekPvzPoint[] {
 
 /**
  * Получить список ПВЗ СДЭК по городу.
+ * @param signal — при отмене запрос прерывается, результат не используется
  */
 export const getCdekPvzByCity = async (
-  city: string
+  city: string,
+  signal?: AbortSignal
 ): Promise<CdekPvzPoint[]> => {
   const url = `${API_BASE}/cdek/pvz?city=${encodeURIComponent(city)}`;
   try {
@@ -80,6 +82,7 @@ export const getCdekPvzByCity = async (
       method: "GET",
       headers: { "Content-Type": "application/json" },
       cache: "no-store",
+      signal,
     });
     if (!res.ok) {
       if (res.status === 404) return getFallbackPvzForCity(city);
@@ -104,7 +107,8 @@ export const getCdekPvzByCity = async (
 export const getCdekPvzByCoords = async (
   lat: number,
   lon: number,
-  fallbackCity?: string
+  fallbackCity?: string,
+  signal?: AbortSignal
 ): Promise<CdekPvzPoint[]> => {
   const byCoordsUrl = `${API_BASE}/cdek/pvz?lat=${lat}&lon=${lon}`;
   try {
@@ -112,6 +116,7 @@ export const getCdekPvzByCoords = async (
       method: "GET",
       headers: { "Content-Type": "application/json" },
       cache: "no-store",
+      signal,
     });
     if (res.ok) {
       const data = await res.json();
@@ -124,7 +129,7 @@ export const getCdekPvzByCoords = async (
     // ignore
   }
   if (fallbackCity) {
-    const byCity = await getCdekPvzByCity(fallbackCity);
+    const byCity = await getCdekPvzByCity(fallbackCity, signal);
     return sortPvzByDistance(byCity, lat, lon);
   }
   return [];

@@ -104,7 +104,8 @@ export function filterYandexPvzByBounds(
 }
 
 export const getYandexPvzByCity = async (
-  city: string
+  city: string,
+  signal?: AbortSignal
 ): Promise<YandexPvzPoint[]> => {
   const url = `${API_BASE}/yandex/pvz?city=${encodeURIComponent(city)}`;
   try {
@@ -112,6 +113,7 @@ export const getYandexPvzByCity = async (
       method: "GET",
       headers: { "Content-Type": "application/json" },
       cache: "no-store",
+      signal,
     });
     if (!res.ok) {
       if (res.status === 404) return [];
@@ -130,7 +132,8 @@ export const getYandexPvzByCity = async (
 export const getYandexPvzByCoords = async (
   lat: number,
   lon: number,
-  fallbackCity?: string
+  fallbackCity?: string,
+  signal?: AbortSignal
 ): Promise<YandexPvzPoint[]> => {
   const url = `${API_BASE}/yandex/pvz?lat=${lat}&lon=${lon}`;
   try {
@@ -138,6 +141,7 @@ export const getYandexPvzByCoords = async (
       method: "GET",
       headers: { "Content-Type": "application/json" },
       cache: "no-store",
+      signal,
     });
     if (res.ok) {
       const data = await res.json();
@@ -148,7 +152,7 @@ export const getYandexPvzByCoords = async (
     // ignore
   }
   if (fallbackCity) {
-    const byCity = await getYandexPvzByCity(fallbackCity);
+    const byCity = await getYandexPvzByCity(fallbackCity, signal);
     return sortYandexPvzByDistance(byCity, lat, lon);
   }
   return [];
