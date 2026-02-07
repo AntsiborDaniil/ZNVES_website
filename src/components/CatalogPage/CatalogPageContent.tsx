@@ -14,8 +14,11 @@ import ProductCard from "../ProductCard/ProductCard";
 import Link from "next/link";
 import Image from "next/image";
 import type { CatalogProduct } from "../../types/products";
+import type { ApiCatalogColor, ApiCatalogSize } from "../../api/catalog/catalogApi";
 import {
   fetchCatalogProductsByCategory,
+  fetchCatalogColors,
+  fetchCatalogSizes,
   normalizeCategoryForApi,
 } from "../../api/catalog/catalogApi";
 import {
@@ -42,23 +45,6 @@ type FilterOption = {
   value: string;
   label: string;
 };
-
-const colorOptions: FilterOption[] = [
-  { value: "all", label: "Все цвета" },
-  { value: "green", label: "Зеленый" },
-  { value: "cream", label: "Кремовый" },
-  { value: "navy", label: "Синий" },
-  { value: "brown", label: "Коричневый" },
-];
-
-const sizeOptions: FilterOption[] = [
-  { value: "all", label: "Все размеры" },
-  { value: "xs", label: "XS" },
-  { value: "s", label: "S" },
-  { value: "m", label: "M" },
-  { value: "l", label: "L" },
-  { value: "xl", label: "XL" },
-];
 
 const orderOptions: FilterOption[] = [
   { value: "popular", label: "По умолчанию" },
@@ -177,6 +163,8 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const orderParam = searchParams?.get("order");
 
   const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [colors, setColors] = useState<ApiCatalogColor[]>([]);
+  const [sizes, setSizes] = useState<ApiCatalogSize[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const getNormalizedCategory = useCallback(() => {
@@ -256,6 +244,40 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const handleMouseLeave = () => {
     setIsDragging(false);
   };
+
+  // Загрузка цветов и размеров для фильтров
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const [colorsData, sizesData] = await Promise.all([
+          fetchCatalogColors(),
+          fetchCatalogSizes(),
+        ]);
+        setColors(colorsData);
+        setSizes(sizesData);
+      } catch (error) {
+        console.error("Error loading filter options:", error);
+      }
+    };
+    loadFilters();
+  }, []);
+
+  // Опции фильтров: "все" + данные с API (slug — value для фильтрации, value — label в UI)
+  const colorOptions: FilterOption[] = useMemo(
+    () => [
+      { value: "all", label: "Все цвета" },
+      ...colors.map((c) => ({ value: c.slug, label: c.value })),
+    ],
+    [colors]
+  );
+
+  const sizeOptions: FilterOption[] = useMemo(
+    () => [
+      { value: "all", label: "Все размеры" },
+      ...sizes.map((s) => ({ value: s.slug, label: s.value })),
+    ],
+    [sizes]
+  );
 
   // Загрузка товаров из API с debounce
   useEffect(() => {

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { getProductById } from "../../data/products";
 import { createOrder, getPaymentUrl, getYandexPaymentUrl, type OrderRequest } from "../../api/order/orderApi";
 import { fetchCatalogProductRaw, type ApiProductDetail } from "../../api/product/productApi";
+import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 import Map, { type PvzListOption } from "../Map/Map";
 import { getAddressSuggestions, type AddressSuggestion } from "../../api/delivery/addressSuggestApi";
 import styles from "../../app/checkout/page.module.css";
@@ -118,6 +119,7 @@ const CheckoutForm = ({
   const [pvzCode, setPvzCode] = useState<string>(""); // Для CDEK
   const [pvzId, setPvzId] = useState<string>(""); // Для Яндекс
   const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>({});
   
   // Refs для полей формы
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -134,6 +136,17 @@ const CheckoutForm = ({
   const pvzAddressRef = useRef<HTMLInputElement>(null);
   const mapSectionRef = useRef<HTMLDivElement>(null);
   const pvzDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Загрузка цветов с API для отображения на русском (slug → value)
+  useEffect(() => {
+    fetchCatalogColors().then((colors) => {
+      const map: Record<string, string> = {};
+      colors.forEach((c) => {
+        map[c.slug] = c.value;
+      });
+      setColorSlugToLabel(map);
+    });
+  }, []);
 
   // Устанавливаем город "Москва" при выборе курьерской доставки
   useEffect(() => {
@@ -909,8 +922,10 @@ const CheckoutForm = ({
               ? getProductById(item.productId)
               : undefined;
           const colorLabel =
+            colorSlugToLabel[item.color] ||
             fullProduct?.availableColors.find((c) => c.value === item.color)
-              ?.label || item.color;
+              ?.label ||
+            item.color;
 
           return {
             id: item.productId,
@@ -1768,9 +1783,11 @@ const CheckoutForm = ({
                         ? getProductById(item.productId)
                         : undefined;
                     const colorLabel =
+                      colorSlugToLabel[item.color] ||
                       fullProduct?.availableColors.find(
                         (c) => c.value === item.color
-                      )?.label || item.color;
+                      )?.label ||
+                      item.color;
 
                     return (
                       <div

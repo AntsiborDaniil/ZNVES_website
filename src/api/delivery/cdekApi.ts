@@ -14,7 +14,6 @@ export type CdekPvzPoint = {
   address_comment?: string;
 };
 
-/** Нормализация координат из разных форматов ответа бэкенда */
 function parseLocation(loc: any): { lat: number; lon: number } | null {
   if (!loc || typeof loc !== "object") return null;
   const lat =

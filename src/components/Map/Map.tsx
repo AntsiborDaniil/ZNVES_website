@@ -1441,7 +1441,6 @@ const Map = ({
                   });
                 });
 
-                // Закрываем balloon при клике на маркер, если он уже открыт
                 marker.events.add("click", () => {
                   try {
                     setTimeout(() => {

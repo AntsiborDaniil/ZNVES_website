@@ -5,6 +5,18 @@ import type { CatalogProduct } from "../../types/products";
 
 const API_BASE_URL = "http://62.84.115.11:8000/api/catalog/";
 
+// Типы ответов ручек цветов и размеров
+export type ApiCatalogColor = {
+  slug: string;
+  value: string;
+  hex: string;
+};
+
+export type ApiCatalogSize = {
+  slug: string;
+  value: string;
+};
+
 // Кеш для запросов
 const cache = new Map<string, { data: CatalogProduct[]; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
@@ -147,6 +159,42 @@ export const fetchCatalogProductsByCategory = async (
   return fetchCatalogProducts({
     category: normalizedCategory,
   });
+};
+
+// Получение списка цветов для фильтров
+export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}colors/`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching catalog colors:", error);
+    return [];
+  }
+};
+
+// Получение списка размеров для фильтров
+export const fetchCatalogSizes = async (): Promise<ApiCatalogSize[]> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}sizes/`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching catalog sizes:", error);
+    return [];
+  }
 };
 
 // Экспорт функции нормализации для использования в компонентах
