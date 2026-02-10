@@ -88,13 +88,21 @@ export const getCdekPvzByCity = async (
       throw new Error(`СДЭК ПВЗ: ${res.status}`);
     }
     const data = await res.json();
+    console.log("[cdekApi] getCdekPvzByCity response:", data);
     const list = extractPvzList(data);
     if (list.length === 0) {
       return getFallbackPvzForCity(city);
     }
     return list;
   } catch (e) {
-    console.warn("[cdekApi] getCdekPvzByCity failed:", e);
+    console.warn(
+      "[cdekApi] getCdekPvzByCity failed for city:",
+      city,
+      "url:",
+      url,
+      "error:",
+      e
+    );
     return getFallbackPvzForCity(city);
   }
 };
@@ -119,6 +127,7 @@ export const getCdekPvzByCoords = async (
     });
     if (res.ok) {
       const data = await res.json();
+      console.log("[cdekApi] getCdekPvzByCoords response:", data);
       const list = extractPvzList(data);
       if (list.length > 0) {
         return sortPvzByDistance(list, lat, lon);

@@ -499,6 +499,31 @@ const CheckoutForm = ({
     }
   }, [formData.city, formData.street, formData.house, mapSearchValue]);
 
+  // Синхронизация поля адреса в левом виджете Яндекса с нашим «Адресом пункта выдачи»
+  useEffect(() => {
+    if (formData.deliveryMethod !== "pickup") return;
+    const value = formData.pvzAddress.trim();
+    if (!value) return;
+
+    try {
+      const root = document.getElementById("delivery-widget");
+      if (!root) return;
+
+      // Пытаемся найти главное текстовое поле адреса внутри виджета
+      const addressInput =
+        (root.querySelector('input[type="text"]') as HTMLInputElement | null) ??
+        null;
+      if (!addressInput) return;
+
+      if (addressInput.value === value) return;
+      addressInput.value = value;
+      addressInput.dispatchEvent(new Event("input", { bubbles: true }));
+      addressInput.dispatchEvent(new Event("change", { bubbles: true }));
+    } catch {
+      // Молча игнорируем, если структура виджета изменилась
+    }
+  }, [formData.deliveryMethod, formData.pvzAddress]);
+
   const generateOrderNumber = () => {
     return Math.floor(100000000 + Math.random() * 900000000).toString();
   };
@@ -529,7 +554,8 @@ const CheckoutForm = ({
     }
 
     // Валидация данных получателя, если отличается от покупателя
-    if (formData.differentRecipient) {
+    // Для ПВЗ блок «Данные о доставке» скрыт, поэтому эти поля не проверяем
+    if (formData.deliveryMethod !== "pickup" && formData.differentRecipient) {
       if (!formData.deliveryFirstName.trim()) {
         newErrors.deliveryFirstName = true;
       }
@@ -546,8 +572,11 @@ const CheckoutForm = ({
 
     // Валидация данных доставки
     if (formData.deliveryMethod === "pickup") {
-      // Для ПВЗ нужно проверить, что выбран пункт выдачи
-      if (formData.deliveryType === "cdek" && !pvzCode) {
+      // Для ПВЗ нужно проверить, что выбран пункт выдачи.
+      // Сейчас и для CDEK, и для Яндекс-ПВЗ выбор идёт через один виджет,
+      // который отдаёт только pvzId, поэтому считаем валидным, если есть
+      // либо pvzCode, либо pvzId.
+      if (formData.deliveryType === "cdek" && !pvzCode && !pvzId) {
         newErrors.pvzAddress = true;
       } else if (formData.deliveryType === "yandex" && !pvzId) {
         newErrors.pvzAddress = true;
@@ -807,7 +836,9 @@ const CheckoutForm = ({
       if (deliveryService === "cdek") {
         // Для CDEK обязательно заполняем cdek_delivery_data
         orderRequest.cdek_delivery_data = {
-          pvz_code: pvzCode || "DEFAULT",
+          // Если кода CDEK нет, пробуем использовать pvzId из виджета,
+          // чтобы на бэке было хоть какое-то значение, а не заглушка.
+          pvz_code: pvzCode || pvzId || "DEFAULT",
           full_address: fullAddress,
         };
       } else if (deliveryService === "yandex") {
@@ -1278,177 +1309,91 @@ const CheckoutForm = ({
             </div>
           </div>
 
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Данные о доставке</h2>
-            <label
-              className={styles.checkboxLabel}
-              style={{ marginBottom: "20px" }}
-            >
-              <input
-                type="checkbox"
-                name="differentRecipient"
-                checked={formData.differentRecipient}
-                onChange={handleInputChange}
-                className={styles.checkbox}
-              />
-              <span>Получатель отличается от покупателя</span>
-            </label>
-            {formData.differentRecipient && (
-              <>
-                <div className={styles.firstInputs}>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="deliveryFirstName" className={styles.label}>
-                      Имя получателя
-                    </label>
-                    <input
-                      type="text"
-                      id="deliveryFirstName"
-                      name="deliveryFirstName"
-                      placeholder="Введите имя"
-                      value={formData.deliveryFirstName}
-                      onChange={handleInputChange}
-                      className={`${styles.input} ${errors.deliveryFirstName ? styles.inputError : ""}`}
-                      ref={deliveryFirstNameRef}
-                    />
-                  </div>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="deliveryLastName" className={styles.label}>
-                      Фамилия получателя
-                    </label>
-                    <input
-                      type="text"
-                      id="deliveryLastName"
-                      name="deliveryLastName"
-                      placeholder="Введите фамилию"
-                      value={formData.deliveryLastName}
-                      onChange={handleInputChange}
-                      className={`${styles.input} ${errors.deliveryLastName ? styles.inputError : ""}`}
-                      ref={deliveryLastNameRef}
-                    />
-                  </div>
-                </div>
-                <div className={styles.infoInputs}>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="deliveryPhone" className={styles.label}>
-                      Телефон получателя
-                    </label>
-                    <input
-                      type="tel"
-                      id="deliveryPhone"
-                      name="deliveryPhone"
-                      placeholder="+7 (___) ___-__-__"
-                      value={formData.deliveryPhone}
-                      onChange={handleInputChange}
-                      className={`${styles.input} ${errors.deliveryPhone ? styles.inputError : ""}`}
-                      ref={deliveryPhoneRef}
-                    />
-                  </div>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="deliveryEmail" className={styles.label}>
-                      Email получателя
-                    </label>
-                    <input
-                      type="email"
-                      id="deliveryEmail"
-                      name="deliveryEmail"
-                      placeholder="Введите email"
-                      value={formData.deliveryEmail}
-                      onChange={handleInputChange}
-                      className={`${styles.input} ${errors.deliveryEmail ? styles.inputError : ""}`}
-                      ref={deliveryEmailRef}
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-            {formData.deliveryMethod === "pickup" && (
-              <>
-                <div className={styles.firstInputs}>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="pickupCity" className={styles.label}>
-                      Город
-                    </label>
-                    <input
-                      type="text"
-                      id="pickupCity"
-                      name="pickupCity"
-                      placeholder="Введите город"
-                      value={formData.pickupCity || ""}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  </div>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="postalCode" className={styles.label}>
-                      Почтовый индекс
-                    </label>
-                    <input
-                      type="text"
-                      id="postalCode"
-                      name="postalCode"
-                      placeholder="Введите индекс"
-                      value={formData.postalCode}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  </div>
-                </div>
-                <div className={styles.infoInputs}>
-                  <div
-                    ref={pvzDropdownRef}
-                    className={styles.pvzAddressDropdownWrap}
-                    style={{ width: "100%" }}
-                  >
-                    <div
-                      className={styles.inputWrapper}
-                      style={{ width: "100%" }}
-                    >
-                      <label htmlFor="pvzAddress" className={styles.label}>
-                        Адрес пункта выдачи
+          {formData.deliveryMethod !== "pickup" && (
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>Данные о доставке</h2>
+              <label
+                className={styles.checkboxLabel}
+                style={{ marginBottom: "20px" }}
+              >
+                <input
+                  type="checkbox"
+                  name="differentRecipient"
+                  checked={formData.differentRecipient}
+                  onChange={handleInputChange}
+                  className={styles.checkbox}
+                />
+                <span>Получатель отличается от покупателя</span>
+              </label>
+              {formData.differentRecipient && (
+                <>
+                  <div className={styles.firstInputs}>
+                    <div className={styles.inputWrapper}>
+                      <label htmlFor="deliveryFirstName" className={styles.label}>
+                        Имя получателя
                       </label>
                       <input
                         type="text"
-                        id="pvzAddress"
-                        name="pvzAddress"
-                        placeholder="Введите город или адрес для поиска пункта выдачи"
-                        value={pvzAddressInputValue}
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          setPvzAddressInputValue(v);
-                          schedulePvzAddressSync(v);
-                        }}
-                        onBlur={flushPvzAddressDebounce}
-                        className={`${styles.input} ${errors.pvzAddress ? styles.inputError : ""}`}
-                        ref={pvzAddressRef}
+                        id="deliveryFirstName"
+                        name="deliveryFirstName"
+                        placeholder="Введите имя"
+                        value={formData.deliveryFirstName}
+                        onChange={handleInputChange}
+                        className={`${styles.input} ${errors.deliveryFirstName ? styles.inputError : ""}`}
+                        ref={deliveryFirstNameRef}
                       />
                     </div>
-                    {filteredPvzOptions.length > 0 && (
-                      <ul className={styles.pvzOptionsList} role="listbox">
-                        {filteredPvzOptions.map((opt, idx) => (
-                          <li
-                            key={opt.code ?? opt.id ?? `pvz-${idx}`}
-                            className={styles.pvzOptionItem}
-                            role="option"
-                            onClick={() => handlePvzOptionSelect(opt)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                handlePvzOptionSelect(opt);
-                              }
-                            }}
-                            tabIndex={0}
-                          >
-                            <span className={styles.pvzOptionName}>{opt.name}</span>
-                            <span className={styles.pvzOptionAddress}>{opt.address}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    <div className={styles.inputWrapper}>
+                      <label htmlFor="deliveryLastName" className={styles.label}>
+                        Фамилия получателя
+                      </label>
+                      <input
+                        type="text"
+                        id="deliveryLastName"
+                        name="deliveryLastName"
+                        placeholder="Введите фамилию"
+                        value={formData.deliveryLastName}
+                        onChange={handleInputChange}
+                        className={`${styles.input} ${errors.deliveryLastName ? styles.inputError : ""}`}
+                        ref={deliveryLastNameRef}
+                      />
+                    </div>
                   </div>
-                </div>
-              </>
-            )}
-            {formData.deliveryMethod === "yandex" && (
+                  <div className={styles.infoInputs}>
+                    <div className={styles.inputWrapper}>
+                      <label htmlFor="deliveryPhone" className={styles.label}>
+                        Телефон получателя
+                      </label>
+                      <input
+                        type="tel"
+                        id="deliveryPhone"
+                        name="deliveryPhone"
+                        placeholder="+7 (___) ___-__-__"
+                        value={formData.deliveryPhone}
+                        onChange={handleInputChange}
+                        className={`${styles.input} ${errors.deliveryPhone ? styles.inputError : ""}`}
+                        ref={deliveryPhoneRef}
+                      />
+                    </div>
+                    <div className={styles.inputWrapper}>
+                      <label htmlFor="deliveryEmail" className={styles.label}>
+                        Email получателя
+                      </label>
+                      <input
+                        type="email"
+                        id="deliveryEmail"
+                        name="deliveryEmail"
+                        placeholder="Введите email"
+                        value={formData.deliveryEmail}
+                        onChange={handleInputChange}
+                        className={`${styles.input} ${errors.deliveryEmail ? styles.inputError : ""}`}
+                        ref={deliveryEmailRef}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+              {formData.deliveryMethod === "yandex" && (
               <>
                 <div className={styles.firstInputs}>
                   <div className={styles.inputWrapper}>
@@ -1560,8 +1505,9 @@ const CheckoutForm = ({
                   </div>
                 </div>
               </>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           <div className={styles.section} ref={mapSectionRef}>
             <h2 className={styles.sectionTitle}>
@@ -1603,6 +1549,7 @@ const CheckoutForm = ({
             </div>
             <div className={styles.checkoutMapContainer}>
               <Map
+                city={formData.pickupCity}
                 onAddressSelect={handleAddressSelect}
                 onPvzListLoaded={setPvzOptions}
                 searchValue={mapSearchValue}

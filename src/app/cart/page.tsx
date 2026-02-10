@@ -20,7 +20,7 @@ const CartPageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { width } = useWindowSize();
-  const isMobile = width > 0 && width <= 1024;
+  const isMobile = width > 0 && width <= 1200;
   const checkoutFormRef = useRef<HTMLDivElement>(null);
 
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);

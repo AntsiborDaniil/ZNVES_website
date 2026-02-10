@@ -644,6 +644,8 @@ textarea.input::placeholder {
   accent-color: #525252;
 }
 
+/* При ширине экрана < 1280px: левая панель виджета и карта делят контейнер 50/50 */
+
 /* Общие стили для карты - используются в checkout и cart */
 .checkoutMapContainer {
   width: 100%;
@@ -651,6 +653,20 @@ textarea.input::placeholder {
   overflow: visible;
   position: relative;
   z-index: 1;
+}
+
+/* Мобильная версия виджета ПВЗ */
+@media (max-width: 768px) {
+  .checkoutMapContainer :global(#delivery-widget) {
+    min-height: 320px;
+    height: 100%;
+  }
+
+  /* Мобильная версия обычной карты (курьерская доставка) */
+  .checkoutMapContainer :global(.ymaps-2-1-79-map) {
+    min-height: 320px;
+    height: 100%;
+  }
 }
 
 .checkoutMapContainer :global([class*="ymaps"]) {
@@ -663,6 +679,13 @@ textarea.input::placeholder {
 
 .checkoutMapContainer :global(.ymaps-2-1-79-controls__control) {
   border-radius: 3px;
+}
+
+/* Скрываем кнопки зума (+/-) на карте */
+.checkoutMapContainer :global([class*="ymaps"][class*="zoom"]) {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* Скрываем лишние элементы интерфейса Яндекс.Карт */

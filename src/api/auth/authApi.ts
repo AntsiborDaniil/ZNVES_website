@@ -1,5 +1,8 @@
 // API для авторизации через Telegram
 
+/** Временно отключить запросы к ручке telegram-login (вернёт null без вызова бэкенда) */
+const TELEGRAM_LOGIN_DISABLED = true;
+
 const TELEGRAM_LOGIN_URL = "http://62.84.115.11:8000/api/auth/telegram-login/";
 const TELEGRAM_BOT_USERNAME = "@my_znves_bot";
 
@@ -20,6 +23,9 @@ export interface TelegramAuthData {
  * После регистрации в боте возвращает заполненные данные
  */
 export const checkTelegramAuth = async (): Promise<TelegramAuthData | null> => {
+  if (TELEGRAM_LOGIN_DISABLED) {
+    return null;
+  }
   try {
     console.log("Checking Telegram auth, URL:", TELEGRAM_LOGIN_URL);
     

@@ -4,11 +4,14 @@ const cspDirectives = {
   "default-src": ["'self'"],
   "script-src": [
     "'self'",
+    "https://ndd-widget.landpro.site",
+    "https://widget-pvz.dostavka.yandex.net",
+    "https://mc.yandex.ru",
     "https://api-maps.yandex.ru",
     "https://yastatic.net",
     "https://core-renderer-tiles.maps.yandex.net",
     "https://*.maps.yandex.net",
-    // Yandex Maps требует unsafe-inline и unsafe-eval для работы
+    // Yandex Maps и виджет Яндекс.Доставки требуют unsafe-inline и unsafe-eval для работы
     "'unsafe-inline'",
     "'unsafe-eval'",
   ],
@@ -16,6 +19,9 @@ const cspDirectives = {
   "img-src": [
     "'self'",
     "data:",
+    "https://ndd-widget.landpro.site",
+    "https://widget-pvz.dostavka.yandex.net",
+    "https://mc.yandex.ru",
     "https://*.yandex.ru",
     "https://yandex.ru",
     "https://*.yandex.net",
@@ -26,9 +32,19 @@ const cspDirectives = {
     "https://widgets.2gis.com",
     "http://62.84.115.11:8000",
   ],
-  "font-src": ["'self'", "data:"],
+  "font-src": [
+    "'self'",
+    "data:",
+    "https://yastatic.net",
+    "https://*.yandex.net",
+    "https://fonts.gstatic.com",
+    "https://fonts.googleapis.com",
+  ],
   "connect-src": [
     "'self'",
+    "https://ndd-widget.landpro.site",
+    "https://widget-pvz.dostavka.yandex.net",
+    "https://mc.yandex.ru",
     "https://*.yandex.ru",
     "https://*.yandex.net",
     "https://api-maps.yandex.ru",

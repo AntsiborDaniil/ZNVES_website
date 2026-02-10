@@ -51,9 +51,9 @@ const CheckoutPageContent = () => {
     }
   }, [searchParams, router]);
 
-  // Редирект на страницу корзины при ширине <= 1024px
+  // Редирект на страницу корзины при ширине <= 1200px
   useEffect(() => {
-    if (width > 0 && width <= 1024) {
+    if (width > 0 && width <= 1200) {
       router.push("/cart?autoCheckout=true");
     }
   }, [width, router]);
