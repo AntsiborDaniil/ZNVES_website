@@ -4,7 +4,10 @@ export type CartItem = {
     /** UUID warehouse_item из API или numeric id — для positions[].id в заказе используется UUID */
     productId: number | string;
     size: string;
+    /** Slug цвета (для сопоставления и API) */
     color: string;
+    /** Название цвета на русском для отображения в корзине */
+    colorLabel?: string;
     quantity: number;
     product: CatalogProduct;
     /** @deprecated используйте productId когда это UUID */
@@ -18,7 +21,8 @@ export type CartContextType = {
         size: string,
         color: string,
         quantity?: number,
-        warehouseProductId?: string
+        warehouseProductId?: string,
+        colorLabel?: string
     ) => Promise<void>;
     removeItem: (productId: number | string, size: string, color: string) => void;
     updateQuantity: (

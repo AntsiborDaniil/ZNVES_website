@@ -1,8 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 10, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 14, "column": 0}, "map": {"version":3,"sources":["file:///D:/allProjects/ZNVES_website/src/app/catalog/%5Bslug%5D/page.tsx"],"sourcesContent":["import { notFound } from \"next/navigation\";\r\nimport ProductPageClient from \"./ProductPageClient\";\r\n\r\ntype ProductPageProps = {\r\n  params: Promise<{\r\n    slug: string;\r\n  }>;\r\n};\r\n\r\n// Разрешаем динамические параметры для статического экспорта\r\nexport const dynamicParams = true;\r\n\r\n// Для статического экспорта требуется generateStaticParams\r\n// Возвращаем пустой массив, так как мы не знаем все slug заранее\r\nexport const generateStaticParams = async () => {\r\n  return [];\r\n};\r\n\r\nconst ProductPage = async ({ params }: ProductPageProps) => {\r\n  const { slug } = await params;\r\n\r\n  return <ProductPageClient slug={slug} />;\r\n};\r\n\r\nexport default ProductPage;\r\n"],"names":[],"mappings":";;;;;;;;;AACA;;;AASO,MAAM,gBAAgB;AAItB,MAAM,uBAAuB;IAClC,OAAO,EAAE;AACX;AAEA,MAAM,cAAc,OAAO,EAAE,MAAM,EAAoB;IACrD,MAAM,EAAE,IAAI,EAAE,GAAG,MAAM;IAEvB,qBAAO,8OAAC,kKAAiB;QAAC,MAAM;;;;;;AAClC;uCAEe","debugId":null}}]
-}

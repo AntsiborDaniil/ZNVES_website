@@ -254,7 +254,7 @@ const CheckoutForm = ({
     }
   };
 
-  const handleAddressSelect = useCallback((addressData: {
+  const handleAddressSelectImpl = useCallback((addressData: {
     city?: string;
     street?: string;
     house?: string;
@@ -265,6 +265,7 @@ const CheckoutForm = ({
     lat?: number;
     lon?: number;
   }) => {
+    console.log("[CheckoutForm] handleAddressSelect вызван:", addressData, "deliveryMethod:", formData.deliveryMethod);
     const fullAddress =
       addressData.fullAddress ||
       addressData.pvzAddress ||
@@ -277,6 +278,7 @@ const CheckoutForm = ({
       !isPvzSelection &&
       lastGeocodedAddressRef.current === fullAddress
     ) {
+      console.log("[CheckoutForm] Пропуск: тот же адрес уже обработан:", fullAddress);
       return;
     }
 
@@ -324,7 +326,7 @@ const CheckoutForm = ({
         street: addressData.street || "",
         house: addressData.house || "",
       };
-
+      console.log("[CheckoutForm] Курьер: обновляем formData:", newAddress);
       setFormData((prev) => ({
         ...prev,
         ...newAddress,
@@ -340,6 +342,15 @@ const CheckoutForm = ({
       isUpdatingFromMapRef.current = false;
     }, 1000);
   }, [formData.deliveryMethod, mapSearchValue]);
+
+  const handleAddressSelectRef = useRef(handleAddressSelectImpl);
+  handleAddressSelectRef.current = handleAddressSelectImpl;
+  const handleAddressSelect = useCallback(
+    (data: Parameters<typeof handleAddressSelectImpl>[0]) => {
+      handleAddressSelectRef.current(data);
+    },
+    []
+  );
 
   const handleMapSearchChange = (value: string) => {
     setMapSearchValue(value);
@@ -479,25 +490,25 @@ const CheckoutForm = ({
     };
   }, [filteredPvzOptions.length, addressSuggestions.length]);
 
+  // inputs → map: при изменении city/street/house (курьер) обновляем mapSearchValue для геокодинга
   useEffect(() => {
-    if (isUpdatingFromMapRef.current) {
-      return;
-    }
+    if (formData.deliveryMethod !== "yandex") return;
+    if (isUpdatingFromMapRef.current) return;
 
     const addressString = [formData.city, formData.street, formData.house]
       .filter(Boolean)
       .join(", ");
 
-    if (addressString && addressString !== mapSearchValue) {
+    if (addressString && addressString.length >= 5 && addressString !== mapSearchValue) {
       const timeoutId = setTimeout(() => {
         setMapSearchValue(addressString);
-      }, 1500);
+      }, 500);
 
       return () => {
         clearTimeout(timeoutId);
       };
     }
-  }, [formData.city, formData.street, formData.house, mapSearchValue]);
+  }, [formData.deliveryMethod, formData.city, formData.street, formData.house, mapSearchValue]);
 
   // Синхронизация поля адреса в левом виджете Яндекса с нашим «Адресом пункта выдачи»
   useEffect(() => {
@@ -953,6 +964,7 @@ const CheckoutForm = ({
               ? getProductById(item.productId)
               : undefined;
           const colorLabel =
+            item.colorLabel ||
             colorSlugToLabel[item.color] ||
             fullProduct?.availableColors.find((c) => c.value === item.color)
               ?.label ||
@@ -1547,8 +1559,15 @@ const CheckoutForm = ({
                 }}
               />
             </div>
-            <div className={styles.checkoutMapContainer}>
+            <div
+              className={`${styles.checkoutMapContainer} ${
+                formData.deliveryMethod === "yandex"
+                  ? styles.checkoutMapContainerCourier
+                  : ""
+              }`}
+            >
               <Map
+                key={`${formData.deliveryType}-${formData.deliveryMethod}`}
                 city={formData.pickupCity}
                 onAddressSelect={handleAddressSelect}
                 onPvzListLoaded={setPvzOptions}
@@ -1730,6 +1749,7 @@ const CheckoutForm = ({
                         ? getProductById(item.productId)
                         : undefined;
                     const colorLabel =
+                      item.colorLabel ||
                       colorSlugToLabel[item.color] ||
                       fullProduct?.availableColors.find(
                         (c) => c.value === item.color

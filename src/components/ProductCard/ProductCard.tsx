@@ -127,7 +127,9 @@ const ProductCard = ({
       catalogProduct,
       product.defaultSize,
       product.availableColors[0]?.value || product.color,
-      1
+      1,
+      undefined,
+      product.availableColors[0]?.label
     );
 
     showToast("Добавлено в корзину");

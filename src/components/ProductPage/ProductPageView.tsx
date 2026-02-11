@@ -27,6 +27,7 @@ import {
   fetchProductImagesByColor,
   type ApiWarehouseItem,
 } from "../../api/product/productApi";
+import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 
 type ProductPageViewProps = {
   product: ProductDetail;
@@ -77,8 +78,19 @@ const ProductPageView = ({
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>({});
 
   const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  useEffect(() => {
+    fetchCatalogColors().then((colors) => {
+      const map: Record<string, string> = {};
+      colors.forEach((c) => {
+        map[c.slug] = c.value;
+      });
+      setColorSlugToLabel(map);
+    });
+  }, []);
 
   useEffect(() => {
     if (
@@ -456,7 +468,10 @@ const ProductPageView = ({
                       selectedSize,
                       selectedColor,
                       1,
-                      warehouseProductId
+                      warehouseProductId,
+                      colorSlugToLabel[selectedColor] ??
+                        selectedColorOption.label ??
+                        selectedColor
                     );
                     showToast("Добавлено в корзину");
                   }}

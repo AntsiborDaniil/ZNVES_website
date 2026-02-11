@@ -58,13 +58,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [items, isHydrated]);
 
   const addItem = useCallback(
-    (
+    async (
       product: CatalogProduct,
       size: string,
       color: string,
       quantity: number = 1,
-      warehouseProductId?: string
-    ) => {
+      warehouseProductId?: string,
+      colorLabel?: string
+    ): Promise<void> => {
       setItems((prevItems) => {
         // UUID warehouse_item — главный id; иначе product.id
         const itemId: number | string =
@@ -80,6 +81,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           updated[existingIndex] = {
             ...updated[existingIndex],
             quantity: updated[existingIndex].quantity + quantity,
+            ...(colorLabel != null && { colorLabel }),
           };
           if (warehouseProductId) {
             console.log("[Cart] UUID в productId (localStorage):", warehouseProductId);
@@ -91,6 +93,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           productId: itemId,
           size,
           color,
+          ...(colorLabel != null && { colorLabel }),
           quantity,
           product,
         };

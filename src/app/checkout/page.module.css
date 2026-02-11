@@ -655,6 +655,10 @@ textarea.input::placeholder {
   z-index: 1;
 }
 
+/* Модификатор для карты курьера — отключаем агрессивное скрытие элементов */
+.checkoutMapContainerCourier {
+}
+
 /* Мобильная версия виджета ПВЗ */
 @media (max-width: 768px) {
   .checkoutMapContainer :global(#delivery-widget) {
@@ -681,23 +685,22 @@ textarea.input::placeholder {
   border-radius: 3px;
 }
 
-/* Скрываем кнопки зума (+/-) на карте */
-.checkoutMapContainer :global([class*="ymaps"][class*="zoom"]) {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-/* Скрываем лишние элементы интерфейса Яндекс.Карт */
+/* Скрываем «Как добраться», «Доехать на такси», «Создать свою карту», «Условия использования», «Яндекс карты» — на обеих картах */
 .checkoutMapContainer :global(.ymaps-2-1-79-balloon__route),
 .checkoutMapContainer :global(.ymaps-2-1-79-balloon__taxi),
 .checkoutMapContainer :global(.ymaps-2-1-79-balloon__create-map),
 .checkoutMapContainer :global(.ymaps-2-1-79-balloon__route-link),
 .checkoutMapContainer :global(.ymaps-2-1-79-balloon__taxi-link),
 .checkoutMapContainer :global(.ymaps-2-1-79-balloon__create-map-link),
+.checkoutMapContainer :global(.ymaps-2-1-79-balloon__footer),
+.checkoutMapContainer :global(.ymaps-2-1-79-balloon__actions),
 .checkoutMapContainer :global([class*="balloon__route"]),
 .checkoutMapContainer :global([class*="balloon__taxi"]),
 .checkoutMapContainer :global([class*="balloon__create-map"]),
+.checkoutMapContainer :global([class*="balloon__footer"]),
+.checkoutMapContainer :global([class*="balloon__actions"]),
+.checkoutMapContainer :global([class*="create-map"]),
+.checkoutMapContainer :global([class*="create-map-link"]),
 .checkoutMapContainer :global(.ymaps-2-1-79-copyrights-promo),
 .checkoutMapContainer :global(.ymaps-2-1-79-copyrights),
 .checkoutMapContainer :global(.ymaps-2-1-79-copyrights__content),
@@ -708,32 +711,68 @@ textarea.input::placeholder {
 .checkoutMapContainer :global([class*="copyrights__content"]),
 .checkoutMapContainer :global([class*="copyrights__link"]),
 .checkoutMapContainer :global([class*="copyrights__wrap"]),
-.checkoutMapContainer :global([class*="create-map"]),
-.checkoutMapContainer :global([class*="create-map-link"]),
-.checkoutMapContainer :global([class*="open-in-maps"]),
-.checkoutMapContainer :global([class*="open-in-yandex"]),
-.checkoutMapContainer :global(.ymaps-2-1-79-balloon__footer),
-.checkoutMapContainer :global(.ymaps-2-1-79-balloon__actions),
-.checkoutMapContainer :global([class*="balloon__footer"]),
-.checkoutMapContainer :global([class*="balloon__actions"]),
 .checkoutMapContainer :global(a[href*="yandex.ru/maps"]),
 .checkoutMapContainer :global(a[href*="yandex.com/maps"]),
-.checkoutMapContainer :global(div[class*="ymaps"] > div[class*="copyrights"] a),
-.checkoutMapContainer :global(div[class*="ymaps"] > div[class*="copyrights"]),
-/* Более агрессивное скрытие всех элементов внизу карты */
-.checkoutMapContainer :global(.ymaps-2-1-79-map > div:last-child),
-.checkoutMapContainer :global(.ymaps-2-1-79-map > div:last-child > *),
-.checkoutMapContainer :global(.ymaps-2-1-79-map > div:last-child a),
-.checkoutMapContainer :global(.ymaps-2-1-79-map > div:last-child button),
-.checkoutMapContainer :global(.ymaps-2-1-79-map > div:last-child span),
-.checkoutMapContainer :global(.ymaps-2-1-79-map a),
-.checkoutMapContainer :global(.ymaps-2-1-79-map button),
-.checkoutMapContainer :global([class*="ymaps"][class*="link"]),
-.checkoutMapContainer :global([class*="ymaps"][class*="button"]),
-.checkoutMapContainer :global([class*="ymaps"][class*="copyright"]),
-.checkoutMapContainer :global(.ymaps-2-1-79-map > div > a),
-.checkoutMapContainer :global(.ymaps-2-1-79-map > div > button),
-.checkoutMapContainer :global(.ymaps-2-1-79-map > div > span) {
+.checkoutMapContainer :global([class*="open-in-maps"]),
+.checkoutMapContainer :global([class*="open-in-yandex"]) {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Скрываем кнопки зума (+/-) на карте — только для виджета ПВЗ, не для карты курьера */
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="ymaps"][class*="zoom"]) {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Скрываем лишние элементы интерфейса Яндекс.Карт — только для виджета ПВЗ */
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-balloon__route),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-balloon__taxi),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-balloon__create-map),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-balloon__route-link),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-balloon__taxi-link),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-balloon__create-map-link),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="balloon__route"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="balloon__taxi"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="balloon__create-map"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-copyrights-promo),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-copyrights),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-copyrights__content),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-copyrights__link),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-copyrights__wrap),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="copyrights-promo"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="copyrights"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="copyrights__content"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="copyrights__link"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="copyrights__wrap"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="create-map"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="create-map-link"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="open-in-maps"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="open-in-yandex"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-balloon__footer),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-balloon__actions),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="balloon__footer"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="balloon__actions"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(a[href*="yandex.ru/maps"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(a[href*="yandex.com/maps"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(div[class*="ymaps"] > div[class*="copyrights"] a),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(div[class*="ymaps"] > div[class*="copyrights"]),
+/* Более агрессивное скрытие всех элементов внизу карты — только для виджета ПВЗ */
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-map > div:last-child),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-map > div:last-child > *),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-map > div:last-child a),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-map > div:last-child button),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-map > div:last-child span),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-map a),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-map button),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="ymaps"][class*="link"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="ymaps"][class*="button"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="ymaps"][class*="copyright"]),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-map > div > a),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-map > div > button),
+.checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-map > div > span) {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;

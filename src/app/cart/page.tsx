@@ -9,6 +9,7 @@ import Footer from "../../components/Footer/Footer";
 import CartItem from "../../components/ui/CartItem/CartItem";
 import { useCart } from "../../contexts/CartContext";
 import { getProductById } from "../../data/products";
+import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import OrderSuccessModal from "../../components/OrderSuccessModal/OrderSuccessModal";
 import CartOrderErrorModal from "../../components/CartOrderErrorModal/CartOrderErrorModal";
@@ -27,6 +28,7 @@ const CartPageContent = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [orderError, setOrderError] = useState<string | null>(null);
+  const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>({});
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ru-RU", {
@@ -75,6 +77,17 @@ const CartPageContent = () => {
       clearCart();
     }
   }, [showSuccessModal, orderNumber, items.length, clearCart]);
+
+  // Загрузка цветов с API каталога для отображения на русском (slug → value)
+  useEffect(() => {
+    fetchCatalogColors().then((colors) => {
+      const map: Record<string, string> = {};
+      colors.forEach((c) => {
+        map[c.slug] = c.value;
+      });
+      setColorSlugToLabel(map);
+    });
+  }, []);
 
   // Показываем модалку ошибки, если редирект с checkout из-за ошибки заказа
   useEffect(() => {
@@ -181,11 +194,14 @@ const CartPageContent = () => {
           <div className={styles.mainContentWrapper}>
             <div className={styles.cartItemsWrapper}>
               {items.map((item, index) => {
-                const fullProduct = getProductById(item.productId);
+                const fullProduct = getProductById(Number(item.productId));
                 const colorLabel =
+                  item.colorLabel ??
+                  colorSlugToLabel[item.color] ??
                   fullProduct?.availableColors.find(
                     (c) => c.value === item.color
-                  )?.label || item.color;
+                  )?.label ??
+                  item.color;
 
                 return (
                   <CartItem
