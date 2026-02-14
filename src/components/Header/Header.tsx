@@ -2,8 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, Suspense } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
 import BurgerMenu from "../BurgerMenu/BurgerMenu";
 import CartIcon from "../ui/CartIcon/CartIcon";
 import AccountIcon from "../ui/AccountIcon/AccountIcon";
@@ -17,21 +16,6 @@ type HeaderProps = {
 
 const Header = ({ variant = "transparent" }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const router = useRouter();
-
-  useEffect(() => {
-    const routesToPrefetch = [
-      "/catalog",
-      "/new-in",
-      "/privacy",
-      "/public-offer",
-      "/cart",
-    ];
-
-    routesToPrefetch.forEach((route) => {
-      void router.prefetch(route);
-    });
-  }, [router]);
 
   const headerClassName = `${styles.header} ${
     variant === "green" ? styles.headerGreen : ""
