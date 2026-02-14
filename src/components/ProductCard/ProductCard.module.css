@@ -6,7 +6,6 @@
 }
 
 .imageWrapper {
-  padding: 140px 66px;
   background-color: #5252520f;
   transition: padding 0.25s ease;
 }
@@ -22,6 +21,7 @@
 }
 
 .imageContainer {
+  min-height: 524px;
   position: relative;
   width: 100%;
   aspect-ratio: 1;
@@ -129,8 +129,8 @@
 }
 
 @media (max-width: 1440px) {
-  .imageWrapper {
-    padding: 100px 44px;
+  .imageContainer {
+    min-height: 424px;
   }
 
   .newBadge {
@@ -168,9 +168,9 @@
 }
 
 @media (max-width: 768px) {
-  .imageWrapper {
-    padding: 82px 33px;
-  }
+    .imageContainer {
+        min-height: 300px;
+    }
 
   .newBadge {
     top: -55px;
@@ -183,6 +183,12 @@
   }
 }
 
+@media (max-width: 600px) {
+    .imageContainer {
+        min-height: 280px;
+    }
+}
+
 /* На мобильных в слайдере карточки остаются полного размера как на десктопе */
 @media (max-width: 480px) {
   .productCard {
@@ -190,9 +196,13 @@
     max-width: none;
   }
 
-  .imageWrapper {
-    padding: 82px 33px;
-  }
+  .imageContainer {
+    min-height: 380px;
+}
+
+    .imageWrapper {
+        width: 269px;
+    }
 
   .newBadge {
     top: -55px;
