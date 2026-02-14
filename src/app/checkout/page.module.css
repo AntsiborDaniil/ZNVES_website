@@ -456,12 +456,15 @@ textarea.input::placeholder {
 }
 
 .checkmarkIcon {
-  font-size: 16px;
   color: #ffffff;
-  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+
+.checkmarkIcon svg {
+  display: block;
 }
 
 .checkmark {

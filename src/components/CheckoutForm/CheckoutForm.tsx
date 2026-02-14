@@ -1121,7 +1121,11 @@ const CheckoutForm = ({
                     }`}
                   >
                     {formData.deliveryType === "cdek" && (
-                      <span className={styles.checkmarkIcon} aria-hidden>✓</span>
+                      <span className={styles.checkmarkIcon} aria-hidden>
+                        <svg viewBox="0 0 12 10" width={12} height={10} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="butt" strokeLinejoin="miter">
+                          <path d="M1 5 L4 8 L11 1" />
+                        </svg>
+                      </span>
                     )}
                   </div>
                 </div>
@@ -1145,7 +1149,11 @@ const CheckoutForm = ({
                     }`}
                   >
                     {formData.deliveryType === "yandex" && (
-                      <span className={styles.checkmarkIcon} aria-hidden>✓</span>
+                      <span className={styles.checkmarkIcon} aria-hidden>
+                        <svg viewBox="0 0 12 10" width={12} height={10} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="butt" strokeLinejoin="miter">
+                          <path d="M1 5 L4 8 L11 1" />
+                        </svg>
+                      </span>
                     )}
                   </div>
                 </div>
@@ -1188,7 +1196,11 @@ const CheckoutForm = ({
                       }`}
                     >
                       {formData.deliveryMethod === "pickup" && (
-                        <span className={styles.checkmarkIcon} aria-hidden>✓</span>
+                        <span className={styles.checkmarkIcon} aria-hidden>
+                          <svg viewBox="0 0 12 10" width={12} height={10} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="butt" strokeLinejoin="miter">
+                            <path d="M1 5 L4 8 L11 1" />
+                          </svg>
+                        </span>
                       )}
                     </div>
                   </div>
@@ -1227,7 +1239,11 @@ const CheckoutForm = ({
                         }`}
                       >
                         {formData.deliveryMethod === "pickup" && (
-                          <span className={styles.checkmarkIcon} aria-hidden>✓</span>
+                          <span className={styles.checkmarkIcon} aria-hidden>
+                            <svg viewBox="0 0 12 10" width={12} height={10} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="butt" strokeLinejoin="miter">
+                              <path d="M1 5 L4 8 L11 1" />
+                            </svg>
+                          </span>
                         )}
                       </div>
                     </div>
@@ -1263,7 +1279,11 @@ const CheckoutForm = ({
                         }`}
                       >
                         {formData.deliveryMethod === "yandex" && (
-                          <span className={styles.checkmarkIcon} aria-hidden>✓</span>
+                          <span className={styles.checkmarkIcon} aria-hidden>
+                            <svg viewBox="0 0 12 10" width={12} height={10} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="butt" strokeLinejoin="miter">
+                              <path d="M1 5 L4 8 L11 1" />
+                            </svg>
+                          </span>
                         )}
                       </div>
                     </div>
