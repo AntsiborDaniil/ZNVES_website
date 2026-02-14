@@ -3,7 +3,9 @@
  * Бэкенд: GET /api/delivery/cdek/pvz (см. DELIVERY_INTEGRATION_REQUIREMENTS.md)
  */
 
-const API_BASE = "http://62.84.115.11:8000/api/delivery";
+import { API_BASE_URL } from "../../lib/apiConfig";
+
+const API_BASE = `${API_BASE_URL}/api/delivery`;
 
 export type CdekPvzPoint = {
   code: string;

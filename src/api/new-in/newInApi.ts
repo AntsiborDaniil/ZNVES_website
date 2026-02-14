@@ -2,8 +2,9 @@
 
 import type { ApiProduct } from "../../types/api";
 import type { CatalogProduct } from "../../types/products";
+import { API_BASE_URL } from "../../lib/apiConfig";
 
-const API_BASE_URL = "http://62.84.115.11:8000/api/catalog/";
+const CATALOG_API_URL = `${API_BASE_URL}/api/catalog/`;
 
 // Кеш для запросов
 const cache = new Map<string, { data: CatalogProduct[]; timestamp: number }>();
@@ -11,7 +12,7 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
 
 // Преобразование API ответа в CatalogProduct
 const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProduct => {
-  const baseUrl = "http://62.84.115.11:8000";
+  const baseUrl = API_BASE_URL;
   
   const images = apiProduct.images.map((img) => {
     if (img.startsWith("http")) {
@@ -99,7 +100,7 @@ export const fetchNewInProducts = async (
   }
 
   try {
-    const url = new URL(API_BASE_URL);
+    const url = new URL(CATALOG_API_URL);
     
     url.searchParams.set("is_new", "true");
     

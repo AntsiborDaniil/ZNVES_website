@@ -5,7 +5,9 @@
 
 import type { MapBounds } from "./cdekApi";
 
-const API_BASE = "http://62.84.115.11:8000/api/delivery";
+import { API_BASE_URL } from "../../lib/apiConfig";
+
+const API_BASE = `${API_BASE_URL}/api/delivery`;
 
 export type YandexPvzPoint = {
   id: string;

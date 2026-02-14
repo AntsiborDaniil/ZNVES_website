@@ -28,6 +28,7 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     qualities: [75, 80, 85, 90],
     remotePatterns: [
+      { protocol: 'https', hostname: 'test-znves.ru', pathname: '/**' },
       { protocol: 'http', hostname: '62.84.115.11', port: '8000', pathname: '/**' },
     ],
   },

@@ -2,8 +2,9 @@
 
 import type { ProductDetail } from "../../types/products";
 import type { ProductColorOption } from "../../types/products";
+import { API_BASE_URL } from "../../lib/apiConfig";
 
-const API_BASE_URL = "http://62.84.115.11:8000/api/catalog/";
+const CATALOG_API_URL = `${API_BASE_URL}/api/catalog/`;
 
 // Типы для API ответа
 export type ApiProductSize = {
@@ -54,7 +55,7 @@ const transformApiProduct = (
   apiProduct: ApiProductDetail,
   slugFromUrl?: string
 ): ProductDetail => {
-  const baseUrl = "http://62.84.115.11:8000";
+  const baseUrl = API_BASE_URL;
   const slug = apiProduct.slug ?? slugFromUrl ?? "";
 
   const images = (apiProduct.images ?? []).map((img) => {
@@ -139,7 +140,7 @@ const hashString = (str: string): number => {
 };
 
 const fetchProductBySlugInternal = async (slug: string): Promise<ProductDetail | null> => {
-  const url = `${API_BASE_URL}${slug}/`;
+  const url = `${CATALOG_API_URL}${slug}/`;
   const response = await fetch(url, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
@@ -190,7 +191,7 @@ export const fetchCatalogProductRaw = async (slug: string): Promise<ApiProductDe
   if (!promise) {
     promise = (async () => {
       try {
-        const url = `${API_BASE_URL}${slug}/`;
+        const url = `${CATALOG_API_URL}${slug}/`;
         const response = await fetch(url, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -220,8 +221,8 @@ const fetchProductImagesByColorInternal = async (
   productSlug: string,
   colorSlug: string
 ): Promise<string[]> => {
-  const url = `${API_BASE_URL}${productSlug}/${colorSlug}/`;
-  const baseUrl = "http://62.84.115.11:8000";
+  const url = `${CATALOG_API_URL}${productSlug}/${colorSlug}/`;
+  const baseUrl = API_BASE_URL;
   const response = await fetch(url, {
     method: "GET",
     headers: { "Content-Type": "application/json" },

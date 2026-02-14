@@ -2,8 +2,9 @@
 
 import type { ApiProduct, CatalogApiParams } from "../../types/api";
 import type { CatalogProduct } from "../../types/products";
+import { API_BASE_URL } from "../../lib/apiConfig";
 
-const API_BASE_URL = "http://62.84.115.11:8000/api/catalog/";
+const CATALOG_API_URL = `${API_BASE_URL}/api/catalog/`;
 
 // Типы ответов ручек цветов и размеров
 export type ApiCatalogColor = {
@@ -23,7 +24,7 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
 
 // Преобразование API ответа в CatalogProduct
 const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProduct => {
-  const baseUrl = "http://62.84.115.11:8000";
+  const baseUrl = API_BASE_URL;
   
   const images = apiProduct.images.map((img) => {
     if (img.startsWith("http")) {
@@ -110,7 +111,7 @@ export const fetchCatalogProducts = async (
   }
 
   try {
-    const url = new URL(API_BASE_URL);
+    const url = new URL(CATALOG_API_URL);
     
     if (params.category) {
       url.searchParams.set("category", params.category);
@@ -164,7 +165,7 @@ export const fetchCatalogProductsByCategory = async (
 // Получение списка цветов для фильтров
 export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}colors/`, {
+    const response = await fetch(`${CATALOG_API_URL}colors/`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       cache: "no-store",
@@ -182,7 +183,7 @@ export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
 // Получение списка размеров для фильтров
 export const fetchCatalogSizes = async (): Promise<ApiCatalogSize[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}sizes/`, {
+    const response = await fetch(`${CATALOG_API_URL}sizes/`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       cache: "no-store",

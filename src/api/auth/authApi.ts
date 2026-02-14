@@ -3,7 +3,9 @@
 /** Временно отключить запросы к ручке telegram-login (вернёт null без вызова бэкенда) */
 const TELEGRAM_LOGIN_DISABLED = true;
 
-const TELEGRAM_LOGIN_URL = "http://62.84.115.11:8000/api/auth/telegram-login/";
+import { API_BASE_URL } from "../../lib/apiConfig";
+
+const TELEGRAM_LOGIN_URL = `${API_BASE_URL}/api/auth/telegram-login/`;
 const TELEGRAM_BOT_USERNAME = "@my_znves_bot";
 
 export interface TelegramAuthData {

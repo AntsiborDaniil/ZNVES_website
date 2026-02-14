@@ -1,4 +1,5 @@
 import ProductPageClient from "./ProductPageClient";
+import { API_BASE_URL } from "../../lib/apiConfig";
 
 type ProductPageProps = {
   params: Promise<{
@@ -12,8 +13,8 @@ type ProductPageProps = {
 export const generateStaticParams = async () => {
   try {
     // Пытаемся получить все товары из API для генерации страниц
-    const API_BASE_URL = "http://62.84.115.11:8000/api/catalog/";
-    const response = await fetch(`${API_BASE_URL}`, {
+    const catalogUrl = `${API_BASE_URL}/api/catalog/`;
+    const response = await fetch(catalogUrl, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

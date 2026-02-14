@@ -1,7 +1,8 @@
 // API для оформления заказа
 
-const ORDER_API_URL =
-  (process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") || "http://62.84.115.11:8000") + "/api/order/";
+import { API_BASE_URL } from "../lib/apiConfig";
+
+const ORDER_API_URL = `${API_BASE_URL}/api/order/`;
 
 export interface OrderRequest {
   total_amount: string;
