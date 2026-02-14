@@ -875,13 +875,9 @@ const CheckoutForm = ({
 
       // Обработка оплаты в зависимости от выбранного способа
       if (formData.paymentMethod === "card" || formData.paymentMethod === "sberbank") {
-        // Оплата картой или СБП — передаём URL возврата на сайт после оплаты
-        const origin = typeof window !== "undefined" ? window.location.origin : "";
+        // Оплата картой или СБП — return_url/cancel_url формируются в API относительно текущей страницы
         try {
-          const paymentResponse = await getPaymentUrl(orderId, {
-            return_url: `${origin}/checkout?payment=success`,
-            cancel_url: `${origin}/checkout?payment=error`,
-          });
+          const paymentResponse = await getPaymentUrl(orderId);
           console.log("Payment URL:", paymentResponse);
           
           // Используем confirmation_url или payment_url для обратной совместимости
@@ -897,13 +893,9 @@ const CheckoutForm = ({
           // Продолжаем с сохранением заказа в sessionStorage
         }
       } else if (formData.paymentMethod === "yandexpay" || formData.paymentMethod === "installment") {
-        // Яндекс Pay и Долями — передаём URL возврата на сайт после оплаты
-        const origin = typeof window !== "undefined" ? window.location.origin : "";
+        // Яндекс Pay и Долями — return_url/cancel_url формируются в API относительно текущей страницы
         try {
-          const paymentResponse = await getYandexPaymentUrl(orderId, {
-            return_url: `${origin}/checkout?payment=success`,
-            cancel_url: `${origin}/checkout?payment=error`,
-          });
+          const paymentResponse = await getYandexPaymentUrl(orderId);
           console.log("Yandex Payment URL:", paymentResponse);
           
           const paymentUrl = paymentResponse.confirmation_url || paymentResponse.payment_url;

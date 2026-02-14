@@ -1,6 +1,7 @@
 // API для оформления заказа
 
-const ORDER_API_URL = "http://62.84.115.11:8000/api/order/";
+const ORDER_API_URL =
+  (process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") || "http://62.84.115.11:8000") + "/api/order/";
 
 export interface OrderRequest {
   total_amount: string;
@@ -81,6 +82,25 @@ export const createOrder = async (
   }
 };
 
+/** Преобразует order_id (number) в request_id (UUID-формат) */
+function toRequestId(orderId: number): string {
+  const hex = orderId.toString(16).padStart(12, "0");
+  return `00000000-0000-0000-0000-${hex}`;
+}
+
+/** Формирует return_url/cancel_url относительно текущей страницы (origin + path) — работает на проде и деве */
+function getRelativePaymentUrls(): { return_url: string; cancel_url: string } {
+  if (typeof window === "undefined") {
+    return { return_url: "/checkout?payment=success", cancel_url: "/checkout?payment=error" };
+  }
+  const { origin, pathname } = window.location;
+  const sep = pathname.includes("?") ? "&" : "?";
+  return {
+    return_url: `${origin}${pathname}${sep}payment=success`,
+    cancel_url: `${origin}${pathname}${sep}payment=error`,
+  };
+}
+
 export interface PaymentUrlRequest {
   /** URL, на который вернуть пользователя после успешной оплаты */
   return_url?: string;
@@ -90,7 +110,7 @@ export interface PaymentUrlRequest {
 
 /**
  * Получает ссылку на оплату через Юкассу (для карты или СБП).
- * return_url и cancel_url передаются бэкенду, чтобы после оплаты вернуть пользователя на сайт.
+ * return_url и cancel_url — относительно текущей страницы (работает на проде и деве).
  */
 export const getPaymentUrl = async (
   orderId: number,
@@ -98,11 +118,13 @@ export const getPaymentUrl = async (
 ): Promise<PaymentResponse> => {
   try {
     const url = `${ORDER_API_URL}${orderId}/pay/`;
+    const urls = getRelativePaymentUrls();
+    const body = {
+      request_id: toRequestId(orderId),
+      return_url: options?.return_url ?? urls.return_url,
+      cancel_url: options?.cancel_url ?? urls.cancel_url,
+    };
     console.log("Getting payment URL for order:", orderId, url);
-
-    const body: Record<string, string> = {};
-    if (options?.return_url) body.return_url = options.return_url;
-    if (options?.cancel_url) body.cancel_url = options.cancel_url;
 
     const response = await fetch(url, {
       method: "POST",
@@ -111,7 +133,7 @@ export const getPaymentUrl = async (
       },
       credentials: "include",
       mode: "cors",
-      body: Object.keys(body).length > 0 ? JSON.stringify(body) : undefined,
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -143,7 +165,7 @@ export interface YandexPayRequest {
 
 /**
  * Получает ссылку на оплату через Яндекс Pay.
- * Yandex Pay API требует redirectUrls (onSuccess, onError) — передаём их в body.
+ * return_url и cancel_url — относительно текущей страницы (работает на проде и деве).
  */
 export const getYandexPaymentUrl = async (
   orderId: number,
@@ -151,11 +173,11 @@ export const getYandexPaymentUrl = async (
 ): Promise<PaymentResponse> => {
   try {
     const url = `${ORDER_API_URL}${orderId}/pay/yandex/`;
-    const origin =
-      typeof window !== "undefined" ? window.location.origin : "";
+    const urls = getRelativePaymentUrls();
     const body = {
-      return_url: options?.return_url ?? `${origin}/checkout?payment=success`,
-      cancel_url: options?.cancel_url ?? `${origin}/checkout?payment=error`,
+      request_id: toRequestId(orderId),
+      return_url: options?.return_url ?? urls.return_url,
+      cancel_url: options?.cancel_url ?? urls.cancel_url,
     };
     console.log("Getting Yandex payment URL for order:", orderId, "body:", body);
 
