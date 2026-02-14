@@ -1,6 +1,6 @@
 // API для оформления заказа
 
-import { API_BASE_URL } from "../lib/apiConfig";
+import { API_BASE_URL } from "../../lib/apiConfig";
 
 const ORDER_API_URL = `${API_BASE_URL}/api/order/`;
 
