@@ -1121,15 +1121,7 @@ const CheckoutForm = ({
                     }`}
                   >
                     {formData.deliveryType === "cdek" && (
-                      <span className={styles.checkmarkIcon}>
-                        <Image
-                          src="/images/checkout/checkmark.png"
-                          alt="checkmark"
-                          width={11.64}
-                          height={10}
-                          loading="lazy"
-                        />
-                      </span>
+                      <span className={styles.checkmarkIcon} aria-hidden>✓</span>
                     )}
                   </div>
                 </div>
@@ -1153,15 +1145,7 @@ const CheckoutForm = ({
                     }`}
                   >
                     {formData.deliveryType === "yandex" && (
-                      <span className={styles.checkmarkIcon}>
-                        <Image
-                          src="/images/checkout/checkmark.png"
-                          alt="checkmark"
-                          width={11.64}
-                          height={10}
-                          loading="lazy"
-                        />
-                      </span>
+                      <span className={styles.checkmarkIcon} aria-hidden>✓</span>
                     )}
                   </div>
                 </div>
@@ -1204,15 +1188,7 @@ const CheckoutForm = ({
                       }`}
                     >
                       {formData.deliveryMethod === "pickup" && (
-                        <span className={styles.checkmarkIcon}>
-                          <Image
-                            src="/images/checkout/checkmark.png"
-                            alt="checkmark"
-                            width={11.64}
-                            height={10}
-                            loading="lazy"
-                          />
-                        </span>
+                        <span className={styles.checkmarkIcon} aria-hidden>✓</span>
                       )}
                     </div>
                   </div>
@@ -1251,15 +1227,7 @@ const CheckoutForm = ({
                         }`}
                       >
                         {formData.deliveryMethod === "pickup" && (
-                          <span className={styles.checkmarkIcon}>
-                            <Image
-                              src="/images/checkout/checkmark.png"
-                              alt="checkmark"
-                              width={11.64}
-                              height={10}
-                              loading="lazy"
-                            />
-                          </span>
+                          <span className={styles.checkmarkIcon} aria-hidden>✓</span>
                         )}
                       </div>
                     </div>
@@ -1295,15 +1263,7 @@ const CheckoutForm = ({
                         }`}
                       >
                         {formData.deliveryMethod === "yandex" && (
-                          <span className={styles.checkmarkIcon}>
-                            <Image
-                              src="/images/checkout/checkmark.png"
-                              alt="checkmark"
-                              width={11.64}
-                              height={10}
-                              loading="lazy"
-                            />
-                          </span>
+                          <span className={styles.checkmarkIcon} aria-hidden>✓</span>
                         )}
                       </div>
                     </div>
@@ -1530,6 +1490,7 @@ const CheckoutForm = ({
                     ? "Выберите пункт получения"
                     : "Выберите адрес доставки"
                 }
+                readOnly={formData.deliveryMethod === "pickup"}
                 value={
                   formData.deliveryMethod === "pickup"
                     ? pvzAddressInputValue ||
@@ -1760,8 +1721,8 @@ const CheckoutForm = ({
                               "/images/catalogs/placeholder.png"
                             }
                             alt={item.product.title}
-                            width={82}
-                            height={82}
+                            fill
+                            sizes="120px"
                             className={styles.orderImage}
                             loading="lazy"
                           />
