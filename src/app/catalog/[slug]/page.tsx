@@ -1,5 +1,5 @@
 import ProductPageClient from "./ProductPageClient";
-import { API_BASE_URL } from "../../lib/apiConfig";
+import { API_BASE_URL } from "../../../lib/apiConfig";
 
 type ProductPageProps = {
   params: Promise<{

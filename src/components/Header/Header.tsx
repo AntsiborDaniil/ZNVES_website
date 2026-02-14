@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, Suspense } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { usePathname } from "next/navigation";
 import BurgerMenu from "../BurgerMenu/BurgerMenu";
 import CartIcon from "../ui/CartIcon/CartIcon";
 import AccountIcon from "../ui/AccountIcon/AccountIcon";
@@ -17,21 +17,8 @@ type HeaderProps = {
 
 const Header = ({ variant = "transparent" }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const router = useRouter();
-
-  useEffect(() => {
-    const routesToPrefetch = [
-      "/catalog",
-      "/new-in",
-      "/privacy",
-      "/public-offer",
-      "/cart",
-    ];
-
-    routesToPrefetch.forEach((route) => {
-      void router.prefetch(route);
-    });
-  }, [router]);
+  const pathname = usePathname();
+  const shouldPrefetch = pathname !== "/checkout" && pathname !== "/cart";
 
   const headerClassName = `${styles.header} ${
     variant === "green" ? styles.headerGreen : ""
@@ -47,7 +34,12 @@ const Header = ({ variant = "transparent" }: HeaderProps) => {
           />
         </Suspense>
       </div>
-      <Link href="/" className={styles.logoLink} aria-label="Go to homepage">
+      <Link
+        href="/"
+        className={styles.logoLink}
+        aria-label="Go to homepage"
+        prefetch={shouldPrefetch}
+      >
         <Image
           src="/images/logo.png"
           alt="ZNVES logo"

@@ -77,6 +77,7 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
   const isCartActive = pathname === "/cart";
 
   const currentCategory = searchParams.get("category");
+  const shouldPrefetch = pathname !== "/checkout" && pathname !== "/cart";
 
   return (
     <div className={styles.burgerMenu}>
@@ -128,6 +129,7 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
                   isNewInActive ? styles.menuHeaderActive : ""
                 }`}
                 onClick={handleLinkClick}
+                prefetch={shouldPrefetch}
               >
                 NEW IN
               </Link>
@@ -140,6 +142,7 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
                   isCatalogActive ? styles.menuHeaderActive : ""
                 }`}
                 onClick={handleLinkClick}
+                prefetch={shouldPrefetch}
               >
                 CATALOG
               </Link>
@@ -183,6 +186,7 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
                             isCategoryActive ? styles.catalogLinkActive : ""
                           }`}
                           onClick={handleLinkClick}
+                          prefetch={shouldPrefetch}
                         >
                           {category.label}
                         </Link>
@@ -201,6 +205,7 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
                 isAccountActive ? styles.menuItemActive : ""
               }`}
               onClick={handleLinkClick}
+              prefetch={shouldPrefetch}
             >
               <Image
                 src="/images/burger/cabinet.png"
@@ -218,6 +223,7 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
                 isCartActive ? styles.menuItemActive : ""
               }`}
               onClick={handleLinkClick}
+              prefetch={shouldPrefetch}
             >
               <Image
                 src="/images/burger/cart.png"
