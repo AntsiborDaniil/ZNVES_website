@@ -220,6 +220,16 @@
     .productCard.gridCard .imageContainer {
       height: 100%;
     }
+
+    .productCard.gridCard .productTitle {
+      font-size: 16px;
+      line-height: 14.87px;
+    }
+
+    .productCard.gridCard .productPrice {
+      font-size: 14px;
+      line-height: 18.87px;
+    }
   }
   
 
