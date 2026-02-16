@@ -29,8 +29,6 @@ type ProductDisplaySectionProps = {
   showShopNow: boolean;
   id?: string;
   isBestseller?: boolean;
-  /** Данные с сервера — сразу рендерим без загрузки */
-  initialProducts?: CatalogProduct[];
 };
 
 const ProductDisplaySection = ({
@@ -38,7 +36,6 @@ const ProductDisplaySection = ({
   showShopNow,
   id,
   isBestseller = false,
-  initialProducts,
 }: ProductDisplaySectionProps) => {
   const swiperRef = useRef<SwiperInstance | null>(null);
   const [activeArrow, setActiveArrow] = useState<ActiveArrow>(null);
@@ -76,10 +73,8 @@ const ProductDisplaySection = ({
     }
   }, [width]);
 
-  // Загрузка товаров из API (только если нет initialProducts с SSR)
+  // Загрузка товаров из API
   useEffect(() => {
-    if (initialProducts && initialProducts.length > 0) return;
-
     const loadProducts = async () => {
       setIsLoading(true);
       try {
@@ -99,7 +94,7 @@ const ProductDisplaySection = ({
     };
 
     loadProducts();
-  }, [title, initialProducts]);
+  }, [title]);
 
   const handlePrev = () => {
     if (!isBeginning && swiperRef.current) {
@@ -289,7 +284,7 @@ const ProductDisplaySection = ({
                 loadPrevNextAmount: 2,
               },
             },
-            products.map((product, idx) => (
+            products.map((product) => (
               <SwiperSlide key={product.id} className={styles.slideItem}>
                 <Link
                   href={`/catalog/${product.slug || product.id}`}
@@ -304,7 +299,6 @@ const ProductDisplaySection = ({
                     productId={product.id}
                     showAddToCart={false}
                     isSliderCard={true}
-                    priority={idx < Math.ceil(maxVisible) + 2}
                   />
                 </Link>
               </SwiperSlide>

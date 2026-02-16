@@ -38,7 +38,7 @@ const Footer = () => {
           <h2 className={styles.politics}>
             Нажимая на кнопку «Подписаться», вы даете согласие на обработку
             персональных данных в соответствии с{" "}
-            <Link href="/privacy" className={styles.politicsLink} prefetch={false}>
+            <Link href="/privacy" className={styles.politicsLink}>
               Политикой конфиденциальности
             </Link>
           </h2>
@@ -169,7 +169,7 @@ const Footer = () => {
             <Link className={styles.link} href="/public-offer">
               Публичная оферта
             </Link>
-            <Link className={styles.link} href="/privacy" prefetch={false}>
+            <Link className={styles.link} href="/privacy">
               Политика конфиденциальности
             </Link>
           </div>

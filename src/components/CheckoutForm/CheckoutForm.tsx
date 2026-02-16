@@ -1695,7 +1695,7 @@ const CheckoutForm = ({
                     />
                     <span>
                       Я принимаю{" "}
-                      <Link href="/privacy" className={styles.checkboxLink} prefetch={false}>
+                      <Link href="/privacy" className={styles.checkboxLink}>
                         политику конфиденциальности
                       </Link>
                     </span>
@@ -1846,7 +1846,7 @@ const CheckoutForm = ({
                     />
                     <span>
                       Я принимаю{" "}
-                      <Link href="/privacy" className={styles.checkboxLink} prefetch={false}>
+                      <Link href="/privacy" className={styles.checkboxLink}>
                         политику конфиденциальности
                       </Link>
                     </span>

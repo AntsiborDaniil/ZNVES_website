@@ -10,8 +10,7 @@ const CartIcon = () => {
   const pathname = usePathname();
   const { getTotalItems } = useCart();
   const totalItems = getTotalItems();
-  const noPrefetchPaths = ["/checkout", "/cart", "/privacy"];
-  const shouldPrefetch = !noPrefetchPaths.includes(pathname);
+  const shouldPrefetch = pathname !== "/checkout" && pathname !== "/cart";
 
   return (
     <Link
