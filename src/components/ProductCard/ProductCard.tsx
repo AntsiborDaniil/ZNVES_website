@@ -22,6 +22,7 @@ type ProductCardProps = {
   productId?: number;
   showAddToCart?: boolean;
   isSliderCard?: boolean;
+  variant?: "slider" | "grid";
 };
 
 const ProductCard = ({
@@ -32,6 +33,7 @@ const ProductCard = ({
   productId,
   showAddToCart = true,
   isSliderCard = false,
+  variant = "slider",
 }: ProductCardProps) => {
   const { addItem } = useCart();
   const { showToast } = useToast();
@@ -139,7 +141,7 @@ const ProductCard = ({
     <div
       className={`${styles.productCard} ${
         isSliderCard ? styles.sliderCard : ""
-      }`}
+      } ${variant === "grid" ? styles.gridCard : ""}`}
     >
       <div className={styles.imageWrapper}>
         <div

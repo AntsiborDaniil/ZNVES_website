@@ -590,6 +590,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
                     isNew={product.isNew}
                     productId={product.id}
                     showAddToCart={false}
+                    variant="grid"
                   />
                 </Link>
               ))}

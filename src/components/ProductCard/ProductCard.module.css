@@ -189,57 +189,76 @@
     }
 }
 
-/* На мобильных в слайдере карточки остаются полного размера как на десктопе */
-@media (max-width: 480px) {
-  .productCard {
-    width: 100%;
-    max-width: none;
+/* Карточка в каталоге и new-in (variant="grid") */
+@media (max-width: 768px) {
+  .productCard.gridCard {
+    height: 480px;
+    width: auto;
+    min-width: 0;
   }
 
-  .imageContainer {
-    min-height: 380px;
+  .productCard.gridCard .imageWrapper {
+    flex: 1;
+  }
+
+  .productCard.gridCard .imageContainer {
+    height: 100%;
+  }
 }
 
-    .imageWrapper {
-        width: 269px;
+@media (max-width: 480px) {
+    .productCard.gridCard {
+      max-height: 435px;
+      width: auto;
+      min-width: 0;
     }
-
-  .newBadge {
-    top: -55px;
-    right: -12px;
-    align-items: center;
-
-    border-radius: 4.41px;
-    padding: 0.5px 10px;
-
-    font-size: 12.26px;
+  
+    .productCard.gridCard .imageWrapper {
+      flex: 1;
+    }
+  
+    .productCard.gridCard .imageContainer {
+      height: 100%;
+    }
   }
+  
 
-  .productTitle {
-    margin-top: 5px;
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 13.88px;
-  }
-
-  .productPrice {
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 13.88px;
-  }
-
-  .productCard {
+/* На мобильных в слайдере карточки остаются полного размера как на десктопе */
+/* Эти стили применяются только к ProductCard в слайдере (isSliderCard) */
+@media (max-width: 480px) {
+  .productCard.sliderCard {
+    width: 100%;
+    max-width: none;
     gap: 0px;
   }
 
-  /* Стили для карточек в слайдере на мобильных */
-  .sliderCard .productTitle {
-    font-size: 17.64px !important;
-    line-height: 21.1px !important;
+  .productCard.sliderCard .imageContainer {
+    min-height: 380px;
   }
 
-  .sliderCard .productPrice {
-    font-size: 17.64px !important;
-    line-height: 21.1px !important;
+  .productCard.sliderCard .imageWrapper {
+    width: 269px;
+  }
+
+  .productCard.sliderCard .newBadge {
+    top: -55px;
+    right: -12px;
+    align-items: center;
+    border-radius: 4.41px;
+    padding: 0.5px 10px;
+    font-size: 12.26px;
+  }
+
+  .productCard.sliderCard .productTitle {
+    margin-top: 5px;
+    font-weight: 400;
+    font-size: 17.64px;
+    line-height: 21.1px;
+  }
+
+  .productCard.sliderCard .productPrice {
+    font-weight: 400;
+    font-size: 17.64px;
+    line-height: 21.1px;
   }
 }
