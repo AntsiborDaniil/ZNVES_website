@@ -23,6 +23,8 @@ type ProductCardProps = {
   showAddToCart?: boolean;
   isSliderCard?: boolean;
   variant?: "slider" | "grid";
+  /** Для слайдера: приоритетная загрузка первых изображений (priority + eager) */
+  priority?: boolean;
 };
 
 const ProductCard = ({
@@ -34,6 +36,7 @@ const ProductCard = ({
   showAddToCart = true,
   isSliderCard = false,
   variant = "slider",
+  priority = false,
 }: ProductCardProps) => {
   const { addItem } = useCart();
   const { showToast } = useToast();
@@ -168,7 +171,8 @@ const ProductCard = ({
                     ? styles.productImageLoaded
                     : styles.productImageLoading
                 }`}
-                loading="lazy"
+                loading={priority && index === 0 ? "eager" : "lazy"}
+                priority={priority && index === 0}
                 onLoad={() => markImageLoaded(index)}
                 quality={80}
               />

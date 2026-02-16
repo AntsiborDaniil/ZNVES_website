@@ -18,7 +18,8 @@ type HeaderProps = {
 const Header = ({ variant = "transparent" }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
-  const shouldPrefetch = pathname !== "/checkout" && pathname !== "/cart";
+  const noPrefetchPaths = ["/checkout", "/cart", "/privacy"];
+  const shouldPrefetch = !noPrefetchPaths.includes(pathname);
 
   const headerClassName = `${styles.header} ${
     variant === "green" ? styles.headerGreen : ""
