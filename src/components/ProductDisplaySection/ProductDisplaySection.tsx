@@ -42,8 +42,6 @@ const ProductDisplaySection = ({
   const [maxVisible, setMaxVisible] = useState(4);
   const [spaceBetween, setSpaceBetween] = useState(30);
   const [isMobile, setIsMobile] = useState(false);
-  const [isBeginning, setIsBeginning] = useState(true);
-  const [isEnd, setIsEnd] = useState(false);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -97,14 +95,14 @@ const ProductDisplaySection = ({
   }, [title]);
 
   const handlePrev = () => {
-    if (!isBeginning && swiperRef.current) {
+    if (swiperRef.current) {
       swiperRef.current.slidePrev();
       setActiveArrow("prev");
     }
   };
 
   const handleNext = () => {
-    if (!isEnd && swiperRef.current) {
+    if (swiperRef.current) {
       swiperRef.current.slideNext();
       setActiveArrow("next");
     }
@@ -121,13 +119,9 @@ const ProductDisplaySection = ({
 
   const handleSwiper = useCallback((swiper: SwiperInstance) => {
     swiperRef.current = swiper;
-    setIsBeginning(swiper.isBeginning);
-    setIsEnd(swiper.isEnd);
   }, []);
 
-  const handleSlideChange = useCallback((swiper: SwiperInstance) => {
-    setIsBeginning(swiper.isBeginning);
-    setIsEnd(swiper.isEnd);
+  const handleSlideChange = useCallback(() => {
     setActiveArrow(null);
   }, []);
 
@@ -197,11 +191,11 @@ const ProductDisplaySection = ({
                   activeArrow === "prev"
                     ? styles.arrowButtonActive
                     : styles.arrowButtonInactive
-                } ${isBeginning ? styles.arrowButtonDisabled : ""}`}
+                }`}
                 onClick={handlePrev}
                 aria-label="Previous"
                 type="button"
-                disabled={isBeginning}
+                disabled={false}
               >
                 <svg
                   width="35"
@@ -223,11 +217,11 @@ const ProductDisplaySection = ({
                   activeArrow === "next"
                     ? styles.arrowButtonActive
                     : styles.arrowButtonInactive
-                } ${isEnd ? styles.arrowButtonDisabled : ""}`}
+                }`}
                 onClick={handleNext}
                 aria-label="Next"
                 type="button"
-                disabled={isEnd}
+                disabled={false}
               >
                 <svg
                   width="35"
@@ -257,23 +251,29 @@ const ProductDisplaySection = ({
             {
               className: styles.slider,
               modules: [FreeMode],
-              freeMode: {
-                enabled: true,
-                momentum: true,
-                momentumRatio: 0.35,
-                minimumVelocity: 0.08,
-                sticky: false,
-              },
-              resistance: true,
-              resistanceRatio: 0.85,
+              loop: true,
+              loopAdditionalSlides: 4,
               spaceBetween,
               slidesPerView: maxVisible,
               slidesPerGroup: 1,
-              loop: false,
               centeredSlides: isMobile,
-              speed: 600,
+              speed: 800,
+              followFinger: true,
+              touchRatio: 1.2,
+              resistance: true,
+              resistanceRatio: 0.7,
+              freeMode: {
+                enabled: true,
+                momentum: true,
+                momentumRatio: 1.0,
+                momentumVelocityRatio: 1.2,
+                momentumBounce: false,
+                minimumVelocity: 0.00005,
+                sticky: false,
+              },
+              grabCursor: true,
               watchSlidesProgress: true,
-              watchOverflow: true,
+              watchOverflow: false,
               onSwiper: handleSwiper,
               onSlideChange: handleSlideChange,
               onBeforeInit: handleBeforeInit,
@@ -315,11 +315,11 @@ const ProductDisplaySection = ({
               activeArrow === "prev"
                 ? styles.arrowButtonActive
                 : styles.arrowButtonInactive
-            } ${isBeginning ? styles.arrowButtonDisabled : ""}`}
+            }`}
             onClick={handlePrev}
             aria-label="Previous"
             type="button"
-            disabled={isBeginning}
+            disabled={false}
           >
             <svg
               width="35"
@@ -341,11 +341,11 @@ const ProductDisplaySection = ({
               activeArrow === "next"
                 ? styles.arrowButtonActive
                 : styles.arrowButtonInactive
-            } ${isEnd ? styles.arrowButtonDisabled : ""}`}
+            }`}
             onClick={handleNext}
             aria-label="Next"
             type="button"
-            disabled={isEnd}
+            disabled={false}
           >
             <svg
               width="35"

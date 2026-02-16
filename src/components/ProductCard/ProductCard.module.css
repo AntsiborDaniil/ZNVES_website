@@ -212,11 +212,11 @@
       width: auto;
       min-width: 0;
     }
-  
+
     .productCard.gridCard .imageWrapper {
       flex: 1;
     }
-  
+
     .productCard.gridCard .imageContainer {
       height: 100%;
     }
@@ -231,7 +231,7 @@
       line-height: 18.87px;
     }
   }
-  
+
 
 /* На мобильных в слайдере карточки остаются полного размера как на десктопе */
 /* Эти стили применяются только к ProductCard в слайдере (isSliderCard) */
