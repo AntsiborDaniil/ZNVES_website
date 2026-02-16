@@ -208,7 +208,7 @@
 
 @media (max-width: 480px) {
     .productCard.gridCard {
-      max-height: 435px;
+      max-height: 325px;
       width: auto;
       min-width: 0;
     }
