@@ -46,11 +46,24 @@ const ProductCard = ({
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loadedStates, setLoadedStates] = useState<boolean[]>([]);
+  const [hoverEnabled, setHoverEnabled] = useState(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 769px)");
+    setHoverEnabled(mq.matches);
+    const handler = () => setHoverEnabled(mq.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   useEffect(() => {
     setLoadedStates(new Array(imageList.length).fill(false));
   }, [imageList]);
+
+  useEffect(() => {
+    if (!hoverEnabled) setCurrentIndex(0);
+  }, [hoverEnabled]);
 
   const markImageLoaded = useCallback((index: number) => {
     setLoadedStates((prev) => {
@@ -82,21 +95,17 @@ const ProductCard = ({
   );
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (imageList.length <= 1) {
-      return;
-    }
+    if (!hoverEnabled || imageList.length <= 1) return;
     updateIndexFromPointer(event.clientX);
   };
 
   const handlePointerEnter = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (imageList.length <= 1) {
-      return;
-    }
+    if (!hoverEnabled || imageList.length <= 1) return;
     updateIndexFromPointer(event.clientX);
   };
 
   const handlePointerLeave = () => {
-    setCurrentIndex(0);
+    if (hoverEnabled) setCurrentIndex(0);
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {

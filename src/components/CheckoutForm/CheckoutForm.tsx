@@ -182,6 +182,40 @@ const CheckoutForm = ({
     }).format(price);
   };
 
+  /** Первая буква каждого слова с заглавной */
+  const capitalizeName = (str: string) => {
+    return str
+      .trim()
+      .split(/\s+/)
+      .map((word) =>
+        word.length > 0
+          ? word[0].toUpperCase() + word.slice(1).toLowerCase()
+          : ""
+      )
+      .filter(Boolean)
+      .join(" ");
+  };
+
+  /** Форматирование телефона: +7 (XXX) XXX-XX-XX. 8 заменяется на +7 */
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+    if (digits.length === 0) return "";
+    let num = digits;
+    if (num.startsWith("8")) num = "7" + num.slice(1);
+    else if (!num.startsWith("7")) num = "7" + num;
+    num = num.slice(0, 11);
+    if (num.length <= 1) return num === "7" ? "+7" : "+7 " + num;
+    const match = num.slice(1).match(/^(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})$/);
+    if (!match) return "+7";
+    const [, a, b, c, d] = match;
+    let out = "+7";
+    if (a) out += ` (${a}`;
+    if (b) out += `) ${b}`;
+    if (c) out += `-${c}`;
+    if (d) out += `-${d}`;
+    return out;
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -247,9 +281,22 @@ const CheckoutForm = ({
         return newErrors;
       });
     } else {
+      let processedValue = type === "checkbox" ? checked : value;
+      if (type !== "checkbox") {
+        if (
+          name === "firstName" ||
+          name === "lastName" ||
+          name === "deliveryFirstName" ||
+          name === "deliveryLastName"
+        ) {
+          processedValue = capitalizeName(value as string);
+        } else if (name === "phone" || name === "deliveryPhone") {
+          processedValue = formatPhone(value as string);
+        }
+      }
       setFormData((prev) => ({
         ...prev,
-        [name]: type === "checkbox" ? checked : value,
+        [name]: processedValue,
       }));
     }
   };
@@ -495,14 +542,21 @@ const CheckoutForm = ({
     if (formData.deliveryMethod !== "yandex") return;
     if (isUpdatingFromMapRef.current) return;
 
-    const addressString = [formData.city, formData.street, formData.house]
-      .filter(Boolean)
-      .join(", ");
+    const street = (formData.street || "").trim();
+    const house = (formData.house || "").trim();
+    const city = (formData.city || "Москва").trim();
 
-    if (addressString && addressString.length >= 5 && addressString !== mapSearchValue) {
+    // Собираем адрес в формате для геокодинга (добавляем ул. только если нет типа)
+    const streetPrefixes = /^(ул\.?|улица|пр\.?|проспект|пр-т|пер\.?|переулок|ш\.?|шоссе|б-р|бульвар)\s/i;
+    const streetPart = street ? (streetPrefixes.test(street) ? street : `ул. ${street}`) : "";
+    const housePart = house ? `д. ${house}` : "";
+    const parts = [streetPart, housePart].filter(Boolean);
+    const addressString = parts.length > 0 ? `${city}, ${parts.join(", ")}` : "";
+
+    if (addressString && addressString.length >= 8 && addressString !== mapSearchValue) {
       const timeoutId = setTimeout(() => {
         setMapSearchValue(addressString);
-      }, 500);
+      }, 300);
 
       return () => {
         clearTimeout(timeoutId);

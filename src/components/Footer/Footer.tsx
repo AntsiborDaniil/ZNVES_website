@@ -2,13 +2,32 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./Footer.module.css";
 
 const Footer = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+
+  useEffect(() => {
+    if (!showSubscribeModal) return;
+    const onEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowSubscribeModal(false);
+    };
+    document.addEventListener("keydown", onEscape);
+    return () => document.removeEventListener("keydown", onEscape);
+  }, [showSubscribeModal]);
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email.trim()) {
+      setShowSubscribeModal(true);
+      setEmail("");
+    }
+  };
 
   return (
     <footer className={styles.footer}>
@@ -25,16 +44,19 @@ const Footer = () => {
           <h1 className={styles.subText}>
             Подпишитесь на получение рассылки рекламно-информационных материалов
           </h1>
-          <div className={styles.inputContainer}>
+          <form className={styles.inputContainer} onSubmit={handleSubscribe}>
             <input
               type="email"
               className={styles.input}
               placeholder="Введите ваш email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
             <button type="submit" className={styles.button}>
               Подписаться
             </button>
-          </div>
+          </form>
           <h2 className={styles.politics}>
             Нажимая на кнопку «Подписаться», вы даете согласие на обработку
             персональных данных в соответствии с{" "}
@@ -175,6 +197,29 @@ const Footer = () => {
           </div>
         </div>
       </div>
+      {showSubscribeModal && (
+        <div
+          className={styles.modalOverlay}
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="subscribe-modal-title"
+        >
+          <div className={styles.modalContent}>
+            <button
+              type="button"
+              className={styles.modalClose}
+              onClick={() => setShowSubscribeModal(false)}
+              aria-label="Закрыть"
+            >
+              ×
+            </button>
+            <p id="subscribe-modal-title" className={styles.modalText}>
+              Вы подписались на получение рассылки
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className={styles.lower}>
         <p className={styles.copyright}>© 2025 Все права защищены</p>
         <p className={styles.copyrightInsta}>

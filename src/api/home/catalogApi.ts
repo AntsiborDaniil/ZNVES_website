@@ -8,7 +8,7 @@ const CATALOG_API_URL = `${API_BASE_URL}/api/catalog/`;
 
 // Кеш для запросов
 const cache = new Map<string, { data: CatalogProduct[]; timestamp: number }>();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
+const CACHE_DURATION = 15 * 60 * 1000; // 15 минут
 
 // Преобразование API ответа в CatalogProduct
 const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProduct => {

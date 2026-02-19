@@ -203,8 +203,11 @@ const Map = ({
           },
           source_platform_station: stationId,
           physical_dims_weight_gross: 10000,
-          delivery_price: "от 100",
-          delivery_term: "от 1 дня",
+          physical_dims_dx: 30,
+          physical_dims_dy: 20,
+          physical_dims_dz: 10,
+          // Не передаём delivery_price и delivery_term — виджет сам рассчитает через API
+          // при выборе ПВЗ (требуются source_platform_station и physical_dims_weight_gross)
           show_select_button: true,
           filter: {
             type: ["pickup_point", "terminal"],
@@ -461,9 +464,12 @@ const Map = ({
 
     if (!window.ymaps) return;
 
+    // Не дублируем "Москва" — если адрес уже содержит город, геокодируем как есть
+    const geocodeQuery = /москва/i.test(query) ? query : `${query}, Москва`;
+
     const timer = setTimeout(() => {
       if (!courierMapInstanceRef.current) return;
-      (window.ymaps!.geocode(`${query}, Москва`, { results: 1 }) as any).then((res: any) => {
+      (window.ymaps!.geocode(geocodeQuery, { results: 1 }) as any).then((res: any) => {
         const obj = res?.geoObjects?.get?.(0);
         if (!obj) return;
         const coords = obj.geometry?.getCoordinates?.();
@@ -484,7 +490,7 @@ const Map = ({
           lon: coords[1],
         });
       });
-    }, 600);
+    }, 400);
 
     return () => clearTimeout(timer);
   }, [isCourier, searchValue, onAddressSelect]);

@@ -340,6 +340,65 @@
   background-color: #f8f8f8;
 }
 
+.clearFiltersButton {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: transparent;
+  border: 0.6px solid rgba(82, 82, 82, 0.5);
+  border-radius: 3px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #525252;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.clearFiltersButton:hover {
+  border-color: #1f1f1f;
+  background-color: rgba(82, 82, 82, 0.08);
+  color: #1f1f1f;
+}
+
+.clearFiltersIcon {
+  font-size: 20px;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.clearFiltersButtonText {
+  display: inline;
+}
+
+@media (min-width: 1025px) {
+  .filters {
+    grid-template-columns: repeat(3, 1fr) auto;
+    align-items: end;
+  }
+
+  .clearFiltersButton {
+    grid-column: auto;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .clearFiltersButton .clearFiltersIcon {
+    font-size: 22px;
+  }
+
+  .clearFiltersButtonText {
+    display: none;
+  }
+}
+
 .productsSection {
   display: flex;
   flex-direction: column;

@@ -676,6 +676,15 @@ textarea.input::placeholder {
   }
 }
 
+/* Скрытие «• Пункты выдачи» в виджете (checkout и cart) при < 480px */
+@media (max-width: 479px) {
+  .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(p[class*="title-text-second"]),
+  .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(p[class*="widget_title-text"]),
+  .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(p[class*="widget-title-text"]) {
+    display: none !important;
+  }
+}
+
 .checkoutMapContainer :global([class*="ymaps"]) {
   border-radius: 3px;
 }

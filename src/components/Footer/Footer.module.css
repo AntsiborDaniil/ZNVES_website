@@ -37,12 +37,11 @@
 }
 
 .input {
-  color: #fff5d991;
+  color: #fff5d9;
   background-color: transparent;
 
   width: 277px;
-  padding-top: 11.62px;
-  padding-bottom: 12.37px;
+  padding: 11.62px 0 12.37px 16px;
   border: none;
   border-bottom: 1px solid #fff5d991;
 
@@ -59,6 +58,14 @@
 .input:focus {
   outline: none;
   border-color: #fff5d9;
+}
+
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #0a5840 inset !important;
+  -webkit-text-fill-color: #fff5d9 !important;
 }
 
 .button {
@@ -330,7 +337,7 @@
 
   .input {
     width: 100%;
-    padding: 8px 0px;
+    padding: 8px 0;
   }
 
   .input::placeholder {
@@ -478,5 +485,81 @@
 @media (max-width: 480px) {
   .copyrightInsta {
     max-width: 125px;
+  }
+}
+
+/* Уведомление о подписке — левый нижний угол */
+.modalOverlay {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 9999;
+  animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.modalContent {
+  position: relative;
+  background-color: #0a5840;
+  color: #fff5d9;
+  padding: 16px 20px 16px 24px;
+  border-radius: 3px;
+  border: 0.75px solid rgba(242, 240, 236, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-width: 360px;
+}
+
+.modalClose {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  color: #fff5d991;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.8;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.modalClose:hover {
+  opacity: 1;
+  color: #fff5d9;
+}
+
+.modalText {
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.4;
+  margin: 0;
+  padding-right: 24px;
+}
+
+@media (max-width: 768px) {
+  .modalOverlay {
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    max-width: none;
+  }
+
+  .modalContent {
+    padding: 14px 18px 14px 20px;
+  }
+
+  .modalText {
+    font-size: 14px;
   }
 }

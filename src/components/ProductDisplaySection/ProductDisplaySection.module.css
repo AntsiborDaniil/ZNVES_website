@@ -147,6 +147,54 @@
   color: inherit;
 }
 
+.ctaSlide {
+  display: flex;
+  align-items: stretch;
+}
+
+.ctaButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 524px;
+  background-color: #5252520f;
+  border: 2px solid #525252;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #525252;
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.ctaButton:hover,
+.ctaButton:focus-visible {
+  background-color: #525252;
+  color: #f2f0ec;
+  border-color: #525252;
+}
+
+.ctaText {
+  font-family: "Playfair Display SC", serif;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ctaArrow {
+  opacity: 0.9;
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.ctaButton:hover .ctaArrow,
+.ctaButton:focus-visible .ctaArrow {
+  transform: translateX(4px);
+  filter: invert(1) brightness(2);
+}
+
 .slider :global(.swiper-lazy-preloader) {
   width: 36px;
   height: 36px;
@@ -164,6 +212,14 @@
 }
 
 @media (max-width: 1440px) {
+  .ctaButton {
+    min-height: 424px;
+  }
+
+  .ctaText {
+    font-size: 20px;
+  }
+
   .header {
     margin-bottom: 15px;
   }
@@ -277,6 +333,23 @@
 @media (max-width: 768px) {
   .section {
     padding: 15px 16px;
+    overflow-x: visible;
+  }
+
+  .ctaButton {
+    min-height: 300px;
+  }
+
+  .ctaText {
+    font-size: 18px;
+  }
+
+  .sliderContainer {
+    overflow: visible;
+  }
+
+  .slider {
+    overflow: visible;
   }
 
   .title {
@@ -311,10 +384,6 @@
     display: none;
   }
 
-  .slider {
-    overflow: hidden;
-  }
-
   .sliderContainer {
     margin: 0;
     padding: 0;
@@ -322,6 +391,15 @@
 
   .isBestseller {
     padding: 0 !important;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .slider :global(.swiper-slide) {
+    width: calc(100% / 3) !important;
+    min-width: calc(100% / 3) !important;
+    flex-shrink: 0;
+    box-sizing: border-box;
   }
 }
 
@@ -341,6 +419,15 @@
 @media (max-width: 480px) {
   .section {
     padding: 10px;
+    overflow-x: visible;
+  }
+
+  .ctaButton {
+    min-height: 380px;
+  }
+
+  .ctaText {
+    font-size: 16px;
   }
 
   .title {
@@ -400,15 +487,11 @@
     display: flex;
   }
 
+  /* Ширина слайда = ширина карточки (269px). totalWidth = N×269 + (N−1)×8 → граница прокрутки не выходит за последний слайд. */
   .slider :global(.swiper-slide) {
-    width: auto !important;
     flex-shrink: 0;
-    flex-basis: auto;
-  }
-
-  .slideItem {
-    width: auto !important;
-    min-width: calc(66.666% - 4px);
+    width: 269px;
+    min-width: 269px;
   }
 
   .slideLink {

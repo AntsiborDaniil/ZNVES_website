@@ -39,8 +39,11 @@ const ProductDisplaySection = ({
 }: ProductDisplaySectionProps) => {
   const swiperRef = useRef<SwiperInstance | null>(null);
   const [activeArrow, setActiveArrow] = useState<ActiveArrow>(null);
-  const [maxVisible, setMaxVisible] = useState(4);
+  const [isBeginning, setIsBeginning] = useState(true);
+  const [isEnd, setIsEnd] = useState(false);
+  const [maxVisible, setMaxVisible] = useState<number | "auto">(4);
   const [spaceBetween, setSpaceBetween] = useState(30);
+  const [slidesOffsetAfter, setSlidesOffsetAfter] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,25 +56,36 @@ const ProductDisplaySection = ({
     if (width === 0) return;
 
     if (width <= 480) {
-      setMaxVisible(1.5);
+      setMaxVisible("auto");
       setSpaceBetween(8);
       setIsMobile(false);
+      setSlidesOffsetAfter(Math.min(120, Math.floor(width * 0.25)));
     } else if (width <= 768) {
-      setMaxVisible(3);
+      setMaxVisible("auto");
       setSpaceBetween(10);
       setIsMobile(false);
+      setSlidesOffsetAfter(Math.min(80, Math.floor(width * 0.15)));
     } else if (width <= 1200) {
       setMaxVisible(3);
       setSpaceBetween(10);
       setIsMobile(false);
+      setSlidesOffsetAfter(0);
     } else {
       setMaxVisible(4);
       setSpaceBetween(10);
       setIsMobile(false);
+      setSlidesOffsetAfter(0);
     }
   }, [width]);
 
-  // Загрузка товаров из API
+  useEffect(() => {
+    if (width > 0 && width <= 480 && swiperRef.current) {
+      const t = setTimeout(() => swiperRef.current?.update(), 100);
+      return () => clearTimeout(t);
+    }
+  }, [width]);
+
+  // Загрузка товаров из API (с кешем в catalogApi)
   useEffect(() => {
     const loadProducts = async () => {
       setIsLoading(true);
@@ -94,8 +108,14 @@ const ProductDisplaySection = ({
     loadProducts();
   }, [title]);
 
+  // Предзагрузка в кеш при монтировании, чтобы карточки быстрее появлялись при повторном открытии
+  useEffect(() => {
+    fetchNewInProducts().catch(() => {});
+    fetchAllCatalogProducts().catch(() => {});
+  }, []);
+
   const handlePrev = () => {
-    if (swiperRef.current) {
+    if (!isBeginning && swiperRef.current) {
       swiperRef.current.slidePrev();
       setActiveArrow("prev");
     }
@@ -108,7 +128,21 @@ const ProductDisplaySection = ({
     }
   };
 
-  const canNavigate = products.length > maxVisible;
+  const MIN_SLIDES_FOR_LOOP = 16;
+
+  const slidesForSwiper = useMemo(() => {
+    if (products.length === 0) return [];
+    if (products.length >= MIN_SLIDES_FOR_LOOP) return products;
+    const repeated: CatalogProduct[] = [];
+    while (repeated.length < MIN_SLIDES_FOR_LOOP) {
+      repeated.push(...products);
+    }
+    return repeated;
+  }, [products]);
+
+  const canNavigate =
+    slidesForSwiper.length >
+    (typeof maxVisible === "number" ? maxVisible : 2);
 
   const shopNowHref =
     title === "NEW IN"
@@ -119,22 +153,33 @@ const ProductDisplaySection = ({
 
   const handleSwiper = useCallback((swiper: SwiperInstance) => {
     swiperRef.current = swiper;
-  }, []);
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd);
+    if (width > 0 && width <= 480) {
+      requestAnimationFrame(() => {
+        swiper.update();
+      });
+    }
+  }, [width]);
 
-  const handleSlideChange = useCallback(() => {
+  const handleSlideChange = useCallback((swiper: SwiperInstance) => {
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd);
     setActiveArrow(null);
   }, []);
 
   const handleBeforeInit = useCallback((swiper: SwiperInstance) => {
     const params = swiper.params as unknown as Record<string, unknown>;
     params.preloadImages = false;
+    params.loopedSlides = Math.max(slidesForSwiper.length, 8);
+    params.loopAdditionalSlides = 4;
     params.lazy = {
       enabled: true,
       loadOnTransitionStart: false,
       loadPrevNext: true,
       loadPrevNextAmount: 2,
     };
-  }, []);
+  }, [slidesForSwiper.length]);
 
   useEffect(() => {
     if (hasPrefetchedProductsRef.current) {
@@ -195,7 +240,7 @@ const ProductDisplaySection = ({
                 onClick={handlePrev}
                 aria-label="Previous"
                 type="button"
-                disabled={false}
+                disabled={isBeginning}
               >
                 <svg
                   width="35"
@@ -221,7 +266,7 @@ const ProductDisplaySection = ({
                 onClick={handleNext}
                 aria-label="Next"
                 type="button"
-                disabled={false}
+                disabled={isEnd}
               >
                 <svg
                   width="35"
@@ -252,23 +297,24 @@ const ProductDisplaySection = ({
               className: styles.slider,
               modules: [FreeMode],
               loop: true,
-              loopAdditionalSlides: 4,
               spaceBetween,
+              slidesOffsetAfter,
               slidesPerView: maxVisible,
               slidesPerGroup: 1,
               centeredSlides: isMobile,
-              speed: 800,
+              speed: width > 0 && width <= 480 ? 550 : 1100,
               followFinger: true,
-              touchRatio: 1.2,
+              touchRatio: width > 0 && width <= 480 ? 1.2 : 1,
+              longSwipesRatio: width > 0 && width <= 480 ? 0.3 : 0.15,
               resistance: true,
-              resistanceRatio: 0.7,
+              resistanceRatio: width > 0 && width <= 480 ? 0.6 : 0.7,
               freeMode: {
-                enabled: true,
+                enabled: false,
                 momentum: true,
-                momentumRatio: 1.0,
-                momentumVelocityRatio: 1.2,
+                momentumRatio: 0.65,
+                momentumVelocityRatio: 0.7,
                 momentumBounce: false,
-                minimumVelocity: 0.00005,
+                minimumVelocity: 0.02,
                 sticky: false,
               },
               grabCursor: true,
@@ -284,25 +330,30 @@ const ProductDisplaySection = ({
                 loadPrevNextAmount: 2,
               },
             },
-            products.map((product) => (
-              <SwiperSlide key={product.id} className={styles.slideItem}>
-                <Link
-                  href={`/catalog/${product.slug || product.id}`}
-                  className={styles.slideLink}
-                  aria-label={`Перейти к товару ${product.title}`}
+            [
+              ...slidesForSwiper.map((product, index) => (
+                <SwiperSlide
+                  key={`${product.id}-${index}`}
+                  className={styles.slideItem}
                 >
-                  <ProductCard
-                    title={product.title}
-                    price={product.price}
-                    images={product.images}
-                    isNew={product.isNew}
-                    productId={product.id}
-                    showAddToCart={false}
-                    isSliderCard={true}
-                  />
-                </Link>
-              </SwiperSlide>
-            ))
+                  <Link
+                    href={`/catalog/${product.slug || product.id}`}
+                    className={styles.slideLink}
+                    aria-label={`Перейти к товару ${product.title}`}
+                  >
+                    <ProductCard
+                      title={product.title}
+                      price={product.price}
+                      images={product.images}
+                      isNew={product.isNew}
+                      productId={product.id}
+                      showAddToCart={false}
+                      isSliderCard={true}
+                    />
+                  </Link>
+                </SwiperSlide>
+              )),
+            ]
           )
         ) : (
           <div className={styles.emptyState}>Товары не найдены</div>
@@ -315,11 +366,11 @@ const ProductDisplaySection = ({
               activeArrow === "prev"
                 ? styles.arrowButtonActive
                 : styles.arrowButtonInactive
-            }`}
+            } ${isBeginning ? styles.arrowButtonDisabled : ""}`}
             onClick={handlePrev}
             aria-label="Previous"
             type="button"
-            disabled={false}
+            disabled={isBeginning}
           >
             <svg
               width="35"
@@ -341,11 +392,11 @@ const ProductDisplaySection = ({
               activeArrow === "next"
                 ? styles.arrowButtonActive
                 : styles.arrowButtonInactive
-            }`}
+            } ${isEnd ? styles.arrowButtonDisabled : ""}`}
             onClick={handleNext}
             aria-label="Next"
             type="button"
-            disabled={false}
+            disabled={isEnd}
           >
             <svg
               width="35"

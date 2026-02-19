@@ -566,6 +566,21 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
               options={orderOptions}
               onChange={handleOrderChange}
             />
+            {(colorFilter !== "all" || sizeFilter !== "all" || order !== "popular") && (
+              <button
+                type="button"
+                className={styles.clearFiltersButton}
+                onClick={() => {
+                  handleColorChange("all");
+                  handleSizeChange("all");
+                  handleOrderChange("popular");
+                }}
+                aria-label="Удалить фильтры"
+              >
+                <span className={styles.clearFiltersIcon} aria-hidden>×</span>
+                <span className={styles.clearFiltersButtonText}>Удалить фильтры</span>
+              </button>
+            )}
           </div>
         </div>
       )}
