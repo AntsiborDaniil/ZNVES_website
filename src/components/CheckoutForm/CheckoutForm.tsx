@@ -1055,6 +1055,7 @@ const CheckoutForm = ({
       const message =
         error instanceof Error ? error.message : "Ошибка при оформлении заказа. Пожалуйста, попробуйте еще раз.";
       setIsSubmitting(false);
+      clearCart();
       redirectToCartWithError(message);
     } finally {
       setIsSubmitting(false);
@@ -1717,6 +1718,12 @@ const CheckoutForm = ({
                   className={`${styles.submitButton} ${styles.submitButtonRight}`}
                   disabled={!formData.agreeToOffer || !formData.agreeToPrivacy || isSubmitting}
                   onClick={handleSubmitOrder}
+                  onPointerDown={(e) => {
+                    if (e.pointerType === "touch") {
+                      e.preventDefault();
+                      handleSubmitOrder();
+                    }
+                  }}
                 >
                   {isSubmitting ? "Оформление..." : "Оформить заказ"}
                 </button>
@@ -1868,6 +1875,12 @@ const CheckoutForm = ({
                   className={`${styles.submitButton} ${styles.submitButtonRight}`}
                   disabled={!formData.agreeToOffer || !formData.agreeToPrivacy || isSubmitting}
                   onClick={handleSubmitOrder}
+                  onPointerDown={(e) => {
+                    if (e.pointerType === "touch") {
+                      e.preventDefault();
+                      handleSubmitOrder();
+                    }
+                  }}
                 >
                   {isSubmitting ? "Оформление..." : "Оформить заказ"}
                 </button>

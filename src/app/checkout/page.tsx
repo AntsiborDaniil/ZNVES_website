@@ -20,13 +20,6 @@ const CheckoutPageContent = () => {
   const [orderNumber, setOrderNumber] = useState("");
   const [paymentReturnStatus, setPaymentReturnStatus] = useState<"success" | "error" | null>(null);
 
-  // Очищаем корзину после показа модалки
-  useEffect(() => {
-    if (showSuccessModal && items.length > 0) {
-      clearCart();
-    }
-  }, [showSuccessModal, items.length, clearCart]);
-
   const handleOrderSubmit = (newOrderNumber: string) => {
     setOrderNumber(newOrderNumber);
     setShowSuccessModal(true);
@@ -42,14 +35,15 @@ const CheckoutPageContent = () => {
     router.push("/catalog");
   };
 
-  // Обработка возврата после оплаты (return_url с платёжной страницы)
+  // Обработка возврата после оплаты (return_url с платёжной страницы). Очищаем корзину при успехе или ошибке.
   useEffect(() => {
     const payment = searchParams.get("payment");
     if (payment === "success" || payment === "error") {
       setPaymentReturnStatus(payment);
+      clearCart();
       router.replace("/checkout", { scroll: false });
     }
-  }, [searchParams, router]);
+  }, [searchParams, router, clearCart]);
 
   // Редирект на страницу корзины при ширине <= 1200px
   useEffect(() => {
@@ -87,14 +81,17 @@ const CheckoutPageContent = () => {
           <div className={styles.paymentReturnBlock}>
             <p className={styles.paymentReturnTitle}>Оплата прошла успешно</p>
             <p className={styles.paymentReturnText}>
-              Заказ оплачен. Подробности можно посмотреть в личном кабинете.
+              Заказ оплачен. Подробности можно посмотреть в личном кабинете — вся информация по заказу также придёт на вашу почту.
+            </p>
+            <p className={styles.paymentReturnHint}>
+              Можете так же вернуться{" "}
+              <Link href="/catalog" className={styles.catalogInlineLink}>
+                в каталог
+              </Link>
             </p>
             <div className={styles.paymentReturnActions}>
               <Link href="/account" className={styles.shopButton}>
                 Личный кабинет
-              </Link>
-              <Link href="/catalog" className={styles.backLink}>
-                В каталог
               </Link>
             </div>
           </div>

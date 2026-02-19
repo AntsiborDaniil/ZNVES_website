@@ -911,6 +911,10 @@ textarea.input::placeholder {
   cursor: pointer;
   transition: background-color 0.2s ease;
   margin-top: 20px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 2;
 }
 
 .submitButton:hover:not(:disabled) {
@@ -926,6 +930,10 @@ textarea.input::placeholder {
   margin-top: 36px;
   margin-bottom: 12px;
   transition: all 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 2;
 }
 
 .submitButtonRight:hover {
@@ -1293,6 +1301,25 @@ textarea.input::placeholder {
   color: #7a7a79;
   margin: 0;
   line-height: 1.5;
+}
+
+.paymentReturnHint {
+  font-size: 16px;
+  color: #7a7a79;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.catalogInlineLink {
+  color: #525252;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.catalogInlineLink:hover {
+  color: #1f1f1f;
 }
 
 .paymentReturnActions {

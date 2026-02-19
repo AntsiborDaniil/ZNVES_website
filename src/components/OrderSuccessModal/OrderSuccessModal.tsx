@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import styles from "./OrderSuccessModal.module.css";
 
@@ -54,9 +53,6 @@ const OrderSuccessModal = ({
           >
             Перейти в личный кабинет
           </button>
-          <Link href="/catalog" className={styles.secondaryButton}>
-            Вернуться в каталог
-          </Link>
         </div>
       </div>
     </div>

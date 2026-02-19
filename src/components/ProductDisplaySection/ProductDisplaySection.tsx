@@ -302,7 +302,7 @@ const ProductDisplaySection = ({
               slidesPerView: maxVisible,
               slidesPerGroup: 1,
               centeredSlides: isMobile,
-              speed: width > 0 && width <= 480 ? 550 : 1100,
+              speed: width > 0 && width <= 480 ? 400 : 1100,
               followFinger: true,
               touchRatio: width > 0 && width <= 480 ? 1.2 : 1,
               longSwipesRatio: width > 0 && width <= 480 ? 0.3 : 0.15,

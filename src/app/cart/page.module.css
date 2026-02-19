@@ -178,6 +178,10 @@
   vertical-align: middle;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 2;
 }
 
 .checkoutButton:hover:not(:disabled) {
@@ -326,6 +330,12 @@
   /* Убеждаемся, что CheckoutForm занимает всю ширину */
   .mainContentWrapper > div:last-child {
     width: 100%;
+  }
+
+  .checkoutFormContainer {
+    position: relative;
+    z-index: 5;
+    touch-action: manipulation;
   }
 }
 /* @media (max-width: 1300px) {

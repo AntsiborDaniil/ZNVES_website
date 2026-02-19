@@ -257,6 +257,12 @@ const CartPageContent = () => {
                       : ""
                   }`}
                   onClick={handleCheckoutClick}
+                  onPointerDown={(e) => {
+                    if (e.pointerType === "touch" && !(showCheckoutForm && isMobile)) {
+                      e.preventDefault();
+                      handleCheckoutClick();
+                    }
+                  }}
                   disabled={showCheckoutForm && isMobile}
                 >
                   Перейти к оформлению
@@ -271,7 +277,7 @@ const CartPageContent = () => {
               </button>
             </div>
             {showCheckoutForm && isMobile && (
-              <div ref={checkoutFormRef} id="checkout-form">
+              <div ref={checkoutFormRef} id="checkout-form" className={styles.checkoutFormContainer}>
                 <CheckoutForm
                   onOrderSubmit={handleOrderSubmit}
                   showRightColumn={false}
