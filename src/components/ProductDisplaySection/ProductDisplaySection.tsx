@@ -309,7 +309,7 @@ const ProductDisplaySection = ({
               resistance: true,
               resistanceRatio: width > 0 && width <= 480 ? 0.6 : 0.7,
               freeMode: {
-                enabled: false,
+                enabled: true,
                 momentum: true,
                 momentumRatio: 0.65,
                 momentumVelocityRatio: 0.7,

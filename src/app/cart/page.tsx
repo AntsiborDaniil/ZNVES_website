@@ -28,6 +28,7 @@ const CartPageContent = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [orderError, setOrderError] = useState<string | null>(null);
+  const [paymentReturnStatus, setPaymentReturnStatus] = useState<"success" | "error" | null>(null);
   const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>({});
 
   const formatPrice = (price: number) => {
@@ -69,6 +70,16 @@ const CartPageContent = () => {
 
     requestAnimationFrame(animation);
   };
+
+  // Обработка возврата после оплаты (return_url/cancel_url с платёжной страницы). Очищаем корзину при успехе или ошибке.
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    if (payment === "success" || payment === "error") {
+      setPaymentReturnStatus(payment);
+      clearCart();
+      router.replace("/cart", { scroll: false });
+    }
+  }, [searchParams, router, clearCart]);
 
   // Очищаем корзину только после закрытия модалки, чтобы модалка показывалась поверх корзины
   useEffect(() => {
@@ -150,8 +161,8 @@ const CartPageContent = () => {
     }
   };
 
-  // Не показываем пустую корзину, если модалка открыта или показываем ошибку заказа
-  if (items.length === 0 && !showSuccessModal && !orderError) {
+  // Не показываем пустую корзину, если модалка открыта, показываем ошибку заказа или возврат после оплаты
+  if (items.length === 0 && !showSuccessModal && !orderError && !paymentReturnStatus) {
     return (
       <div className={styles.cart}>
         <Header variant="green" />
@@ -166,6 +177,52 @@ const CartPageContent = () => {
                 Перейти в каталог
               </Link>
             </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // После оплаты или ошибки оплаты — показываем результат, корзина уже очищена
+  if (paymentReturnStatus) {
+    return (
+      <div className={styles.cart}>
+        <Header variant="green" />
+        <main className={styles.main}>
+          <div className={styles.cartContainer}>
+            {paymentReturnStatus === "success" && (
+              <div className={styles.paymentReturnBlock}>
+                <p className={styles.paymentReturnTitle}>Оплата прошла успешно</p>
+                <p className={styles.paymentReturnText}>
+                  Заказ оплачен. Подробности можно посмотреть в личном кабинете — вся информация по заказу также придёт на вашу почту.
+                </p>
+                <div className={styles.paymentReturnActions}>
+                  <Link href="/account" className={styles.shopButton}>
+                    Личный кабинет
+                  </Link>
+                </div>
+                <p className={styles.paymentReturnHint}>
+                  Можете так же вернуться{" "}
+                  <Link href="/catalog" className={styles.catalogInlineLink}>
+                    в каталог
+                  </Link>
+                </p>
+              </div>
+            )}
+            {paymentReturnStatus === "error" && (
+              <div className={styles.paymentReturnBlock}>
+                <p className={styles.paymentReturnTitle}>Оплата не выполнена</p>
+                <p className={styles.paymentReturnText}>
+                  Оплата была отменена или произошла ошибка. Можно попробовать оформить заказ снова.
+                </p>
+                <div className={styles.paymentReturnActions}>
+                  <Link href="/catalog" className={styles.shopButton}>
+                    В каталог
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </main>
         <Footer />

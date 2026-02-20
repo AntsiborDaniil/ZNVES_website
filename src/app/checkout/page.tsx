@@ -83,17 +83,17 @@ const CheckoutPageContent = () => {
             <p className={styles.paymentReturnText}>
               Заказ оплачен. Подробности можно посмотреть в личном кабинете — вся информация по заказу также придёт на вашу почту.
             </p>
+            <div className={styles.paymentReturnActions}>
+              <Link href="/account" className={styles.shopButton}>
+                Личный кабинет
+              </Link>
+            </div>
             <p className={styles.paymentReturnHint}>
               Можете так же вернуться{" "}
               <Link href="/catalog" className={styles.catalogInlineLink}>
                 в каталог
               </Link>
             </p>
-            <div className={styles.paymentReturnActions}>
-              <Link href="/account" className={styles.shopButton}>
-                Личный кабинет
-              </Link>
-            </div>
           </div>
         )}
         {paymentReturnStatus === "error" && (
