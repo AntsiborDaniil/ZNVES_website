@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../../../contexts/AuthContext";
 import styles from "./MyAccount.module.css";
 
@@ -20,7 +21,8 @@ type MyAccountProps = {
 };
 
 const MyAccount = ({ onNavigate }: MyAccountProps) => {
-  const { isAuthenticated, redirectToBot } = useAuth();
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [lastOrder, setLastOrder] = useState<OrderData | null>(null);
 
   useEffect(() => {
@@ -50,7 +52,7 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
 
   const handlePersonalDataClick = () => {
     if (!isAuthenticated) {
-      redirectToBot();
+      router.push("/account");
       return;
     }
     onNavigate?.("profile");
@@ -58,7 +60,7 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
 
   const handleOrdersClick = () => {
     if (!isAuthenticated) {
-      redirectToBot();
+      router.push("/account");
       return;
     }
     if (lastOrder) {

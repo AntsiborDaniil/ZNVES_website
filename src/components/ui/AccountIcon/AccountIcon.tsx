@@ -7,14 +7,10 @@ import styles from "./AccountIcon.module.css";
 
 const AccountIcon = () => {
   const router = useRouter();
-  const { isAuthenticated, redirectToBot } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const handleClick = () => {
-    if (!isAuthenticated) {
-      redirectToBot();
-    } else {
-      router.push("/account");
-    }
+    router.push("/account");
   };
 
   return (

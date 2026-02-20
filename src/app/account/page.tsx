@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "../../contexts/AuthContext";
 import Header from "../../components/Header/Header";
@@ -9,11 +8,11 @@ import Footer from "../../components/Footer/Footer";
 import PersonalData from "../../components/AccountPage/PersonalData/PersonalData";
 import MyAccount from "../../components/AccountPage/MyAccount/MyAccount";
 import Orders from "../../components/AccountPage/Orders/Orders";
+import TelegramLoginWidget from "../../components/TelegramLoginWidget/TelegramLoginWidget";
 import styles from "./page.module.css";
 
 const AccountPage = () => {
-  const router = useRouter();
-  const { isAuthenticated, isLoading, redirectToBot } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<"account" | "profile" | "orders">(
     "account"
   );
@@ -21,44 +20,30 @@ const AccountPage = () => {
     undefined
   );
 
-  // Проверяем авторизацию при загрузке страницы
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      redirectToBot();
-    }
-  }, [isAuthenticated, isLoading, redirectToBot]);
-
-  // Проверяем авторизацию при возврате из бота (фокус окна)
-  useEffect(() => {
-    if (isLoading) {
-      return;
-    }
-
-    const handleFocus = () => {
-      // Проверяем авторизацию при возврате на страницу
-      if (!isAuthenticated) {
-        redirectToBot();
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible" && !isAuthenticated) {
-        redirectToBot();
-      }
-    };
-
-    window.addEventListener("focus", handleFocus);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      window.removeEventListener("focus", handleFocus);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [isAuthenticated, isLoading, redirectToBot]);
-
-  // Показываем загрузку или ничего, если не авторизован
-  if (isLoading || !isAuthenticated) {
+  // Показываем загрузку или экран входа через виджет Telegram
+  if (isLoading) {
     return null;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className={styles.accountPage}>
+        <Header variant="green" />
+        <main className={styles.main}>
+          <div className={styles.telegramLoginBlock}>
+            <h1 className={styles.telegramLoginTitle}>Войдите через Telegram</h1>
+            <p className={styles.telegramLoginDescription}>
+              Для входа в личный кабинет нажмите кнопку ниже — откроется сервис Telegram,
+              после авторизации вы вернётесь на сайт.
+            </p>
+            <TelegramLoginWidget size="large" className={styles.telegramLoginWidget} />
+          </div>
+        </main>
+        <div className={styles.footerWrapper}>
+          <Footer />
+        </div>
+      </div>
+    );
   }
 
   return (

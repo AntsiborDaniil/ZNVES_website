@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../../contexts/CartContext";
-import { useAuth } from "../../contexts/AuthContext";
+import TelegramLoginWidget from "../TelegramLoginWidget/TelegramLoginWidget";
 import Image from "next/image";
 import Link from "next/link";
 import { getProductById } from "../../data/products";
@@ -64,7 +64,6 @@ const CheckoutForm = ({
 }: CheckoutFormProps) => {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCart();
-  const { redirectToBot } = useAuth();
   const { width } = useWindowSize();
   const isCartMobilePvz = width > 0 && width < 480 && !showRightColumn;
 
@@ -1161,22 +1160,9 @@ const CheckoutForm = ({
         <div className={styles.leftColumn}>
           <div className={styles.telegramSection}>
             <h1 className={styles.title}>Оформление заказа</h1>
-            <button
-              className={styles.telegramButton}
-              type="button"
-              onClick={redirectToBot}
-            >
-              <div className={styles.telegramIcon}>
-                <Image
-                  src="/images/checkout/telegram.png"
-                  alt="Telegram"
-                  width={32}
-                  height={32}
-                  loading="lazy"
-                />
-              </div>
-              <span>Подключить Telegram</span>
-            </button>
+            <div className={styles.telegramWidgetWrap}>
+              <TelegramLoginWidget size="large" />
+            </div>
           </div>
 
           <div className={styles.section}>

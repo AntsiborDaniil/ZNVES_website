@@ -149,6 +149,11 @@
   flex-shrink: 0;
 }
 
+.telegramWidgetWrap {
+  display: flex;
+  align-items: center;
+}
+
 .telegramDescription {
   color: #525252;
   font-weight: 400;
@@ -1519,7 +1524,8 @@ textarea.input::placeholder {
   }
 
   .title,
-  .telegramButton {
+  .telegramButton,
+  .telegramWidgetWrap {
     text-wrap: nowrap;
     margin-bottom: 15px;
   }

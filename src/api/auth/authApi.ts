@@ -1,12 +1,11 @@
 // API для авторизации через Telegram
 
-/** Временно отключить запросы к ручке telegram-login (вернёт null без вызова бэкенда) */
-const TELEGRAM_LOGIN_DISABLED = true;
-
 import { API_BASE_URL } from "../../lib/apiConfig";
 
 const TELEGRAM_LOGIN_URL = `${API_BASE_URL}/api/auth/telegram-login/`;
-const TELEGRAM_BOT_USERNAME = "@my_znves_bot";
+/** Имя бота без @ — для виджета Telegram Login */
+export const TELEGRAM_BOT_USERNAME = "my_znves_bot";
+const TELEGRAM_BOT_DISPLAY = `@${TELEGRAM_BOT_USERNAME}`;
 
 export interface TelegramAuthData {
   id?: number;
@@ -24,10 +23,10 @@ export interface TelegramAuthData {
  * GET запрос, не требует параметров
  * После регистрации в боте возвращает заполненные данные
  */
+/** URL, на который Telegram редиректит после успешного входа (ручка бэкенда). */
+export const getTelegramLoginCallbackUrl = (): string => TELEGRAM_LOGIN_URL;
+
 export const checkTelegramAuth = async (): Promise<TelegramAuthData | null> => {
-  if (TELEGRAM_LOGIN_DISABLED) {
-    return null;
-  }
   try {
     console.log("Checking Telegram auth, URL:", TELEGRAM_LOGIN_URL);
     
@@ -79,9 +78,7 @@ export const checkTelegramAuth = async (): Promise<TelegramAuthData | null> => {
  * Получает URL для перенаправления на Telegram бота
  */
 export const getTelegramBotUrl = (): string => {
-  const botUsername = TELEGRAM_BOT_USERNAME.replace("@", "").trim();
-  // Используем простой URL без параметров - Telegram автоматически откроет бота
-  return `https://t.me/${botUsername}`;
+  return `https://t.me/${TELEGRAM_BOT_USERNAME}`;
 };
 
 /**
@@ -92,31 +89,19 @@ export const redirectToTelegramBot = (): void => {
     return;
   }
 
-  const botUsername = TELEGRAM_BOT_USERNAME.replace("@", "").trim();
-  
-  // Определяем, мобильное устройство или нет
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent
   );
 
-  let url: string;
-  
-  if (isMobile) {
-    // Для мобильных устройств используем tg:// протокол
-    url = `tg://resolve?domain=${botUsername}`;
-  } else {
-    // Для десктопа используем https://t.me/ без параметров
-    url = `https://t.me/${botUsername}`;
-  }
+  const url = isMobile
+    ? `tg://resolve?domain=${TELEGRAM_BOT_USERNAME}`
+    : `https://t.me/${TELEGRAM_BOT_USERNAME}`;
 
-  console.log("Redirecting to Telegram bot:", url, "Bot username:", botUsername);
-  
   try {
     window.location.href = url;
   } catch (error) {
     console.error("Error redirecting to Telegram bot:", error);
-    // Fallback на обычный URL
-    window.location.href = `https://t.me/${botUsername}`;
+    window.location.href = `https://t.me/${TELEGRAM_BOT_USERNAME}`;
   }
 };
 
