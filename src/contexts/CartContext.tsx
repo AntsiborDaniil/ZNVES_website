@@ -8,7 +8,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import type { CartItem, CartContextType } from "../types/cart";
+import type { CartItem, CartContextType, AppliedPromo } from "../types/cart";
 import type { CatalogProduct } from "../types/products";
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -42,6 +42,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   // Инициализируем с пустым массивом для SSR совместимости
   const [items, setItems] = useState<CartItem[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null);
 
   // Загружаем данные из localStorage только после монтирования на клиенте
   useEffect(() => {
@@ -56,6 +57,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       saveCartToStorage(items);
     }
   }, [items, isHydrated]);
+
+  // Сбрасываем применённый промокод при изменении состава корзины
+  useEffect(() => {
+    setAppliedPromo(null);
+  }, [items]);
 
   const addItem = useCallback(
     async (
@@ -144,6 +150,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const clearCart = useCallback(() => {
     setItems([]);
+    setAppliedPromo(null);
   }, []);
 
   const getTotalPrice = useCallback(() => {
@@ -166,6 +173,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         clearCart,
         getTotalPrice,
         getTotalItems,
+        appliedPromo,
+        setAppliedPromo,
       }}
     >
       {children}

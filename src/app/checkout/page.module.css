@@ -1264,6 +1264,21 @@ textarea.input::placeholder {
   color: #525252;
 }
 
+.summaryValueWithPromo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.summaryValueOld {
+  font-weight: 400;
+  font-size: 14px;
+  color: #9a9a9a;
+  text-decoration: line-through;
+}
+
 .summaryTotal {
   color: #525252;
   font-weight: 500;

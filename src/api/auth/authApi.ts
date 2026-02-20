@@ -1,11 +1,14 @@
 // API для авторизации через Telegram
+// В BotFather → бот → Domain должен быть: znves-website.vercel.app (домен фронта с виджетом)
 
 import { API_BASE_URL } from "../../lib/apiConfig";
+
+/** Временно отключить ручку telegram-login (не вызывать бэкенд и не показывать вход через Telegram). */
+const TELEGRAM_LOGIN_DISABLED = true;
 
 const TELEGRAM_LOGIN_URL = `${API_BASE_URL}/api/auth/telegram-login/`;
 /** Имя бота без @ — для виджета Telegram Login */
 export const TELEGRAM_BOT_USERNAME = "my_znves_bot";
-const TELEGRAM_BOT_DISPLAY = `@${TELEGRAM_BOT_USERNAME}`;
 
 export interface TelegramAuthData {
   id?: number;
@@ -26,7 +29,23 @@ export interface TelegramAuthData {
 /** URL, на который Telegram редиректит после успешного входа (ручка бэкенда). */
 export const getTelegramLoginCallbackUrl = (): string => TELEGRAM_LOGIN_URL;
 
+/**
+ * URL страницы на бэкенде для входа через Telegram (виджет там работает, CORS с продом настроен).
+ * После входа пользователь может вернуться на фронт — куки уйдут с запросами на бэк.
+ * @param returnTo — опционально URL для редиректа после входа (бэк может поддерживать return_url)
+ */
+export const getTelegramLoginRedirectUrl = (returnTo?: string): string => {
+  const base = API_BASE_URL.replace(/\/$/, "");
+  if (returnTo) {
+    return `${base}?return_url=${encodeURIComponent(returnTo)}`;
+  }
+  return base;
+};
+
 export const checkTelegramAuth = async (): Promise<TelegramAuthData | null> => {
+  if (TELEGRAM_LOGIN_DISABLED) {
+    return null;
+  }
   try {
     console.log("Checking Telegram auth, URL:", TELEGRAM_LOGIN_URL);
     

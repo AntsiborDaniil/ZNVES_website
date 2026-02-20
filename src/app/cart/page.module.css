@@ -131,6 +131,21 @@
   color: #525252;
 }
 
+.summaryTotalWithPromo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 24px;
+  line-height: 38px;
+}
+
+.summaryTotalOld {
+  font-weight: 500;
+  font-size: 20px;
+  color: #9a9a9a;
+  text-decoration: line-through;
+}
+
 .promoSection {
   display: flex;
   flex-direction: column;
@@ -192,6 +207,10 @@
 
 .checkoutButton:disabled {
   cursor: not-allowed;
+  background-color: #525252;
+  color: #f2f0ec;
+  border: none;
+  opacity: 1;
 }
 
 .checkoutButtonActive {

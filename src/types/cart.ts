@@ -14,6 +14,11 @@ export type CartItem = {
     warehouseProduct?: string;
 };
 
+export type AppliedPromo = {
+    promoCode: string;
+    discount: string;
+};
+
 export type CartContextType = {
     items: CartItem[];
     addItem: (
@@ -34,4 +39,7 @@ export type CartContextType = {
     clearCart: () => void;
     getTotalPrice: () => number;
     getTotalItems: () => number;
+    /** Применённый промокод (скидка в рублях, строка из API) */
+    appliedPromo: AppliedPromo | null;
+    setAppliedPromo: (promo: AppliedPromo | null) => void;
 };

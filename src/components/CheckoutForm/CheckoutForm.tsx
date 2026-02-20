@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../../contexts/CartContext";
-import TelegramLoginWidget from "../TelegramLoginWidget/TelegramLoginWidget";
 import Image from "next/image";
 import Link from "next/link";
 import { getProductById } from "../../data/products";
@@ -63,7 +62,7 @@ const CheckoutForm = ({
   className = "",
 }: CheckoutFormProps) => {
   const router = useRouter();
-  const { items, getTotalPrice, clearCart } = useCart();
+  const { items, getTotalPrice, clearCart, appliedPromo, setAppliedPromo } = useCart();
   const { width } = useWindowSize();
   const isCartMobilePvz = width > 0 && width < 480 && !showRightColumn;
 
@@ -225,9 +224,12 @@ const CheckoutForm = ({
     yandex: 0,
   };
 
-  // Расчет итоговой суммы
+  // Расчет итоговой суммы (с учётом промокода, если применён)
   const calculateTotal = () => {
-    const itemsTotal = getTotalPrice();
+    let itemsTotal = getTotalPrice();
+    if (appliedPromo) {
+      itemsTotal = Math.max(0, itemsTotal - parseFloat(appliedPromo.discount));
+    }
     const deliveryPrice =
       deliveryPrices[formData.deliveryMethod as keyof typeof deliveryPrices] ||
       0;
@@ -988,6 +990,9 @@ const CheckoutForm = ({
         },
         positions: validPositions,
       };
+      if (appliedPromo?.promoCode) {
+        orderRequest.promocode_value = appliedPromo.promoCode;
+      }
 
       // Добавляем данные доставки в зависимости от типа
       if (deliveryService === "cdek") {
@@ -1015,6 +1020,9 @@ const CheckoutForm = ({
       // Создаем заказ
       const orderResponse = await createOrder(orderRequest);
       console.log("Order created:", orderResponse);
+
+      // Сбрасываем применённый промокод после успешного создания заказа
+      setAppliedPromo(null);
 
       // Сохраняем order_id для дальнейшего использования
       const orderId = orderResponse.id;
@@ -1160,9 +1168,6 @@ const CheckoutForm = ({
         <div className={styles.leftColumn}>
           <div className={styles.telegramSection}>
             <h1 className={styles.title}>Оформление заказа</h1>
-            <div className={styles.telegramWidgetWrap}>
-              <TelegramLoginWidget size="large" />
-            </div>
           </div>
 
           <div className={styles.section}>
@@ -1950,9 +1955,25 @@ const CheckoutForm = ({
               </div>
               <div className={styles.summaryRow}>
                 <span className={styles.summaryLabel}>Товаров на:</span>
-                <span className={styles.summaryValue}>
-                  {formatPrice(getTotalPrice())}
-                </span>
+                {appliedPromo ? (
+                  <span className={styles.summaryValueWithPromo}>
+                    <span className={styles.summaryValueOld}>
+                      {formatPrice(getTotalPrice())}
+                    </span>{" "}
+                    <span className={styles.summaryValue}>
+                      {formatPrice(
+                        Math.max(
+                          0,
+                          getTotalPrice() - parseFloat(appliedPromo.discount)
+                        )
+                      )}
+                    </span>
+                  </span>
+                ) : (
+                  <span className={styles.summaryValue}>
+                    {formatPrice(getTotalPrice())}
+                  </span>
+                )}
               </div>
               <div className={styles.orderSummaryBlock}>
                 <div className={styles.orderSummary}>

@@ -14,10 +14,22 @@ import { useWindowSize } from "../../hooks/useWindowSize";
 import OrderSuccessModal from "../../components/OrderSuccessModal/OrderSuccessModal";
 import CartOrderErrorModal from "../../components/CartOrderErrorModal/CartOrderErrorModal";
 import CheckoutForm from "../../components/CheckoutForm/CheckoutForm";
+import PromoErrorToast from "../../components/PromoErrorToast/PromoErrorToast";
+import {
+  buildCartItemsForPromo,
+  applyPromoCode,
+} from "../../api/discounts/discountsApi";
 
 const CartPageContent = () => {
-  const { items, removeItem, updateQuantity, getTotalPrice, clearCart } =
-    useCart();
+  const {
+    items,
+    removeItem,
+    updateQuantity,
+    getTotalPrice,
+    clearCart,
+    appliedPromo,
+    setAppliedPromo,
+  } = useCart();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { width } = useWindowSize();
@@ -30,6 +42,11 @@ const CartPageContent = () => {
   const [orderError, setOrderError] = useState<string | null>(null);
   const [paymentReturnStatus, setPaymentReturnStatus] = useState<"success" | "error" | null>(null);
   const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>({});
+  const [promoInputValue, setPromoInputValue] = useState("");
+  const [promoErrorMessage, setPromoErrorMessage] = useState<string | null>(null);
+  const [isPromoLoading, setIsPromoLoading] = useState(false);
+  const lastFailedPromoRef = useRef<string | null>(null);
+  const checkoutButtonRef = useRef<HTMLButtonElement>(null);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ru-RU", {
@@ -89,6 +106,11 @@ const CartPageContent = () => {
     }
   }, [showSuccessModal, orderNumber, items.length, clearCart]);
 
+  // При заходе на страницу корзины сбрасываем применённый промокод (скидка не должна сохраняться между визитами)
+  useEffect(() => {
+    setAppliedPromo(null);
+  }, [setAppliedPromo]);
+
   // Загрузка цветов с API каталога для отображения на русском (slug → value)
   useEffect(() => {
     fetchCatalogColors().then((colors) => {
@@ -147,10 +169,9 @@ const CartPageContent = () => {
     setOrderError(null);
   };
 
-  const handleCheckoutClick = () => {
+  const proceedToCheckout = () => {
     if (isMobile) {
       setShowCheckoutForm(true);
-      // Прокручиваем к форме оформления после небольшой задержки для рендеринга
       setTimeout(() => {
         if (checkoutFormRef.current) {
           smoothScrollToElement(checkoutFormRef.current, 1200);
@@ -158,6 +179,59 @@ const CartPageContent = () => {
       }, 100);
     } else {
       router.push("/checkout");
+    }
+  };
+
+  const handleCheckoutClick = async () => {
+    const promo = promoInputValue.trim();
+    // Если промокод уже давал ошибку — при повторном нажатии просто переходим к оформлению
+    if (promo && lastFailedPromoRef.current === promo) {
+      lastFailedPromoRef.current = null;
+      setPromoErrorMessage(null);
+      proceedToCheckout();
+      return;
+    }
+    if (promo) {
+      lastFailedPromoRef.current = null;
+      setIsPromoLoading(true);
+      setPromoErrorMessage(null);
+      try {
+        const cartItemsForApi = await buildCartItemsForPromo(items);
+        if (cartItemsForApi.length !== items.length) {
+          setPromoErrorMessage("Не удалось применить промокод к части товаров.");
+          setIsPromoLoading(false);
+          return;
+        }
+        const orderTotal = getTotalPrice().toFixed(2);
+        const result = await applyPromoCode(promo, {
+          cartItems: cartItemsForApi,
+          orderTotal,
+          previousPromoCode: appliedPromo?.promoCode ?? null,
+          previousDiscount: appliedPromo ? appliedPromo.discount : undefined,
+        });
+        if (result.success) {
+          lastFailedPromoRef.current = null;
+          setAppliedPromo({ promoCode: result.promo_code, discount: result.discount });
+          proceedToCheckout();
+        } else {
+          setIsPromoLoading(false);
+          setAppliedPromo(null);
+          setPromoErrorMessage(result.error ?? "Промокод не найден");
+          lastFailedPromoRef.current = promo;
+          checkoutButtonRef.current?.blur();
+        }
+      } catch {
+        setIsPromoLoading(false);
+        setAppliedPromo(null);
+        setPromoErrorMessage("Ошибка проверки промокода.");
+        lastFailedPromoRef.current = promo;
+        checkoutButtonRef.current?.blur();
+      } finally {
+        setIsPromoLoading(false);
+        checkoutButtonRef.current?.blur();
+      }
+    } else {
+      proceedToCheckout();
     }
   };
 
@@ -294,9 +368,25 @@ const CartPageContent = () => {
               <div className={styles.summary}>
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>Итого</span>
-                  <span className={styles.summaryTotal}>
-                    {formatPrice(getTotalPrice())}
-                  </span>
+                  {appliedPromo ? (
+                    <span className={styles.summaryTotalWithPromo}>
+                      <span className={styles.summaryTotalOld}>
+                        {formatPrice(getTotalPrice())}
+                      </span>{" "}
+                      <span className={styles.summaryTotal}>
+                        {formatPrice(
+                          Math.max(
+                            0,
+                            getTotalPrice() - parseFloat(appliedPromo.discount)
+                          )
+                        )}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className={styles.summaryTotal}>
+                      {formatPrice(getTotalPrice())}
+                    </span>
+                  )}
                 </div>
                 <div className={styles.promoSection}>
                   <input
@@ -304,9 +394,13 @@ const CartPageContent = () => {
                     type="text"
                     className={styles.promoInput}
                     placeholder="Промокод"
+                    value={promoInputValue}
+                    onChange={(e) => setPromoInputValue(e.target.value)}
+                    disabled={isPromoLoading}
                   />
                 </div>
                 <button
+                  ref={checkoutButtonRef}
                   type="button"
                   className={`${styles.checkoutButton} ${
                     showCheckoutForm && isMobile
@@ -320,9 +414,9 @@ const CartPageContent = () => {
                       handleCheckoutClick();
                     }
                   }}
-                  disabled={showCheckoutForm && isMobile}
+                  disabled={(showCheckoutForm && isMobile) || isPromoLoading}
                 >
-                  Перейти к оформлению
+                  {isPromoLoading ? "Проверка промокода…" : "Перейти к оформлению"}
                 </button>
               </div>
               <button
@@ -356,6 +450,12 @@ const CartPageContent = () => {
         <CartOrderErrorModal
           message={orderError}
           onClose={handleCloseErrorModal}
+        />
+      )}
+      {promoErrorMessage && (
+        <PromoErrorToast
+          message={promoErrorMessage}
+          onClose={() => setPromoErrorMessage(null)}
         />
       )}
     </div>

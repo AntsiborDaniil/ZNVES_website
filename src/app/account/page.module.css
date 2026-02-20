@@ -96,6 +96,52 @@
   min-height: 44px;
 }
 
+.telegramLoginButton {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #0088cc;
+  color: #fff;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.4;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.telegramLoginButton:hover {
+  background-color: #006699;
+}
+
+.telegramLoginHint {
+  color: #7d7d7d;
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 16px 0 8px 0;
+}
+
+.telegramLoginRetry {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #525252;
+  color: #525252;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.telegramLoginRetry:hover:not(:disabled) {
+  background: #525252;
+  color: #fff;
+}
+
+.telegramLoginRetry:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .aside {
   flex-shrink: 0;
   margin-right: 75px;

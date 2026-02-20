@@ -85,6 +85,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [isHydrated]);
 
+  // Сразу проверяем авторизацию при загрузке (важно после возврата с test-znves.ru)
+  useEffect(() => {
+    if (!isHydrated) return;
+    checkAuth();
+  }, [isHydrated, checkAuth]);
+
   // Перенаправление на бота
   const redirectToBot = useCallback(() => {
     redirectToTelegramBot();

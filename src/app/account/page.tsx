@@ -8,11 +8,10 @@ import Footer from "../../components/Footer/Footer";
 import PersonalData from "../../components/AccountPage/PersonalData/PersonalData";
 import MyAccount from "../../components/AccountPage/MyAccount/MyAccount";
 import Orders from "../../components/AccountPage/Orders/Orders";
-import TelegramLoginWidget from "../../components/TelegramLoginWidget/TelegramLoginWidget";
 import styles from "./page.module.css";
 
 const AccountPage = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, checkAuth } = useAuth();
   const [activeTab, setActiveTab] = useState<"account" | "profile" | "orders">(
     "account"
   );
@@ -31,12 +30,10 @@ const AccountPage = () => {
         <Header variant="green" />
         <main className={styles.main}>
           <div className={styles.telegramLoginBlock}>
-            <h1 className={styles.telegramLoginTitle}>Войдите через Telegram</h1>
+            <h1 className={styles.telegramLoginTitle}>Личный кабинет</h1>
             <p className={styles.telegramLoginDescription}>
-              Для входа в личный кабинет нажмите кнопку ниже — откроется сервис Telegram,
-              после авторизации вы вернётесь на сайт.
+              Вход в личный кабинет временно недоступен.
             </p>
-            <TelegramLoginWidget size="large" className={styles.telegramLoginWidget} />
           </div>
         </main>
         <div className={styles.footerWrapper}>
