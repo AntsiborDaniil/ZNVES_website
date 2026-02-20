@@ -683,6 +683,16 @@ textarea.input::placeholder {
   .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(p[class*="widget-title-text"]) {
     display: none !important;
   }
+
+  /* Ограничиваем выпадающий список подсказок (options) контейнером — без display:none, чтобы при повторном вводе options снова открывались */
+  .checkoutMapContainer:not(.checkoutMapContainerCourier) {
+    overflow: hidden;
+  }
+
+  /* После нажатия «Продолжить» и выбора адреса скрываем кнопку; при очистке адреса она снова показывается */
+  .hideContinueButton .checkoutMapContainer :global(#delivery-widget button) {
+    display: none !important;
+  }
 }
 
 .checkoutMapContainer :global([class*="ymaps"]) {

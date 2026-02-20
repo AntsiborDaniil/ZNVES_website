@@ -12,6 +12,7 @@ import { fetchCatalogProductRaw, type ApiProductDetail } from "../../api/product
 import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 import Map, { type PvzListOption } from "../Map/Map";
 import { getAddressSuggestions, type AddressSuggestion } from "../../api/delivery/addressSuggestApi";
+import { useWindowSize } from "../../hooks/useWindowSize";
 import styles from "../../app/checkout/page.module.css";
 
 interface CheckoutFormProps {
@@ -64,6 +65,8 @@ const CheckoutForm = ({
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCart();
   const { redirectToBot } = useAuth();
+  const { width } = useWindowSize();
+  const isCartMobilePvz = width > 0 && width < 480 && !showRightColumn;
 
   const redirectToCartWithError = (message: string) => {
     if (typeof window !== "undefined") {
@@ -99,6 +102,12 @@ const CheckoutForm = ({
     agreeToPrivacy: false,
     differentRecipient: false,
   });
+  const [showContinueButtonAgain, setShowContinueButtonAgain] = useState(false);
+  const hideContinueButton =
+    isCartMobilePvz &&
+    !!formData.pvzAddress.trim() &&
+    formData.deliveryMethod === "pickup" &&
+    !showContinueButtonAgain;
   const [mapSearchValue, setMapSearchValue] = useState("");
   const [pvzAddressInputValue, setPvzAddressInputValue] = useState("");
   const pvzAddressDebounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -136,6 +145,58 @@ const CheckoutForm = ({
   const pvzAddressRef = useRef<HTMLInputElement>(null);
   const mapSectionRef = useRef<HTMLDivElement>(null);
   const pvzDropdownRef = useRef<HTMLDivElement>(null);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
+  const formContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setShowContinueButtonAgain(false);
+  }, [formData.deliveryType, formData.deliveryMethod]);
+
+  // При вставке/автозаполнении — снять фокус с кнопки, чтобы она стала серой
+  useEffect(() => {
+    const el = formContainerRef.current;
+    if (!el) return;
+    const blurSubmitIfActive = () => {
+      if (submitButtonRef.current && document.activeElement === submitButtonRef.current) {
+        submitButtonRef.current.blur();
+      }
+    };
+    el.addEventListener("input", blurSubmitIfActive, true);
+    el.addEventListener("change", blurSubmitIfActive, true);
+    el.addEventListener("paste", blurSubmitIfActive, true);
+    el.addEventListener("animationstart", blurSubmitIfActive, true);
+    return () => {
+      el.removeEventListener("input", blurSubmitIfActive, true);
+      el.removeEventListener("change", blurSubmitIfActive, true);
+      el.removeEventListener("paste", blurSubmitIfActive, true);
+      el.removeEventListener("animationstart", blurSubmitIfActive, true);
+    };
+  }, []);
+
+  // Если кнопка в фокусе, периодически проверяем: не изменились ли значения в инпутах (вставка/автофилл без событий) — тогда снять фокус
+  useEffect(() => {
+    const el = formContainerRef.current;
+    if (!el) return;
+    let lastSnapshot: Record<string, string> = {};
+    const getInputsSnapshot = (): Record<string, string> => {
+      const out: Record<string, string> = {};
+      el.querySelectorAll<HTMLInputElement | HTMLSelectElement>("input:not([type=checkbox]):not([type=radio]), select").forEach((node) => {
+        const name = node.getAttribute("name");
+        if (name) out[name] = node.value ?? "";
+      });
+      return out;
+    };
+    const tick = () => {
+      if (!submitButtonRef.current || document.activeElement !== submitButtonRef.current) return;
+      const current = getInputsSnapshot();
+      if (Object.keys(lastSnapshot).length && JSON.stringify(current) !== JSON.stringify(lastSnapshot)) {
+        submitButtonRef.current.blur();
+      }
+      lastSnapshot = current;
+    };
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, []);
 
   // Загрузка цветов с API для отображения на русском (slug → value)
   useEffect(() => {
@@ -221,6 +282,11 @@ const CheckoutForm = ({
   ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
+
+    // Если кнопка «Оформить заказ» в фокусе — снимаем фокус, чтобы она снова стала серой
+    if (submitButtonRef.current && document.activeElement === submitButtonRef.current) {
+      submitButtonRef.current.blur();
+    }
 
     // Убираем ошибку при изменении поля
     if (errors[name]) {
@@ -366,6 +432,7 @@ const CheckoutForm = ({
       if (typeof addressData.lat === "number" && typeof addressData.lon === "number") {
         setSelectedPvzCoords([addressData.lat, addressData.lon]);
       }
+      setShowContinueButtonAgain(false);
     } else {
       // Для курьерской доставки сохраняем полный адрес
       const newAddress = {
@@ -1064,7 +1131,7 @@ const CheckoutForm = ({
 
   return (
     <div className={className}>
-      <div className={styles.content}>
+      <div ref={formContainerRef} className={styles.content}>
         <div className={styles.leftColumn}>
           <div className={styles.telegramSection}>
             <h1 className={styles.title}>Оформление заказа</h1>
@@ -1548,7 +1615,15 @@ const CheckoutForm = ({
             </div>
           )}
 
-          <div className={styles.section} ref={mapSectionRef}>
+          <div
+            className={`${styles.section} ${hideContinueButton ? styles.hideContinueButton : ""}`}
+            ref={mapSectionRef}
+            onPointerDown={
+              isCartMobilePvz && formData.deliveryMethod === "pickup" && formData.pvzAddress.trim()
+                ? () => setShowContinueButtonAgain(true)
+                : undefined
+            }
+          >
             <h2 className={styles.sectionTitle}>
               {formData.deliveryMethod === "pickup"
                 ? "Пункт получения"
@@ -1593,6 +1668,11 @@ const CheckoutForm = ({
                   ? styles.checkoutMapContainerCourier
                   : ""
               }`}
+              onPointerDown={
+                isCartMobilePvz && formData.deliveryMethod === "pickup" && formData.pvzAddress.trim()
+                  ? () => setShowContinueButtonAgain(true)
+                  : undefined
+              }
             >
               <Map
                 key={`${formData.deliveryType}-${formData.deliveryMethod}`}
@@ -1714,6 +1794,7 @@ const CheckoutForm = ({
                   </div>
                 </div>
                 <button
+                  ref={submitButtonRef}
                   type="button"
                   className={`${styles.submitButton} ${styles.submitButtonRight}`}
                   disabled={!formData.agreeToOffer || !formData.agreeToPrivacy || isSubmitting}
@@ -1871,6 +1952,7 @@ const CheckoutForm = ({
                   </div>
                 </div>
                 <button
+                  ref={submitButtonRef}
                   type="button"
                   className={`${styles.submitButton} ${styles.submitButtonRight}`}
                   disabled={!formData.agreeToOffer || !formData.agreeToPrivacy || isSubmitting}
