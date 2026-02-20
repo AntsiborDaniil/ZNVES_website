@@ -129,6 +129,10 @@ const Map = ({
     map: { destroy: () => void; setCenter: (c: number[]) => void };
     placemark: { geometry: { setCoordinates: (c: number[]) => void } };
   } | null>(null);
+  const onAddressSelectRef = useRef(onAddressSelect);
+  const onSearchChangeRef = useRef(onSearchChange);
+  onAddressSelectRef.current = onAddressSelect;
+  onSearchChangeRef.current = onSearchChange;
 
   const isPickup =
     deliveryMethod === "pickup" &&
@@ -344,7 +348,7 @@ const Map = ({
           console.log("[Map] applyAddress вызван:", { coords, addr });
           if (!isInMoscow(addr)) {
             console.log("[Map] Адрес вне Москвы, пропускаем");
-            if (onSearchChange) onSearchChange("Доставка только по Москве");
+            onSearchChangeRef.current?.("Доставка только по Москве");
             return;
           }
           const payload = {
@@ -356,7 +360,7 @@ const Map = ({
             lon: coords[1],
           };
           console.log("[Map] Вызываем onAddressSelect с:", payload);
-          onAddressSelect?.(payload);
+          onAddressSelectRef.current?.(payload);
         };
 
         const reverseGeocode = (coords: [number, number]) => {
@@ -454,46 +458,80 @@ const Map = ({
         courierMapInstanceRef.current = null;
       }
     };
-  }, [isCourier, onAddressSelect, onSearchChange]);
+  }, [isCourier]);
 
-  // Геокодинг по searchValue (ввод адреса) — перемещаем метку
+  // Адрес из инпутов → метка на карте: геокодируем через наш API (без scriptError в браузере).
   useEffect(() => {
-    if (!isCourier || !searchValue?.trim()) return;
-    const query = searchValue.trim();
-    if (query === "Доставка только по Москве" || query.length < 5) return;
+    if (!isCourier) return;
+    const query = (searchValue ?? "").trim();
+    if (!query || query === "Доставка только по Москве" || query.length < 5) return;
 
-    if (!window.ymaps) return;
-
-    // Не дублируем "Москва" — если адрес уже содержит город, геокодируем как есть
     const geocodeQuery = /москва/i.test(query) ? query : `${query}, Москва`;
+    const base = typeof window !== "undefined" ? window.location.origin : "";
+    const url = `${base}/api/geocode?address=${encodeURIComponent(geocodeQuery)}`;
+    const abort = new AbortController();
 
-    const timer = setTimeout(() => {
-      if (!courierMapInstanceRef.current) return;
-      (window.ymaps!.geocode(geocodeQuery, { results: 1 }) as any).then((res: any) => {
-        const obj = res?.geoObjects?.get?.(0);
-        if (!obj) return;
-        const coords = obj.geometry?.getCoordinates?.();
-        if (!coords || coords.length < 2) return;
-        const addr = parseAddressFromGeoObject(obj);
-        if (!isInMoscow(addr)) return;
-
-        const inst = courierMapInstanceRef.current;
-        if (!inst) return;
-        inst.placemark.geometry.setCoordinates(coords);
-        inst.map.setCenter(coords);
-        onAddressSelect?.({
+    const applyCoords = (
+      data: { lat: number; lon: number; city?: string; street?: string; house?: string; fullAddress?: string },
+      retry = 0
+    ) => {
+      const coords: [number, number] = [data.lat, data.lon];
+      const cityLower = (data.city ?? "").toLowerCase();
+      if (!cityLower.includes("москва") && !cityLower.includes("moscow") && !cityLower.includes("московск")) {
+        onSearchChangeRef.current?.("Доставка только по Москве");
+        return;
+      }
+      const inst = courierMapInstanceRef.current;
+      if (!inst) {
+        if (retry < 15) setTimeout(() => applyCoords(data, retry + 1), 200);
+        return;
+      }
+      requestAnimationFrame(() => {
+        const inst2 = courierMapInstanceRef.current;
+        if (!inst2) return;
+        try {
+          inst2.placemark.geometry.setCoordinates(coords);
+          inst2.map.setCenter(coords);
+        } catch (e) {
+          console.error("[Map] Ошибка при перемещении метки:", e);
+        }
+        onAddressSelectRef.current?.({
           city: "Москва",
-          street: addr.street,
-          house: addr.house,
-          fullAddress: addr.fullAddress,
-          lat: coords[0],
-          lon: coords[1],
+          street: data.street ?? "",
+          house: data.house ?? "",
+          fullAddress: data.fullAddress ?? "",
+          lat: data.lat,
+          lon: data.lon,
         });
       });
-    }, 400);
+    };
 
-    return () => clearTimeout(timer);
-  }, [isCourier, searchValue, onAddressSelect]);
+    const delay = 300;
+    const timer = setTimeout(() => {
+      fetch(url, { signal: abort.signal })
+        .then((r) => r.json())
+        .then((data: { lat?: number; lon?: number; city?: string; street?: string; house?: string; fullAddress?: string; error?: string }) => {
+          if (data.error || data.lat == null || data.lon == null) return;
+          applyCoords({
+            lat: data.lat,
+            lon: data.lon,
+            city: data.city,
+            street: data.street,
+            house: data.house,
+            fullAddress: data.fullAddress,
+          });
+        })
+        .catch((err: unknown) => {
+          if ((err as { name?: string })?.name === "AbortError") return;
+          console.error("[Map] Ошибка геокодера:", err);
+        });
+    }, delay);
+
+    return () => {
+      clearTimeout(timer);
+      abort.abort();
+    };
+  }, [isCourier, searchValue]);
 
   if (isPickup) {
     return (

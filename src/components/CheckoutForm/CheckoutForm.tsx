@@ -147,6 +147,7 @@ const CheckoutForm = ({
   const pvzDropdownRef = useRef<HTMLDivElement>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const formContainerRef = useRef<HTMLDivElement>(null);
+  const mapSearchSyncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setShowContinueButtonAgain(false);
@@ -364,6 +365,31 @@ const CheckoutForm = ({
         ...prev,
         [name]: processedValue,
       }));
+
+      // Курьер: при вводе улицы/дома/города синхронизируем адрес в карту → метка обновится по геокоду
+      if (
+        (name === "street" || name === "house" || name === "city") &&
+        formData.deliveryMethod === "yandex"
+      ) {
+        const nextCity = name === "city" ? String(value) : (formData.city || "Москва");
+        const nextStreet = name === "street" ? String(value) : (formData.street || "");
+        const nextHouse = name === "house" ? String(value) : (formData.house || "");
+        const city = (nextCity || "Москва").trim();
+        const street = (nextStreet || "").trim();
+        const house = (nextHouse || "").trim();
+        const streetPrefixes = /^(ул\.?|улица|пр\.?|проспект|пр-т|пер\.?|переулок|ш\.?|шоссе|б-р|бульвар)\s/i;
+        const streetPart = street ? (streetPrefixes.test(street) ? street : `ул. ${street}`) : "";
+        const housePart = house ? `д. ${house}` : "";
+        const parts = [streetPart, housePart].filter(Boolean);
+        const addressString = parts.length > 0 ? `${city}, ${parts.join(", ")}` : "";
+        if (addressString.length >= 8) {
+          if (mapSearchSyncTimeoutRef.current) clearTimeout(mapSearchSyncTimeoutRef.current);
+          mapSearchSyncTimeoutRef.current = setTimeout(() => {
+            mapSearchSyncTimeoutRef.current = null;
+            setMapSearchValue(addressString);
+          }, 200);
+        }
+      }
     }
   };
 
@@ -623,7 +649,7 @@ const CheckoutForm = ({
     if (addressString && addressString.length >= 8 && addressString !== mapSearchValue) {
       const timeoutId = setTimeout(() => {
         setMapSearchValue(addressString);
-      }, 300);
+      }, 150);
 
       return () => {
         clearTimeout(timeoutId);

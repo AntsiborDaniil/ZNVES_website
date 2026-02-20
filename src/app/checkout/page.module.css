@@ -662,6 +662,11 @@ textarea.input::placeholder {
 .checkoutMapContainerCourier {
 }
 
+/* Скрываем контролы Яндекса на карте курьера */
+.checkoutMapContainerCourier :global(.ymaps-2-1-79-controls__control) {
+  display: none !important;
+}
+
 /* Мобильная версия виджета ПВЗ */
 @media (max-width: 768px) {
   .checkoutMapContainer :global(#delivery-widget) {
