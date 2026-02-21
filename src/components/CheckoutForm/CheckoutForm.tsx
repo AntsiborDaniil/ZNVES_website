@@ -12,6 +12,7 @@ import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 import Map, { type PvzListOption } from "../Map/Map";
 import { getAddressSuggestions, type AddressSuggestion } from "../../api/delivery/addressSuggestApi";
 import { useWindowSize } from "../../hooks/useWindowSize";
+import TelegramLoginWidget from "../TelegramLoginWidget/TelegramLoginWidget";
 import styles from "../../app/checkout/page.module.css";
 
 interface CheckoutFormProps {
@@ -1168,6 +1169,9 @@ const CheckoutForm = ({
         <div className={styles.leftColumn}>
           <div className={styles.telegramSection}>
             <h1 className={styles.title}>Оформление заказа</h1>
+            <div className={styles.telegramWidgetWrap}>
+              <TelegramLoginWidget size="large" />
+            </div>
           </div>
 
           <div className={styles.section}>

@@ -1,10 +1,7 @@
 // API для авторизации через Telegram
-// В BotFather → бот → Domain должен быть: znves-website.vercel.app (домен фронта с виджетом)
+// В BotFather → бот → Domain: домен фронта, где отображается виджет (например znves-website.vercel.app)
 
 import { API_BASE_URL } from "../../lib/apiConfig";
-
-/** Временно отключить ручку telegram-login (не вызывать бэкенд и не показывать вход через Telegram). */
-const TELEGRAM_LOGIN_DISABLED = true;
 
 const TELEGRAM_LOGIN_URL = `${API_BASE_URL}/api/auth/telegram-login/`;
 /** Имя бота без @ — для виджета Telegram Login */
@@ -22,30 +19,18 @@ export interface TelegramAuthData {
 }
 
 /**
- * Проверяет авторизацию пользователя через Telegram
- * GET запрос, не требует параметров
- * После регистрации в боте возвращает заполненные данные
+ * URL ручки бэкенда для виджета Telegram.
+ * Нужен не для фронта, а для сервиса Telegram: после успешного входа Telegram
+ * редиректит пользователя на этот URL с данными (id, first_name, hash и т.д.);
+ * бэкенд проверяет hash, выставляет куки и редиректит на бота с start.
  */
-/** URL, на который Telegram редиректит после успешного входа (ручка бэкенда). */
 export const getTelegramLoginCallbackUrl = (): string => TELEGRAM_LOGIN_URL;
 
 /**
- * URL страницы на бэкенде для входа через Telegram (виджет там работает, CORS с продом настроен).
- * После входа пользователь может вернуться на фронт — куки уйдут с запросами на бэк.
- * @param returnTo — опционально URL для редиректа после входа (бэк может поддерживать return_url)
+ * Проверяет авторизацию: GET на ручку с credentials (куки).
+ * После входа через виджет бэк выставляет куки — этот запрос их подхватывает.
  */
-export const getTelegramLoginRedirectUrl = (returnTo?: string): string => {
-  const base = API_BASE_URL.replace(/\/$/, "");
-  if (returnTo) {
-    return `${base}?return_url=${encodeURIComponent(returnTo)}`;
-  }
-  return base;
-};
-
 export const checkTelegramAuth = async (): Promise<TelegramAuthData | null> => {
-  if (TELEGRAM_LOGIN_DISABLED) {
-    return null;
-  }
   try {
     console.log("Checking Telegram auth, URL:", TELEGRAM_LOGIN_URL);
     
