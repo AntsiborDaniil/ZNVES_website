@@ -69,24 +69,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    console.log("[Auth] Проверка авторизации: запрос к бэку…");
     setIsLoading(true);
     try {
       const authData = await checkTelegramAuth();
       setUser(authData);
       saveAuthToStorage(authData);
+
       if (authData) {
-        console.log("[Auth] Получили JWT, авторизация успешна");
+        console.log("[Auth] JWT валиден, пользователь авторизован. Редирект на /account при необходимости.");
         if (typeof window !== "undefined" && window.location.pathname !== "/account") {
           window.location.href = "/account";
         }
+      } else {
+        console.log("[Auth] Ответ бэка без данных пользователя — показываем виджет входа.");
       }
     } catch (error) {
-      // Ошибка уже обработана в checkTelegramAuth, просто устанавливаем null
-      console.warn("Auth check completed with error, user considered not authenticated");
+      console.warn("[Auth] checkAuth завершился с ошибкой, пользователь не авторизован:", error);
       setUser(null);
       saveAuthToStorage(null);
     } finally {
       setIsLoading(false);
+      console.log("[Auth] Проверка авторизации завершена, isLoading=false.");
     }
   }, [isHydrated]);
 

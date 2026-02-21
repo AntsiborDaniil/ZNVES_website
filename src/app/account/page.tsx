@@ -12,7 +12,7 @@ import TelegramLoginWidget from "../../components/TelegramLoginWidget/TelegramLo
 import styles from "./page.module.css";
 
 const AccountPage = () => {
-  const { isAuthenticated, isLoading, hasAccessToken } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<"account" | "profile" | "orders">(
     "account"
   );
@@ -20,12 +20,12 @@ const AccountPage = () => {
     undefined
   );
 
-  // Показываем пустой экран только если ещё грузим и нет access_token (куки/Storage)
-  if (isLoading && !hasAccessToken()) {
+  // Пока не получили ответ от бэка (response.ok = JWT есть) — не показываем виджет
+  if (isLoading) {
     return null;
   }
 
-  // Нет ни JWT в куках, ни данных пользователя — показываем виджет входа
+  // Бэк вернул не 200 или без данных — показываем виджет входа
   if (!isAuthenticated) {
     return (
       <div className={styles.accountPage}>

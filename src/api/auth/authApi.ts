@@ -50,10 +50,12 @@ export const getTelegramLoginCallbackUrl = (): string => TELEGRAM_LOGIN_URL;
  * Проверяет авторизацию: GET на ручку с credentials (куки).
  * После входа через виджет бэк выставляет куки — этот запрос их подхватывает.
  */
+const AUTH_LOG_PREFIX = "[Auth/telegram-login]";
+
 export const checkTelegramAuth = async (): Promise<TelegramAuthData | null> => {
   try {
-    console.log("Checking Telegram auth, URL:", TELEGRAM_LOGIN_URL);
-    
+    console.log(`${AUTH_LOG_PREFIX} Запрос: GET ${TELEGRAM_LOGIN_URL} (credentials: include, куки уйдут на бэк)`);
+
     const response = await fetch(TELEGRAM_LOGIN_URL, {
       method: "GET",
       headers: {
@@ -63,37 +65,41 @@ export const checkTelegramAuth = async (): Promise<TelegramAuthData | null> => {
       mode: "cors",
     });
 
+    console.log(
+      `${AUTH_LOG_PREFIX} Ответ: status=${response.status}, ok=${response.ok}, statusText=${response.statusText}`
+    );
+
     if (!response.ok) {
-      // Если пользователь не авторизован или неверный запрос — возвращаем null
+      const errorText = await response.text();
       if (response.status === 400 || response.status === 401 || response.status === 403) {
-        console.log("User not authenticated or bad request:", response.status);
+        console.log(
+          `${AUTH_LOG_PREFIX} Нет JWT или бэк отклонил: ${response.status}. Тело:`,
+          errorText || "(пусто)"
+        );
         return null;
       }
-      const errorText = await response.text();
-      console.error(`Telegram auth API error: ${response.status}`, errorText);
+      console.error(
+        `${AUTH_LOG_PREFIX} Ошибка бэка ${response.status}:`,
+        errorText || "(пусто)"
+      );
       return null;
     }
 
     const data: TelegramAuthData = await response.json();
-    
-    // Выводим данные в консоль как требуется
-    console.log("Telegram auth data:", data);
-    
+    console.log(
+      `${AUTH_LOG_PREFIX} Всё ок (response.ok=true). Данные пользователя:`,
+      data
+    );
     return data;
   } catch (error) {
-    // Обрабатываем разные типы ошибок
     if (error instanceof TypeError && error.message === "Failed to fetch") {
       console.warn(
-        "Failed to fetch Telegram auth. Possible causes:",
-        "- CORS issue (server needs to allow requests from this origin)",
-        "- Network error (server might be down)",
-        "- URL might be incorrect"
+        `${AUTH_LOG_PREFIX} Запрос не прошёл (Failed to fetch). Возможные причины: CORS, сеть, бэк недоступен.`,
+        error
       );
-      console.warn("Auth check failed, user will be redirected to bot on next action");
     } else {
-      console.error("Error checking Telegram auth:", error);
+      console.error(`${AUTH_LOG_PREFIX} Исключение при проверке авторизации:`, error);
     }
-    // Возвращаем null при любой ошибке - это означает, что пользователь не авторизован
     return null;
   }
 };
