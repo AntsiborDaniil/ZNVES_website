@@ -15,7 +15,8 @@ interface AuthContextType {
   user: AuthUser | null;
   isLoading: boolean;
   hasAccessToken: () => boolean;
-  checkAuth: () => Promise<void>;
+  checkAuth: (forceRefresh?: boolean) => Promise<void>;
+  updateUser: (user: AuthUser | null) => void;
   redirectToBot: () => void;
 }
 
@@ -72,13 +73,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setCacheFreshOnLoad(fresh);
   }, []);
 
-  // Проверка авторизации только на клиенте. Редкий re-check: не дергаем API, если недавно уже проверяли.
-  const checkAuth = useCallback(async () => {
+  // Проверка авторизации только на клиенте. Редкий re-check: не дергаем API, если недавно уже проверяли. forceRefresh=true — всегда запрос (например после PATCH профиля).
+  const checkAuth = useCallback(async (forceRefresh?: boolean) => {
     if (typeof window === "undefined" || !isHydrated) return;
 
-    const { savedAt } = getAuthFromStorage();
-    if (savedAt && Date.now() - savedAt < RECHECK_INTERVAL_MS) {
-      return; // уже проверяли недавно
+    if (!forceRefresh) {
+      const { savedAt } = getAuthFromStorage();
+      if (savedAt && Date.now() - savedAt < RECHECK_INTERVAL_MS) {
+        return; // уже проверяли недавно
+      }
     }
 
     setIsLoading(true);
@@ -100,6 +103,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!isHydrated || cacheFreshOnLoad) return;
     checkAuth();
   }, [isHydrated, cacheFreshOnLoad, checkAuth]);
+
+  const updateUser = useCallback((newUser: AuthUser | null) => {
+    setUser(newUser);
+    saveAuthToStorage(newUser);
+  }, []);
 
   // Перенаправление на бота
   const redirectToBot = useCallback(() => {
@@ -143,6 +151,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isLoading,
         hasAccessToken,
         checkAuth,
+        updateUser,
         redirectToBot,
       }}
     >

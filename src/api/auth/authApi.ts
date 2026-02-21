@@ -90,6 +90,51 @@ export const checkTelegramAuth = async (): Promise<AuthUser | null> => {
   return getCurrentUser();
 };
 
+/** Тело запроса PATCH /api/auth/user/ — изменение личных данных */
+export type UpdateUserPayload = {
+  username?: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone_number?: string;
+};
+
+/**
+ * Изменение личных данных: PATCH /api/auth/user/ с credentials (куки).
+ * Тело — поля для обновления (username, first_name, last_name, email, phone_number).
+ * Возвращает обновлённые данные пользователя.
+ */
+export const updateCurrentUser = async (
+  payload: UpdateUserPayload
+): Promise<AuthUser> => {
+  if (typeof window === "undefined") {
+    throw new Error("Вызов только на клиенте");
+  }
+  const response = await fetch(AUTH_USER_URL, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const text = await response.text();
+    let message = "Не удалось сохранить изменения";
+    try {
+      const json = JSON.parse(text);
+      if (typeof json.detail === "string") message = json.detail;
+      else if (typeof json.message === "string") message = json.message;
+    } catch {
+      if (text) message = text;
+    }
+    throw new Error(message);
+  }
+  const data = (await response.json()) as AuthUser;
+  return data;
+};
+
 /**
  * Получает URL для перенаправления на Telegram бота
  */

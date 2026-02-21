@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
-import { updateAccountDetails } from "../../../services/accountService";
+import { updateCurrentUser } from "../../../api/auth/authApi";
 import styles from "./PersonalData.module.css";
 
 const emptyProfileData = {
@@ -37,7 +37,7 @@ const emptyDeliveryData = { sdekAddress: "", yandexPvz: "", yandexCourier: "" };
 type DeliveryFieldKey = keyof typeof emptyDeliveryData;
 
 const PersonalData = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [profileData, setProfileData] = useState({ ...emptyProfileData });
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [deliveryData, setDeliveryData] = useState({ ...emptyDeliveryData });
@@ -78,12 +78,19 @@ const PersonalData = () => {
     setSaveStatus(null);
 
     try {
-      await updateAccountDetails(profileData);
+      const updated = await updateCurrentUser({
+        username: profileData.username || undefined,
+        first_name: profileData.firstName || undefined,
+        last_name: profileData.lastName || undefined,
+        email: profileData.email || undefined,
+        phone_number: profileData.phone || undefined,
+      });
       setHasUnsavedChanges(false);
       setSaveStatus({
         type: "success",
         message: "Изменения сохранены",
       });
+      updateUser(updated);
     } catch (error) {
       setSaveStatus({
         type: "error",
