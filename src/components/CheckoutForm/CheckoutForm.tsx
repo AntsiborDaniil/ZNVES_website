@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../../contexts/CartContext";
+import { useAuth } from "../../contexts/AuthContext";
 import Image from "next/image";
 import Link from "next/link";
 import { getProductById } from "../../data/products";
-import { createOrder, getPaymentUrl, getYandexPaymentUrl, type OrderRequest } from "../../api/order/orderApi";
+import { createOrder, getPaymentUrl, getYandexPaymentUrl, invalidateMyOrdersCache, type OrderRequest } from "../../api/order/orderApi";
 import { fetchCatalogProductRaw, type ApiProductDetail } from "../../api/product/productApi";
 import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 import Map, { type PvzListOption } from "../Map/Map";
@@ -64,6 +65,7 @@ const CheckoutForm = ({
 }: CheckoutFormProps) => {
   const router = useRouter();
   const { items, getTotalPrice, clearCart, appliedPromo, setAppliedPromo } = useCart();
+  const { user } = useAuth();
   const { width } = useWindowSize();
   const isCartMobilePvz = width > 0 && width < 480 && !showRightColumn;
 
@@ -151,6 +153,22 @@ const CheckoutForm = ({
   useEffect(() => {
     setShowContinueButtonAgain(false);
   }, [formData.deliveryType, formData.deliveryMethod]);
+
+  // Автозаполнение личных данных из личного кабинета (ручка GET /api/auth/user/)
+  useEffect(() => {
+    if (!user) return;
+    setFormData((prev) => ({
+      ...prev,
+      firstName: prev.firstName || user.first_name || "",
+      lastName: prev.lastName || user.last_name || "",
+      phone: prev.phone || user.phone_number || "",
+      email: prev.email || user.email || "",
+      deliveryFirstName: prev.deliveryFirstName || user.first_name || "",
+      deliveryLastName: prev.deliveryLastName || user.last_name || "",
+      deliveryPhone: prev.deliveryPhone || user.phone_number || "",
+      deliveryEmail: prev.deliveryEmail || user.email || "",
+    }));
+  }, [user]);
 
   // При вставке/автозаполнении — снять фокус с кнопки, чтобы она стала серой
   useEffect(() => {
@@ -1021,6 +1039,8 @@ const CheckoutForm = ({
       // Создаем заказ
       const orderResponse = await createOrder(orderRequest);
       console.log("Order created:", orderResponse);
+
+      invalidateMyOrdersCache();
 
       // Сбрасываем применённый промокод после успешного создания заказа
       setAppliedPromo(null);

@@ -3,6 +3,92 @@
 import { API_BASE_URL } from "../../lib/apiConfig";
 
 const ORDER_API_URL = `${API_BASE_URL}/api/order/`;
+const MY_ORDERS_URL = `${API_BASE_URL}/api/order/my/`;
+
+/** Элемент ответа GET /api/order/my/?active=true|false */
+export interface ApiMyOrderItem {
+  id: string;
+  total_amount: string;
+  status: string;
+  payment_type: string;
+  delivery_service: string;
+  promocode?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+const MY_ORDERS_CACHE_TTL_MS = 60 * 1000; // 1 мин
+const myOrdersCache: { active: { data: ApiMyOrderItem[]; at: number } | null; all: { data: ApiMyOrderItem[]; at: number } | null } = {
+  active: null,
+  all: null,
+};
+
+/**
+ * Заказы пользователя: active=true — последний активный заказ, active=false — все остальные.
+ * С куками (credentials). Результат кешируется на 1 минуту.
+ */
+export const getMyOrders = async (active: boolean): Promise<ApiMyOrderItem[]> => {
+  if (typeof window === "undefined") return [];
+  const key = active ? "active" : "all";
+  const cached = myOrdersCache[key];
+  if (cached && Date.now() - cached.at < MY_ORDERS_CACHE_TTL_MS) {
+    return cached.data;
+  }
+  try {
+    const url = `${MY_ORDERS_URL}?active=${active}`;
+    const response = await fetch(url, {
+      method: "GET",
+      credentials: "include",
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok) return [];
+    const data = (await response.json()) as ApiMyOrderItem[];
+    const list = Array.isArray(data) ? data : [];
+    myOrdersCache[key] = { data: list, at: Date.now() };
+    return list;
+  } catch {
+    return [];
+  }
+};
+
+/** Сброс кеша заказов (вызвать после создания заказа и т.п.) */
+export const invalidateMyOrdersCache = () => {
+  myOrdersCache.active = null;
+  myOrdersCache.all = null;
+};
+
+/** Вид заказа для отображения в кабинете (общий минимум из API) */
+export interface AccountOrderView {
+  id: string;
+  date: string;
+  status: string;
+  totalAmount: string;
+  paymentType: string;
+  deliveryService: string;
+  products: Array<{ image: string; name: string }>;
+}
+
+function formatOrderDate(iso: string): string {
+  try {
+    const d = new Date(iso);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}.${month}.${year}`;
+  } catch {
+    return "";
+  }
+}
+
+export const apiOrderToAccountView = (api: ApiMyOrderItem): AccountOrderView => ({
+  id: String(api.id),
+  date: formatOrderDate(api.created_at),
+  status: api.status,
+  totalAmount: api.total_amount ?? "",
+  paymentType: api.payment_type ?? "",
+  deliveryService: api.delivery_service ?? "",
+  products: [], // API не отдаёт состав заказа в списке
+});
 
 export interface OrderRequest {
   total_amount: string;

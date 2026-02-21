@@ -1,12 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { useAuth } from "../../../contexts/AuthContext";
-import {
-  updateAccountDetails,
-  updatePassword,
-} from "../../../services/accountService";
+import { updateAccountDetails } from "../../../services/accountService";
 import styles from "./PersonalData.module.css";
 
 const emptyProfileData = {
@@ -31,12 +27,26 @@ const profileFields: Array<{
   { key: "phone", label: "Номер", placeholder: "Введите ваш номер телефона*" },
 ];
 
-type PasswordFieldKey = "newPassword" | "confirmPassword";
+const deliveryFieldsList = [
+  { key: "sdekAddress" as const, label: "Адрес СДЕК (ПВЗ)", placeholder: "Введите адрес ПВЗ СДЕК" },
+  { key: "yandexPvz" as const, label: "ПВЗ Яндекс", placeholder: "Введите адрес ПВЗ Яндекс" },
+  { key: "yandexCourier" as const, label: "Яндекс курьер", placeholder: "Введите адрес доставки курьером" },
+];
+
+const emptyDeliveryData = { sdekAddress: "", yandexPvz: "", yandexCourier: "" };
+type DeliveryFieldKey = keyof typeof emptyDeliveryData;
 
 const PersonalData = () => {
   const { user } = useAuth();
   const [profileData, setProfileData] = useState({ ...emptyProfileData });
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [deliveryData, setDeliveryData] = useState({ ...emptyDeliveryData });
+  const [hasDeliveryChanges, setHasDeliveryChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   // Подставляем данные из ручки GET /api/auth/user/ в поля личной информации
   useEffect(() => {
@@ -49,28 +59,6 @@ const PersonalData = () => {
       phone: user.phone_number ?? "",
     });
   }, [user]);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
-
-  const [passwordForm, setPasswordForm] = useState({
-    newPassword: "",
-    confirmPassword: "",
-  });
-  const [hasPasswordChanges, setHasPasswordChanges] = useState(false);
-  const [passwordVisibility, setPasswordVisibility] = useState<
-    Record<PasswordFieldKey, boolean>
-  >({
-    newPassword: false,
-    confirmPassword: false,
-  });
-  const [isPasswordSubmitting, setIsPasswordSubmitting] = useState(false);
-  const [passwordStatus, setPasswordStatus] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
 
   const handleProfileChange =
     (field: ProfileFieldKey) =>
@@ -125,129 +113,17 @@ const PersonalData = () => {
     setSaveStatus(null);
   };
 
-  const togglePasswordVisibility = (field: PasswordFieldKey) => {
-    setPasswordVisibility((prev) => ({ ...prev, [field]: !prev[field] }));
-  };
-
-  const handlePasswordChange =
-    (field: PasswordFieldKey) =>
+  const handleDeliveryChange =
+    (field: DeliveryFieldKey) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setPasswordForm((prev) => ({
-        ...prev,
-        [field]: event.target.value,
-      }));
-      setHasPasswordChanges(true);
-      setPasswordStatus(null);
+      setDeliveryData((prev) => ({ ...prev, [field]: event.target.value }));
+      setHasDeliveryChanges(true);
     };
 
-  const handlePasswordSubmit = async () => {
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordStatus({
-        type: "error",
-        message: "Пароли не совпадают",
-      });
-      return;
-    }
-
-    setIsPasswordSubmitting(true);
-    setPasswordStatus(null);
-
-    try {
-      await updatePassword({
-        currentPassword: "",
-        newPassword: passwordForm.newPassword,
-        confirmPassword: passwordForm.confirmPassword,
-      });
-      setPasswordStatus({
-        type: "success",
-        message: "Пароль успешно обновлён",
-      });
-      setPasswordForm({
-        newPassword: "",
-        confirmPassword: "",
-      });
-      setHasPasswordChanges(false);
-    } catch (error) {
-      setPasswordStatus({
-        type: "error",
-        message:
-          error instanceof Error ? error.message : "Не удалось изменить пароль",
-      });
-    } finally {
-      setIsPasswordSubmitting(false);
-    }
+  const handleResetDelivery = () => {
+    setDeliveryData({ ...emptyDeliveryData });
+    setHasDeliveryChanges(false);
   };
-
-  const handlePasswordCancel = () => {
-    setPasswordForm({
-      newPassword: "",
-      confirmPassword: "",
-    });
-    setHasPasswordChanges(false);
-    setPasswordStatus(null);
-  };
-
-  const renderPasswordInput = (
-    label: string,
-    field: PasswordFieldKey,
-    placeholder: string
-  ) => (
-    <div className={styles.passwordField}>
-      <label className={styles.passwordLabel}>{label}</label>
-      <div className={styles.passwordInputWrapper}>
-        <input
-          className={styles.input}
-          type={passwordVisibility[field] ? "text" : "password"}
-          placeholder={placeholder}
-          value={passwordForm[field]}
-          onChange={handlePasswordChange(field)}
-        />
-        <button
-          type="button"
-          className={styles.togglePassword}
-          onClick={() => togglePasswordVisibility(field)}
-          aria-label={
-            passwordVisibility[field] ? "Скрыть пароль" : "Показать пароль"
-          }
-        >
-          {passwordVisibility[field] ? (
-            <svg
-              className={styles.togglePasswordIcon}
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 3C5.5 3 2.73 5.61 1 10C2.73 14.39 5.5 17 10 17C14.5 17 17.27 14.39 19 10C17.27 5.61 14.5 3 10 3Z"
-                stroke="#7a7a79"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M10 13C11.6569 13 13 11.6569 13 10C13 8.34315 11.6569 7 10 7C8.34315 7 7 8.34315 7 10C7 11.6569 8.34315 13 10 13Z"
-                stroke="#7a7a79"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          ) : (
-            <Image
-              className={styles.togglePasswordIcon}
-              src="/images/login/eye-open.png"
-              alt="Показать пароль"
-              width={20}
-              height={20}
-              loading="lazy"
-            />
-          )}
-        </button>
-      </div>
-    </div>
-  );
 
   return (
     <>
@@ -255,8 +131,7 @@ const PersonalData = () => {
         <section className={styles.panel}>
           <h1 className={styles.sectionHeading}>Настройки</h1>
           <p className={styles.sectionDescription}>
-            В данном разделе предоставляются возможности для настройки имени,
-            изменения пароля и других параметров.
+            В данном разделе можно изменить имя, контакты и адреса доставки.
           </p>
         </section>
 
@@ -307,54 +182,45 @@ const PersonalData = () => {
         </section>
       </div>
 
-      <section className={styles.passwordPanel}>
-        <h2 className={styles.subsectionHeading}>Изменить пароль</h2>
-        <form
-          className={styles.fieldsGrid}
-          onSubmit={(event) => {
-            event.preventDefault();
-            handlePasswordSubmit();
-          }}
-        >
-          {renderPasswordInput(
-            "Новый пароль",
-            "newPassword",
-            "Введите ваш новый пароль*"
-          )}
-          {renderPasswordInput(
-            "Повторите пароль",
-            "confirmPassword",
-            "Введите пароль*"
-          )}
-        </form>
+      <section className={styles.deliveryPanel}>
+        <h2 className={styles.subsectionHeading}>Адреса доставки</h2>
+        <div className={styles.infoPanel}>
+          <div className={styles.fieldsGrid}>
+            {deliveryFieldsList.map(({ key, label, placeholder }) => (
+              <div className={styles.fieldRow} key={key}>
+                <label className={styles.fieldLabel} htmlFor={`delivery-${key}`}>
+                  {label}
+                </label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    id={`delivery-${key}`}
+                    className={styles.input}
+                    type="text"
+                    value={deliveryData[key]}
+                    onChange={handleDeliveryChange(key)}
+                    placeholder={placeholder}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
         <div className={styles.actions}>
           <button
             type="button"
             className={styles.primaryButton}
-            onClick={handlePasswordSubmit}
-            disabled={isPasswordSubmitting || !hasPasswordChanges}
+            disabled={!hasDeliveryChanges}
           >
-            {isPasswordSubmitting ? "Сохранение..." : "Сохранить изменения"}
+            Сохранить изменения
           </button>
           <button
             type="button"
             className={styles.secondaryButton}
-            onClick={handlePasswordCancel}
+            onClick={handleResetDelivery}
           >
             Отмена
           </button>
         </div>
-        {passwordStatus && (
-          <p
-            className={`${styles.passwordMessage} ${
-              passwordStatus.type === "success"
-                ? styles.passwordMessageSuccess
-                : styles.passwordMessageError
-            }`}
-          >
-            {passwordStatus.message}
-          </p>
-        )}
       </section>
     </>
   );

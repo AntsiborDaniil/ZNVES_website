@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import styles from "./Orders.module.css";
 import Image from "next/image";
+import { getMyOrders, apiOrderToAccountView, type AccountOrderView } from "../../../api/order/orderApi";
 
 interface OrderProduct {
   id: number;
@@ -50,14 +51,48 @@ interface OrderData {
   };
 }
 
+const emptyBuyer = { firstName: "", lastName: "", email: "", phone: "" };
+const emptyDelivery = {
+  firstName: "", lastName: "", email: "", phone: "",
+  city: "", street: "", house: "", apartment: "",
+  type: "cdek", method: "pickup",
+};
+
+function accountViewToOrderData(view: AccountOrderView): OrderData {
+  const deliveryType = (view.deliveryService || "cdek").toLowerCase();
+  const deliveryMethod = deliveryType.includes("yandex") ? "pickup" : "pickup";
+  const products: OrderProduct[] = (view.products || []).map((p, i) => ({
+    id: i,
+    name: p.name || "",
+    category: "",
+    color: "",
+    size: "",
+    quantity: 0,
+    price: "",
+    priceValue: 0,
+    image: p.image || "",
+  }));
+  return {
+    id: view.id,
+    date: view.date,
+    status: view.status,
+    buyer: { ...emptyBuyer },
+    delivery: { ...emptyDelivery, type: view.deliveryService || "cdek", method: deliveryMethod },
+    payment: { method: view.paymentType || "prepayment", amount: view.totalAmount || "" },
+    products,
+    total: { itemsCount: products.length, totalAmount: view.totalAmount ?? "", totalAmountValue: 0 },
+  };
+}
+
 const getPaymentSystemName = (method: string) => {
   const paymentNames: Record<string, string> = {
     sberbank: "Оплата по СПБ",
     yandexpay: "Яндекс Pay",
     installment: "Долями",
     card: "Картой онлайн",
+    prepayment: "Предоплата",
   };
-  return paymentNames[method] || "Оплата по СПБ";
+  return paymentNames[method] || method || "Оплата по СПБ";
 };
 
 const getDeliveryServiceName = (type: string, method: string) => {
@@ -73,6 +108,11 @@ const getDeliveryServiceName = (type: string, method: string) => {
   return "СДЭК: доставка в пункт выдачи";
 };
 
+const isUnpaidStatus = (status: string) =>
+  status === "created" ||
+  status === "не оплачен" ||
+  status?.toLowerCase().includes("неоплачен");
+
 type OrdersProps = {
   initialOrderId?: string;
 };
@@ -81,46 +121,39 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Загружаем заказы из sessionStorage
-    if (typeof window !== "undefined") {
-      try {
-        const storedOrders = sessionStorage.getItem("znves:orders");
-        if (storedOrders) {
-          const parsedOrders = JSON.parse(storedOrders);
-          // Сортируем заказы по дате (новые первыми)
-          const sortedOrders = parsedOrders.sort(
-            (a: OrderData, b: OrderData) => {
-              const dateA = new Date(a.date.split(".").reverse().join("-"));
-              const dateB = new Date(b.date.split(".").reverse().join("-"));
-              return dateB.getTime() - dateA.getTime();
-            }
-          );
-          setOrders(sortedOrders);
+    Promise.all([getMyOrders(true), getMyOrders(false)])
+      .then(([activeList, restList]) => {
+        const activeViews = activeList.map(apiOrderToAccountView);
+        const restViews = restList.map(apiOrderToAccountView);
+        const combined: AccountOrderView[] = [...activeViews, ...restViews];
+        const sorted = combined
+          .slice()
+          .sort((a, b) => {
+            const parse = (d: string) => {
+              const [day, month, year] = d.split(".");
+              return new Date(`${year}-${month}-${day}`).getTime();
+            };
+            return parse(b.date) - parse(a.date);
+          });
+        const orderDataList = sorted.map(accountViewToOrderData);
+        setOrders(orderDataList);
 
-          // Если передан initialOrderId, выбираем заказ по ID
-          if (initialOrderId) {
-            const orderToSelect = sortedOrders.find(
-              (order: OrderData) => order.id === initialOrderId
-            );
-            if (orderToSelect) {
-              setSelectedOrder(orderToSelect);
-              setIsDetailsOpen(true);
-            } else if (sortedOrders.length > 0) {
-              setSelectedOrder(sortedOrders[0]);
-              setIsDetailsOpen(true);
-            }
-          } else if (sortedOrders.length > 0 && !selectedOrder) {
-            // Если нет initialOrderId, выбираем первый заказ
-            setSelectedOrder(sortedOrders[0]);
-            setIsDetailsOpen(true);
-          }
+        if (orderDataList.length > 0) {
+          const toSelect =
+            initialOrderId
+              ? orderDataList.find((o) => o.id === initialOrderId)
+              : orderDataList[0];
+          setSelectedOrder(toSelect ?? orderDataList[0]);
+          setIsDetailsOpen(true);
+        } else {
+          setSelectedOrder(null);
         }
-      } catch (error) {
-        console.error("Failed to load orders from sessionStorage:", error);
-      }
-    }
+      })
+      .catch(() => setOrders([]))
+      .finally(() => setIsLoading(false));
   }, [initialOrderId]);
 
   // Автоматически открываем детали при смене выбранного заказа
@@ -130,7 +163,16 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
     }
   }, [selectedOrder?.id]);
 
-  // Если нет заказов, показываем пустое состояние
+  if (isLoading) {
+    return (
+      <section className={styles.panel}>
+        <div className={styles.emptyState}>
+          <p className={styles.emptyText}>Загрузка заказов…</p>
+        </div>
+      </section>
+    );
+  }
+
   if (orders.length === 0) {
     return (
       <section className={styles.panel}>
@@ -186,8 +228,8 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                     <div className={styles.orderCardNumber}>
                       №{selectedOrder.id}
                     </div>
-                    <div className={styles.orderCardStatus}>
-                      {selectedOrder.status === "не оплачен"
+                        <div className={styles.orderCardStatus}>
+                      {isUnpaidStatus(selectedOrder.status)
                         ? "Ожидает оплаты"
                         : "Оплачен"}
                     </div>
@@ -260,10 +302,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                     <span className={styles.orderStatusLabel}>Статус:</span>{" "}
                     <span
                       className={
-                        selectedOrder.status
-                          .toLowerCase()
-                          .includes("не оплачен") ||
-                        selectedOrder.status.toLowerCase().includes("неоплачен")
+                        isUnpaidStatus(selectedOrder.status)
                           ? styles.orderStatusUnpaid
                           : styles.orderStatusPaid
                       }
@@ -453,7 +492,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
 
               {/* Блок Итого во всю ширину */}
               <div className={styles.totalSection}>
-                {selectedOrder.status === "не оплачен" && (
+                {isUnpaidStatus(selectedOrder.status) && (
                   <button className={styles.payButton}>Оплатить заказ</button>
                 )}
                 <div className={styles.totalInfo}>
@@ -516,7 +555,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                           №{order.id}
                         </div>
                         <div className={styles.orderCardStatus}>
-                          {order.status === "не оплачен"
+                          {isUnpaidStatus(order.status)
                             ? "Ожидает оплаты"
                             : "Оплачен"}
                         </div>

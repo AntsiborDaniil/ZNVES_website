@@ -15,10 +15,10 @@
   gap: 8px;
 }
 
-.passwordPanel {
+.passwordPanel,
+.deliveryPanel {
   border-radius: 3px;
   padding: 30px;
-
   background-color: #f8f8f8;
 }
 

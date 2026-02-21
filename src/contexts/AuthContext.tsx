@@ -22,29 +22,34 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AUTH_STORAGE_KEY = "znves:auth";
+/** Кеш при загрузке: если данные сохранены не более N минут назад — не дергаем API. */
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 мин
+/** При focus/visibility не делаем запрос, если последняя проверка была не более N минут назад. */
+const RECHECK_INTERVAL_MS = 15 * 60 * 1000; // 15 мин
 
-const getAuthFromStorage = (): AuthUser | null => {
+type StoredAuth = { user: AuthUser | null; savedAt: number };
+
+const getAuthFromStorage = (): StoredAuth => {
   if (typeof window === "undefined") {
-    return null;
+    return { user: null, savedAt: 0 };
   }
   try {
     const stored = sessionStorage.getItem(AUTH_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : null;
+    if (!stored) return { user: null, savedAt: 0 };
+    const parsed = JSON.parse(stored) as StoredAuth;
+    const user = parsed?.user ?? null;
+    const savedAt = typeof parsed?.savedAt === "number" ? parsed.savedAt : 0;
+    return { user, savedAt };
   } catch {
-    return null;
+    return { user: null, savedAt: 0 };
   }
 };
 
 const saveAuthToStorage = (user: AuthUser | null) => {
-  if (typeof window === "undefined") {
-    return;
-  }
+  if (typeof window === "undefined") return;
   try {
-    if (user) {
-      sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-    } else {
-      sessionStorage.removeItem(AUTH_STORAGE_KEY);
-    }
+    const payload: StoredAuth = { user, savedAt: Date.now() };
+    sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(payload));
   } catch {
     // Ignore storage errors
   }
@@ -54,19 +59,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
+  /** При загрузке был свежий кеш — не дергаем API при mount. */
+  const [cacheFreshOnLoad, setCacheFreshOnLoad] = useState(false);
 
-  // Кеш: при гидрации подставляем данные из sessionStorage, чтобы не мигать «не авторизован»
+  // Кеш с TTL: при гидрации читаем sessionStorage; если данные свежие (< 10 мин) — API не вызываем.
   useEffect(() => {
-    const storedUser = getAuthFromStorage();
+    const { user: storedUser, savedAt } = getAuthFromStorage();
     setUser(storedUser);
     setIsHydrated(true);
     setIsLoading(false);
+    const fresh = !!(storedUser && savedAt && Date.now() - savedAt <= CACHE_TTL_MS);
+    setCacheFreshOnLoad(fresh);
   }, []);
 
-  // Проверка авторизации только на клиенте (куки есть только в браузере).
+  // Проверка авторизации только на клиенте. Редкий re-check: не дергаем API, если недавно уже проверяли.
   const checkAuth = useCallback(async () => {
-    if (typeof window === "undefined" || !isHydrated) {
-      return;
+    if (typeof window === "undefined" || !isHydrated) return;
+
+    const { savedAt } = getAuthFromStorage();
+    if (savedAt && Date.now() - savedAt < RECHECK_INTERVAL_MS) {
+      return; // уже проверяли недавно
     }
 
     setIsLoading(true);
@@ -75,12 +87,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(authData);
       saveAuthToStorage(authData);
 
-      if (authData) {
-        if (typeof window !== "undefined" && window.location.pathname !== "/account") {
-          window.location.href = "/account";
-        }
+      if (authData && typeof window !== "undefined" && window.location.pathname !== "/account") {
+        window.location.href = "/account";
       }
-    } catch (error) {
+    } catch {
       setUser(null);
       saveAuthToStorage(null);
     } finally {
@@ -88,11 +98,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [isHydrated]);
 
-  // Сразу проверяем авторизацию при загрузке (важно после возврата с test-znves.ru)
+  // При загрузке вызываем API только если кеш пустой или протух (иначе уже подставили из кеша).
   useEffect(() => {
-    if (!isHydrated) return;
+    if (!isHydrated || cacheFreshOnLoad) return;
     checkAuth();
-  }, [isHydrated, checkAuth]);
+  }, [isHydrated, cacheFreshOnLoad, checkAuth]);
 
   // Перенаправление на бота
   const redirectToBot = useCallback(() => {

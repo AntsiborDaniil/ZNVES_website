@@ -4,17 +4,8 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../contexts/AuthContext";
+import { getMyOrders, apiOrderToAccountView, type AccountOrderView } from "../../../api/order/orderApi";
 import styles from "./MyAccount.module.css";
-
-interface OrderData {
-  id: string;
-  date: string;
-  status: string;
-  products: Array<{
-    image: string;
-    name: string;
-  }>;
-}
 
 type MyAccountProps = {
   onNavigate?: (tab: "profile" | "orders", orderId?: string) => void;
@@ -22,33 +13,24 @@ type MyAccountProps = {
 
 const MyAccount = ({ onNavigate }: MyAccountProps) => {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
-  const [lastOrder, setLastOrder] = useState<OrderData | null>(null);
+  const { isAuthenticated, user } = useAuth();
+  const [lastOrder, setLastOrder] = useState<AccountOrderView | null>(null);
+
+  const displayName = user
+    ? [user.last_name, user.first_name].filter(Boolean).join(" ") || user.username || "—"
+    : "—";
+  const displayEmail = user?.email ?? "—";
+  const displayPhone = user?.phone_number ?? "—";
 
   useEffect(() => {
-    // Загружаем последний заказ из sessionStorage
-    if (typeof window !== "undefined") {
-      try {
-        const storedOrders = sessionStorage.getItem("znves:orders");
-        if (storedOrders) {
-          const parsedOrders = JSON.parse(storedOrders);
-          if (parsedOrders.length > 0) {
-            // Сортируем заказы по дате (новые первыми) и берем первый
-            const sortedOrders = parsedOrders.sort(
-              (a: OrderData, b: OrderData) => {
-                const dateA = new Date(a.date.split(".").reverse().join("-"));
-                const dateB = new Date(b.date.split(".").reverse().join("-"));
-                return dateB.getTime() - dateA.getTime();
-              }
-            );
-            setLastOrder(sortedOrders[0]);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to load orders from sessionStorage:", error);
-      }
-    }
-  }, []);
+    if (!isAuthenticated) return;
+    getMyOrders(true)
+      .then((list) => {
+        const first = list[0];
+        setLastOrder(first ? apiOrderToAccountView(first) : null);
+      })
+      .catch(() => setLastOrder(null));
+  }, [isAuthenticated]);
 
   const handlePersonalDataClick = () => {
     if (!isAuthenticated) {
@@ -88,9 +70,7 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
           <div className={styles.cardContentInner}>
             <div className={styles.cardContentInnerLeft}>
               <h1 className={styles.cardHeader}>Личные данные</h1>
-              <h1 className={styles.cardTitle}>
-                Смирнов Александр Александрович
-              </h1>
+              <h1 className={styles.cardTitle}>{displayName}</h1>
             </div>
             <Image
               src="/images/account/arrowRight.png"
@@ -102,8 +82,8 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
             />
           </div>
           <div className={styles.cardInfo}>
-            <div className={styles.cardInfoItem}>abvgd@mail.com</div>
-            <div className={styles.cardInfoItem}>+7 (977) 721-04-52</div>
+            <div className={styles.cardInfoItem}>{displayEmail}</div>
+            <div className={styles.cardInfoItem}>{displayPhone}</div>
           </div>
         </div>
       </div>
@@ -143,7 +123,7 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
                 <div className={styles.orderDetailsTop}>
                   <div className={styles.cardInfoItem}>№{lastOrder.id}</div>
                   <div className={styles.orderStatus}>
-                    {lastOrder.status === "не оплачен"
+                    {lastOrder.status === "created" || lastOrder.status?.toLowerCase().includes("не оплачен")
                       ? "Ожидает оплаты"
                       : "Оплачен"}
                   </div>
@@ -159,7 +139,7 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
               </div>
               <div className={styles.orderDetailsRight}>
                 <div className={styles.orderThumbnails}>
-                  {lastOrder.products.slice(0, 3).map((product, index) => (
+                  {lastOrder.products?.slice(0, 3).map((product, index) => (
                     <div key={index} className={styles.thumbnail}>
                       <Image
                         src={product.image || "/images/catalogs/placeholder.png"}
@@ -171,7 +151,7 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
                       />
                     </div>
                   ))}
-                  {lastOrder.products.length > 3 && (
+                  {lastOrder.products && lastOrder.products.length > 3 && (
                     <div className={styles.thumbnailMore}>
                       +{lastOrder.products.length - 3}
                     </div>
