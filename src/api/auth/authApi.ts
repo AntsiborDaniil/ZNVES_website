@@ -18,6 +18,26 @@ export interface TelegramAuthData {
   [key: string]: any;
 }
 
+const ACCESS_TOKEN_KEY = "access-token";
+
+/**
+ * Проверяет наличие access-token (JWT) в куках или в Storage (localStorage/sessionStorage).
+ */
+export const hasAccessToken = (): boolean => {
+  if (typeof window === "undefined") return false;
+  if (/(?:^|;\s*)access-token\s*=\s*[^;]+/.test(document.cookie)) return true;
+  try {
+    if (localStorage.getItem(ACCESS_TOKEN_KEY)) return true;
+    if (sessionStorage.getItem(ACCESS_TOKEN_KEY)) return true;
+  } catch {
+    // Доступ к Storage может быть запрещён
+  }
+  return false;
+};
+
+/** @deprecated Используйте hasAccessToken() — проверяет и куки, и Storage */
+export const hasAccessTokenCookie = (): boolean => hasAccessToken();
+
 /**
  * URL ручки бэкенда для виджета Telegram.
  * Нужен не для фронта, а для сервиса Telegram: после успешного входа Telegram

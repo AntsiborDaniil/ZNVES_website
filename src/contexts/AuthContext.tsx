@@ -8,12 +8,13 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import { checkTelegramAuth, redirectToTelegramBot, type TelegramAuthData } from "../api/auth/authApi";
+import { checkTelegramAuth, hasAccessToken, redirectToTelegramBot, type TelegramAuthData } from "../api/auth/authApi";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   user: TelegramAuthData | null;
   isLoading: boolean;
+  hasAccessToken: () => boolean;
   checkAuth: () => Promise<void>;
   redirectToBot: () => void;
 }
@@ -126,7 +127,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [isHydrated, checkAuth]);
 
-  const isAuthenticated = !!user;
+  // Авторизован, если есть данные пользователя с бэка или есть access_token (куки или Storage)
+  const isAuthenticated = !!user || hasAccessToken();
 
   return (
     <AuthContext.Provider
@@ -134,6 +136,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated,
         user,
         isLoading,
+        hasAccessToken,
         checkAuth,
         redirectToBot,
       }}
