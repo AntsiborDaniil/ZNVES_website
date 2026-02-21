@@ -86,10 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const authData = await checkTelegramAuth();
       setUser(authData);
       saveAuthToStorage(authData);
-
-      if (authData && typeof window !== "undefined" && window.location.pathname !== "/account") {
-        window.location.href = "/account";
-      }
+      // Не редиректим на /account при заходе на сайт — пользователь остаётся на текущей странице.
     } catch {
       setUser(null);
       saveAuthToStorage(null);
