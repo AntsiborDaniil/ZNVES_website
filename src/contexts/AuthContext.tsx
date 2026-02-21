@@ -71,10 +71,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     try {
       const authData = await checkTelegramAuth();
-      // Если authData null, это может быть как "не авторизован", так и "ошибка сети"
-      // В любом случае считаем пользователя неавторизованным
       setUser(authData);
       saveAuthToStorage(authData);
+      if (authData) {
+        console.log("[Auth] Получили JWT, авторизация успешна");
+        if (typeof window !== "undefined" && window.location.pathname !== "/account") {
+          window.location.href = "/account";
+        }
+      }
     } catch (error) {
       // Ошибка уже обработана в checkTelegramAuth, просто устанавливаем null
       console.warn("Auth check completed with error, user considered not authenticated");
