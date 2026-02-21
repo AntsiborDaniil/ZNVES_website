@@ -8,11 +8,11 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import { checkTelegramAuth, hasAccessToken, redirectToTelegramBot, type TelegramAuthData } from "../api/auth/authApi";
+import { checkTelegramAuth, hasAccessToken, redirectToTelegramBot, type AuthUser } from "../api/auth/authApi";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: TelegramAuthData | null;
+  user: AuthUser | null;
   isLoading: boolean;
   hasAccessToken: () => boolean;
   checkAuth: () => Promise<void>;
@@ -23,7 +23,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AUTH_STORAGE_KEY = "znves:auth";
 
-const getAuthFromStorage = (): TelegramAuthData | null => {
+const getAuthFromStorage = (): AuthUser | null => {
   if (typeof window === "undefined") {
     return null;
   }
@@ -35,7 +35,7 @@ const getAuthFromStorage = (): TelegramAuthData | null => {
   }
 };
 
-const saveAuthToStorage = (user: TelegramAuthData | null) => {
+const saveAuthToStorage = (user: AuthUser | null) => {
   if (typeof window === "undefined") {
     return;
   }
@@ -51,11 +51,11 @@ const saveAuthToStorage = (user: TelegramAuthData | null) => {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<TelegramAuthData | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Загружаем данные из sessionStorage только после монтирования на клиенте
+  // Кеш: при гидрации подставляем данные из sessionStorage, чтобы не мигать «не авторизован»
   useEffect(() => {
     const storedUser = getAuthFromStorage();
     setUser(storedUser);
@@ -63,13 +63,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  // Проверяем авторизацию на сервере
+  // Проверка авторизации: GET /api/auth/user/ с credentials (куки). При response.ok — доступ к кабинету.
   const checkAuth = useCallback(async () => {
     if (!isHydrated) {
       return;
     }
 
-    console.log("[Auth] Проверка авторизации: запрос к бэку…");
     setIsLoading(true);
     try {
       const authData = await checkTelegramAuth();
@@ -77,20 +76,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       saveAuthToStorage(authData);
 
       if (authData) {
-        console.log("[Auth] JWT валиден, пользователь авторизован. Редирект на /account при необходимости.");
         if (typeof window !== "undefined" && window.location.pathname !== "/account") {
           window.location.href = "/account";
         }
-      } else {
-        console.log("[Auth] Ответ бэка без данных пользователя — показываем виджет входа.");
       }
     } catch (error) {
-      console.warn("[Auth] checkAuth завершился с ошибкой, пользователь не авторизован:", error);
       setUser(null);
       saveAuthToStorage(null);
     } finally {
       setIsLoading(false);
-      console.log("[Auth] Проверка авторизации завершена, isLoading=false.");
     }
   }, [isHydrated]);
 

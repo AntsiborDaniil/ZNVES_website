@@ -1,27 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useAuth } from "../../../contexts/AuthContext";
 import {
   updateAccountDetails,
   updatePassword,
 } from "../../../services/accountService";
 import styles from "./PersonalData.module.css";
 
-const defaultProfileData = {
-  firstName: "Александр",
-  lastName: "Смирнов",
-  email: "abvdf@gmail.com",
-  phone: "+7 (977) 721-04-52",
+const emptyProfileData = {
+  username: "",
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
 };
 
-type ProfileFieldKey = keyof typeof defaultProfileData;
+type ProfileFieldKey = keyof typeof emptyProfileData;
 
 const profileFields: Array<{
   key: ProfileFieldKey;
   label: string;
   placeholder: string;
 }> = [
+  { key: "username", label: "Никнейм", placeholder: "Введите никнейм" },
   { key: "firstName", label: "Имя", placeholder: "Введите ваше имя*" },
   { key: "lastName", label: "Фамилия", placeholder: "Введите вашу фамилию*" },
   { key: "email", label: "Email", placeholder: "Введите ваш email*" },
@@ -31,8 +34,21 @@ const profileFields: Array<{
 type PasswordFieldKey = "newPassword" | "confirmPassword";
 
 const PersonalData = () => {
-  const [profileData, setProfileData] = useState({ ...defaultProfileData });
+  const { user } = useAuth();
+  const [profileData, setProfileData] = useState({ ...emptyProfileData });
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Подставляем данные из ручки GET /api/auth/user/ в поля личной информации
+  useEffect(() => {
+    if (!user) return;
+    setProfileData({
+      username: user.username ?? "",
+      firstName: user.first_name ?? "",
+      lastName: user.last_name ?? "",
+      email: user.email ?? "",
+      phone: user.phone_number ?? "",
+    });
+  }, [user]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<{
     type: "success" | "error";
@@ -94,7 +110,17 @@ const PersonalData = () => {
   };
 
   const handleResetProfile = () => {
-    setProfileData({ ...defaultProfileData });
+    if (user) {
+      setProfileData({
+        username: user.username ?? "",
+        firstName: user.first_name ?? "",
+        lastName: user.last_name ?? "",
+        email: user.email ?? "",
+        phone: user.phone_number ?? "",
+      });
+    } else {
+      setProfileData({ ...emptyProfileData });
+    }
     setHasUnsavedChanges(false);
     setSaveStatus(null);
   };

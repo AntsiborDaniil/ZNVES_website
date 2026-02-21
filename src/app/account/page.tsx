@@ -9,6 +9,7 @@ import PersonalData from "../../components/AccountPage/PersonalData/PersonalData
 import MyAccount from "../../components/AccountPage/MyAccount/MyAccount";
 import Orders from "../../components/AccountPage/Orders/Orders";
 import TelegramLoginWidget from "../../components/TelegramLoginWidget/TelegramLoginWidget";
+import LoadingStub from "../../components/LoadingStub/LoadingStub";
 import styles from "./page.module.css";
 
 const AccountPage = () => {
@@ -20,9 +21,21 @@ const AccountPage = () => {
     undefined
   );
 
-  // Пока не получили ответ от бэка (response.ok = JWT есть) — не показываем виджет
+  // Пока не получили ответ от бэка — показываем заглушку загрузки
   if (isLoading) {
-    return null;
+    return (
+      <div className={styles.accountPage}>
+        <Header variant="green" />
+        <main className={styles.main}>
+          <div className={styles.loadingStubWrap}>
+            <LoadingStub label="Проверка авторизации…" />
+          </div>
+        </main>
+        <div className={styles.footerWrapper}>
+          <Footer />
+        </div>
+      </div>
+    );
   }
 
   // Бэк вернул не 200 или без данных — показываем виджет входа

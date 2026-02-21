@@ -38,6 +38,18 @@ export type ApiProductDetail = {
   sizes: ApiProductSize[];
   colors: ApiProductColor[];
   warehouse_items: ApiWarehouseItem[];
+  /** Описание нанесения */
+  print_application?: string;
+  /** Описание размеров / размерная сетка */
+  sizes_table?: string;
+  /** Параметры модели */
+  model_params?: string;
+  /** Состав и уход */
+  composition_and_care?: string;
+  /** Информация о доставке */
+  delivery_info?: string;
+  /** Информация о возврате */
+  return_info?: string;
 };
 
 // Кеш для запросов
@@ -85,13 +97,58 @@ const transformApiProduct = (
   const category = extractCategoryFromSlug(slug) || "T-shirts";
   const id = hashString(slug || apiProduct.name);
 
-  const sections = [
+  const sectionEntries: Array<{ id: string; title: string; content: string }> = [
     {
       id: "description",
       title: "Описание",
       content: apiProduct.description || "Описание товара отсутствует.",
     },
   ];
+
+  if (apiProduct.print_application?.trim()) {
+    sectionEntries.push({
+      id: "print_application",
+      title: "Нанесение",
+      content: apiProduct.print_application.trim(),
+    });
+  }
+  if (apiProduct.sizes_table?.trim()) {
+    sectionEntries.push({
+      id: "sizes_table",
+      title: "Размерная сетка",
+      content: apiProduct.sizes_table.trim(),
+    });
+  }
+  if (apiProduct.model_params?.trim()) {
+    sectionEntries.push({
+      id: "model_params",
+      title: "Параметры модели",
+      content: apiProduct.model_params.trim(),
+    });
+  }
+  if (apiProduct.composition_and_care?.trim()) {
+    sectionEntries.push({
+      id: "composition_and_care",
+      title: "Состав и уход",
+      content: apiProduct.composition_and_care.trim(),
+    });
+  }
+  if (apiProduct.delivery_info?.trim()) {
+    sectionEntries.push({
+      id: "delivery_info",
+      title: "Доставка",
+      content: apiProduct.delivery_info.trim(),
+    });
+  }
+  if (apiProduct.return_info?.trim()) {
+    sectionEntries.push({
+      id: "return_info",
+      title: "Возврат",
+      content: apiProduct.return_info.trim(),
+    });
+  }
+
+  const sections = sectionEntries;
 
   return {
     id,

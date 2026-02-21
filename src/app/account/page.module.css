@@ -66,6 +66,14 @@
   justify-content: space-between;
 }
 
+.loadingStubWrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+}
+
 .telegramLoginBlock {
   flex: 1;
   display: flex;

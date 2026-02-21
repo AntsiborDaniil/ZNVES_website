@@ -3,9 +3,20 @@
 
 import { API_BASE_URL } from "../../lib/apiConfig";
 
+/** Только для callback виджета: сюда редиректит Telegram с параметрами. Прямой GET с фронта даёт 400. */
 const TELEGRAM_LOGIN_URL = `${API_BASE_URL}/api/auth/telegram-login/`;
+
 /** Имя бота без @ — для виджета Telegram Login */
 export const TELEGRAM_BOT_USERNAME = "my_znves_bot";
+
+/** Ответ ручки GET /api/auth/user/ — данные авторизованного пользователя (куки) */
+export interface AuthUser {
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+}
 
 export interface TelegramAuthData {
   id?: number;
@@ -46,62 +57,34 @@ export const hasAccessTokenCookie = (): boolean => hasAccessToken();
  */
 export const getTelegramLoginCallbackUrl = (): string => TELEGRAM_LOGIN_URL;
 
+const AUTH_USER_URL = `${API_BASE_URL}/api/auth/user/`;
+
 /**
- * Проверяет авторизацию: GET на ручку с credentials (куки).
- * После входа через виджет бэк выставляет куки — этот запрос их подхватывает.
+ * Проверка авторизации: GET /api/auth/user/ с credentials (куки).
+ * Если response.ok — возвращаем данные пользователя, иначе null.
+ * Результат можно кешировать на клиенте (например в AuthContext/sessionStorage).
  */
-const AUTH_LOG_PREFIX = "[Auth/telegram-login]";
-
-export const checkTelegramAuth = async (): Promise<TelegramAuthData | null> => {
+export const getCurrentUser = async (): Promise<AuthUser | null> => {
   try {
-    console.log(`${AUTH_LOG_PREFIX} Запрос: GET ${TELEGRAM_LOGIN_URL} (credentials: include, куки уйдут на бэк)`);
-
-    const response = await fetch(TELEGRAM_LOGIN_URL, {
+    const response = await fetch(AUTH_USER_URL, {
       method: "GET",
-      headers: {
-        "Accept": "application/json",
-      },
       credentials: "include",
-      mode: "cors",
+      headers: { Accept: "application/json" },
     });
-
-    console.log(
-      `${AUTH_LOG_PREFIX} Ответ: status=${response.status}, ok=${response.ok}, statusText=${response.statusText}`
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      if (response.status === 400 || response.status === 401 || response.status === 403) {
-        console.log(
-          `${AUTH_LOG_PREFIX} Нет JWT или бэк отклонил: ${response.status}. Тело:`,
-          errorText || "(пусто)"
-        );
-        return null;
-      }
-      console.error(
-        `${AUTH_LOG_PREFIX} Ошибка бэка ${response.status}:`,
-        errorText || "(пусто)"
-      );
-      return null;
-    }
-
-    const data: TelegramAuthData = await response.json();
-    console.log(
-      `${AUTH_LOG_PREFIX} Всё ок (response.ok=true). Данные пользователя:`,
-      data
-    );
-    return data;
-  } catch (error) {
-    if (error instanceof TypeError && error.message === "Failed to fetch") {
-      console.warn(
-        `${AUTH_LOG_PREFIX} Запрос не прошёл (Failed to fetch). Возможные причины: CORS, сеть, бэк недоступен.`,
-        error
-      );
-    } else {
-      console.error(`${AUTH_LOG_PREFIX} Исключение при проверке авторизации:`, error);
-    }
+    if (!response.ok) return null;
+    const data = (await response.json()) as AuthUser;
+    return data && typeof data.username === "string" ? data : null;
+  } catch {
     return null;
   }
+};
+
+/**
+ * Проверка авторизации через ручку GET /api/auth/user/ (куки).
+ * Возвращает данные пользователя при успешной авторизации, иначе null.
+ */
+export const checkTelegramAuth = async (): Promise<AuthUser | null> => {
+  return getCurrentUser();
 };
 
 /**

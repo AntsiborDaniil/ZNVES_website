@@ -82,6 +82,38 @@ const ProductPageView = ({
 
   const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
+  // Соответствие цветов и размеров по warehouse: только комбинации с quantity > 0
+  const colorToSizesFromWarehouse = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    warehouseItems.forEach((wi) => {
+      if ((wi.quantity ?? 0) <= 0) return;
+      const c = (wi.color ?? wi.color_slug ?? "").toLowerCase().trim();
+      const s = (wi.size ?? wi.size_slug ?? "").toLowerCase().trim();
+      if (!c) return;
+      if (!map.has(c)) map.set(c, new Set());
+      map.get(c)!.add(s);
+    });
+    return map;
+  }, [warehouseItems]);
+
+  // Цвета, у которых есть хотя бы один размер в наличии (по warehouse)
+  const colorOptions = useMemo(() => {
+    const withStock = product.availableColors.filter((opt) => {
+      const key = (opt.value ?? "").toLowerCase().trim();
+      return colorToSizesFromWarehouse.has(key) && (colorToSizesFromWarehouse.get(key)?.size ?? 0) > 0;
+    });
+    return withStock.length > 0 ? withStock : product.availableColors;
+  }, [product.availableColors, colorToSizesFromWarehouse]);
+
+  // Размеры, доступные для выбранного цвета (по warehouse)
+  const availableSizesForSelectedColor = useMemo(() => {
+    const key = (selectedColor ?? "").toLowerCase().trim();
+    const set = colorToSizesFromWarehouse.get(key);
+    if (!set || set.size === 0) return product.availableSizes;
+    const list = Array.from(set);
+    return product.availableSizes.filter((s) => list.includes((s ?? "").toLowerCase().trim()));
+  }, [selectedColor, colorToSizesFromWarehouse, product.availableSizes]);
+
   useEffect(() => {
     fetchCatalogColors().then((colors) => {
       const map: Record<string, string> = {};
@@ -93,18 +125,27 @@ const ProductPageView = ({
   }, []);
 
   useEffect(() => {
-    if (
-      !product.availableColors.some((color) => color.value === selectedColor)
-    ) {
+    const inProduct = product.availableColors.some((color) => color.value === selectedColor);
+    const inOptions = colorOptions.some((c) => c.value === selectedColor);
+    if (!inProduct) {
       setSelectedColor(product.availableColors[0]?.value ?? "");
+    } else if (!inOptions && colorOptions.length > 0) {
+      setSelectedColor(colorOptions[0]?.value ?? "");
     }
-  }, [product.availableColors, selectedColor]);
+  }, [product.availableColors, colorOptions, selectedColor]);
 
+  // Синхронизация размера с доступными для выбранного цвета (по warehouse)
   useEffect(() => {
-    if (!product.availableSizes.includes(selectedSize)) {
+    const key = (selectedColor ?? "").toLowerCase().trim();
+    const allowed = colorToSizesFromWarehouse.get(key);
+    const normalizedSelected = (selectedSize ?? "").toLowerCase().trim();
+    if (allowed && allowed.size > 0 && !allowed.has(normalizedSelected)) {
+      const first = product.availableSizes.find((s) => allowed.has((s ?? "").toLowerCase().trim()));
+      setSelectedSize(first ?? Array.from(allowed)[0] ?? product.availableSizes[0] ?? "");
+    } else if (!product.availableSizes.includes(selectedSize)) {
       setSelectedSize(product.availableSizes[0] ?? "");
     }
-  }, [product.availableSizes, selectedSize]);
+  }, [selectedColor, selectedSize, colorToSizesFromWarehouse, product.availableSizes]);
 
   // Загрузка изображений при изменении цвета
   useEffect(() => {
@@ -174,11 +215,6 @@ const ProductPageView = ({
   useEffect(() => {
     adjustSectionHeights();
   }, [adjustSectionHeights, width]);
-
-  const colorOptions = useMemo(
-    () => product.availableColors,
-    [product.availableColors]
-  );
 
   const selectedColorOption = useMemo(() => {
     return (
@@ -346,7 +382,7 @@ const ProductPageView = ({
                   </div>
                 </div>
                 )}
-                {product.availableSizes.length > 0 && (
+                {availableSizesForSelectedColor.length > 0 && (
                 <div
                   className={`${styles.variantRow} ${styles.variantRowCompact}`}
                 >
@@ -384,7 +420,7 @@ const ProductPageView = ({
                     </button>
                     {isSizeListOpen && (
                       <ul className={styles.sizeList}>
-                        {product.availableSizes.map((size) => {
+                        {availableSizesForSelectedColor.map((size) => {
                           const isSelected = selectedSize === size;
                           return (
                             <li key={size} className={styles.sizeListItem}>
