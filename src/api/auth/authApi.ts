@@ -61,10 +61,13 @@ const AUTH_USER_URL = `${API_BASE_URL}/api/auth/user/`;
 
 /**
  * Проверка авторизации: GET /api/auth/user/ с credentials (куки).
+ * Вызывать только на клиенте — на сервере кук нет, запрос всегда даст 403.
  * Если response.ok — возвращаем данные пользователя, иначе null.
- * Результат можно кешировать на клиенте (например в AuthContext/sessionStorage).
  */
 export const getCurrentUser = async (): Promise<AuthUser | null> => {
+  if (typeof window === "undefined") {
+    return null;
+  }
   try {
     const response = await fetch(AUTH_USER_URL, {
       method: "GET",

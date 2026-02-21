@@ -63,9 +63,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  // Проверка авторизации: GET /api/auth/user/ с credentials (куки). При response.ok — доступ к кабинету.
+  // Проверка авторизации только на клиенте (куки есть только в браузере).
   const checkAuth = useCallback(async () => {
-    if (!isHydrated) {
+    if (typeof window === "undefined" || !isHydrated) {
       return;
     }
 
