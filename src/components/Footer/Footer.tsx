@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import styles from "./Footer.module.css";
 
 const Footer = () => {
@@ -11,14 +11,39 @@ const Footer = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [isModalClosing, setIsModalClosing] = useState(false);
+  const autoCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const closeModal = useCallback(() => {
+    if (isModalClosing) return;
+    if (autoCloseTimerRef.current) {
+      clearTimeout(autoCloseTimerRef.current);
+      autoCloseTimerRef.current = null;
+    }
+    setIsModalClosing(true);
+  }, [isModalClosing]);
+
+  const handleModalAnimationEnd = (e: React.AnimationEvent) => {
+    if (e.target !== e.currentTarget || !isModalClosing) return;
+    setShowSubscribeModal(false);
+    setIsModalClosing(false);
+  };
 
   useEffect(() => {
     if (!showSubscribeModal) return;
+    setIsModalClosing(false);
     const onEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setShowSubscribeModal(false);
+      if (e.key === "Escape") closeModal();
     };
     document.addEventListener("keydown", onEscape);
-    return () => document.removeEventListener("keydown", onEscape);
+    autoCloseTimerRef.current = setTimeout(() => setIsModalClosing(true), 4000);
+    return () => {
+      document.removeEventListener("keydown", onEscape);
+      if (autoCloseTimerRef.current) {
+        clearTimeout(autoCloseTimerRef.current);
+        autoCloseTimerRef.current = null;
+      }
+    };
   }, [showSubscribeModal]);
 
   const handleSubscribe = (e: React.FormEvent) => {
@@ -199,16 +224,17 @@ const Footer = () => {
       </div>
       {showSubscribeModal && (
         <div
-          className={styles.modalOverlay}
+          className={`${styles.modalOverlay} ${isModalClosing ? styles.modalOverlayClosing : ""}`}
           role="alertdialog"
           aria-modal="true"
           aria-labelledby="subscribe-modal-title"
+          onAnimationEnd={handleModalAnimationEnd}
         >
           <div className={styles.modalContent}>
             <button
               type="button"
               className={styles.modalClose}
-              onClick={() => setShowSubscribeModal(false)}
+              onClick={closeModal}
               aria-label="Закрыть"
             >
               ×

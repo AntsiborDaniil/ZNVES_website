@@ -494,7 +494,11 @@
   bottom: 24px;
   left: 24px;
   z-index: 9999;
-  animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: toastSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.modalOverlay.modalOverlayClosing {
+  animation: toastSlideOut 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes toastSlideIn {
@@ -508,6 +512,17 @@
   }
 }
 
+@keyframes toastSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
 .modalContent {
   position: relative;
   background-color: #0a5840;
@@ -517,6 +532,33 @@
   border: 0.75px solid rgba(242, 240, 236, 0.3);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   max-width: 360px;
+  animation: modalContentIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.modalOverlay.modalOverlayClosing .modalContent {
+  animation: modalContentOut 0.8s ease forwards;
+}
+
+@keyframes modalContentIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes modalContentOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
 }
 
 .modalClose {
