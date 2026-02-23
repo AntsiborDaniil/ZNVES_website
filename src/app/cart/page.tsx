@@ -111,8 +111,10 @@ const CartPageContent = () => {
     setAppliedPromo(null);
   }, [setAppliedPromo]);
 
-  // Загрузка цветов с API каталога для отображения на русском (slug → value)
+  // Загрузка цветов только если есть позиции без colorLabel (корзина из localStorage)
   useEffect(() => {
+    const needsColors = items.some((item) => !item.colorLabel);
+    if (!needsColors) return;
     fetchCatalogColors().then((colors) => {
       const map: Record<string, string> = {};
       colors.forEach((c) => {
@@ -120,7 +122,7 @@ const CartPageContent = () => {
       });
       setColorSlugToLabel(map);
     });
-  }, []);
+  }, [items]);
 
   // Показываем модалку ошибки, если редирект с checkout из-за ошибки заказа
   useEffect(() => {

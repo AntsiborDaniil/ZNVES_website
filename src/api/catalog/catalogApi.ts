@@ -171,8 +171,16 @@ export const fetchCatalogProductsByCategory = async (
   });
 };
 
-// Получение списка цветов для фильтров
+// Кеш для цветов и размеров (один запрос на сессию, TTL 5 мин)
+const FILTERS_CACHE_DURATION = 5 * 60 * 1000;
+let colorsCacheState: { data: ApiCatalogColor[]; timestamp: number } | null = null;
+let sizesCacheState: { data: ApiCatalogSize[]; timestamp: number } | null = null;
+
+// Получение списка цветов для фильтров (с in-memory кешем)
 export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
+  if (colorsCacheState && Date.now() - colorsCacheState.timestamp < FILTERS_CACHE_DURATION) {
+    return colorsCacheState.data;
+  }
   try {
     const response = await fetch(`${CATALOG_API_URL}colors/`, {
       method: "GET",
@@ -182,15 +190,20 @@ export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
     if (!response.ok) {
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
-    return response.json();
+    const data = await response.json();
+    colorsCacheState = { data, timestamp: Date.now() };
+    return data;
   } catch (error) {
     console.error("Error fetching catalog colors:", error);
-    return [];
+    return colorsCacheState?.data ?? [];
   }
 };
 
-// Получение списка размеров для фильтров
+// Получение списка размеров для фильтров (с in-memory кешем)
 export const fetchCatalogSizes = async (): Promise<ApiCatalogSize[]> => {
+  if (sizesCacheState && Date.now() - sizesCacheState.timestamp < FILTERS_CACHE_DURATION) {
+    return sizesCacheState.data;
+  }
   try {
     const response = await fetch(`${CATALOG_API_URL}sizes/`, {
       method: "GET",
@@ -200,10 +213,12 @@ export const fetchCatalogSizes = async (): Promise<ApiCatalogSize[]> => {
     if (!response.ok) {
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
-    return response.json();
+    const data = await response.json();
+    sizesCacheState = { data, timestamp: Date.now() };
+    return data;
   } catch (error) {
     console.error("Error fetching catalog sizes:", error);
-    return [];
+    return sizesCacheState?.data ?? [];
   }
 };
 

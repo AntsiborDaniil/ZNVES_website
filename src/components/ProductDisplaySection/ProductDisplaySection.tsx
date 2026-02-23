@@ -108,12 +108,6 @@ const ProductDisplaySection = ({
     loadProducts();
   }, [title]);
 
-  // Предзагрузка в кеш при монтировании, чтобы карточки быстрее появлялись при повторном открытии
-  useEffect(() => {
-    fetchNewInProducts().catch(() => {});
-    fetchAllCatalogProducts().catch(() => {});
-  }, []);
-
   const handlePrev = () => {
     if (!isBeginning && swiperRef.current) {
       swiperRef.current.slidePrev();
@@ -186,7 +180,7 @@ const ProductDisplaySection = ({
       return;
     }
 
-    const prefetchCount = Math.min(products.length, 6);
+    const prefetchCount = Math.min(products.length, 3);
     const routesToPrefetch = products
       .slice(0, prefetchCount)
       .map((product) => `/catalog/${product.slug || product.id}`);
@@ -349,6 +343,7 @@ const ProductDisplaySection = ({
                       productId={product.id}
                       showAddToCart={false}
                       isSliderCard={true}
+                      colorLabel={product.colors?.[0]?.value ?? product.color}
                     />
                   </Link>
                 </SwiperSlide>

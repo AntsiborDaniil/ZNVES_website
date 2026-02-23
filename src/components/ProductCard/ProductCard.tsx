@@ -23,6 +23,8 @@ type ProductCardProps = {
   showAddToCart?: boolean;
   isSliderCard?: boolean;
   variant?: "slider" | "grid";
+  /** Подпись цвета для корзины (чтобы не дергать API colors на cart) */
+  colorLabel?: string;
 };
 
 const ProductCard = ({
@@ -34,6 +36,7 @@ const ProductCard = ({
   showAddToCart = true,
   isSliderCard = false,
   variant = "slider",
+  colorLabel: colorLabelProp,
 }: ProductCardProps) => {
   const { addItem } = useCart();
   const { showToast } = useToast();
@@ -140,7 +143,7 @@ const ProductCard = ({
       product.availableColors[0]?.value || product.color,
       1,
       undefined,
-      product.availableColors[0]?.label
+      colorLabelProp ?? product.availableColors[0]?.label
     );
 
     showToast("Добавлено в корзину");

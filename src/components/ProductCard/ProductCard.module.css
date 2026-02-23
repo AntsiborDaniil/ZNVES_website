@@ -55,8 +55,8 @@
 
 .newBadge {
   position: absolute;
-  top: -90px;
-  right: -20px;
+  top: 35px;
+  right: 30px;
   background-color: #525252;
   color: #f2f0ec;
   padding: 7px 14px;
@@ -136,8 +136,8 @@
   }
 
   .newBadge {
-    top: -70px;
-    right: -20px;
+    top: 25px;
+    right: 20px;
     font-size: 20px;
     padding: 5px 14px;
   }
@@ -154,6 +154,8 @@
 
 @media (max-width: 1024px) {
     .newBadge {
+        top: 25px;
+        right: 20px;
         font-size: 16px;
         padding: 3px 12px;
     }
@@ -179,8 +181,8 @@
     }
 
   .newBadge {
-    top: -55px;
-    right: -5px;
+    top: 20px;
+    right: 20px;
   }
 
   .addToCartButton {
@@ -218,6 +220,11 @@
       width: auto;
       min-width: 0;
     }
+
+    .newBadge {
+        top: -0px;
+        right: 20px;
+      }
 
     .productCard.gridCard .imageWrapper {
       flex: 1;
@@ -257,12 +264,11 @@
   }
 
   .productCard.sliderCard .newBadge {
-    top: -55px;
-    right: -12px;
+    top: 25px;
+    right: 20px;
     align-items: center;
     border-radius: 4.41px;
-    padding: 0.5px 10px;
-    font-size: 12.26px;
+
   }
 
   .productCard.sliderCard .productTitle {

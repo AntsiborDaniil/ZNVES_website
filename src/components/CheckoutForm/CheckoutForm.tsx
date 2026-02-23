@@ -216,8 +216,10 @@ const CheckoutForm = ({
     return () => clearInterval(id);
   }, []);
 
-  // Загрузка цветов с API для отображения на русском (slug → value)
+  // Загрузка цветов только если есть позиции без colorLabel
   useEffect(() => {
+    const needsColors = items.some((item) => !item.colorLabel);
+    if (!needsColors) return;
     fetchCatalogColors().then((colors) => {
       const map: Record<string, string> = {};
       colors.forEach((c) => {
@@ -225,7 +227,7 @@ const CheckoutForm = ({
       });
       setColorSlugToLabel(map);
     });
-  }, []);
+  }, [items]);
 
   // Устанавливаем город "Москва" при выборе курьерской доставки
   useEffect(() => {

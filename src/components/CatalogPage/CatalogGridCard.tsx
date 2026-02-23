@@ -31,6 +31,8 @@ const CatalogGridCard = ({ product }: CatalogGridCardProps) => {
   const imageContainerRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const hasPrefetchedRef = useRef(false);
+  const prefetchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const PREFETCH_DELAY_MS = 150;
 
   useEffect(() => {
     setLoadedStates(new Array(imageList.length).fill(false));
@@ -75,14 +77,24 @@ const CatalogGridCard = ({ product }: CatalogGridCardProps) => {
   };
 
   const prefetchProduct = useCallback(() => {
-    if (hasPrefetchedRef.current) {
-      return;
-    }
+    if (hasPrefetchedRef.current) return;
+    if (prefetchTimeoutRef.current) return;
 
-    const productSlug = product.slug || product.id;
-    void router.prefetch(`/catalog/${productSlug}`);
-    hasPrefetchedRef.current = true;
+    prefetchTimeoutRef.current = setTimeout(() => {
+      prefetchTimeoutRef.current = null;
+      if (hasPrefetchedRef.current) return;
+      const productSlug = product.slug || product.id;
+      void router.prefetch(`/catalog/${productSlug}`);
+      hasPrefetchedRef.current = true;
+    }, PREFETCH_DELAY_MS);
   }, [router, product.id, product.slug]);
+
+  const cancelPrefetch = useCallback(() => {
+    if (prefetchTimeoutRef.current) {
+      clearTimeout(prefetchTimeoutRef.current);
+      prefetchTimeoutRef.current = null;
+    }
+  }, []);
 
   return (
     <Link
@@ -90,6 +102,7 @@ const CatalogGridCard = ({ product }: CatalogGridCardProps) => {
       className={styles.catalogCardLink}
       aria-label={`Открыть товар ${product.title}`}
       onPointerEnter={prefetchProduct}
+      onPointerLeave={cancelPrefetch}
       onFocus={prefetchProduct}
     >
       <article className={styles.catalogCard}>
