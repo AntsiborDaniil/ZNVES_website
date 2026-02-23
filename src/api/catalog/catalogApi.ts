@@ -41,6 +41,12 @@ const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProd
   // Генерируем стабильный ID на основе slug
   const id = hashString(apiProduct.slug) || index + 1;
 
+  const colors = apiProduct.colors ?? [];
+  const sizes = apiProduct.sizes ?? [];
+  const defaultColor = colors[0]?.slug ?? "";
+  const defaultSize = sizes[0]?.slug ?? "";
+  const variants = apiProduct.variants ?? undefined;
+
   return {
     id,
     slug: apiProduct.slug,
@@ -50,8 +56,11 @@ const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProd
     images,
     isNew: apiProduct.is_new,
     category,
-    color: "green",
-    size: "m",
+    color: defaultColor,
+    size: defaultSize,
+    colors: colors.length > 0 ? colors : undefined,
+    sizes: sizes.length > 0 ? sizes : undefined,
+    variants,
     sortOrder: index,
   };
 };

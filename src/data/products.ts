@@ -1002,5 +1002,11 @@ export const toCatalogProduct = (product: ProductDetail): CatalogProduct => ({
     category: product.category,
     color: product.color,
     size: product.size,
+    colors: product.availableColors?.map((c) => ({
+        slug: c.value,
+        value: c.label,
+        hex: c.hex ?? "",
+    })),
+    sizes: product.availableSizes?.map((s) => ({ slug: s, value: s })),
     sortOrder: product.sortOrder,
 });

@@ -1,12 +1,15 @@
 import type { CatalogProduct } from "../types/products";
 
-// Типы для API ответа
+// Типы для API ответа (совпадают с /api/catalog)
 type ApiProduct = {
   slug: string;
   name: string;
   price: string;
   is_new: boolean;
   images: string[];
+  colors?: { slug: string; value: string; hex: string }[];
+  sizes?: { slug: string; value: string }[];
+  variants?: { color_slug: string; size_slugs: string[] }[];
 };
 
 type CatalogApiParams = {
@@ -82,16 +85,26 @@ const transformApiProduct = (
     return Math.abs(hash);
   };
 
+  const colors = apiProduct.colors ?? [];
+  const sizes = apiProduct.sizes ?? [];
+  const defaultColor = colors[0]?.slug ?? "";
+  const defaultSize = sizes[0]?.slug ?? "";
+  const variants = apiProduct.variants ?? undefined;
+
   return {
     id: generateId(apiProduct.slug),
+    slug: apiProduct.slug,
     title: apiProduct.name,
     price: formatPrice(apiProduct.price),
     priceValue,
     images: processImages(apiProduct.images),
     isNew: apiProduct.is_new,
     category: category || "All",
-    color: "",
-    size: "",
+    color: defaultColor,
+    size: defaultSize,
+    colors: colors.length > 0 ? colors : undefined,
+    sizes: sizes.length > 0 ? sizes : undefined,
+    variants,
     sortOrder: index,
   };
 };

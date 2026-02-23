@@ -46,6 +46,17 @@ type FilterOption = {
   label: string;
 };
 
+/** Строит варианты из colors×sizes, когда с API не пришли variants (один вариант на цвет — все размеры товара). */
+function buildPseudoVariants(product: CatalogProduct): { color_slug: string; size_slugs: string[] }[] {
+  const colors = product.colors ?? [];
+  const sizes = product.sizes ?? [];
+  if (!colors.length || !sizes.length) return [];
+  return colors.map((c) => ({
+    color_slug: c.slug,
+    size_slugs: sizes.map((s) => s.slug),
+  }));
+}
+
 const orderOptions: FilterOption[] = [
   { value: "popular", label: "По умолчанию" },
   { value: "price-asc", label: "Сначала дешевле" },
@@ -448,16 +459,54 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
       );
     }
 
-    if (colorFilter !== "all") {
-      currentProducts = currentProducts.filter(
-        (product) => product.color === colorFilter
-      );
-    }
+    // Используем состояние фильтров (обновляется сразу при смене селекта), чтобы фильтр срабатывал без задержки от router.push
+    const colorActive = (colorFilter ?? "").trim() || "all";
+    const sizeActive = (sizeFilter ?? "").trim() || "all";
+    const colorNorm = colorActive.toLowerCase();
+    const sizeNorm = sizeActive.toLowerCase();
 
-    if (sizeFilter !== "all") {
-      currentProducts = currentProducts.filter(
-        (product) => product.size === sizeFilter
-      );
+    const bothFiltersSet = colorActive !== "all" && sizeActive !== "all";
+
+    if (bothFiltersSet) {
+      // Одна логика: пара (цвет + размер) есть в вариантах. Варианты — с API или строим из colors×sizes (каждый цвет — все размеры товара).
+      currentProducts = currentProducts.filter((product) => {
+        const variantList = product.variants?.length
+          ? product.variants
+          : buildPseudoVariants(product);
+        if (!variantList.length) return false;
+        return variantList.some((v) => {
+          const vColor = (v.color_slug ?? "").toLowerCase().trim();
+          if (vColor !== colorNorm) return false;
+          const vAny = v as { size_slugs?: string[]; size_slug?: string };
+          const sizeList = Array.isArray(vAny.size_slugs)
+            ? vAny.size_slugs
+            : vAny.size_slug != null
+              ? [vAny.size_slug]
+              : [];
+          return sizeList.some(
+            (sz) => String(sz).toLowerCase().trim() === sizeNorm
+          );
+        });
+      });
+    } else {
+      if (colorActive !== "all") {
+        currentProducts = currentProducts.filter((product) =>
+          product.colors?.length
+            ? product.colors.some(
+                (c) => (c.slug ?? "").toLowerCase().trim() === colorNorm
+              )
+            : (product.color ?? "").toLowerCase().trim() === colorNorm
+        );
+      }
+      if (sizeActive !== "all") {
+        currentProducts = currentProducts.filter((product) =>
+          product.sizes?.length
+            ? product.sizes.some(
+                (s) => (s.slug ?? "").toLowerCase().trim() === sizeNorm
+              )
+            : (product.size ?? "").toLowerCase().trim() === sizeNorm
+        );
+      }
     }
 
     switch (order) {
@@ -591,9 +640,9 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
         ) : (
           <>
             <div className={styles.productsGrid}>
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product, index) => (
                 <Link
-                  key={product.id}
+                  key={`${String(product.slug ?? product.id)}-${index}`}
                   href={`/catalog/${product.slug || product.id}`}
                   className={styles.catalogCardLink}
                   aria-label={`Открыть товар ${product.title}`}
