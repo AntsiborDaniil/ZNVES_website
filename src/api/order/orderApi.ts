@@ -139,10 +139,6 @@ export const createOrder = async (
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
-    const csrfToken = getCsrfToken();
-    if (csrfToken) {
-      headers["X-CSRFToken"] = csrfToken;
-    }
 
     const response = await fetch(ORDER_API_URL, {
       method: "POST",
