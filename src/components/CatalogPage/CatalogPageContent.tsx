@@ -101,8 +101,8 @@ const FilterDropdown = ({
   const selectedOption =
     options.find((option) => option.value === value) ?? options[0];
 
-  const displayText =
-    value === options[0]?.value ? label : selectedOption?.label ?? label;
+  const displayValue =
+    value === options[0]?.value ? options[0]?.label ?? label : selectedOption?.label ?? label;
 
   const handleToggle = () => {
     setIsOpen((prev) => !prev);
@@ -137,7 +137,8 @@ const FilterDropdown = ({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
-        <span className={styles.filterValue}>{displayText}</span>
+        <span className={styles.filterLabel}>{label}</span>
+        <span className={styles.filterValue}>{displayValue}</span>
         <span className={styles.filterIcon} aria-hidden="true" />
       </button>
       <ul className={styles.filterMenu} role="listbox" aria-hidden={!isOpen}>
@@ -199,6 +200,8 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const filtersButtonRef = useRef<HTMLButtonElement | null>(null);
   const filtersButtonDesktopRef = useRef<HTMLButtonElement | null>(null);
   const categoriesRef = useRef<HTMLElement | null>(null);
+  /** true после первой успешной загрузки — при смене категории скелетон не показываем */
+  const hasLoadedOnceRef = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
@@ -294,7 +297,9 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   // Загрузка товаров из API с debounce
   useEffect(() => {
     const loadProducts = async () => {
-      setIsLoading(true);
+      if (!hasLoadedOnceRef.current) {
+        setIsLoading(true);
+      }
       try {
         if (title === "NEW IN") {
           // Для страницы NEW IN загружаем только новые товары
@@ -321,6 +326,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
         console.error("Error loading products:", error);
         setProducts([]);
       } finally {
+        hasLoadedOnceRef.current = true;
         setIsLoading(false);
       }
     };
@@ -662,10 +668,32 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
             </div>
 
             {filteredProducts.length === 0 && (
-              <p className={styles.emptyState}>
-                Нет товаров, соответствующих выбранным фильтрам. Попробуйте
-                изменить параметры.
-              </p>
+              <div className={styles.emptyStateWrap}>
+                <div className={styles.emptyStateIcon} aria-hidden>
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <path d="M16 10a4 4 0 01-8 0" />
+                  </svg>
+                </div>
+                <h2 className={styles.emptyStateTitle}>Ничего не найдено</h2>
+                <p className={styles.emptyStateText}>
+                  Нет товаров, подходящих под выбранные фильтры. Измените цвет, размер или порядок сортировки.
+                </p>
+                {(colorFilter !== "all" || sizeFilter !== "all" || order !== "popular") && (
+                  <button
+                    type="button"
+                    className={styles.emptyStateButton}
+                    onClick={() => {
+                      handleColorChange("all");
+                      handleSizeChange("all");
+                      handleOrderChange("popular");
+                    }}
+                  >
+                    Сбросить фильтры
+                  </button>
+                )}
+              </div>
             )}
           </>
         )}
