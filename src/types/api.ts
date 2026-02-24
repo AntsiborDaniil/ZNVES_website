@@ -34,11 +34,6 @@ export type CatalogApiParams = {
   is_new?: boolean;
 };
 
-// Реэкспорт типов для детальной страницы товара
-export type {
-  ApiProductDetail,
-  ApiProductSize,
-  ApiProductColor,
-  ApiWarehouseItem,
-} from "../api/product/productApi";
+// Реэкспорт типов для детальной страницы товара (ApiProductSize и ApiProductColor уже объявлены выше)
+export type { ApiProductDetail, ApiWarehouseItem } from "../api/product/productApi";
 
