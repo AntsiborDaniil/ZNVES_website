@@ -12,6 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ProductCard from "../ProductCard/ProductCard";
+import SliderSkeleton from "./SliderSkeleton";
 import styles from "./ProductDisplaySection.module.css";
 import type { CatalogProduct } from "../../types/products";
 import { fetchNewInProducts, fetchAllCatalogProducts } from "../../api/home/catalogApi";
@@ -283,7 +284,7 @@ const ProductDisplaySection = ({
       </div>
       <div className={styles.sliderContainer}>
         {isLoading ? (
-          <div className={styles.loading}>Загрузка...</div>
+          <SliderSkeleton />
         ) : products.length > 0 ? (
           createElement(
             Swiper as any,

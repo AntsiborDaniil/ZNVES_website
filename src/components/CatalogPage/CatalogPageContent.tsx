@@ -11,6 +11,7 @@ import {
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import styles from "./CatalogPage.module.css";
 import ProductCard from "../ProductCard/ProductCard";
+import CatalogSkeleton from "./CatalogSkeleton";
 import Link from "next/link";
 import Image from "next/image";
 import type { CatalogProduct } from "../../types/products";
@@ -636,7 +637,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
 
       <section className={styles.productsSection}>
         {isLoading ? (
-          <div className={styles.emptyState}>Загрузка...</div>
+          <CatalogSkeleton />
         ) : (
           <>
             <div className={styles.productsGrid}>
