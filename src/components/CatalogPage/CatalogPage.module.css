@@ -688,4 +688,10 @@
   .categoryButton {
     font-size: 13px;
   }
+
+  /* Позиция бейджа "new" на карточках: задайте свои top и right */
+  .productsGrid {
+    --productCard-newBadge-top: 0;
+    --productCard-newBadge-right: 20px;
+  }
 }

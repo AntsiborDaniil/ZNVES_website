@@ -221,6 +221,14 @@
       min-width: 0;
     }
 
+    /* Каталог / New in: свои top/right задавайте через --productCard-newBadge-top и --productCard-newBadge-right на родителе (например .productsGrid в CatalogPage.module.css) */
+    .productCard.gridCard .newBadge {
+      top: 18px;
+      right: 18px;
+      font-size: 14px;
+      padding: 2px 10px;
+    }
+
     .newBadge {
         top: -0px;
         right: 20px;

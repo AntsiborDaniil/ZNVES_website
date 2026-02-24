@@ -44,19 +44,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ru">
-      <head>
-        <link
-          rel="preload"
-          href="/images/hero-background.png"
-          as="image"
-        />
-        <link
-          rel="preload"
-          href="/images/heroMobile.png"
-          as="image"
-          media="(max-width: 768px)"
-        />
-      </head>
+      <head />
       <body
         className={`${roboto.variable} ${inter.variable} ${montserrat.variable} ${plusJakarta.variable}`}
       >
