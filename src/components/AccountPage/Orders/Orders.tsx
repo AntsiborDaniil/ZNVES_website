@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import styles from "./Orders.module.css";
 import Image from "next/image";
 import { getMyOrders, apiOrderToAccountView, type AccountOrderView } from "../../../api/order/orderApi";
@@ -176,11 +177,20 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
   if (orders.length === 0) {
     return (
       <section className={styles.panel}>
-        <div className={styles.emptyState}>
-          <h2 className={styles.emptyTitle}>У вас пока нет заказов</h2>
-          <p className={styles.emptyText}>
-            После оформления заказа он появится здесь
+        <div className={styles.emptyOrdersWrap}>
+          <div className={styles.emptyOrdersIcon} aria-hidden>
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+              <path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12" />
+            </svg>
+          </div>
+          <h2 className={styles.emptyOrdersTitle}>У вас пока нет заказов</h2>
+          <p className={styles.emptyOrdersText}>
+            После оформления заказа он появится здесь. Пока можно выбрать что-нибудь в каталоге.
           </p>
+          <Link href="/catalog" className={styles.emptyOrdersLink}>
+            Перейти в каталог
+          </Link>
         </div>
       </section>
     );
