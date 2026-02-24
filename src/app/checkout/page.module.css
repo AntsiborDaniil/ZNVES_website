@@ -7,8 +7,10 @@
 }
 
 .main {
+  width: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
   padding: 20px clamp(15px, 8vw, 210px) 106px clamp(15px, 8vw, 210px);
 }
 
@@ -672,6 +674,16 @@ textarea.input::placeholder {
   display: none !important;
 }
 
+/* После клика по кнопке «Продолжить» в виджете ПВЗ скрываем её (класс вешается из Map.tsx) — на всех дисплеях, cart и checkout */
+.checkoutMapContainer :global(#delivery-widget.widget-continue-clicked .widget__list-button) {
+  display: none !important;
+}
+
+/* Центрирование галочки в кружке выбора ПВЗ виджета */
+.checkoutMapContainer :global(.widget__location-checkbox-label::after) {
+  margin-top: 3px;
+}
+
 /* Мобильная версия виджета ПВЗ */
 @media (max-width: 768px) {
   .checkoutMapContainer :global(#delivery-widget) {
@@ -1311,35 +1323,84 @@ textarea.input::placeholder {
   margin: 0;
 }
 
-/* Возврат на сайт после оплаты */
+/* Возврат на сайт после оплаты — карточка с иконкой */
 .paymentReturnBlock {
+  width: 100%;
+  max-width: 560px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 20px;
-  padding: 80px 20px;
-  max-width: 560px;
+  gap: 24px;
+  padding: 48px 32px;
   margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(82, 82, 82, 0.08), 0 1px 3px rgba(82, 82, 82, 0.06);
+  border: 1px solid rgba(82, 82, 82, 0.1);
+  transition: box-shadow 0.25s ease;
+}
+
+.paymentReturnBlock:hover {
+  box-shadow: 0 8px 32px rgba(82, 82, 82, 0.1), 0 2px 6px rgba(82, 82, 82, 0.06);
+}
+
+.paymentReturnBlockSuccess {
+  border-top: 4px solid #22a55a;
+}
+
+.paymentReturnBlockSuccess .paymentReturnIcon {
+  background: rgba(34, 165, 90, 0.12);
+  color: #22a55a;
+}
+
+.paymentReturnBlockError {
+  border-top: 4px solid #c0392b;
+}
+
+.paymentReturnBlockError .paymentReturnIcon {
+  background: rgba(192, 57, 43, 0.12);
+  color: #c0392b;
+}
+
+.paymentReturnIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.paymentReturnBlock:hover .paymentReturnIcon {
+  transform: scale(1.05);
+}
+
+.paymentReturnIcon svg {
+  width: 36px;
+  height: 36px;
+  display: block;
 }
 
 .paymentReturnTitle {
   font-weight: 600;
-  font-size: 32px;
+  font-size: 28px;
   line-height: 1.3;
-  color: #525252;
+  color: #1f1f1f;
   margin: 0;
 }
 
 .paymentReturnText {
-  font-size: 18px;
-  color: #7a7a79;
+  font-size: 17px;
+  color: #525252;
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .paymentReturnHint {
-  font-size: 16px;
+  font-size: 15px;
   color: #7a7a79;
   margin: 0;
   line-height: 1.5;
@@ -1360,17 +1421,88 @@ textarea.input::placeholder {
 .paymentReturnActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
   justify-content: center;
-  margin-top: 12px;
+  align-items: center;
+  margin-top: 4px;
 }
 
 .paymentReturnActions .shopButton {
   margin-top: 0;
+  padding: 14px 28px;
+  font-size: 16px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
-.paymentReturnActions .backLink {
+.paymentReturnActions .shopButton:hover {
+  transform: translateY(-1px);
+}
+
+.paymentReturnActions .backLink,
+.paymentReturnActions .paymentReturnLink {
   margin-top: 0;
+  padding: 14px 28px;
+  font-size: 16px;
+  border-radius: 8px;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.paymentReturnActions .backLink:hover,
+.paymentReturnActions .paymentReturnLink:hover {
+  color: #1f1f1f;
+  transform: translateY(-1px);
+}
+
+.paymentReturnLink {
+  color: #525252;
+  text-decoration: none;
+  font-weight: 500;
+  border: 1px solid rgba(82, 82, 82, 0.35);
+  background: transparent;
+  display: inline-block;
+}
+
+.paymentReturnLink:hover {
+  border-color: #525252;
+  background: rgba(82, 82, 82, 0.04);
+}
+
+@media (max-width: 600px) {
+  .paymentReturnBlock {
+    padding: 32px 20px;
+    gap: 20px;
+  }
+
+  .paymentReturnIcon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .paymentReturnIcon svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .paymentReturnTitle {
+    font-size: 24px;
+  }
+
+  .paymentReturnText {
+    font-size: 16px;
+  }
+
+  .paymentReturnActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .paymentReturnActions .shopButton,
+  .paymentReturnActions .paymentReturnLink {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
 }
 
 .shopButton {

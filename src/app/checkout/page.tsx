@@ -35,22 +35,23 @@ const CheckoutPageContent = () => {
     router.push("/catalog");
   };
 
-  // Обработка возврата после оплаты (return_url с платёжной страницы). Очищаем корзину при успехе или ошибке.
+  // Обработка возврата после оплаты (return_url с платёжной страницы). Очищаем корзину при успехе или ошибке. URL не трогаем — так можно смотреть стили и не терять состояние.
   useEffect(() => {
     const payment = searchParams.get("payment");
     if (payment === "success" || payment === "error") {
       setPaymentReturnStatus(payment);
       clearCart();
-      router.replace("/checkout", { scroll: false });
     }
-  }, [searchParams, router, clearCart]);
+  }, [searchParams, clearCart]);
 
-  // Редирект на страницу корзины при ширине <= 1200px
+  // Редирект на страницу корзины при ширине <= 1200px (не делаем, если в URL уже результат оплаты — чтобы можно было посмотреть экран успеха/ошибки)
   useEffect(() => {
+    const payment = searchParams.get("payment");
+    if (payment === "success" || payment === "error") return;
     if (width > 0 && width <= 1200) {
       router.push("/cart?autoCheckout=true");
     }
-  }, [width, router]);
+  }, [width, router, searchParams]);
 
   // Показываем пустую корзину только если модалка не открыта и не возврат с оплаты
   if (items.length === 0 && !showSuccessModal && !paymentReturnStatus) {
@@ -78,7 +79,12 @@ const CheckoutPageContent = () => {
       <Header variant="green" />
       <main className={styles.main}>
         {paymentReturnStatus === "success" && (
-          <div className={styles.paymentReturnBlock}>
+          <div className={`${styles.paymentReturnBlock} ${styles.paymentReturnBlockSuccess}`}>
+            <div className={styles.paymentReturnIcon} aria-hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
             <p className={styles.paymentReturnTitle}>Оплата прошла успешно</p>
             <p className={styles.paymentReturnText}>
               Заказ оплачен. Подробности можно посмотреть в личном кабинете — вся информация по заказу также придёт на вашу почту.
@@ -87,17 +93,20 @@ const CheckoutPageContent = () => {
               <Link href="/account" className={styles.shopButton}>
                 Личный кабинет
               </Link>
-            </div>
-            <p className={styles.paymentReturnHint}>
-              Можете так же вернуться{" "}
-              <Link href="/catalog" className={styles.catalogInlineLink}>
-                в каталог
+              <Link href="/catalog" className={styles.paymentReturnLink}>
+                В каталог
               </Link>
-            </p>
+            </div>
           </div>
         )}
         {paymentReturnStatus === "error" && (
-          <div className={styles.paymentReturnBlock}>
+          <div className={`${styles.paymentReturnBlock} ${styles.paymentReturnBlockError}`}>
+            <div className={styles.paymentReturnIcon} aria-hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M15 9l-6 6M9 9l6 6" />
+              </svg>
+            </div>
             <p className={styles.paymentReturnTitle}>Оплата не выполнена</p>
             <p className={styles.paymentReturnText}>
               Оплата была отменена или произошла ошибка. Можно попробовать оформить заказ снова.
@@ -106,7 +115,10 @@ const CheckoutPageContent = () => {
               <Link href="/cart" className={styles.shopButton}>
                 Вернуться в корзину
               </Link>
-              <Link href="/catalog" className={styles.backLink}>
+              <Link href="/account" className={styles.paymentReturnLink}>
+                Личный кабинет
+              </Link>
+              <Link href="/catalog" className={styles.paymentReturnLink}>
                 В каталог
               </Link>
             </div>

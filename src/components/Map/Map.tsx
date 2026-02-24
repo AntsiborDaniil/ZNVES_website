@@ -183,6 +183,25 @@ const Map = ({
     return () => document.removeEventListener("YaNddWidgetPointSelected", handler);
   }, [isPickup, city, onAddressSelect, onPvzListLoaded]);
 
+  // После клика по кнопке «Продолжить» в виджете добавляем класс на контейнер — в CSS по нему скрываем кнопку (без помех работе виджета)
+  useEffect(() => {
+    if (!isPickup) return;
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const widgetRoot = document.getElementById(CONTAINER_ID);
+      if (!widgetRoot || !target.closest?.(".widget__list-button")) return;
+      const isInsideWidget = widgetRoot.contains(target);
+      if (!isInsideWidget) return;
+      setTimeout(() => {
+        widgetRoot.classList.add("widget-continue-clicked");
+      }, 0);
+    };
+
+    document.addEventListener("click", handleClick, false);
+    return () => document.removeEventListener("click", handleClick, false);
+  }, [isPickup]);
+
   // Загрузка скрипта и инициализация виджета ПВЗ
   useEffect(() => {
     if (!isPickup || !containerRef.current) return;

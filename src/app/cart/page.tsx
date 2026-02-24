@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense, useRef } from "react";
+import dynamic from "next/dynamic";
 import styles from "./page.module.css";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,14 +12,30 @@ import { useCart } from "../../contexts/CartContext";
 import { getProductById } from "../../data/products";
 import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 import { useWindowSize } from "../../hooks/useWindowSize";
-import OrderSuccessModal from "../../components/OrderSuccessModal/OrderSuccessModal";
-import CartOrderErrorModal from "../../components/CartOrderErrorModal/CartOrderErrorModal";
-import CheckoutForm from "../../components/CheckoutForm/CheckoutForm";
-import PromoErrorToast from "../../components/PromoErrorToast/PromoErrorToast";
 import {
   buildCartItemsForPromo,
   applyPromoCode,
 } from "../../api/discounts/discountsApi";
+
+const OrderSuccessModal = dynamic(
+  () => import("../../components/OrderSuccessModal/OrderSuccessModal").then((m) => ({ default: m.default })),
+  { ssr: false }
+);
+
+const CartOrderErrorModal = dynamic(
+  () => import("../../components/CartOrderErrorModal/CartOrderErrorModal").then((m) => ({ default: m.default })),
+  { ssr: false }
+);
+
+const CheckoutForm = dynamic(
+  () => import("../../components/CheckoutForm/CheckoutForm").then((m) => ({ default: m.default })),
+  { ssr: false }
+);
+
+const PromoErrorToast = dynamic(
+  () => import("../../components/PromoErrorToast/PromoErrorToast").then((m) => ({ default: m.default })),
+  { ssr: false }
+);
 
 const CartPageContent = () => {
   const {
@@ -88,15 +105,14 @@ const CartPageContent = () => {
     requestAnimationFrame(animation);
   };
 
-  // Обработка возврата после оплаты (return_url/cancel_url с платёжной страницы). Очищаем корзину при успехе или ошибке.
+  // Обработка возврата после оплаты (return_url/cancel_url с платёжной страницы). Очищаем корзину при успехе или ошибке. URL не трогаем — так можно смотреть стили.
   useEffect(() => {
     const payment = searchParams.get("payment");
     if (payment === "success" || payment === "error") {
       setPaymentReturnStatus(payment);
       clearCart();
-      router.replace("/cart", { scroll: false });
     }
-  }, [searchParams, router, clearCart]);
+  }, [searchParams, clearCart]);
 
   // Очищаем корзину только после закрытия модалки, чтобы модалка показывалась поверх корзины
   useEffect(() => {
@@ -268,7 +284,12 @@ const CartPageContent = () => {
         <main className={styles.main}>
           <div className={styles.cartContainer}>
             {paymentReturnStatus === "success" && (
-              <div className={styles.paymentReturnBlock}>
+              <div className={`${styles.paymentReturnBlock} ${styles.paymentReturnBlockSuccess}`}>
+                <div className={styles.paymentReturnIcon} aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </div>
                 <p className={styles.paymentReturnTitle}>Оплата прошла успешно</p>
                 <p className={styles.paymentReturnText}>
                   Заказ оплачен. Подробности можно посмотреть в личном кабинете — вся информация по заказу также придёт на вашу почту.
@@ -277,17 +298,20 @@ const CartPageContent = () => {
                   <Link href="/account" className={styles.shopButton}>
                     Личный кабинет
                   </Link>
-                </div>
-                <p className={styles.paymentReturnHint}>
-                  Можете так же вернуться{" "}
-                  <Link href="/catalog" className={styles.catalogInlineLink}>
-                    в каталог
+                  <Link href="/catalog" className={styles.paymentReturnLink}>
+                    В каталог
                   </Link>
-                </p>
+                </div>
               </div>
             )}
             {paymentReturnStatus === "error" && (
-              <div className={styles.paymentReturnBlock}>
+              <div className={`${styles.paymentReturnBlock} ${styles.paymentReturnBlockError}`}>
+                <div className={styles.paymentReturnIcon} aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M15 9l-6 6M9 9l6 6" />
+                  </svg>
+                </div>
                 <p className={styles.paymentReturnTitle}>Оплата не выполнена</p>
                 <p className={styles.paymentReturnText}>
                   Оплата была отменена или произошла ошибка. Можно попробовать оформить заказ снова.
@@ -295,6 +319,9 @@ const CartPageContent = () => {
                 <div className={styles.paymentReturnActions}>
                   <Link href="/catalog" className={styles.shopButton}>
                     В каталог
+                  </Link>
+                  <Link href="/account" className={styles.paymentReturnLink}>
+                    Личный кабинет
                   </Link>
                 </div>
               </div>
@@ -434,6 +461,7 @@ const CartPageContent = () => {
                 <CheckoutForm
                   onOrderSubmit={handleOrderSubmit}
                   showRightColumn={false}
+                  initialColorSlugToLabel={colorSlugToLabel}
                 />
               </div>
             )}

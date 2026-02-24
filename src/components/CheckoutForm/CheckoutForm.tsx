@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -10,16 +11,30 @@ import { getProductById } from "../../data/products";
 import { createOrder, getPaymentUrl, getYandexPaymentUrl, invalidateMyOrdersCache, type OrderRequest } from "../../api/order/orderApi";
 import { fetchCatalogProductRaw, type ApiProductDetail } from "../../api/product/productApi";
 import { fetchCatalogColors } from "../../api/catalog/catalogApi";
-import Map, { type PvzListOption } from "../Map/Map";
+import type { PvzListOption } from "../Map/Map";
 import { getAddressSuggestions, type AddressSuggestion } from "../../api/delivery/addressSuggestApi";
 import { useWindowSize } from "../../hooks/useWindowSize";
-import TelegramLoginWidget from "../TelegramLoginWidget/TelegramLoginWidget";
 import styles from "../../app/checkout/page.module.css";
+
+const MapLazy = dynamic(
+  () => import("../Map/Map").then((m) => ({ default: m.default })),
+  { ssr: false }
+);
+
+const TelegramLoginWidgetLazy = dynamic(
+  () => import("../TelegramLoginWidget/TelegramLoginWidget").then((m) => ({ default: m.default })),
+  { ssr: false }
+);
+
+/** Кеш по slug на время сессии — меньше повторных запросов при оформлении заказа */
+const productRawCache = new Map<string, ApiProductDetail | null>();
 
 interface CheckoutFormProps {
   onOrderSubmit?: (orderNumber: string) => void;
   showRightColumn?: boolean;
   className?: string;
+  /** Цвета с каталога (с cart), чтобы не дублировать запрос при открытии формы на cart */
+  initialColorSlugToLabel?: Record<string, string>;
 }
 
 const ORDER_ERROR_STORAGE_KEY = "znves:orderError";
@@ -62,6 +77,7 @@ const CheckoutForm = ({
   onOrderSubmit,
   showRightColumn = true,
   className = "",
+  initialColorSlugToLabel: initialColors = {},
 }: CheckoutFormProps) => {
   const router = useRouter();
   const { items, getTotalPrice, clearCart, appliedPromo, setAppliedPromo } = useCart();
@@ -129,7 +145,7 @@ const CheckoutForm = ({
   const [pvzCode, setPvzCode] = useState<string>(""); // Для CDEK
   const [pvzId, setPvzId] = useState<string>(""); // Для Яндекс
   const [errors, setErrors] = useState<Record<string, boolean>>({});
-  const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>({});
+  const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>(initialColors);
   
   // Refs для полей формы
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -216,10 +232,11 @@ const CheckoutForm = ({
     return () => clearInterval(id);
   }, []);
 
-  // Загрузка цветов только если есть позиции без colorLabel
+  // Загрузка цветов только если есть позиции без colorLabel; не дублируем запрос, если передан initialColorSlugToLabel (с cart)
   useEffect(() => {
     const needsColors = items.some((item) => !item.colorLabel);
     if (!needsColors) return;
+    if (Object.keys(initialColors).length > 0) return;
     fetchCatalogColors().then((colors) => {
       const map: Record<string, string> = {};
       colors.forEach((c) => {
@@ -227,7 +244,7 @@ const CheckoutForm = ({
       });
       setColorSlugToLabel(map);
     });
-  }, [items]);
+  }, [items, initialColors]);
 
   // Устанавливаем город "Москва" при выборе курьерской доставки
   useEffect(() => {
@@ -245,8 +262,8 @@ const CheckoutForm = ({
     yandex: 0,
   };
 
-  // Расчет итоговой суммы (с учётом промокода, если применён)
-  const calculateTotal = () => {
+  // Расчет итоговой суммы (с учётом промокода) — мемоизация, чтобы не пересчитывать на каждый рендер
+  const totalAmount = useMemo(() => {
     let itemsTotal = getTotalPrice();
     if (appliedPromo) {
       itemsTotal = Math.max(0, itemsTotal - parseFloat(appliedPromo.discount));
@@ -255,7 +272,7 @@ const CheckoutForm = ({
       deliveryPrices[formData.deliveryMethod as keyof typeof deliveryPrices] ||
       0;
     return itemsTotal + deliveryPrice;
-  };
+  }, [getTotalPrice, appliedPromo, formData.deliveryMethod]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ru-RU", {
@@ -940,7 +957,13 @@ const CheckoutForm = ({
       const slugToProduct: Record<string, ApiProductDetail | null> = {};
       await Promise.all(
         uniqueSlugs.map(async (slug) => {
+          const cached = productRawCache.get(slug);
+          if (cached !== undefined) {
+            slugToProduct[slug] = cached;
+            return;
+          }
           const data = await fetchCatalogProductRaw(slug);
+          productRawCache.set(slug, data ?? null);
           if (data) slugToProduct[slug] = data;
         })
       );
@@ -1001,7 +1024,7 @@ const CheckoutForm = ({
 
       // Формируем данные заказа для API
       const orderRequest: OrderRequest = {
-        total_amount: calculateTotal().toFixed(2),
+        total_amount: totalAmount.toFixed(2),
         payment_type: "prepayment",
         delivery_service: deliveryService,
         customer_data: {
@@ -1125,7 +1148,7 @@ const CheckoutForm = ({
         },
         payment: {
           method: formData.paymentMethod,
-          amount: formatPrice(calculateTotal()),
+          amount: formatPrice(totalAmount),
         },
         products: items.map((item) => {
           const fullProduct =
@@ -1153,8 +1176,8 @@ const CheckoutForm = ({
         }),
         total: {
           itemsCount: items.reduce((sum, item) => sum + item.quantity, 0),
-          totalAmount: formatPrice(calculateTotal()),
-          totalAmountValue: calculateTotal(),
+          totalAmount: formatPrice(totalAmount),
+          totalAmountValue: totalAmount,
         },
       };
 
@@ -1192,7 +1215,7 @@ const CheckoutForm = ({
           <div className={styles.telegramSection}>
             <h1 className={styles.title}>Оформление заказа</h1>
             <div className={styles.telegramWidgetWrap}>
-              <TelegramLoginWidget size="large" />
+              <TelegramLoginWidgetLazy size="large" />
             </div>
           </div>
 
@@ -1717,17 +1740,19 @@ const CheckoutForm = ({
                   : undefined
               }
             >
-              <Map
-                key={`${formData.deliveryType}-${formData.deliveryMethod}`}
-                city={formData.pickupCity}
-                onAddressSelect={handleAddressSelect}
-                onPvzListLoaded={setPvzOptions}
-                searchValue={mapSearchValue}
-                onSearchChange={handleMapSearchChange}
-                deliveryMethod={formData.deliveryMethod}
-                deliveryType={formData.deliveryType}
-                selectedPvzCoords={selectedPvzCoords}
-              />
+              {(formData.deliveryType === "cdek" || formData.deliveryType === "yandex") && (
+                <MapLazy
+                  key={`${formData.deliveryType}-${formData.deliveryMethod}`}
+                  city={formData.pickupCity}
+                  onAddressSelect={handleAddressSelect}
+                  onPvzListLoaded={setPvzOptions}
+                  searchValue={mapSearchValue}
+                  onSearchChange={handleMapSearchChange}
+                  deliveryMethod={formData.deliveryMethod}
+                  deliveryType={formData.deliveryType}
+                  selectedPvzCoords={selectedPvzCoords}
+                />
+              )}
             </div>
           </div>
 
@@ -1832,7 +1857,7 @@ const CheckoutForm = ({
                   <div className={styles.summaryRowTotal}>
                     <span className={styles.summaryLabelTotal}>Итого</span>
                     <span className={styles.summaryTotal}>
-                      {formatPrice(calculateTotal())}
+                      {formatPrice(totalAmount)}
                     </span>
                   </div>
                 </div>
@@ -2006,7 +2031,7 @@ const CheckoutForm = ({
                   <div className={styles.summaryRowTotal}>
                     <span className={styles.summaryLabelTotal}>Итого</span>
                     <span className={styles.summaryTotal}>
-                      {formatPrice(calculateTotal())}
+                      {formatPrice(totalAmount)}
                     </span>
                   </div>
                 </div>
