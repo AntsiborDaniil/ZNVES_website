@@ -260,12 +260,19 @@ const CartPageContent = () => {
         <Header variant="green" />
         <main className={styles.main}>
           <div className={styles.cartContainer}>
-            <div className={styles.emptyCart}>
-              <h1 className={styles.emptyTitle}>Корзина пуста</h1>
-              <p className={styles.emptyText}>
+            <div className={styles.emptyCartWrap}>
+              <div className={styles.emptyCartIcon} aria-hidden>
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="9" cy="21" r="1" />
+                  <circle cx="20" cy="21" r="1" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
+              </div>
+              <h2 className={styles.emptyCartTitle}>Корзина пуста</h2>
+              <p className={styles.emptyCartText}>
                 Добавьте товары в корзину, чтобы продолжить покупки
               </p>
-              <Link href="/catalog" className={styles.shopButton}>
+              <Link href="/catalog" className={styles.emptyCartLink}>
                 Перейти в каталог
               </Link>
             </div>
