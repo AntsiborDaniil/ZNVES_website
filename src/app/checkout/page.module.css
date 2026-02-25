@@ -79,12 +79,10 @@
   overflow-y: auto;
   flex: 1;
   min-height: 0;
-  /* Тонкий скроллбар для Firefox */
   scrollbar-width: thin;
   scrollbar-color: rgba(82, 82, 82, 0.3) transparent;
 }
 
-/* Тонкий скроллбар для блока товаров (Webkit браузеры) */
 .orderItemsBlock::-webkit-scrollbar {
   width: 6px;
 }
@@ -654,9 +652,6 @@ textarea.input::placeholder {
   accent-color: #525252;
 }
 
-/* При ширине экрана < 1280px: левая панель виджета и карта делят контейнер 50/50 */
-
-/* Общие стили для карты - используются в checkout и cart */
 .checkoutMapContainer {
   width: 100%;
   border-radius: 3px;
@@ -665,40 +660,33 @@ textarea.input::placeholder {
   z-index: 1;
 }
 
-/* Модификатор для карты курьера — отключаем агрессивное скрытие элементов */
 .checkoutMapContainerCourier {
 }
 
-/* Скрываем контролы Яндекса на карте курьера */
 .checkoutMapContainerCourier :global(.ymaps-2-1-79-controls__control) {
   display: none !important;
 }
 
-/* После клика по кнопке «Продолжить» в виджете ПВЗ скрываем её (класс вешается из Map.tsx) — на всех дисплеях, cart и checkout */
 .checkoutMapContainer :global(#delivery-widget.widget-continue-clicked .widget__list-button) {
   display: none !important;
 }
 
-/* Центрирование галочки в кружке выбора ПВЗ виджета */
 .checkoutMapContainer :global(.widget__location-checkbox-label::after) {
   margin-top: 3px;
 }
 
-/* Мобильная версия виджета ПВЗ */
 @media (max-width: 768px) {
   .checkoutMapContainer :global(#delivery-widget) {
     min-height: 320px;
     height: 100%;
   }
 
-  /* Мобильная версия обычной карты (курьерская доставка) */
   .checkoutMapContainer :global(.ymaps-2-1-79-map) {
     min-height: 320px;
     height: 100%;
   }
 }
 
-/* Скрытие «• Пункты выдачи» в виджете (checkout и cart) при < 480px */
 @media (max-width: 479px) {
   .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(p[class*="title-text-second"]),
   .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(p[class*="widget_title-text"]),
@@ -706,12 +694,10 @@ textarea.input::placeholder {
     display: none !important;
   }
 
-  /* Ограничиваем выпадающий список подсказок (options) контейнером — без display:none, чтобы при повторном вводе options снова открывались */
   .checkoutMapContainer:not(.checkoutMapContainerCourier) {
     overflow: hidden;
   }
 
-  /* После нажатия «Продолжить» и выбора адреса скрываем кнопку; при очистке адреса она снова показывается */
   .hideContinueButton .checkoutMapContainer :global(#delivery-widget button) {
     display: none !important;
   }
@@ -729,7 +715,6 @@ textarea.input::placeholder {
   border-radius: 3px;
 }
 
-/* Скрываем «Как добраться», «Доехать на такси», «Создать свою карту», «Условия использования», «Яндекс карты» — на обеих картах */
 .checkoutMapContainer :global(.ymaps-2-1-79-balloon__route),
 .checkoutMapContainer :global(.ymaps-2-1-79-balloon__taxi),
 .checkoutMapContainer :global(.ymaps-2-1-79-balloon__create-map),
@@ -764,14 +749,12 @@ textarea.input::placeholder {
   pointer-events: none !important;
 }
 
-/* Скрываем кнопки зума (+/-) на карте — только для виджета ПВЗ, не для карты курьера */
 .checkoutMapContainer:not(.checkoutMapContainerCourier) :global([class*="ymaps"][class*="zoom"]) {
   display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;
 }
 
-/* Скрываем лишние элементы интерфейса Яндекс.Карт — только для виджета ПВЗ */
 .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-balloon__route),
 .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-balloon__taxi),
 .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-balloon__create-map),
@@ -803,7 +786,6 @@ textarea.input::placeholder {
 .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(a[href*="yandex.com/maps"]),
 .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(div[class*="ymaps"] > div[class*="copyrights"] a),
 .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(div[class*="ymaps"] > div[class*="copyrights"]),
-/* Более агрессивное скрытие всех элементов внизу карты — только для виджета ПВЗ */
 .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-map > div:last-child),
 .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-map > div:last-child > *),
 .checkoutMapContainer:not(.checkoutMapContainerCourier) :global(.ymaps-2-1-79-map > div:last-child a),
@@ -1323,7 +1305,6 @@ textarea.input::placeholder {
   margin: 0;
 }
 
-/* Возврат на сайт после оплаты — карточка с иконкой */
 .paymentReturnBlock {
   width: 100%;
   max-width: 560px;
@@ -1522,7 +1503,6 @@ textarea.input::placeholder {
   background-color: #1f1f1f;
 }
 
-/* Адаптивность для экранов до 1440px */
 @media (max-width: 1440px) {
   .firstInputs,
   .infoInputs {
