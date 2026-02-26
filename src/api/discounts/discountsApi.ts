@@ -1,6 +1,7 @@
 // API для проверки и применения промокодов
 
 import { API_BASE_URL } from "../../lib/apiConfig";
+import { getCsrfToken } from "../../lib/csrf";
 import { getProductById } from "../../data/products";
 import { fetchCatalogProductRaw, type ApiProductDetail } from "../product/productApi";
 import type { CartItem } from "../../types/cart";
@@ -122,9 +123,13 @@ export async function applyPromoCode(
   if (params.previousDiscount != null) body.previous_discount = params.previousDiscount;
 
   const url = `${DISCOUNTS_API_URL}/${encodeURIComponent(trimmed)}/`;
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const csrf = getCsrfToken();
+  if (csrf) headers["X-CSRFToken"] = csrf;
+
   const response = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     credentials: "include",
     mode: "cors",
     body: JSON.stringify(body),

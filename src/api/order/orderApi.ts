@@ -1,6 +1,7 @@
 // API для оформления заказа
 
 import { API_BASE_URL } from "../../lib/apiConfig";
+import { getCsrfToken } from "../../lib/csrf";
 
 const ORDER_API_URL = `${API_BASE_URL}/api/order/`;
 const MY_ORDERS_URL = `${API_BASE_URL}/api/order/my/`;
@@ -139,6 +140,8 @@ export const createOrder = async (
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
+    const csrf = getCsrfToken();
+    if (csrf) headers["X-CSRFToken"] = csrf;
 
     const response = await fetch(ORDER_API_URL, {
       method: "POST",
@@ -215,11 +218,13 @@ export const getPaymentUrl = async (
     };
     console.log("Getting payment URL for order:", orderId, url);
 
+    const payHeaders: Record<string, string> = { "Content-Type": "application/json" };
+    const payCsrf = getCsrfToken();
+    if (payCsrf) payHeaders["X-CSRFToken"] = payCsrf;
+
     const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: payHeaders,
       credentials: "include",
       mode: "cors",
       body: JSON.stringify(body),
@@ -270,11 +275,13 @@ export const getYandexPaymentUrl = async (
     };
     console.log("Getting Yandex payment URL for order:", orderId, "body:", body);
 
+    const yandexHeaders: Record<string, string> = { "Content-Type": "application/json" };
+    const yandexCsrf = getCsrfToken();
+    if (yandexCsrf) yandexHeaders["X-CSRFToken"] = yandexCsrf;
+
     const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: yandexHeaders,
       credentials: "include",
       mode: "cors",
       body: JSON.stringify(body),

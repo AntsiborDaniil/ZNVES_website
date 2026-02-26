@@ -13,6 +13,22 @@
   padding: 20px 210px 90px;
 }
 
+/* Пустая корзина: центрирование и отступы на мобильных */
+.cartEmpty .main {
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 60px;
+}
+
+.cartEmpty .cartContainer {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
 .backLink {
   color: #525252c9;
   font-weight: 400;
@@ -385,6 +401,7 @@
   border-radius: 8px;
   border: 1px solid rgba(82, 82, 82, 0.12);
   animation: emptyCartAppear 0.35s ease-out;
+  box-sizing: border-box;
 }
 
 .emptyCartWrap:hover .emptyCartIcon {
@@ -708,7 +725,9 @@
 
   .emptyCartWrap {
     padding: 36px 20px 44px;
-    margin: 40px 16px 0;
+    margin: 40px auto 0;
+    width: calc(100% - 32px);
+    max-width: 480px;
   }
 
   .emptyCartIcon {
@@ -743,6 +762,16 @@
     padding: 14px 32px;
     font-size: 15px;
   }
+
+  /* Пустая корзина на мобильных: центрируем блок по вертикали */
+  .cartEmpty .main {
+    justify-content: center;
+    padding: 24px 20px 48px;
+  }
+
+  .cartEmpty .emptyCartWrap {
+    margin: 0 auto;
+  }
 }
 
 @media (max-width: 480px) {
@@ -759,21 +788,50 @@
   }
 
   .emptyCartWrap {
-    padding: 28px 16px 36px;
-    margin-top: 24px;
+    padding: 28px 20px 36px;
+    margin: 0 auto;
+    width: 100%;
   }
 
   .emptyCartTitle {
     font-size: 18px;
+    line-height: 1.35;
   }
 
   .emptyCartText {
-    font-size: 13px;
+    font-size: 14px;
+    line-height: 1.45;
+    margin-bottom: 22px;
+    padding: 0 8px;
   }
 
   .emptyCartLink {
-    padding: 10px 20px;
-    font-size: 13px;
+    padding: 14px 28px;
+    font-size: 15px;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  /* Пустая корзина: компактные отступы и центрирование */
+  .cartEmpty .main {
+    padding: 20px 16px 40px;
+    justify-content: center;
+  }
+
+  .cartEmpty .emptyCartWrap {
+    padding: 32px 20px 40px;
+  }
+
+  .cartEmpty .emptyCartIcon {
+    margin-bottom: 18px;
+  }
+
+  .cartEmpty .emptyCartIcon svg {
+    width: 56px;
+    height: 56px;
   }
 }
 

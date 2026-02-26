@@ -256,7 +256,7 @@ const CartPageContent = () => {
   // Не показываем пустую корзину, если модалка открыта, показываем ошибку заказа или возврат после оплаты
   if (items.length === 0 && !showSuccessModal && !orderError && !paymentReturnStatus) {
     return (
-      <div className={styles.cart}>
+      <div className={`${styles.cart} ${styles.cartEmpty}`}>
         <Header variant="green" />
         <main className={styles.main}>
           <div className={styles.cartContainer}>
