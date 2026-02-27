@@ -43,6 +43,8 @@ type MapProps = {
   deliveryMethod?: string;
   deliveryType?: string;
   selectedPvzCoords?: [number, number] | null;
+  /** Суммарный вес корзины в граммах — для расчёта сроков и стоимости в виджете ПВЗ */
+  totalWeightGrams?: number;
 };
 
 declare global {
@@ -121,6 +123,7 @@ const Map = ({
   onSearchChange,
   deliveryMethod,
   deliveryType,
+  totalWeightGrams,
 }: MapProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const courierMapRef = useRef<HTMLDivElement>(null);
@@ -149,6 +152,7 @@ const Map = ({
     const handler = (event: Event) => {
       const e = event as CustomEvent;
       const detail = e.detail;
+      console.log("[Map NDD widget] YaNddWidgetPointSelected", detail);
       if (!detail) return;
 
       const addr = detail.address || {};
@@ -206,75 +210,133 @@ const Map = ({
   useEffect(() => {
     if (!isPickup || !containerRef.current) return;
 
-    const stationId =
-      (typeof window !== "undefined" &&
-        process.env.NEXT_PUBLIC_YA_DELIVERY_STATION_ID) ||
-      "05e809bb-4521-42d9-a936-0fb0744c0fb3";
+    const envStationId =
+      typeof window !== "undefined" ? process.env.NEXT_PUBLIC_YA_DELIVERY_STATION_ID : undefined;
+    const stationId = envStationId || "05e809bb-4521-42d9-a936-0fb0744c0fb3";
+
+    console.log("[Map NDD widget] Эффект: isPickup=true", {
+      city,
+      totalWeightGrams_from_props: totalWeightGrams,
+      NEXT_PUBLIC_YA_DELIVERY_STATION_ID: envStationId ?? "(не задан, используется fallback)",
+      stationId_used: stationId,
+      container_exists: !!document.getElementById(CONTAINER_ID),
+    });
 
     function startWidget() {
-      if (widgetInitedRef.current) return;
-      if (!window.YaDelivery || !document.getElementById(CONTAINER_ID)) return;
+      if (widgetInitedRef.current) {
+        console.log("[Map NDD widget] startWidget пропущен: уже инициализирован");
+        return;
+      }
+      if (!window.YaDelivery) {
+        console.warn("[Map NDD widget] startWidget: window.YaDelivery ещё нет");
+        return;
+      }
+      if (!document.getElementById(CONTAINER_ID)) {
+        console.warn("[Map NDD widget] startWidget: контейнер #" + CONTAINER_ID + " не найден");
+        return;
+      }
       widgetInitedRef.current = true;
+
+      const weightGrams = Math.max(100, totalWeightGrams ?? 10000);
+      const params = {
+        city,
+        size: { height: "450px", width: "100%" },
+        source_platform_station: stationId,
+        physical_dims_weight_gross: weightGrams,
+        physical_dims_dx: 30,
+        physical_dims_dy: 20,
+        physical_dims_dz: 10,
+        delivery_term: 0,
+        delivery_price: (price: number) => `${price} ₽`,
+        show_select_button: true,
+        filter: {
+          type: ["pickup_point", "terminal"],
+          is_yandex_branded: false,
+          payment_methods: ["already_paid", "card_on_receipt"],
+          payment_methods_filter: "or",
+        },
+      };
+      console.log("[Map NDD widget] Вызов createWidget с params:", {
+        ...params,
+        delivery_price: "(function)",
+      });
 
       window.YaDelivery.createWidget({
         containerId: CONTAINER_ID,
-        params: {
-          city,
-          size: {
-            height: "450px",
-            width: "100%",
-          },
-          source_platform_station: stationId,
-          physical_dims_weight_gross: 10000,
-          physical_dims_dx: 30,
-          physical_dims_dy: 20,
-          physical_dims_dz: 10,
-          // Не передаём delivery_price и delivery_term — виджет сам рассчитает через API
-          // при выборе ПВЗ (требуются source_platform_station и physical_dims_weight_gross)
-          show_select_button: true,
-          filter: {
-            type: ["pickup_point", "terminal"],
-            is_yandex_branded: false,
-            payment_methods: ["already_paid", "card_on_receipt"],
-            payment_methods_filter: "or",
-          },
-        },
+        params,
       });
+      console.log("[Map NDD widget] createWidget вызван. Запросы к API идут из скрипта ndd-widget.landpro.site — смотреть вкладку Network (фильтр по landpro / taxi / yandex).");
     }
 
     if (window.YaDelivery) {
+      console.log("[Map NDD widget] YaDelivery уже в window → startWidget()");
       startWidget();
     } else {
+      console.log("[Map NDD widget] Ожидаем событие YaNddWidgetLoad");
       document.addEventListener("YaNddWidgetLoad", startWidget);
     }
 
     const existing = document.querySelector(
       `script[src="${WIDGET_SCRIPT_URL}"]`
-    );
+    ) as (HTMLScriptElement & { readyState?: string }) | null;
     if (existing) {
-      startWidget();
+      const readyState = existing.readyState ?? "";
+      console.log("[Map NDD widget] Скрипт виджета уже на странице", {
+        readyState: readyState || "(нет)",
+      });
+      // Не вызываем startWidget() синхронно: скрипт с async мог ещё не выполниться.
+      // Если скрипт уже загружен — событие YaNddWidgetLoad мы могли пропустить; тогда опрашиваем YaDelivery.
+      if (readyState === "complete" || readyState === "loaded") {
+        const poll = setInterval(() => {
+          if (window.YaDelivery) {
+            clearInterval(poll);
+            startWidget();
+          }
+        }, 50);
+        const stopPoll = setTimeout(() => clearInterval(poll), 3000);
+        return () => {
+          clearInterval(poll);
+          clearTimeout(stopPoll);
+          document.removeEventListener("YaNddWidgetLoad", startWidget);
+          widgetInitedRef.current = false;
+          const container = document.getElementById(CONTAINER_ID);
+          if (container) container.innerHTML = "";
+          console.log("[Map NDD widget] Cleanup: виджет сброшен");
+        };
+      }
       return () => {
         document.removeEventListener("YaNddWidgetLoad", startWidget);
+        widgetInitedRef.current = false;
+        const container = document.getElementById(CONTAINER_ID);
+        if (container) container.innerHTML = "";
+        console.log("[Map NDD widget] Cleanup: виджет сброшен");
       };
     }
 
     const script = document.createElement("script");
     script.src = WIDGET_SCRIPT_URL;
     script.async = true;
-    script.onload = startWidget;
+    script.onload = () => {
+      console.log("[Map NDD widget] Скрипт загружен:", WIDGET_SCRIPT_URL);
+      startWidget();
+    };
     script.onerror = () => {
       console.error(
-        "[Map] Ошибка загрузки виджета Яндекс.Доставки:",
+        "[Map NDD widget] Ошибка загрузки виджета:",
         WIDGET_SCRIPT_URL
       );
     };
     document.body.appendChild(script);
+    console.log("[Map NDD widget] Добавлен script", WIDGET_SCRIPT_URL);
 
     return () => {
       document.removeEventListener("YaNddWidgetLoad", startWidget);
       widgetInitedRef.current = false;
+      const container = document.getElementById(CONTAINER_ID);
+      if (container) container.innerHTML = "";
+      console.log("[Map NDD widget] Cleanup: виджет сброшен");
     };
-  }, [isPickup, city]);
+  }, [isPickup, city, totalWeightGrams]);
 
   // Курьер: обычная Яндекс.Карта с меткой, геокодинг, только Москва
   useEffect(() => {

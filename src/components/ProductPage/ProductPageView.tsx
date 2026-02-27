@@ -259,7 +259,7 @@ const ProductPageView = ({
                             src={image}
                             alt={`${product.title} — фото ${index + 1}`}
                             className={styles.mainImage}
-                            loading={index === 0 ? "eager" : "lazy"}
+                            loading={index <= 2 ? "eager" : "lazy"}
                             decoding="async"
                           />
                         </div>
@@ -276,7 +276,7 @@ const ProductPageView = ({
                           src={image}
                           alt={`${product.title} — фото ${index + 1}`}
                           className={styles.mainImage}
-                          loading={index === 0 ? "eager" : "lazy"}
+                          loading={index <= 2 ? "eager" : "lazy"}
                           decoding="async"
                         />
                       </div>

@@ -165,14 +165,14 @@ const ProductDisplaySection = ({
 
   const handleBeforeInit = useCallback((swiper: SwiperInstance) => {
     const params = swiper.params as unknown as Record<string, unknown>;
-    params.preloadImages = false;
+    params.preloadImages = true;
     params.loopedSlides = Math.max(slidesForSwiper.length, 8);
     params.loopAdditionalSlides = 4;
     params.lazy = {
       enabled: true,
-      loadOnTransitionStart: false,
+      loadOnTransitionStart: true,
       loadPrevNext: true,
-      loadPrevNextAmount: 2,
+      loadPrevNextAmount: 3,
     };
   }, [slidesForSwiper.length]);
 
@@ -320,9 +320,9 @@ const ProductDisplaySection = ({
               onBeforeInit: handleBeforeInit,
               lazy: {
                 enabled: true,
-                loadOnTransitionStart: false,
+                loadOnTransitionStart: true,
                 loadPrevNext: true,
-                loadPrevNextAmount: 2,
+                loadPrevNextAmount: 3,
               },
             },
             [

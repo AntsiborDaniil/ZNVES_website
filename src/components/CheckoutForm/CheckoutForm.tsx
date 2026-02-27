@@ -9,7 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getProductById } from "../../data/products";
 import { createOrder, getPaymentUrl, getYandexPaymentUrl, invalidateMyOrdersCache, type OrderRequest } from "../../api/order/orderApi";
-import { fetchCatalogProductRaw, type ApiProductDetail } from "../../api/product/productApi";
+import { fetchCatalogProductRaw, type ApiProductDetail, type ApiWarehouseItem } from "../../api/product/productApi";
 import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 import type { PvzListOption } from "../Map/Map";
 import { getAddressSuggestions, type AddressSuggestion } from "../../api/delivery/addressSuggestApi";
@@ -146,7 +146,8 @@ const CheckoutForm = ({
   const [pvzId, setPvzId] = useState<string>(""); // Для Яндекс
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>(initialColors);
-  
+  const [totalWeightGrams, setTotalWeightGrams] = useState<number | undefined>(undefined);
+
   // Refs для полей формы
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
@@ -169,6 +170,108 @@ const CheckoutForm = ({
   useEffect(() => {
     setShowContinueButtonAgain(false);
   }, [formData.deliveryType, formData.deliveryMethod]);
+
+  // Суммарный вес корзины в граммах из warehouse_items (для виджета доставки)
+  useEffect(() => {
+    if (!items.length) {
+      setTotalWeightGrams(undefined);
+      console.log("[Delivery weight] Корзина пуста → totalWeightGrams = undefined");
+      return;
+    }
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const hasValidUuid = (id: unknown) => typeof id === "string" && uuidRegex.test(id);
+    const slugsFromItems = items.map(
+      (item) =>
+        (typeof item.productId === "number"
+          ? getProductById(item.productId)?.slug
+          : null) ?? item.product?.slug
+    ).filter((s): s is string => !!s);
+    const uniqueSlugs = Array.from(new Set(slugsFromItems));
+    console.log("[Delivery weight] Старт: items=" + items.length, {
+      slugs: uniqueSlugs,
+      items: items.map((i) => ({ productId: i.productId, color: i.color, size: i.size, quantity: i.quantity, warehouseProduct: i.warehouseProduct })),
+    });
+
+    let cancelled = false;
+    const slugToProduct: Record<string, ApiProductDetail | null> = {};
+    Promise.all(
+      uniqueSlugs.map(async (slug) => {
+        const cached = productRawCache.get(slug);
+        if (cached !== undefined) {
+          slugToProduct[slug] = cached;
+          return;
+        }
+        const data = await fetchCatalogProductRaw(slug);
+        productRawCache.set(slug, data ?? null);
+        if (data) slugToProduct[slug] = data;
+      })
+    ).then(() => {
+      if (cancelled) return;
+      const weightBySlug: Record<string, { warehouse_items?: Array<{ weight?: number; id?: string; uuid?: string; color?: string; size?: string }> }> = {};
+      for (const [slug, productData] of Object.entries(slugToProduct)) {
+        if (productData?.warehouse_items) {
+          weightBySlug[slug] = {
+            warehouse_items: productData.warehouse_items.map((wi) => ({
+              weight: (wi as ApiWarehouseItem).weight,
+              id: (wi as ApiWarehouseItem).id,
+              uuid: (wi as { uuid?: string }).uuid,
+              color: (wi as ApiWarehouseItem).color,
+              size: (wi as ApiWarehouseItem).size,
+            })),
+          };
+        }
+      }
+      console.log("[Delivery weight] Данные товаров загружены:", weightBySlug);
+
+      let total = 0;
+      for (const item of items) {
+        const uuidFromCart = hasValidUuid(item.productId) ? item.productId : item.warehouseProduct;
+        if (uuidFromCart && typeof uuidFromCart === "string") {
+          let found = false;
+          for (const productData of Object.values(slugToProduct)) {
+            if (!productData?.warehouse_items) continue;
+            const wi = productData.warehouse_items.find(
+              (wi) => (wi.id ?? (wi as { uuid?: string }).uuid) === uuidFromCart
+            ) as ApiWarehouseItem | undefined;
+            if (wi && typeof wi.weight === "number") {
+              total += wi.weight * item.quantity;
+              found = true;
+              console.log("[Delivery weight] По UUID:", { uuid: uuidFromCart, weight: wi.weight, qty: item.quantity, add: wi.weight * item.quantity });
+              break;
+            }
+          }
+          if (!found) console.warn("[Delivery weight] По UUID не найден вес:", { uuid: uuidFromCart, item });
+          continue;
+        }
+        const fullProduct =
+          typeof item.productId === "number" ? getProductById(item.productId) : undefined;
+        const productSlug = fullProduct?.slug ?? item.product?.slug;
+        if (!productSlug) {
+          console.warn("[Delivery weight] Нет slug у товара:", item);
+          continue;
+        }
+        const productData = slugToProduct[productSlug];
+        const warehouseItem = productData?.warehouse_items?.find(
+          (wi) =>
+            (wi.color === item.color || (wi as { color_slug?: string }).color_slug === item.color) &&
+            (wi.size === item.size || (wi as { size_slug?: string }).size_slug === item.size)
+        ) as ApiWarehouseItem | undefined;
+        const w = warehouseItem?.weight;
+        if (typeof w === "number") {
+          total += w * item.quantity;
+          console.log("[Delivery weight] По color/size:", { slug: productSlug, color: item.color, size: item.size, weight: w, qty: item.quantity, add: w * item.quantity });
+        } else {
+          console.warn("[Delivery weight] По color/size вес не найден:", { slug: productSlug, color: item.color, size: item.size, productData: !!productData, warehouse_items: productData?.warehouse_items?.length });
+        }
+      }
+      const result = total > 0 ? total : undefined;
+      console.log("[Delivery weight] Итого totalWeightGrams =", result, "(г)");
+      setTotalWeightGrams(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [items]);
 
   // Автозаполнение личных данных из личного кабинета (ручка GET /api/auth/user/)
   useEffect(() => {
@@ -1751,6 +1854,7 @@ const CheckoutForm = ({
                   deliveryMethod={formData.deliveryMethod}
                   deliveryType={formData.deliveryType}
                   selectedPvzCoords={selectedPvzCoords}
+                  totalWeightGrams={totalWeightGrams}
                 />
               )}
             </div>

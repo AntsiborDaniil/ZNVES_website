@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 import CatalogPageContent from "./CatalogPageContent";
+import LoadingStub from "../LoadingStub/LoadingStub";
 import styles from "./CatalogPage.module.css";
 
 type CatalogPageProps = {
@@ -13,7 +14,7 @@ const CatalogPage = ({ title }: CatalogPageProps) => {
     <div className={styles.page}>
       <Header variant="green" />
       <main className={styles.main}>
-        <Suspense fallback={<div>Загрузка...</div>}>
+        <Suspense fallback={<LoadingStub label="Загрузка каталога…" />}>
           <CatalogPageContent title={title} />
         </Suspense>
       </main>

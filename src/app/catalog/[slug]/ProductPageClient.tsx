@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import ProductPageView from "../../../components/ProductPage/ProductPageView";
+import LoadingStub from "../../../components/LoadingStub/LoadingStub";
 import { fetchProductWithWarehouse } from "../../../api/product/productApi";
 import type { ProductDetail } from "../../../types/products";
 import type { ApiWarehouseItem } from "../../../api/product/productApi";
@@ -38,11 +39,7 @@ const ProductPageClient = ({ slug }: ProductPageClientProps) => {
   }, [slug]);
 
   if (isLoading) {
-    return (
-      <div style={{ padding: "100px 20px", textAlign: "center" }}>
-        Загрузка...
-      </div>
-    );
+    return <LoadingStub label="Загрузка товара…" />;
   }
 
   if (!product) {

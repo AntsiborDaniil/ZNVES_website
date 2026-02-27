@@ -25,6 +25,8 @@ export type ApiWarehouseItem = {
   size?: string;
   size_slug?: string;
   quantity: number;
+  /** Вес единицы товара в граммах (для расчёта доставки в виджете) */
+  weight?: number;
 };
 
 export type ApiProductDetail = {

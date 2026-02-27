@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import LoadingStub from "../../components/LoadingStub/LoadingStub";
 import CartItem from "../../components/ui/CartItem/CartItem";
 import { useCart } from "../../contexts/CartContext";
 import { getProductById } from "../../data/products";
@@ -508,7 +509,7 @@ const CartPage = () => {
           <main className={styles.main}>
             <div className={styles.cartContainer}>
               <div className={styles.emptyCart}>
-                <h1 className={styles.emptyTitle}>Загрузка...</h1>
+                <LoadingStub label="Загрузка корзины…" />
               </div>
             </div>
           </main>

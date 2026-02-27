@@ -180,7 +180,7 @@ const ProductCard = ({
                     ? styles.productImageLoaded
                     : styles.productImageLoading
                 }`}
-                loading="lazy"
+                loading={isSliderCard && index === 0 ? "eager" : "lazy"}
                 onLoad={() => markImageLoaded(index)}
                 quality={80}
               />
