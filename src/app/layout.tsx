@@ -37,8 +37,15 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "ZNVES",
-  description: "ZNVES storefront built with Next.js",
+  title: {
+    default: "ZNVES — Одежда и аксессуары",
+    template: "%s | ZNVES",
+  },
+  description:
+    "ZNVES — интернет-магазин стильной одежды: футболки, худи, джинсы, куртки и многое другое. Удобная доставка СДЭК и Яндекс. Доставка по России.",
+  icons: {
+    icon: "/images/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
