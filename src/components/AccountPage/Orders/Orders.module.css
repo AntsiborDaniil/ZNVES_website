@@ -181,6 +181,74 @@
   flex-shrink: 0;
 }
 
+/* Заглушка загрузки заказов */
+.ordersLoadingWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.ordersLoadingCard {
+  padding: 48px 32px;
+  background: linear-gradient(145deg, rgba(82, 82, 82, 0.04) 0%, rgba(82, 82, 82, 0.08) 100%);
+  border: 1px solid rgba(82, 82, 82, 0.1);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ordersLoadingFadeIn 0.4s ease-out;
+}
+
+@keyframes ordersLoadingFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ordersLoadingSkeletons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.ordersLoadingSkeleton {
+  height: 88px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(82, 82, 82, 0.06) 0%,
+    rgba(82, 82, 82, 0.12) 50%,
+    rgba(82, 82, 82, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: ordersLoadingShimmer 1.4s ease-in-out infinite;
+}
+
+.ordersLoadingSkeleton:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.ordersLoadingSkeleton:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes ordersLoadingShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+ 100% {
+    background-position: -200% 0;
+  }
+}
+
 .emptyState {
   display: flex;
   flex-direction: column;

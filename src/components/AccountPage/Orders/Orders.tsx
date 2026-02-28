@@ -5,6 +5,7 @@ import Link from "next/link";
 import styles from "./Orders.module.css";
 import Image from "next/image";
 import { getMyOrders, apiOrderToAccountView, type AccountOrderView } from "../../../api/order/orderApi";
+import LoadingStub from "../../LoadingStub/LoadingStub";
 
 interface OrderProduct {
   id: number;
@@ -167,8 +168,15 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
   if (isLoading) {
     return (
       <section className={styles.panel}>
-        <div className={styles.emptyState}>
-          <p className={styles.emptyText}>Загрузка заказов…</p>
+        <div className={styles.ordersLoadingWrap}>
+          <div className={styles.ordersLoadingCard}>
+            <LoadingStub label="Загрузка заказов…" inline />
+          </div>
+          <div className={styles.ordersLoadingSkeletons}>
+            <div className={styles.ordersLoadingSkeleton} />
+            <div className={styles.ordersLoadingSkeleton} />
+            <div className={styles.ordersLoadingSkeleton} />
+          </div>
         </div>
       </section>
     );
