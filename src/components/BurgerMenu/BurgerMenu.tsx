@@ -77,7 +77,10 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
   const isCartActive = pathname === "/cart";
 
   const currentCategory = searchParams.get("category");
-  const shouldPrefetch = pathname !== "/checkout" && pathname !== "/cart";
+  const shouldPrefetch =
+    pathname !== "/checkout" &&
+    pathname !== "/cart" &&
+    pathname !== "/account";
 
   return (
     <div className={styles.burgerMenu}>

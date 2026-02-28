@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "../../contexts/AuthContext";
 import Header from "../../components/Header/Header";
@@ -13,13 +13,18 @@ import LoadingStub from "../../components/LoadingStub/LoadingStub";
 import styles from "./page.module.css";
 
 const AccountPage = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, checkAuth } = useAuth();
   const [activeTab, setActiveTab] = useState<"account" | "profile" | "orders">(
     "account"
   );
   const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>(
     undefined
   );
+
+  // При загрузке/перезагрузке страницы аккаунта всегда запрашиваем данные пользователя с бэка (GET /api/auth/user/)
+  useEffect(() => {
+    checkAuth(true);
+  }, [checkAuth]);
 
   // Пока не получили ответ от бэка — показываем заглушку загрузки
   if (isLoading) {
@@ -95,7 +100,7 @@ const AccountPage = () => {
       </nav>
       <main className={styles.main}>
         <div className={styles.aside}>
-          <Link href="/catalog" className={styles.backLink}>
+          <Link href="/catalog" className={styles.backLink} prefetch={false}>
             Вернуться в каталог
           </Link>
           <h2 className={styles.asideTitle}>Личный кабинет</h2>

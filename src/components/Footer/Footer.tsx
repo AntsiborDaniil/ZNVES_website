@@ -3,9 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import styles from "./Footer.module.css";
 
 const Footer = () => {
+  const pathname = usePathname();
+  const shouldPrefetch = pathname !== "/account";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
@@ -85,7 +88,7 @@ const Footer = () => {
           <h2 className={styles.politics}>
             Нажимая на кнопку «Подписаться», вы даете согласие на обработку
             персональных данных в соответствии с{" "}
-            <Link href="/privacy" className={styles.politicsLink}>
+            <Link href="/privacy" className={styles.politicsLink} prefetch={shouldPrefetch}>
               Политикой конфиденциальности
             </Link>
           </h2>
@@ -109,10 +112,10 @@ const Footer = () => {
                   isMenuOpen ? styles.columnListOpen : ""
                 }`}
               >
-                  <Link className={styles.columnItem} href="/account">
+                  <Link className={styles.columnItem} href="/account" prefetch={shouldPrefetch}>
                     Личный кабинет
                   </Link>
-                  <Link className={styles.columnItem} href="/cart">
+                  <Link className={styles.columnItem} href="/cart" prefetch={shouldPrefetch}>
                     Корзина
                   </Link>
               </ul>
@@ -139,19 +142,20 @@ const Footer = () => {
                     isCatalogOpen ? styles.columnListOpen : ""
                   }`}
                 >
-                    <Link className={styles.columnItem} href="/new-in">
+                    <Link className={styles.columnItem} href="/new-in" prefetch={shouldPrefetch}>
                       New in
                     </Link>
-                    <Link className={styles.columnItem} href="/catalog/t-shirt">
+                    <Link className={styles.columnItem} href="/catalog/t-shirt" prefetch={shouldPrefetch}>
                       T-shirt
                     </Link>
                   
-                    <Link className={styles.columnItem} href="/catalog/hoodies">
+                    <Link className={styles.columnItem} href="/catalog/hoodies" prefetch={shouldPrefetch}>
                       Hoodies
                     </Link>
                     <Link
                       className={styles.columnItem}
                       href="/catalog/zip-hoodies"
+                      prefetch={shouldPrefetch}
                     >
                       Zip hoodies
                     </Link>
@@ -161,16 +165,16 @@ const Footer = () => {
                     isCatalogOpen ? styles.columnListOpen : ""
                   }`}
                 >
-                    <Link className={styles.columnItem} href="/catalog/jeans">
+                    <Link className={styles.columnItem} href="/catalog/jeans" prefetch={shouldPrefetch}>
                       Jeans
                     </Link>
-                    <Link className={styles.columnItem} href="/catalog/pants">
+                    <Link className={styles.columnItem} href="/catalog/pants" prefetch={shouldPrefetch}>
                       Pants
                     </Link>
-                    <Link className={styles.columnItem} href="/catalog/shorts">
+                    <Link className={styles.columnItem} href="/catalog/shorts" prefetch={shouldPrefetch}>
                       Shorts
                     </Link>
-                    <Link className={styles.columnItem} href="/catalog/jackets">
+                    <Link className={styles.columnItem} href="/catalog/jackets" prefetch={shouldPrefetch}>
                       Jackets
                     </Link>
                 </ul>
@@ -213,10 +217,10 @@ const Footer = () => {
             </div>
           </div>
           <div className={styles.links}>
-            <Link className={styles.link} href="/public-offer">
+            <Link className={styles.link} href="/public-offer" prefetch={shouldPrefetch}>
               Публичная оферта
             </Link>
-            <Link className={styles.link} href="/privacy">
+            <Link className={styles.link} href="/privacy" prefetch={shouldPrefetch}>
               Политика конфиденциальности
             </Link>
           </div>
