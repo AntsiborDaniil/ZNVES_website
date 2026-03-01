@@ -1302,7 +1302,7 @@ const CheckoutForm = ({
     } catch (error) {
       console.error("Failed to submit order:", error);
       const message =
-        error instanceof Error ? error.message : "Ошибка при оформлении заказа. Пожалуйста, попробуйте еще раз.";
+        "Возможно, заказано слишком много товара или товар отсутствует в наличии.";
       setIsSubmitting(false);
       clearCart();
       redirectToCartWithError(message);

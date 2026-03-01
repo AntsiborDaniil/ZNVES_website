@@ -12,7 +12,7 @@ import {
   type AccountOrderView,
 } from "../../../api/order/orderApi";
 import LoadingStub from "../../LoadingStub/LoadingStub";
-import { useToast } from "../../ui/ToastProvider/ToastProvider";
+import CartOrderErrorModal from "../../CartOrderErrorModal/CartOrderErrorModal";
 
 interface OrderProduct {
   id: number;
@@ -147,13 +147,16 @@ type OrdersProps = {
 };
 
 const Orders = ({ initialOrderId }: OrdersProps) => {
-  const { showToast } = useToast();
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isPaying, setIsPaying] = useState(false);
+  const [orderPayError, setOrderPayError] = useState<string | null>(null);
   const selectedOrderSectionRef = useRef<HTMLDivElement>(null);
+
+  const ORDER_ERROR_MESSAGE =
+    "Возможно, заказано слишком много товара или товар отсутствует в наличии.";
 
   useEffect(() => {
     Promise.all([getMyOrders(true), getMyOrders(false)])
@@ -231,7 +234,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
     if (!selectedOrder || isPaying) return;
     const orderId = Number(selectedOrder.id);
     if (!Number.isFinite(orderId)) {
-      showToast("Неверный номер заказа");
+      setOrderPayError(ORDER_ERROR_MESSAGE);
       return;
     }
     setIsPaying(true);
@@ -257,11 +260,9 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
         window.location.href = paymentUrl;
         return;
       }
-      showToast("Не удалось получить ссылку на оплату");
-    } catch (err) {
-      showToast(
-        err instanceof Error ? err.message : "Ошибка при переходе к оплате"
-      );
+      setOrderPayError(ORDER_ERROR_MESSAGE);
+    } catch {
+      setOrderPayError(ORDER_ERROR_MESSAGE);
     } finally {
       setIsPaying(false);
     }
@@ -756,6 +757,13 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
             ))}
           </div>
         </div>
+      )}
+
+      {orderPayError && (
+        <CartOrderErrorModal
+          message={orderPayError}
+          onClose={() => setOrderPayError(null)}
+        />
       )}
     </section>
   );
