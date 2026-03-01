@@ -6,6 +6,15 @@ import { getCsrfToken } from "../../lib/csrf";
 const ORDER_API_URL = `${API_BASE_URL}/api/order/`;
 const MY_ORDERS_URL = `${API_BASE_URL}/api/order/my/`;
 
+/** Позиция заказа в ответе API */
+export interface ApiOrderPosition {
+  id: string;
+  product_name: string;
+  color: string;
+  size: string;
+  quantity: number;
+}
+
 /** Элемент ответа GET /api/order/my/?active=true|false */
 export interface ApiMyOrderItem {
   id: string;
@@ -13,9 +22,19 @@ export interface ApiMyOrderItem {
   status: string;
   payment_type: string;
   delivery_service: string;
-  promocode?: string;
+  promocode?: string | null;
   created_at: string;
   updated_at: string;
+  customer_data?: {
+    full_name: string;
+    email: string;
+    phone: string;
+  };
+  positions?: ApiOrderPosition[];
+  delivery_data?: {
+    pvz_code?: string;
+    full_address: string;
+  };
 }
 
 const MY_ORDERS_CACHE_TTL_MS = 60 * 1000; // 1 мин
@@ -58,7 +77,7 @@ export const invalidateMyOrdersCache = () => {
   myOrdersCache.all = null;
 };
 
-/** Вид заказа для отображения в кабинете (общий минимум из API) */
+/** Вид заказа для отображения в кабинете (данные из API) */
 export interface AccountOrderView {
   id: string;
   date: string;
@@ -66,7 +85,20 @@ export interface AccountOrderView {
   totalAmount: string;
   paymentType: string;
   deliveryService: string;
-  products: Array<{ image: string; name: string }>;
+  products: Array<{
+    image: string;
+    name: string;
+    color?: string;
+    size?: string;
+    quantity?: number;
+  }>;
+  buyer?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  };
+  deliveryAddress?: string;
 }
 
 function formatOrderDate(iso: string): string {
@@ -81,15 +113,49 @@ function formatOrderDate(iso: string): string {
   }
 }
 
-export const apiOrderToAccountView = (api: ApiMyOrderItem): AccountOrderView => ({
-  id: String(api.id),
-  date: formatOrderDate(api.created_at),
-  status: api.status,
-  totalAmount: api.total_amount ?? "",
-  paymentType: api.payment_type ?? "",
-  deliveryService: api.delivery_service ?? "",
-  products: [], // API не отдаёт состав заказа в списке
-});
+function splitFullName(fullName: string): { firstName: string; lastName: string } {
+  const trimmed = (fullName || "").trim();
+  const space = trimmed.indexOf(" ");
+  if (space <= 0) return { firstName: trimmed, lastName: "" };
+  return {
+    firstName: trimmed.slice(0, space).trim(),
+    lastName: trimmed.slice(space + 1).trim(),
+  };
+}
+
+export const apiOrderToAccountView = (api: ApiMyOrderItem): AccountOrderView => {
+  const buyer = api.customer_data
+    ? (() => {
+        const { firstName, lastName } = splitFullName(api.customer_data.full_name);
+        return {
+          firstName,
+          lastName,
+          email: api.customer_data.email ?? "",
+          phone: api.customer_data.phone ?? "",
+        };
+      })()
+    : undefined;
+
+  const products = (api.positions ?? []).map((p) => ({
+    image: "",
+    name: p.product_name ?? "",
+    color: p.color ?? "",
+    size: p.size ?? "",
+    quantity: p.quantity ?? 1,
+  }));
+
+  return {
+    id: String(api.id),
+    date: formatOrderDate(api.created_at),
+    status: api.status,
+    totalAmount: api.total_amount ?? "",
+    paymentType: api.payment_type ?? "",
+    deliveryService: api.delivery_service ?? "",
+    products,
+    buyer,
+    deliveryAddress: api.delivery_data?.full_address,
+  };
+};
 
 export interface OrderRequest {
   total_amount: string;

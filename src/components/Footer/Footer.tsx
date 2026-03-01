@@ -4,17 +4,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
+import { useToast } from "../ui/ToastProvider/ToastProvider";
+import { subscribeToMailing } from "../../api/mailing/mailingApi";
 import styles from "./Footer.module.css";
 
 const Footer = () => {
   const pathname = usePathname();
+  const { showToast } = useToast();
   const shouldPrefetch = pathname !== "/account";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [isModalClosing, setIsModalClosing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const autoCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const closeModal = useCallback(() => {
@@ -49,11 +54,25 @@ const Footer = () => {
     };
   }, [showSubscribeModal]);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
+    const value = email.trim();
+    if (isSubmitting) return;
+    setEmailError(null);
+    if (!value) return;
+    if (!value.includes("@")) {
+      setEmailError("Введите корректный email (должен содержать @)");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await subscribeToMailing(value);
       setShowSubscribeModal(true);
       setEmail("");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Не удалось подписаться на рассылку");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -73,16 +92,28 @@ const Footer = () => {
             Подпишитесь на получение рассылки рекламно-информационных материалов
           </h1>
           <form className={styles.inputContainer} onSubmit={handleSubscribe}>
-            <input
-              type="email"
-              className={styles.input}
-              placeholder="Введите ваш email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <button type="submit" className={styles.button}>
-              Подписаться
+            <div className={styles.inputWrap}>
+              <input
+                type="email"
+                className={`${styles.input} ${emailError ? styles.inputError : ""}`}
+                placeholder="Введите ваш email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError(null);
+                }}
+                required
+                aria-invalid={!!emailError}
+                aria-describedby={emailError ? "footer-email-error" : undefined}
+              />
+              {emailError && (
+                <span id="footer-email-error" className={styles.inputErrorMsg} role="alert">
+                  {emailError}
+                </span>
+              )}
+            </div>
+            <button type="submit" className={styles.button} disabled={isSubmitting}>
+              {isSubmitting ? "Отправка…" : "Подписаться"}
             </button>
           </form>
           <h2 className={styles.politics}>

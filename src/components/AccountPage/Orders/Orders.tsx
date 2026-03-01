@@ -1,11 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import styles from "./Orders.module.css";
 import Image from "next/image";
-import { getMyOrders, apiOrderToAccountView, type AccountOrderView } from "../../../api/order/orderApi";
+import {
+  getMyOrders,
+  apiOrderToAccountView,
+  getPaymentUrl,
+  getYandexPaymentUrl,
+  type AccountOrderView,
+} from "../../../api/order/orderApi";
 import LoadingStub from "../../LoadingStub/LoadingStub";
+import { useToast } from "../../ui/ToastProvider/ToastProvider";
 
 interface OrderProduct {
   id: number;
@@ -40,6 +47,8 @@ interface OrderData {
     apartment: string;
     type: string;
     method: string;
+    /** Полный адрес из API (доставка) */
+    fullAddress?: string;
   };
   payment: {
     method: string;
@@ -67,9 +76,9 @@ function accountViewToOrderData(view: AccountOrderView): OrderData {
     id: i,
     name: p.name || "",
     category: "",
-    color: "",
-    size: "",
-    quantity: 0,
+    color: p.color ?? "",
+    size: p.size ?? "",
+    quantity: p.quantity ?? 1,
     price: "",
     priceValue: 0,
     image: p.image || "",
@@ -78,8 +87,13 @@ function accountViewToOrderData(view: AccountOrderView): OrderData {
     id: view.id,
     date: view.date,
     status: view.status,
-    buyer: { ...emptyBuyer },
-    delivery: { ...emptyDelivery, type: view.deliveryService || "cdek", method: deliveryMethod },
+    buyer: view.buyer ? { ...view.buyer } : { ...emptyBuyer },
+    delivery: {
+      ...emptyDelivery,
+      type: view.deliveryService || "cdek",
+      method: deliveryMethod,
+      fullAddress: view.deliveryAddress,
+    },
     payment: { method: view.paymentType || "prepayment", amount: view.totalAmount || "" },
     products,
     total: { itemsCount: products.length, totalAmount: view.totalAmount ?? "", totalAmountValue: 0 },
@@ -110,20 +124,36 @@ const getDeliveryServiceName = (type: string, method: string) => {
   return "СДЭК: доставка в пункт выдачи";
 };
 
-const isUnpaidStatus = (status: string) =>
-  status === "created" ||
-  status === "не оплачен" ||
-  status?.toLowerCase().includes("неоплачен");
+const getStatusDisplayName = (status: string): string => {
+  const s = (status || "").toLowerCase();
+  if (s === "pending_payment" || s === "ожидает оплаты") return "Ожидает оплаты";
+  if (s === "paid" || s === "оплачен") return "Оплачен";
+  if (s === "created" || s === "новый") return "Новый";
+  return status || "—";
+};
+
+const isUnpaidStatus = (status: string) => {
+  const s = (status || "").toLowerCase();
+  return (
+    s === "created" ||
+    s === "pending_payment" ||
+    status === "не оплачен" ||
+    status?.toLowerCase().includes("неоплачен")
+  );
+};
 
 type OrdersProps = {
   initialOrderId?: string;
 };
 
 const Orders = ({ initialOrderId }: OrdersProps) => {
+  const { showToast } = useToast();
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPaying, setIsPaying] = useState(false);
+  const selectedOrderSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     Promise.all([getMyOrders(true), getMyOrders(false)])
@@ -164,6 +194,78 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
       setIsDetailsOpen(true);
     }
   }, [selectedOrder?.id]);
+
+  // Прокрутка к выбранному заказу при смене выбора (медленная плавная анимация)
+  useEffect(() => {
+    const el = selectedOrderSectionRef.current;
+    if (!selectedOrder || !el) return;
+
+    const duration = 900;
+    const easeInOutCubic = (t: number) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    const scrollable =
+      document.scrollingElement ||
+      (document.documentElement as Element);
+    const startTop = scrollable.scrollTop;
+    const targetTop =
+      startTop + el.getBoundingClientRect().top;
+
+    let rafId: number;
+    const startTime = { current: 0 };
+
+    const step = (timestamp: number) => {
+      if (!startTime.current) startTime.current = timestamp;
+      const elapsed = timestamp - startTime.current;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeInOutCubic(progress);
+      scrollable.scrollTop = startTop + (targetTop - startTop) * eased;
+      if (progress < 1) rafId = requestAnimationFrame(step);
+    };
+
+    rafId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafId);
+  }, [selectedOrder?.id]);
+
+  const handlePayOrder = async () => {
+    if (!selectedOrder || isPaying) return;
+    const orderId = Number(selectedOrder.id);
+    if (!Number.isFinite(orderId)) {
+      showToast("Неверный номер заказа");
+      return;
+    }
+    setIsPaying(true);
+    try {
+      const baseUrl =
+        typeof window !== "undefined" ? `${window.location.origin}/account` : "";
+      const returnUrl = `${baseUrl}?payment=success`;
+      const cancelUrl = `${baseUrl}?payment=cancel`;
+      const method = (selectedOrder.payment?.method || "").toLowerCase();
+      const useYandex = method === "yandexpay" || method === "installment";
+      const paymentResponse = useYandex
+        ? await getYandexPaymentUrl(orderId, {
+            return_url: returnUrl,
+            cancel_url: cancelUrl,
+          })
+        : await getPaymentUrl(orderId, {
+            return_url: returnUrl,
+            cancel_url: cancelUrl,
+          });
+      const paymentUrl =
+        paymentResponse.confirmation_url || paymentResponse.payment_url;
+      if (paymentUrl) {
+        window.location.href = paymentUrl;
+        return;
+      }
+      showToast("Не удалось получить ссылку на оплату");
+    } catch (err) {
+      showToast(
+        err instanceof Error ? err.message : "Ошибка при переходе к оплате"
+      );
+    } finally {
+      setIsPaying(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -211,7 +313,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
     <section className={styles.panel}>
       {/* Выбранный заказ (плашка) - сверху */}
       {selectedOrder && (
-        <div className={styles.selectedOrderSection}>
+        <div ref={selectedOrderSectionRef} className={styles.selectedOrderSection}>
           <div
             className={`${styles.orderCard} ${styles.orderCardActive}`}
             onClick={() => setIsDetailsOpen(!isDetailsOpen)}
@@ -252,14 +354,14 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                         : "Оплачен"}
                     </div>
                   </div>
-                  <div className={styles.orderCardDetailsBottom}>
-                    <div className={styles.orderCardState}>
-                      <span>•</span>{" "}
-                      <h2 className={styles.orderCardStateText}>
-                        Новый ({selectedOrder.status})
-                      </h2>
+                    <div className={styles.orderCardDetailsBottom}>
+                      <div className={styles.orderCardState}>
+                        <span>•</span>{" "}
+                        <h2 className={styles.orderCardStateText}>
+                          {getStatusDisplayName(selectedOrder.status)}
+                        </h2>
+                      </div>
                     </div>
-                  </div>
                 </div>
                 <div className={styles.orderCardDetailsRight}>
                   <div className={styles.orderCardThumbnails}>
@@ -267,14 +369,22 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                       .slice(0, 3)
                       .map((product, index) => (
                         <div key={index} className={styles.orderCardThumbnail}>
-                          <Image
-                            src={product.image}
-                            alt={product.name}
-                            width={60}
-                            height={60}
-                            className={styles.orderCardThumbnailImage}
-                            loading="lazy"
-                          />
+                          {product.image ? (
+                            <Image
+                              src={product.image}
+                              alt={product.name}
+                              width={60}
+                              height={60}
+                              className={styles.orderCardThumbnailImage}
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div
+                              className={styles.orderCardThumbnailPlaceholder}
+                              title={product.name}
+                              aria-hidden
+                            />
+                          )}
                         </div>
                       ))}
                     {selectedOrder.products.length > 3 && (
@@ -325,7 +435,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                           : styles.orderStatusPaid
                       }
                     >
-                      {selectedOrder.status}
+                      {getStatusDisplayName(selectedOrder.status)}
                     </span>
                   </div>
                 </div>
@@ -442,18 +552,19 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                       <div className={styles.deliveryField}>
                         <span className={styles.label}>Адрес</span>
                         <span className={styles.value}>
-                          {selectedOrder.delivery.city ||
-                          selectedOrder.delivery.street ||
-                          selectedOrder.delivery.house
-                            ? [
-                                selectedOrder.delivery.city,
-                                selectedOrder.delivery.street,
-                                selectedOrder.delivery.house,
-                                selectedOrder.delivery.apartment,
-                              ]
-                                .filter(Boolean)
-                                .join(", ")
-                            : "г. Москва"}
+                          {selectedOrder.delivery.fullAddress ||
+                            (selectedOrder.delivery.city ||
+                            selectedOrder.delivery.street ||
+                            selectedOrder.delivery.house
+                              ? [
+                                  selectedOrder.delivery.city,
+                                  selectedOrder.delivery.street,
+                                  selectedOrder.delivery.house,
+                                  selectedOrder.delivery.apartment,
+                                ]
+                                  .filter(Boolean)
+                                  .join(", ")
+                              : "—")}
                         </span>
                       </div>
                     </div>
@@ -468,14 +579,21 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                         key={`${product.id}-${index}`}
                         className={styles.productItem}
                       >
-                        <Image
-                          src={product.image}
-                          className={styles.productImage}
-                          alt={product.name}
-                          width={104}
-                          height={149}
-                          loading="lazy"
-                        />
+                        {product.image ? (
+                          <Image
+                            src={product.image}
+                            className={styles.productImage}
+                            alt={product.name}
+                            width={104}
+                            height={149}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div
+                            className={styles.productImagePlaceholder}
+                            aria-hidden
+                          />
+                        )}
                         <div className={styles.productDetails}>
                           <div className={styles.upper}>
                             <div className={styles.left}>
@@ -485,8 +603,14 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                               <h1 className={styles.title}>{product.name}</h1>
                             </div>
                             <div className={styles.right}>
-                              <h3 className={styles.amountWord}>Сумма</h3>
-                              <h1 className={styles.amount}>{product.price}</h1>
+                              <h3 className={styles.amountWord}>Кол-во</h3>
+                              <h1 className={styles.amount}>{product.quantity} шт</h1>
+                              {product.price && (
+                                <>
+                                  <h3 className={styles.amountWord}>Сумма</h3>
+                                  <h1 className={styles.amount}>{product.price}</h1>
+                                </>
+                              )}
                             </div>
                           </div>
                           <div className={styles.bottom}>
@@ -511,7 +635,14 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
               {/* Блок Итого во всю ширину */}
               <div className={styles.totalSection}>
                 {isUnpaidStatus(selectedOrder.status) && (
-                  <button className={styles.payButton}>Оплатить заказ</button>
+                  <button
+                    type="button"
+                    className={styles.payButton}
+                    onClick={handlePayOrder}
+                    disabled={isPaying}
+                  >
+                    {isPaying ? "Перенаправление к оплате…" : "Оплатить заказ"}
+                  </button>
                 )}
                 <div className={styles.totalInfo}>
                   <div className={styles.totalAmount}>
@@ -582,7 +713,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                         <div className={styles.orderCardState}>
                           <span>•</span>{" "}
                           <h2 className={styles.orderCardStateText}>
-                            Новый ({order.status})
+                            {getStatusDisplayName(order.status)}
                           </h2>
                         </div>
                       </div>
@@ -594,14 +725,22 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                             key={index}
                             className={styles.orderCardThumbnail}
                           >
-                            <Image
-                              src={product.image}
-                              alt={product.name}
-                              width={60}
-                              height={60}
-                              className={styles.orderCardThumbnailImage}
-                              loading="lazy"
-                            />
+                            {product.image ? (
+                              <Image
+                                src={product.image}
+                                alt={product.name}
+                                width={60}
+                                height={60}
+                                className={styles.orderCardThumbnailImage}
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div
+                                className={styles.orderCardThumbnailPlaceholder}
+                                title={product.name}
+                                aria-hidden
+                              />
+                            )}
                           </div>
                         ))}
                         {order.products.length > 3 && (
