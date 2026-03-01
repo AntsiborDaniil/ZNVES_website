@@ -7,6 +7,24 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { getMyOrders, apiOrderToAccountView, type AccountOrderView } from "../../../api/order/orderApi";
 import styles from "./MyAccount.module.css";
 
+const getStatusDisplayName = (status: string): string => {
+  const s = (status || "").toLowerCase();
+  if (s === "pending_payment" || s === "ожидает оплаты") return "Ожидает оплаты";
+  if (s === "paid" || s === "оплачен") return "Оплачен";
+  if (s === "created" || s === "новый") return "Новый";
+  return status || "—";
+};
+
+const isUnpaidStatus = (status: string): boolean => {
+  const s = (status || "").toLowerCase();
+  return (
+    s === "created" ||
+    s === "pending_payment" ||
+    status === "не оплачен" ||
+    status?.toLowerCase().includes("неоплачен")
+  );
+};
+
 type MyAccountProps = {
   onNavigate?: (tab: "profile" | "orders", orderId?: string) => void;
 };
@@ -123,7 +141,7 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
                 <div className={styles.orderDetailsTop}>
                   <div className={styles.cardInfoItem}>№{lastOrder.id}</div>
                   <div className={styles.orderStatus}>
-                    {lastOrder.status === "created" || lastOrder.status?.toLowerCase().includes("не оплачен")
+                    {isUnpaidStatus(lastOrder.status)
                       ? "Ожидает оплаты"
                       : "Оплачен"}
                   </div>
@@ -132,7 +150,7 @@ const MyAccount = ({ onNavigate }: MyAccountProps) => {
                   <div className={styles.orderState}>
                     <span>•</span>{" "}
                     <h2 className={styles.orderStateText}>
-                      Новый ({lastOrder.status})
+                      {getStatusDisplayName(lastOrder.status)}
                     </h2>
                   </div>
                 </div>
