@@ -156,7 +156,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
   const selectedOrderSectionRef = useRef<HTMLDivElement>(null);
 
   const ORDER_ERROR_MESSAGE =
-    "Возможно, заказано слишком много товара или товар отсутствует в наличии.";
+    "К сожалению, оплатить заказ не удалось: один или несколько товаров отсутствуют в наличии или их количество ограничено. Пожалуйста, обновите состав заказа и попробуйте снова либо свяжитесь со службой поддержки.";
 
   useEffect(() => {
     Promise.all([getMyOrders(true), getMyOrders(false)])

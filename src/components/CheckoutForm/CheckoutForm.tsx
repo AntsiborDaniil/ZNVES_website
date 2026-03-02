@@ -1302,7 +1302,7 @@ const CheckoutForm = ({
     } catch (error) {
       console.error("Failed to submit order:", error);
       const message =
-        "Возможно, заказано слишком много товара или товар отсутствует в наличии.";
+        "К сожалению, оформить заказ не удалось: один или несколько товаров отсутствуют в наличии или их количество ограничено. Пожалуйста, обновите корзину и попробуйте оформить заказ повторно либо свяжитесь со службой поддержки.";
       setIsSubmitting(false);
       clearCart();
       redirectToCartWithError(message);
