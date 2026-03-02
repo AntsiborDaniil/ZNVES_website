@@ -68,6 +68,7 @@
   width: 100%;
   border-radius: 18px;
   overflow: hidden;
+  animation: productImageFadeIn 0.5s ease-out forwards;
 }
 
 .mainImage {
@@ -75,6 +76,19 @@
   height: auto;
   display: block;
   object-fit: contain;
+  will-change: opacity, transform;
+}
+
+@keyframes productImageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(1.01);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .info {
