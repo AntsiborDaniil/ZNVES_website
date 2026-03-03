@@ -45,6 +45,12 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      // Google и браузеры по умолчанию запрашивают /favicon.ico — отдаём нашу иконку
+      { source: "/favicon.ico", destination: "/icon.png" },
+    ];
+  },
 };
 
 module.exports = nextConfig;
