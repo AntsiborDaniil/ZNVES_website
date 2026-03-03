@@ -173,41 +173,68 @@ const Footer = () => {
                     isCatalogOpen ? styles.columnListOpen : ""
                   }`}
                 >
-                    <Link className={styles.columnItem} href="/new-in" prefetch={shouldPrefetch}>
-                      New in
-                    </Link>
-                    <Link className={styles.columnItem} href="/catalog/t-shirt" prefetch={shouldPrefetch}>
-                      T-shirt
-                    </Link>
-                  
-                    <Link className={styles.columnItem} href="/catalog/hoodies" prefetch={shouldPrefetch}>
-                      Hoodies
-                    </Link>
-                    <Link
-                      className={styles.columnItem}
-                      href="/catalog/zip-hoodies"
-                      prefetch={shouldPrefetch}
-                    >
-                      Zip hoodies
-                    </Link>
+                  <Link
+                    className={styles.columnItem}
+                    href="/new-in"
+                    prefetch={shouldPrefetch}
+                  >
+                    New in
+                  </Link>
+                  <Link
+                    className={styles.columnItem}
+                    href="/catalog?category=t-shirts"
+                    prefetch={shouldPrefetch}
+                  >
+                    T-shirt
+                  </Link>
+                  <Link
+                    className={styles.columnItem}
+                    href="/catalog?category=hoodies"
+                    prefetch={shouldPrefetch}
+                  >
+                    Hoodies
+                  </Link>
+                  <Link
+                    className={styles.columnItem}
+                    href="/catalog?category=zip%20hoodies"
+                    prefetch={shouldPrefetch}
+                  >
+                    Zip hoodies
+                  </Link>
                 </ul>
                 <ul
                   className={`${styles.columnList} ${
                     isCatalogOpen ? styles.columnListOpen : ""
                   }`}
                 >
-                    <Link className={styles.columnItem} href="/catalog/jeans" prefetch={shouldPrefetch}>
-                      Jeans
-                    </Link>
-                    <Link className={styles.columnItem} href="/catalog/pants" prefetch={shouldPrefetch}>
-                      Pants
-                    </Link>
-                    <Link className={styles.columnItem} href="/catalog/shorts" prefetch={shouldPrefetch}>
-                      Shorts
-                    </Link>
-                    <Link className={styles.columnItem} href="/catalog/jackets" prefetch={shouldPrefetch}>
-                      Jackets
-                    </Link>
+                  <Link
+                    className={styles.columnItem}
+                    href="/catalog?category=jeans"
+                    prefetch={shouldPrefetch}
+                  >
+                    Jeans
+                  </Link>
+                  <Link
+                    className={styles.columnItem}
+                    href="/catalog?category=pants"
+                    prefetch={shouldPrefetch}
+                  >
+                    Pants
+                  </Link>
+                  <Link
+                    className={styles.columnItem}
+                    href="/catalog?category=shorts"
+                    prefetch={shouldPrefetch}
+                  >
+                    Shorts
+                  </Link>
+                  <Link
+                    className={styles.columnItem}
+                    href="/catalog?category=jackets"
+                    prefetch={shouldPrefetch}
+                  >
+                    Jackets
+                  </Link>
                 </ul>
               </div>
             </div>
