@@ -533,6 +533,13 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
     return currentProducts;
   }, [activeCategory, colorFilter, sizeFilter, order, products]);
 
+  const handleClearFilters = useCallback(() => {
+    setColorFilter("all");
+    setSizeFilter("all");
+    setOrder("popular");
+    updateURL({ color: "all", size: "all", order: "popular" });
+  }, [updateURL]);
+
   return (
     <>
       <div className={styles.intro}>
@@ -626,14 +633,12 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
               <button
                 type="button"
                 className={styles.clearFiltersButton}
-                onClick={() => {
-                  handleColorChange("all");
-                  handleSizeChange("all");
-                  handleOrderChange("popular");
-                }}
+                onClick={handleClearFilters}
                 aria-label="Удалить фильтры"
               >
-                <span className={styles.clearFiltersIcon} aria-hidden>×</span>
+                <span className={styles.clearFiltersIcon} aria-hidden>
+                  ×
+                </span>
                 <span className={styles.clearFiltersButtonText}>Удалить фильтры</span>
               </button>
             )}
@@ -684,11 +689,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
                   <button
                     type="button"
                     className={styles.emptyStateButton}
-                    onClick={() => {
-                      handleColorChange("all");
-                      handleSizeChange("all");
-                      handleOrderChange("popular");
-                    }}
+                    onClick={handleClearFilters}
                   >
                     Сбросить фильтры
                   </button>
