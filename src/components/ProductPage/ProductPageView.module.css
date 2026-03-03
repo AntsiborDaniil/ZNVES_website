@@ -46,8 +46,14 @@
   position: relative;
 }
 
-.imageSlider {
+.imageSliderWrap {
   display: none;
+  width: 100%;
+}
+
+.imageSlider {
+  display: block;
+  width: 100%;
 }
 
 .imageColumn {
@@ -55,6 +61,26 @@
   flex-direction: column;
   gap: 36px;
   width: 100%;
+}
+
+@media (min-width: 1025px) {
+  .imageSliderWrap {
+    display: none !important;
+  }
+
+  .imageColumn {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .imageSliderWrap {
+    display: block !important;
+  }
+
+  .imageColumn {
+    display: none !important;
+  }
 }
 
 .imageSlide {

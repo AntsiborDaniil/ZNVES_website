@@ -242,7 +242,7 @@ const ProductPageView = ({
         <section className={styles.content}>
           <div className={styles.gallery} aria-live="polite">
             <div className={styles.imageViewport}>
-              {width && width < 1025 ? (
+              <div className={styles.imageSliderWrap}>
                 <Swiper
                   slidesPerView={1}
                   spaceBetween={20}
@@ -267,23 +267,22 @@ const ProductPageView = ({
                     </SwiperSlide>
                   ))}
                 </Swiper>
-              ) : (
-                <div className={styles.imageColumn}>
-                  {currentImages.map((image, index) => (
-                    <div key={image + index} className={styles.imageSlide}>
-                      <div className={styles.imageSlideInner}>
-                        <img
-                          src={image}
-                          alt={`${product.title} — фото ${index + 1}`}
-                          className={styles.mainImage}
-                          loading={index <= 2 ? "eager" : "lazy"}
-                          decoding="async"
-                        />
-                      </div>
+              </div>
+              <div className={styles.imageColumn}>
+                {currentImages.map((image, index) => (
+                  <div key={image + index} className={styles.imageSlide}>
+                    <div className={styles.imageSlideInner}>
+                      <img
+                        src={image}
+                        alt={`${product.title} — фото ${index + 1}`}
+                        className={styles.mainImage}
+                        loading={index <= 2 ? "eager" : "lazy"}
+                        decoding="async"
+                      />
                     </div>
-                  ))}
-                </div>
-              )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           <div className={styles.info}>
