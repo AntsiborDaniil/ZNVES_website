@@ -373,7 +373,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                           {product.image ? (
                             <Image
                               src={product.image}
-                              alt={product.name}
+                              alt={product.name ? `${product.name}${product.color ? `, ${product.color}` : ""}${product.size ? `, ${product.size}` : ""}`.trim() || "Фото товара" : "Фото товара"}
                               width={60}
                               height={60}
                               className={styles.orderCardThumbnailImage}
@@ -584,7 +584,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                           <Image
                             src={product.image}
                             className={styles.productImage}
-                            alt={product.name}
+                            alt={product.name ? `${product.name}${product.color ? `, ${product.color}` : ""}${product.size ? `, ${product.size}` : ""}`.trim() || "Фото товара" : "Фото товара"}
                             width={104}
                             height={149}
                             loading="lazy"
@@ -729,7 +729,7 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                             {product.image ? (
                               <Image
                                 src={product.image}
-                                alt={product.name}
+                                alt={product.name ? `${product.name}${product.color ? `, ${product.color}` : ""}${product.size ? `, ${product.size}` : ""}`.trim() || "Фото товара" : "Фото товара"}
                                 width={60}
                                 height={60}
                                 className={styles.orderCardThumbnailImage}

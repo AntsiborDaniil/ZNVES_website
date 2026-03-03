@@ -3,6 +3,16 @@
 import { API_BASE_URL } from "../../lib/apiConfig";
 import { getCsrfToken } from "../../lib/csrf";
 
+/** Собирает URL изображения товара: если передан путь без протокола — дополняем базовым URL API. */
+function buildProductImageUrl(value: string | undefined): string {
+  if (!value || typeof value !== "string") return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  const base = API_BASE_URL.replace(/\/$/, "");
+  return trimmed.startsWith("/") ? `${base}${trimmed}` : `${base}/${trimmed}`;
+}
+
 const ORDER_API_URL = `${API_BASE_URL}/api/order/`;
 const MY_ORDERS_URL = `${API_BASE_URL}/api/order/my/`;
 
@@ -13,6 +23,8 @@ export interface ApiOrderPosition {
   color: string;
   size: string;
   quantity: number;
+  /** URL или путь к изображению товара */
+  product_image?: string;
 }
 
 /** Элемент ответа GET /api/order/my/?active=true|false */
@@ -137,7 +149,7 @@ export const apiOrderToAccountView = (api: ApiMyOrderItem): AccountOrderView => 
     : undefined;
 
   const products = (api.positions ?? []).map((p) => ({
-    image: "",
+    image: buildProductImageUrl(p.product_image),
     name: p.product_name ?? "",
     color: p.color ?? "",
     size: p.size ?? "",
