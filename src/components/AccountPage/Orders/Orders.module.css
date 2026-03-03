@@ -153,11 +153,12 @@
 }
 
 .orderCardThumbnail {
+    display: none;
   width: 68px;
   height: 68px;
   border-radius: 8px;
   overflow: hidden;
-  background-color: #ffffff;
+  background-color: #5252520f;
   flex-shrink: 0;
 }
 
