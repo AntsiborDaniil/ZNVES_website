@@ -235,8 +235,8 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
-  padding: 14px 40px 14px 18px;
-  min-height: 72px;
+  padding: 10px 36px 10px 16px;
+  min-height: 56px;
   background-color: #ffffff;
   border: 1px solid rgba(82, 82, 82, 0.2);
   border-radius: 6px;
@@ -404,18 +404,20 @@
 @media (min-width: 1025px) {
   .filters {
     grid-template-columns: repeat(3, 1fr) auto;
-    align-items: end;
+    align-items: stretch;
   }
 
   .clearFiltersButton {
     grid-column: auto;
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    min-height: 48px;
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    min-height: 56px;
     padding: 0;
     border-radius: 6px;
     flex-shrink: 0;
+    justify-content: center;
+    align-items: center;
   }
 
   .clearFiltersButton .clearFiltersIcon {
