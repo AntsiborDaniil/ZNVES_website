@@ -364,37 +364,6 @@ const Orders = ({ initialOrderId }: OrdersProps) => {
                       </div>
                     </div>
                 </div>
-                <div className={styles.orderCardDetailsRight}>
-                  <div className={styles.orderCardThumbnails}>
-                    {selectedOrder.products
-                      .slice(0, 3)
-                      .map((product, index) => (
-                        <div key={index} className={styles.orderCardThumbnail}>
-                          {product.image ? (
-                            <Image
-                              src={product.image}
-                              alt={product.name ? `${product.name}${product.color ? `, ${product.color}` : ""}${product.size ? `, ${product.size}` : ""}`.trim() || "Фото товара" : "Фото товара"}
-                              width={60}
-                              height={60}
-                              className={styles.orderCardThumbnailImage}
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div
-                              className={styles.orderCardThumbnailPlaceholder}
-                              title={product.name}
-                              aria-hidden
-                            />
-                          )}
-                        </div>
-                      ))}
-                    {selectedOrder.products.length > 3 && (
-                      <div className={styles.orderCardThumbnailMore}>
-                        +{selectedOrder.products.length - 3}
-                      </div>
-                    )}
-                  </div>
-                </div>
               </div>
             </div>
           </div>
