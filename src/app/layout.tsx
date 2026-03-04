@@ -36,15 +36,45 @@ const roboto = Roboto({
   preload: true,
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://znves.ru";
+const defaultTitle = "ZNVES — Одежда и аксессуары";
+const defaultDescription =
+  "ZNVES — интернет-магазин стильной одежды: футболки, худи, джинсы, куртки и многое другое. Удобная доставка СДЭК и Яндекс. Доставка по России.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
-    default: "ZNVES — Одежда и аксессуары",
+    default: defaultTitle,
     template: "%s | ZNVES",
   },
-  description:
-    "ZNVES — интернет-магазин стильной одежды: футболки, худи, джинсы, куртки и многое другое. Удобная доставка СДЭК и Яндекс. Доставка по России.",
+  description: defaultDescription,
   icons: {
-    icon: "/images/logo.png",
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/images/logo.png", type: "image/png", sizes: "any" },
+    ],
+    apple: "/icon.png",
+  },
+  openGraph: {
+    type: "website",
+    locale: "ru_RU",
+    url: siteUrl,
+    siteName: "ZNVES",
+    title: defaultTitle,
+    description: defaultDescription,
+    images: [
+      {
+        url: "/images/logo.png",
+        width: 512,
+        height: 512,
+        alt: "ZNVES",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: defaultTitle,
+    description: defaultDescription,
   },
 };
 
