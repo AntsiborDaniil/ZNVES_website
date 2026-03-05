@@ -359,7 +359,7 @@ const CartPageContent = () => {
               Очистить корзину
             </button>
           </div>
-          <div className={styles.mainContentWrapper}>
+            <div className={styles.mainContentWrapper}>
             <div className={styles.cartItemsWrapper}>
               {items.map((item, index) => {
                 const fullProduct = getProductById(Number(item.productId));
@@ -474,6 +474,7 @@ const CartPageContent = () => {
               </div>
             )}
           </div>
+
         </div>
       </main>
       <Footer />

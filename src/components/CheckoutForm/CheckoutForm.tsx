@@ -109,7 +109,7 @@ const CheckoutForm = ({
     floor: "",
     entrance: "",
     intercom: "",
-    pickupCity: "",
+    pickupCity: "Москва",
     postalCode: "",
     pvzAddress: "",
     deliveryType: "cdek",
@@ -147,6 +147,11 @@ const CheckoutForm = ({
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>(initialColors);
   const [totalWeightGrams, setTotalWeightGrams] = useState<number | undefined>(undefined);
+  const [cdekDeliveryEstimate, setCdekDeliveryEstimate] = useState<{
+    price: number;
+    daysMin: number;
+    daysMax: number;
+  } | null>(null);
 
   // Refs для полей формы
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -359,23 +364,22 @@ const CheckoutForm = ({
     }
   }, [formData.deliveryMethod]);
 
-  // Цены доставки (сейчас всегда 0)
-  const deliveryPrices = {
-    pickup: 0,
-    yandex: 0,
-  };
+  // Стоимость доставки: для СДЭК ПВЗ — из расчёта API, для остальных — 0
+  const deliveryPrice = useMemo(() => {
+    if (formData.deliveryType === "cdek" && formData.deliveryMethod === "pickup" && cdekDeliveryEstimate) {
+      return cdekDeliveryEstimate.price;
+    }
+    return 0;
+  }, [formData.deliveryType, formData.deliveryMethod, cdekDeliveryEstimate]);
 
-  // Расчет итоговой суммы (с учётом промокода) — мемоизация, чтобы не пересчитывать на каждый рендер
+  // Расчет итоговой суммы (с учётом промокода и доставки)
   const totalAmount = useMemo(() => {
     let itemsTotal = getTotalPrice();
     if (appliedPromo) {
       itemsTotal = Math.max(0, itemsTotal - parseFloat(appliedPromo.discount));
     }
-    const deliveryPrice =
-      deliveryPrices[formData.deliveryMethod as keyof typeof deliveryPrices] ||
-      0;
     return itemsTotal + deliveryPrice;
-  }, [getTotalPrice, appliedPromo, formData.deliveryMethod]);
+  }, [getTotalPrice, appliedPromo, deliveryPrice]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ru-RU", {
@@ -446,6 +450,7 @@ const CheckoutForm = ({
         ...prev,
         deliveryType: value,
         deliveryMethod: "pickup",
+        ...(!prev.pickupCity?.trim() ? { pickupCity: "Москва" } : {}),
       }));
       setSelectedPvzCoords(null);
       // Сбрасываем ошибки доставки при смене типа
@@ -478,6 +483,8 @@ const CheckoutForm = ({
       setFormData((prev) => ({
         ...prev,
         deliveryMethod: value,
+        // При выборе «Пункт выдачи» по умолчанию город — Москва, если не задан
+        ...(value === "pickup" && !prev.pickupCity?.trim() ? { pickupCity: "Москва" } : {}),
       }));
       setSelectedPvzCoords(null);
       // Сбрасываем ошибки доставки при смене метода
@@ -1473,10 +1480,18 @@ const CheckoutForm = ({
                     </div>
                     <div className={styles.deliveryButtonInfo}>
                       <span className={styles.deliveryButtonSubtext}>
-                        Послезавтра
+                        {cdekDeliveryEstimate
+                          ? cdekDeliveryEstimate.daysMin === cdekDeliveryEstimate.daysMax
+                            ? `${cdekDeliveryEstimate.daysMin} дн.`
+                            : `${cdekDeliveryEstimate.daysMin}–${cdekDeliveryEstimate.daysMax} дн.`
+                          : "Послезавтра"}
                       </span>
                       <span className={styles.deliveryButtonPrice}>
-                        бесплатно
+                        {cdekDeliveryEstimate
+                          ? cdekDeliveryEstimate.price === 0
+                            ? "бесплатно"
+                            : `от ${cdekDeliveryEstimate.price} ₽`
+                          : "бесплатно"}
                       </span>
                     </div>
                     <div
@@ -1798,6 +1813,25 @@ const CheckoutForm = ({
                 ? "Пункт получения"
                 : "Адрес доставки"}
             </h2>
+            {formData.deliveryMethod === "pickup" && formData.deliveryType === "cdek" && (
+              <div className={styles.firstInputs} style={{ marginBottom: 12 }}>
+                <div className={styles.inputWrapper}>
+                  <label htmlFor="pickupCity" className={styles.label}>
+                    Город
+                  </label>
+                  <input
+                    type="text"
+                    id="pickupCity"
+                    name="pickupCity"
+                    placeholder="Например: Москва, Санкт-Петербург"
+                    value={formData.pickupCity}
+                    onChange={handleInputChange}
+                    className={styles.input}
+                    autoComplete="address-level2"
+                  />
+                </div>
+              </div>
+            )}
             <div className={styles.checkoutMapSearchContainer}>
               <input
                 type="text"
@@ -1849,6 +1883,7 @@ const CheckoutForm = ({
                   city={formData.pickupCity}
                   onAddressSelect={handleAddressSelect}
                   onPvzListLoaded={setPvzOptions}
+                  onCdekDeliveryEstimate={setCdekDeliveryEstimate}
                   searchValue={mapSearchValue}
                   onSearchChange={handleMapSearchChange}
                   deliveryMethod={formData.deliveryMethod}
@@ -2106,7 +2141,9 @@ const CheckoutForm = ({
               </div>
               <div className={styles.summaryRow}>
                 <span className={styles.summaryLabel}>Доставка:</span>
-                <span className={styles.summaryValue}>Бесплатно</span>
+                <span className={styles.summaryValue}>
+                  {deliveryPrice === 0 ? "Бесплатно" : formatPrice(deliveryPrice)}
+                </span>
               </div>
               <div className={styles.summaryRow}>
                 <span className={styles.summaryLabel}>Товаров на:</span>

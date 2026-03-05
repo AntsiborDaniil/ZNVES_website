@@ -1,11 +1,13 @@
 /**
  * API для получения пунктов выдачи СДЭК.
- * Бэкенд: GET /api/delivery/cdek/pvz (см. DELIVERY_INTEGRATION_REQUIREMENTS.md)
+ * Сначала запрос в GET /api/cdek/pvz (OAuth по CDEK_ACCOUNT и CDEK_SECURE_PASSWORD, apidoc.cdek.ru).
+ * При ошибке или 502 — fallback на внешний бэкенд GET /api/delivery/cdek/pvz.
  */
 
 import { API_BASE_URL } from "../../lib/apiConfig";
 
 const API_BASE = `${API_BASE_URL}/api/delivery`;
+const APP_CDEK_PVZ_PATH = "/api/cdek/pvz";
 
 export type CdekPvzPoint = {
   code: string;
@@ -77,36 +79,38 @@ export const getCdekPvzByCity = async (
   city: string,
   signal?: AbortSignal
 ): Promise<CdekPvzPoint[]> => {
-  const url = `${API_BASE}/cdek/pvz?city=${encodeURIComponent(city)}`;
-  try {
+  const appUrl = `${APP_CDEK_PVZ_PATH}?city=${encodeURIComponent(city)}`;
+  const backendUrl = `${API_BASE}/cdek/pvz?city=${encodeURIComponent(city)}`;
+
+  const tryFetch = async (url: string): Promise<CdekPvzPoint[] | null> => {
     const res = await fetch(url, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       cache: "no-store",
       signal,
     });
-    if (!res.ok) {
-      if (res.status === 404) return getFallbackPvzForCity(city);
-      throw new Error(`СДЭК ПВЗ: ${res.status}`);
-    }
+    if (!res.ok) return null;
     const data = await res.json();
-    console.log("[cdekApi] getCdekPvzByCity response:", data);
     const list = extractPvzList(data);
-    if (list.length === 0) {
-      return getFallbackPvzForCity(city);
+    return list.length > 0 ? list : null;
+  };
+
+  try {
+    const list = await tryFetch(appUrl);
+    if (list) {
+      return list;
     }
-    return list;
-  } catch (e) {
-    console.warn(
-      "[cdekApi] getCdekPvzByCity failed for city:",
-      city,
-      "url:",
-      url,
-      "error:",
-      e
-    );
-    return getFallbackPvzForCity(city);
+  } catch {
+    // ignore, try backend
   }
+
+  try {
+    const list = await tryFetch(backendUrl);
+    if (list) return list;
+  } catch (e) {
+    console.warn("[cdekApi] getCdekPvzByCity backend failed for city:", city, e);
+  }
+  return getFallbackPvzForCity(city);
 };
 
 /**

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getCdekPvzByCity, type CdekPvzPoint } from "../../api/delivery/cdekApi";
 
 const WIDGET_SCRIPT_URL = "https://ndd-widget.landpro.site/widget.js";
 const CONTAINER_ID = "delivery-widget";
@@ -45,6 +46,8 @@ type MapProps = {
   selectedPvzCoords?: [number, number] | null;
   /** Суммарный вес корзины в граммах — для расчёта сроков и стоимости в виджете ПВЗ */
   totalWeightGrams?: number;
+  /** Колбэк при изменении расчёта доставки СДЭК (срок и цена) — для отображения в блоке «Доставка» */
+  onCdekDeliveryEstimate?: (estimate: { price: number; daysMin: number; daysMax: number } | null) => void;
 };
 
 declare global {
@@ -124,6 +127,7 @@ const Map = ({
   deliveryMethod,
   deliveryType,
   totalWeightGrams,
+  onCdekDeliveryEstimate,
 }: MapProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const courierMapRef = useRef<HTMLDivElement>(null);
@@ -141,13 +145,196 @@ const Map = ({
     deliveryMethod === "pickup" &&
     (deliveryType === "cdek" || deliveryType === "yandex");
 
+  /** ПВЗ Яндекса — показываем виджет «Я Доставка» */
+  const isPickupYandex =
+    deliveryMethod === "pickup" && deliveryType === "yandex";
+
+  /** ПВЗ СДЭК — показываем список из нашего API (ключи в env) */
+  const isPickupCdek =
+    deliveryMethod === "pickup" && deliveryType === "cdek";
+
   const isCourier = deliveryMethod === "yandex";
+
+  const [cdekPvzList, setCdekPvzList] = useState<CdekPvzPoint[]>([]);
+  const [cdekPvzLoading, setCdekPvzLoading] = useState(false);
+  const [selectedCdekPvzCode, setSelectedCdekPvzCode] = useState<string | null>(null);
+  const [cdekDeliveryEstimate, setCdekDeliveryEstimate] = useState<{ price: number; daysMin: number; daysMax: number } | null>(null);
+  const [cdekTariffs, setCdekTariffs] = useState<
+    Array<{ code: string | number | null; name: string; description: string; price: number; daysMin: number | null; daysMax: number | null }>
+  >([]);
+  const [selectedCdekTariffCode, setSelectedCdekTariffCode] = useState<string | number | null>(null);
+  const [cdekPvzSearch, setCdekPvzSearch] = useState("");
 
   const city = (cityProp || "Москва").trim() || "Москва";
 
-  // Подписка на выбор ПВЗ (событие из документации виджета)
+  /** Нормализация для поиска: trim, нижний регистр, схлопывание пробелов */
+  const normalizeSearch = (s: string) =>
+    (s || "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, " ");
+
+  const cdekPvzFiltered = cdekPvzSearch.trim()
+    ? cdekPvzList.filter((p) => {
+        const q = normalizeSearch(cdekPvzSearch);
+        if (!q) return true;
+        const address = normalizeSearch(p.address ?? "");
+        const name = normalizeSearch(p.name ?? "");
+        const code = normalizeSearch(p.code ?? "");
+        const workTime = normalizeSearch(p.work_time ?? "");
+        return (
+          address.includes(q) ||
+          name.includes(q) ||
+          code.includes(q) ||
+          workTime.includes(q)
+        );
+      })
+    : cdekPvzList;
+
+  const selectCdekPvz = (pvz: CdekPvzPoint) => {
+    setSelectedCdekPvzCode(pvz.code);
+    const payload = {
+      city,
+      pvzAddress: pvz.address,
+      pvzCode: pvz.code,
+      fullAddress: pvz.address,
+      lat: pvz.location?.lat,
+      lon: pvz.location?.lon,
+    };
+    onAddressSelectRef.current?.(payload);
+    onPvzListLoaded?.([
+      {
+        name: pvz.name || pvz.address,
+        address: pvz.address,
+        code: pvz.code,
+        city,
+        lat: pvz.location?.lat,
+        lon: pvz.location?.lon,
+      },
+    ]);
+  };
+
+  // Загрузка списка ПВЗ СДЭК по городу (наш API с ключами из env)
   useEffect(() => {
-    if (!isPickup) return;
+    if (!isPickupCdek || !city) return;
+    const ac = new AbortController();
+    setCdekPvzLoading(true);
+    setSelectedCdekPvzCode(null);
+    getCdekPvzByCity(city, ac.signal)
+      .then((list) => {
+        setCdekPvzList(list);
+        if (onPvzListLoaded && list.length > 0) {
+          onPvzListLoaded(
+            list.map((p) => ({
+              name: p.name || p.address,
+              address: p.address,
+              code: p.code,
+              city: city,
+              lat: p.location?.lat,
+              lon: p.location?.lon,
+            }))
+          );
+        }
+      })
+      .catch(() => setCdekPvzList([]))
+      .finally(() => setCdekPvzLoading(false));
+    return () => ac.abort();
+  }, [isPickupCdek, city, onPvzListLoaded]);
+
+  // Расчёт доставки СДЭК (срок и стоимость) + список тарифов — опционально, если есть роут
+  useEffect(() => {
+    if (!isPickupCdek || !city || (totalWeightGrams ?? 0) <= 0) return;
+    const ac = new AbortController();
+    fetch(`/api/cdek/calculate?city=${encodeURIComponent(city)}&weight_grams=${totalWeightGrams ?? 1000}`, {
+      signal: ac.signal,
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then(
+        (data:
+          | {
+              price?: number;
+              days_min?: number;
+              days_max?: number;
+              from_api?: boolean;
+              tariffs?: Array<{
+                code: string | number | null;
+                name: string;
+                description: string;
+                price: number;
+                days_min: number | null;
+                days_max: number | null;
+              }>;
+              selected_tariff_code?: string | number | null;
+            }
+          | null) => {
+          if (!data || data.from_api !== true || typeof data.price !== "number") {
+            setCdekDeliveryEstimate(null);
+            setCdekTariffs([]);
+            setSelectedCdekTariffCode(null);
+            return;
+          }
+
+          const tariffs =
+            data.tariffs?.map((t) => ({
+              code: t.code,
+              name: t.name,
+              description: t.description,
+              price: t.price,
+              daysMin: t.days_min,
+              daysMax: t.days_max,
+            })) ?? [];
+
+          setCdekTariffs(tariffs);
+
+          // Выбираем тариф: сначала по selected_tariff_code, затем по минимальной цене, затем просто первый
+          let selected =
+            tariffs.find((t) => t.code === data.selected_tariff_code) ??
+            tariffs.reduce(
+              (min, t) => (min == null || t.price < min.price ? t : min),
+              tariffs[0] ?? null
+            ) ??
+            null;
+
+          if (!selected) {
+            // fallback к значению price/days из ответа, если тарифы пусты
+            setCdekDeliveryEstimate({
+              price: data.price,
+              daysMin: data.days_min ?? 1,
+              daysMax: data.days_max ?? 2,
+            });
+            setSelectedCdekTariffCode(null);
+            return;
+          }
+
+          setSelectedCdekTariffCode(selected.code);
+          setCdekDeliveryEstimate({
+            price: selected.price,
+            daysMin: selected.daysMin ?? data.days_min ?? 1,
+            daysMax: selected.daysMax ?? data.days_max ?? 2,
+          });
+        }
+      )
+      .catch(() => {
+        setCdekDeliveryEstimate(null);
+        setCdekTariffs([]);
+        setSelectedCdekTariffCode(null);
+      });
+    return () => ac.abort();
+  }, [isPickupCdek, city, totalWeightGrams]);
+
+  // Пробрасываем расчёт СДЭК наверх для отображения в блоке «Доставка»
+  useEffect(() => {
+    if (!onCdekDeliveryEstimate) return;
+    if (isPickupCdek) {
+      onCdekDeliveryEstimate(cdekDeliveryEstimate);
+    } else {
+      onCdekDeliveryEstimate(null);
+    }
+  }, [isPickupCdek, cdekDeliveryEstimate, onCdekDeliveryEstimate]);
+
+  // Подписка на выбор ПВЗ (событие из документации виджета) — только для Яндекса
+  useEffect(() => {
+    if (!isPickupYandex) return;
 
     const handler = (event: Event) => {
       const e = event as CustomEvent;
@@ -185,11 +372,11 @@ const Map = ({
 
     document.addEventListener("YaNddWidgetPointSelected", handler);
     return () => document.removeEventListener("YaNddWidgetPointSelected", handler);
-  }, [isPickup, city, onAddressSelect, onPvzListLoaded]);
+  }, [isPickupYandex, city, onAddressSelect, onPvzListLoaded]);
 
   // После клика по кнопке «Продолжить» в виджете добавляем класс на контейнер — в CSS по нему скрываем кнопку (без помех работе виджета)
   useEffect(() => {
-    if (!isPickup) return;
+    if (!isPickupYandex) return;
 
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -206,13 +393,13 @@ const Map = ({
     return () => document.removeEventListener("click", handleClick, false);
   }, [isPickup]);
 
-  // Загрузка скрипта и инициализация виджета ПВЗ
+  // Загрузка скрипта и инициализация виджета ПВЗ (только для Яндекса)
   useEffect(() => {
-    if (!isPickup || !containerRef.current) return;
+    if (!isPickupYandex || !containerRef.current) return;
 
     const envStationId =
       typeof window !== "undefined" ? process.env.NEXT_PUBLIC_YA_DELIVERY_STATION_ID : undefined;
-    const stationId = envStationId || "05e809bb-4521-42d9-a936-0fb0744c0fb3";
+    const stationId = envStationId || "y0__xCu_f3ECBix9BwgzZ6knhXCN2Fl0du7QjxRiZq6AYLgkMMUPA";
 
     console.log("[Map NDD widget] Эффект: isPickup=true", {
       city,
@@ -336,7 +523,7 @@ const Map = ({
       if (container) container.innerHTML = "";
       console.log("[Map NDD widget] Cleanup: виджет сброшен");
     };
-  }, [isPickup, city, totalWeightGrams]);
+  }, [isPickupYandex, city, totalWeightGrams]);
 
   // Курьер: обычная Яндекс.Карта с меткой, геокодинг, только Москва
   useEffect(() => {
@@ -614,14 +801,184 @@ const Map = ({
     };
   }, [isCourier, searchValue]);
 
-  if (isPickup) {
+  if (isPickupCdek) {
     return (
       <div style={{ width: "100%", minHeight: 400 }}>
         <div
-          ref={containerRef}
-          id={CONTAINER_ID}
-          style={{ width: "100%", minHeight: 450 }}
-        />
+          id="cdek-pvz-block"
+          style={{
+            width: "100%",
+            border: "1px solid #e5e5e5",
+            borderRadius: 8,
+            overflow: "hidden",
+            background: "#fafafa",
+          }}
+        >
+          <div style={{ padding: "12px 14px", borderBottom: "1px solid #e5e5e5", display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
+            <span style={{ fontWeight: 600, color: "#333" }}>
+              СДЭК · Пункты выдачи · {city}
+            </span>
+            {cdekDeliveryEstimate != null && (
+              <span style={{ fontSize: 13, color: "#555" }}>
+                {cdekDeliveryEstimate.daysMin === cdekDeliveryEstimate.daysMax
+                  ? `${cdekDeliveryEstimate.daysMin} дн.`
+                  : `${cdekDeliveryEstimate.daysMin}–${cdekDeliveryEstimate.daysMax} дн.`}
+                {" · "}
+                {cdekDeliveryEstimate.price === 0 ? "бесплатно" : `от ${cdekDeliveryEstimate.price} ₽`}
+              </span>
+            )}
+            {cdekDeliveryEstimate == null && !cdekPvzLoading && cdekPvzList.length > 0 && (
+              <span style={{ fontSize: 13, color: "#777" }}>
+                Срок и стоимость уточняются
+              </span>
+            )}
+          </div>
+
+          {cdekTariffs.length > 0 && (
+            <div
+              style={{
+                padding: "8px 12px 4px",
+                borderBottom: "1px solid #e5e5e5",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 8,
+              }}
+            >
+              {cdekTariffs.map((t) => {
+                const isSelected =
+                  selectedCdekTariffCode != null && t.code === selectedCdekTariffCode;
+                const daysLabel =
+                  t.daysMin != null && t.daysMax != null
+                    ? t.daysMin === t.daysMax
+                      ? `${t.daysMin} дн.`
+                      : `${t.daysMin}–${t.daysMax} дн.`
+                    : null;
+                return (
+                  <button
+                    key={String(t.code ?? t.name)}
+                    type="button"
+                    onClick={() => {
+                      setSelectedCdekTariffCode(t.code);
+                      setCdekDeliveryEstimate({
+                        price: t.price,
+                        daysMin: t.daysMin ?? cdekDeliveryEstimate?.daysMin ?? 1,
+                        daysMax: t.daysMax ?? cdekDeliveryEstimate?.daysMax ?? 2,
+                      });
+                    }}
+                    style={{
+                      borderRadius: 999,
+                      border: isSelected ? "2px solid #1366ae" : "1px solid #e0e0e0",
+                      padding: "4px 10px",
+                      background: isSelected ? "#e8f4fc" : "#fff",
+                      cursor: "pointer",
+                      fontSize: 12,
+                      lineHeight: 1.3,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
+                    <span style={{ fontWeight: 600 }}>
+                      {t.name || `Тариф ${t.code ?? ""}`}
+                    </span>
+                    <span style={{ color: "#555" }}>
+                      {t.price === 0 ? "бесплатно" : `${t.price} ₽`}
+                    </span>
+                    {daysLabel && (
+                      <span style={{ color: "#777" }}>{daysLabel}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {cdekPvzLoading && (
+            <div style={{ padding: 48, textAlign: "center", color: "#666" }}>
+              Загрузка пунктов выдачи…
+            </div>
+          )}
+
+          {!cdekPvzLoading && cdekPvzList.length === 0 && (
+            <div style={{ padding: 48, textAlign: "center", color: "#666" }}>
+              Нет пунктов выдачи в этом городе. Проверьте CDEK_ACCOUNT и CDEK_SECURE_PASSWORD в .env.local.
+            </div>
+          )}
+
+          {!cdekPvzLoading && cdekPvzList.length > 0 && (
+            <div style={{ padding: "0 12px 12px" }}>
+              <input
+                type="text"
+                placeholder="Поиск по адресу ПВЗ"
+                value={cdekPvzSearch}
+                onChange={(e) => setCdekPvzSearch(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  marginBottom: 10,
+                  border: "1px solid #e5e5e5",
+                  borderRadius: 8,
+                  fontSize: 14,
+                  boxSizing: "border-box",
+                }}
+                aria-label="Поиск по адресу ПВЗ"
+              />
+              <div
+                style={{
+                  overflowY: "auto",
+                  maxHeight: 420,
+                  padding: 4,
+                }}
+              >
+                {cdekPvzFiltered.length === 0 ? (
+                  <div style={{ padding: 24, textAlign: "center", color: "#666", fontSize: 14 }}>
+                    По вашему запросу ничего не найдено. Измените строку поиска.
+                  </div>
+                ) : (
+                cdekPvzFiltered.map((pvz) => (
+                  <button
+                    key={pvz.code}
+                    type="button"
+                    onClick={() => selectCdekPvz(pvz)}
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      textAlign: "left",
+                      padding: "12px 14px",
+                      marginBottom: 8,
+                      border: selectedCdekPvzCode === pvz.code ? "2px solid #1366ae" : "1px solid #e0e0e0",
+                      borderRadius: 6,
+                      background: selectedCdekPvzCode === pvz.code ? "#e8f4fc" : "#fff",
+                      cursor: "pointer",
+                      fontSize: 14,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    <span style={{ fontWeight: 600 }}>{pvz.name || pvz.code}</span>
+                    <br />
+                    <span style={{ color: "#555" }}>{pvz.address}</span>
+                    {pvz.work_time && (
+                      <div style={{ marginTop: 4, fontSize: 12, color: "#777" }}>
+                        {pvz.work_time}
+                      </div>
+                    )}
+                  </button>
+                )))
+                }
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (isPickupYandex) {
+    return (
+      <div style={{ width: "100%", minHeight: 400 }}>
+        <div ref={containerRef} style={{ width: "100%", minHeight: 450 }}>
+          <div id={CONTAINER_ID} style={{ width: "100%", height: "100%", minHeight: 450 }} />
+        </div>
       </div>
     );
   }
