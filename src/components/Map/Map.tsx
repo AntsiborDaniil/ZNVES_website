@@ -159,10 +159,6 @@ const Map = ({
   const [cdekPvzLoading, setCdekPvzLoading] = useState(false);
   const [selectedCdekPvzCode, setSelectedCdekPvzCode] = useState<string | null>(null);
   const [cdekDeliveryEstimate, setCdekDeliveryEstimate] = useState<{ price: number; daysMin: number; daysMax: number } | null>(null);
-  const [cdekTariffs, setCdekTariffs] = useState<
-    Array<{ code: string | number | null; name: string; description: string; price: number; daysMin: number | null; daysMax: number | null }>
-  >([]);
-  const [selectedCdekTariffCode, setSelectedCdekTariffCode] = useState<string | number | null>(null);
   const [cdekPvzSearch, setCdekPvzSearch] = useState("");
 
   const city = (cityProp || "Москва").trim() || "Москва";
@@ -241,7 +237,7 @@ const Map = ({
     return () => ac.abort();
   }, [isPickupCdek, city, onPvzListLoaded]);
 
-  // Расчёт доставки СДЭК (срок и стоимость) + список тарифов — опционально, если есть роут
+  // Расчёт доставки СДЭК (срок и стоимость) — опционально, если есть роут
   useEffect(() => {
     if (!isPickupCdek || !city || (totalWeightGrams ?? 0) <= 0) return;
     const ac = new AbortController();
@@ -249,75 +245,19 @@ const Map = ({
       signal: ac.signal,
     })
       .then((r) => (r.ok ? r.json() : null))
-      .then(
-        (data:
-          | {
-              price?: number;
-              days_min?: number;
-              days_max?: number;
-              from_api?: boolean;
-              tariffs?: Array<{
-                code: string | number | null;
-                name: string;
-                description: string;
-                price: number;
-                days_min: number | null;
-                days_max: number | null;
-              }>;
-              selected_tariff_code?: string | number | null;
-            }
-          | null) => {
-          if (!data || data.from_api !== true || typeof data.price !== "number") {
-            setCdekDeliveryEstimate(null);
-            setCdekTariffs([]);
-            setSelectedCdekTariffCode(null);
-            return;
-          }
-
-          const tariffs =
-            data.tariffs?.map((t) => ({
-              code: t.code,
-              name: t.name,
-              description: t.description,
-              price: t.price,
-              daysMin: t.days_min,
-              daysMax: t.days_max,
-            })) ?? [];
-
-          setCdekTariffs(tariffs);
-
-          // Выбираем тариф: сначала по selected_tariff_code, затем по минимальной цене, затем просто первый
-          let selected =
-            tariffs.find((t) => t.code === data.selected_tariff_code) ??
-            tariffs.reduce(
-              (min, t) => (min == null || t.price < min.price ? t : min),
-              tariffs[0] ?? null
-            ) ??
-            null;
-
-          if (!selected) {
-            // fallback к значению price/days из ответа, если тарифы пусты
-            setCdekDeliveryEstimate({
-              price: data.price,
-              daysMin: data.days_min ?? 1,
-              daysMax: data.days_max ?? 2,
-            });
-            setSelectedCdekTariffCode(null);
-            return;
-          }
-
-          setSelectedCdekTariffCode(selected.code);
+      .then((data: { price?: number; days_min?: number; days_max?: number; from_api?: boolean } | null) => {
+        if (data && data.from_api === true && typeof data.price === "number") {
           setCdekDeliveryEstimate({
-            price: selected.price,
-            daysMin: selected.daysMin ?? data.days_min ?? 1,
-            daysMax: selected.daysMax ?? data.days_max ?? 2,
+            price: data.price,
+            daysMin: data.days_min ?? 1,
+            daysMax: data.days_max ?? 2,
           });
+        } else {
+          setCdekDeliveryEstimate(null);
         }
-      )
+      })
       .catch(() => {
         setCdekDeliveryEstimate(null);
-        setCdekTariffs([]);
-        setSelectedCdekTariffCode(null);
       });
     return () => ac.abort();
   }, [isPickupCdek, city, totalWeightGrams]);
@@ -338,8 +278,22 @@ const Map = ({
 
     const handler = (event: Event) => {
       const e = event as CustomEvent;
-      const detail = e.detail;
-      console.log("[Map NDD widget] YaNddWidgetPointSelected", detail);
+      const detail = e.detail as any;
+      const deliveryPrice =
+        detail?.delivery_price ??
+        detail?.deliveryPrice ??
+        detail?.delivery?.price ??
+        null;
+      const deliveryTerm =
+        detail?.delivery_term ??
+        detail?.deliveryTerm ??
+        detail?.delivery?.term ??
+        null;
+      console.log("[Map NDD widget] YaNddWidgetPointSelected", {
+        raw: detail,
+        deliveryPrice,
+        deliveryTerm,
+      });
       if (!detail) return;
 
       const addr = detail.address || {};
@@ -397,15 +351,16 @@ const Map = ({
   useEffect(() => {
     if (!isPickupYandex || !containerRef.current) return;
 
-    const envStationId =
-      typeof window !== "undefined" ? process.env.NEXT_PUBLIC_YA_DELIVERY_STATION_ID : undefined;
-    const stationId = envStationId || "y0__xCu_f3ECBix9BwgzZ6knhXCN2Fl0du7QjxRiZq6AYLgkMMUPA";
+    const envSourceAddress =
+      typeof window !== "undefined" ? process.env.NEXT_PUBLIC_YA_DELIVERY_SOURCE_ADDRESS : undefined;
+    const sourceAddress =
+      envSourceAddress || "Москва, Промышленная улица, 12А, 115516";
 
     console.log("[Map NDD widget] Эффект: isPickup=true", {
       city,
       totalWeightGrams_from_props: totalWeightGrams,
-      NEXT_PUBLIC_YA_DELIVERY_STATION_ID: envStationId ?? "(не задан, используется fallback)",
-      stationId_used: stationId,
+      NEXT_PUBLIC_YA_DELIVERY_SOURCE_ADDRESS: envSourceAddress ?? "(не задан, используется fallback)",
+      source_address_used: sourceAddress,
       container_exists: !!document.getElementById(CONTAINER_ID),
     });
 
@@ -428,13 +383,21 @@ const Map = ({
       const params = {
         city,
         size: { height: "450px", width: "100%" },
-        source_platform_station: stationId,
+        source_address: sourceAddress,
         physical_dims_weight_gross: weightGrams,
         physical_dims_dx: 30,
         physical_dims_dy: 20,
         physical_dims_dz: 10,
         delivery_term: 0,
-        delivery_price: (price: number) => `${price} ₽`,
+        delivery_price: (price: number) => {
+          console.log("[Map NDD widget] delivery_price callback", {
+            city,
+            sourceAddress,
+            weightGrams,
+            price,
+          });
+          return `${price} ₽`;
+        },
         show_select_button: true,
         filter: {
           type: ["pickup_point", "terminal"],
@@ -818,7 +781,7 @@ const Map = ({
             <span style={{ fontWeight: 600, color: "#333" }}>
               СДЭК · Пункты выдачи · {city}
             </span>
-            {cdekDeliveryEstimate != null && (
+          {cdekDeliveryEstimate != null && (
               <span style={{ fontSize: 13, color: "#555" }}>
                 {cdekDeliveryEstimate.daysMin === cdekDeliveryEstimate.daysMax
                   ? `${cdekDeliveryEstimate.daysMin} дн.`
@@ -833,65 +796,6 @@ const Map = ({
               </span>
             )}
           </div>
-
-          {cdekTariffs.length > 0 && (
-            <div
-              style={{
-                padding: "8px 12px 4px",
-                borderBottom: "1px solid #e5e5e5",
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 8,
-              }}
-            >
-              {cdekTariffs.map((t) => {
-                const isSelected =
-                  selectedCdekTariffCode != null && t.code === selectedCdekTariffCode;
-                const daysLabel =
-                  t.daysMin != null && t.daysMax != null
-                    ? t.daysMin === t.daysMax
-                      ? `${t.daysMin} дн.`
-                      : `${t.daysMin}–${t.daysMax} дн.`
-                    : null;
-                return (
-                  <button
-                    key={String(t.code ?? t.name)}
-                    type="button"
-                    onClick={() => {
-                      setSelectedCdekTariffCode(t.code);
-                      setCdekDeliveryEstimate({
-                        price: t.price,
-                        daysMin: t.daysMin ?? cdekDeliveryEstimate?.daysMin ?? 1,
-                        daysMax: t.daysMax ?? cdekDeliveryEstimate?.daysMax ?? 2,
-                      });
-                    }}
-                    style={{
-                      borderRadius: 999,
-                      border: isSelected ? "2px solid #1366ae" : "1px solid #e0e0e0",
-                      padding: "4px 10px",
-                      background: isSelected ? "#e8f4fc" : "#fff",
-                      cursor: "pointer",
-                      fontSize: 12,
-                      lineHeight: 1.3,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                    }}
-                  >
-                    <span style={{ fontWeight: 600 }}>
-                      {t.name || `Тариф ${t.code ?? ""}`}
-                    </span>
-                    <span style={{ color: "#555" }}>
-                      {t.price === 0 ? "бесплатно" : `${t.price} ₽`}
-                    </span>
-                    {daysLabel && (
-                      <span style={{ color: "#777" }}>{daysLabel}</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          )}
 
           {cdekPvzLoading && (
             <div style={{ padding: 48, textAlign: "center", color: "#666" }}>
