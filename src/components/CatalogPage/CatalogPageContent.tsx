@@ -20,7 +20,8 @@ import {
   fetchCatalogProductsByCategory,
   fetchCatalogColors,
   fetchCatalogSizes,
-  normalizeCategoryForApi,
+  fetchCatalogCategories,
+  type ApiCatalogCategory,
 } from "../../api/catalog/catalogApi";
 import {
   fetchNewInProducts,
@@ -31,16 +32,27 @@ type CatalogPageContentProps = {
   title: string;
 };
 
-const categories = [
-  "All",
-  "Pants",
-  "Jeans",
-  "T-shirts",
-  "Zip hoodies",
-  "Jackets",
-  "Hoodies",
-  "Shorts",
+// Фолбэк-категории на случай, если API временно недоступно (названия на английском)
+const FALLBACK_CATEGORIES: ApiCatalogCategory[] = [
+  { slug: "pants", name: "Pants" },
+  { slug: "jeans", name: "Jeans" },
+  { slug: "t-shirt", name: "T-shirts" },
+  { slug: "zip-hoodie", name: "Zip hoodies" },
+  { slug: "jackets", name: "Jackets" },
+  { slug: "hoodies", name: "Hoodies" },
+  { slug: "shorts", name: "Shorts" },
 ];
+
+// Отображение названий категорий на английском (slug → label)
+const CATEGORY_SLUG_TO_ENGLISH: Record<string, string> = {
+  pants: "Pants",
+  jeans: "Jeans",
+  "t-shirt": "T-shirts",
+  "zip-hoodie": "Zip hoodies",
+  jackets: "Jackets",
+  hoodies: "Hoodies",
+  shorts: "Shorts",
+};
 
 type FilterOption = {
   value: string;
@@ -176,21 +188,13 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const orderParam = searchParams?.get("order");
 
   const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [categories, setCategories] = useState<ApiCatalogCategory[]>(FALLBACK_CATEGORIES);
   const [colors, setColors] = useState<ApiCatalogColor[]>([]);
   const [sizes, setSizes] = useState<ApiCatalogSize[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getNormalizedCategory = useCallback(() => {
-    if (!categoryParam) return "All";
-    const decodedParam = decodeURIComponent(categoryParam).toLowerCase();
-    return (
-      categories.find((category) => category.toLowerCase() === decodedParam) ??
-      "All"
-    );
-  }, [categoryParam]);
-
   const [activeCategory, setActiveCategory] = useState<string>(
-    getNormalizedCategory()
+    categoryParam ? decodeURIComponent(categoryParam) : "all"
   );
   const [colorFilter, setColorFilter] = useState<string>(colorParam || "all");
   const [sizeFilter, setSizeFilter] = useState<string>(sizeParam || "all");
@@ -260,16 +264,20 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
     setIsDragging(false);
   };
 
-  // Загрузка цветов и размеров для фильтров
+  // Загрузка категорий, цветов и размеров для фильтров
   useEffect(() => {
     const loadFilters = async () => {
       try {
-        const [colorsData, sizesData] = await Promise.all([
+        const [colorsData, sizesData, categoriesData] = await Promise.all([
           fetchCatalogColors(),
           fetchCatalogSizes(),
+          fetchCatalogCategories(),
         ]);
         setColors(colorsData);
         setSizes(sizesData);
+        if (categoriesData && categoriesData.length > 0) {
+          setCategories(categoriesData);
+        }
       } catch (error) {
         console.error("Error loading filter options:", error);
       }
@@ -301,22 +309,24 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
         setIsLoading(true);
       }
       try {
+        const categorySlug = categoryParam
+          ? decodeURIComponent(categoryParam)
+          : undefined;
+
         if (title === "NEW IN") {
           // Для страницы NEW IN загружаем только новые товары
-          const normalizedCategory = getNormalizedCategory();
           const categoryForApi =
-            normalizedCategory === "All"
+            !categorySlug || categorySlug === "all"
               ? undefined
-              : normalizeCategoryForNewInApi(normalizedCategory);
+              : normalizeCategoryForNewInApi(categorySlug);
           const newInProducts = await fetchNewInProducts(categoryForApi);
           setProducts(newInProducts);
         } else {
           // Для страницы CATALOG загружаем все товары с учетом категории
-          const normalizedCategory = getNormalizedCategory();
           const categoryForApi =
-            normalizedCategory === "All"
+            !categorySlug || categorySlug === "all"
               ? undefined
-              : normalizeCategoryForApi(normalizedCategory);
+              : categorySlug;
           const catalogProducts = await fetchCatalogProductsByCategory(
             categoryForApi
           );
@@ -337,13 +347,16 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [title, categoryParam, getNormalizedCategory]);
+  }, [title, categoryParam]);
 
   // Обновляем состояние из URL при изменении параметров
   useEffect(() => {
-    const normalized = getNormalizedCategory();
-    setActiveCategory(normalized);
-  }, [getNormalizedCategory]);
+    if (categoryParam) {
+      setActiveCategory(decodeURIComponent(categoryParam));
+    } else {
+      setActiveCategory("all");
+    }
+  }, [categoryParam]);
 
   useEffect(() => {
     if (colorParam) {
@@ -381,13 +394,10 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
 
       // Обновляем параметры
       if (updates.category !== undefined) {
-        if (updates.category === "All") {
+        if (updates.category === "All" || updates.category === "all") {
           params.delete("category");
         } else {
-          // Нормализуем категорию к нижнему регистру для соответствия с бургер-меню
-          // URLSearchParams.set() автоматически кодирует значение, не нужно encodeURIComponent
-          const normalizedCategory = updates.category.toLowerCase();
-          params.set("category", normalizedCategory);
+          params.set("category", updates.category);
         }
       }
 
@@ -426,9 +436,9 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
 
   // Обработчики для изменения фильтров
   const handleCategoryChange = useCallback(
-    (category: string) => {
-      setActiveCategory(category);
-      updateURL({ category });
+    (slug: string) => {
+      setActiveCategory(slug);
+      updateURL({ category: slug === "all" ? "All" : slug });
     },
     [updateURL]
   );
@@ -459,12 +469,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
 
   const filteredProducts = useMemo(() => {
     let currentProducts = [...products];
-
-    if (activeCategory !== "All") {
-      currentProducts = currentProducts.filter(
-        (product) => product.category === activeCategory
-      );
-    }
+    // Категория уже учтена при загрузке с API (categoryParam) — не фильтруем по ней на клиенте
 
     // Используем состояние фильтров (обновляется сразу при смене селекта), чтобы фильтр срабатывал без задержки от router.push
     const colorActive = (colorFilter ?? "").trim() || "all";
@@ -574,18 +579,29 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
         >
+          <button
+            key="all"
+            className={`${styles.categoryButton} ${
+              activeCategory === "all" ? styles.categoryButtonActive : ""
+            }`}
+            onClick={() => handleCategoryChange("all")}
+            type="button"
+          >
+            All
+          </button>
           {categories.map((category) => {
-            const isActive = category === activeCategory;
+            const isActive = category.slug === activeCategory;
+            const label = CATEGORY_SLUG_TO_ENGLISH[category.slug] ?? category.name;
             return (
               <button
-                key={category}
+                key={category.slug}
                 className={`${styles.categoryButton} ${
                   isActive ? styles.categoryButtonActive : ""
                 }`}
-                onClick={() => handleCategoryChange(category)}
+                onClick={() => handleCategoryChange(category.slug)}
                 type="button"
               >
-                {category}
+                {label}
               </button>
             );
           })}

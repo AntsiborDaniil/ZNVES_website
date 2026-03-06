@@ -6,7 +6,12 @@ import { API_BASE_URL } from "../../lib/apiConfig";
 
 const CATALOG_API_URL = `${API_BASE_URL}/api/catalog/`;
 
-// Типы ответов ручек цветов и размеров
+// Типы ответов ручек категорий, цветов и размеров
+export type ApiCatalogCategory = {
+  slug: string;
+  name: string;
+};
+
 export type ApiCatalogColor = {
   slug: string;
   value: string;
@@ -96,13 +101,13 @@ const normalizeCategoryForApi = (category: string): string | undefined => {
   if (category === "All") return undefined;
   
   const categoryMap: Record<string, string> = {
-    "Pants": "pants",
-    "Jeans": "jeans",
+    Pants: "pants",
+    Jeans: "jeans",
     "T-shirts": "t-shirt",
-    "Zip hoodies": "zip hoodies",
-    "Jackets": "jackets",
-    "Hoodies": "hoodies",
-    "Shorts": "shorts",
+    "Zip hoodies": "zip-hoodie",
+    Jackets: "jackets",
+    Hoodies: "hoodies",
+    Shorts: "shorts",
   };
   
   return categoryMap[category] || category.toLowerCase();
@@ -171,10 +176,35 @@ export const fetchCatalogProductsByCategory = async (
   });
 };
 
-// Кеш для цветов и размеров (один запрос на сессию, TTL 5 мин)
+// Кеш для категорий, цветов и размеров (один запрос на сессию, TTL 5 мин)
 const FILTERS_CACHE_DURATION = 5 * 60 * 1000;
+let categoriesCacheState: { data: ApiCatalogCategory[]; timestamp: number } | null = null;
 let colorsCacheState: { data: ApiCatalogColor[]; timestamp: number } | null = null;
 let sizesCacheState: { data: ApiCatalogSize[]; timestamp: number } | null = null;
+
+// Получение списка категорий для фильтров (с in-memory кешем)
+export const fetchCatalogCategories = async (): Promise<ApiCatalogCategory[]> => {
+  if (categoriesCacheState && Date.now() - categoriesCacheState.timestamp < FILTERS_CACHE_DURATION) {
+    return categoriesCacheState.data;
+  }
+  try {
+    const response = await fetch(`${CATALOG_API_URL}categories/`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+    const data = (await response.json()) as ApiCatalogCategory[];
+    const list = Array.isArray(data) ? data : [];
+    categoriesCacheState = { data: list, timestamp: Date.now() };
+    return list;
+  } catch (error) {
+    console.error("Error fetching catalog categories:", error);
+    return categoriesCacheState?.data ?? [];
+  }
+};
 
 // Получение списка цветов для фильтров (с in-memory кешем)
 export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {

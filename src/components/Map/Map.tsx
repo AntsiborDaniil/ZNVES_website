@@ -488,7 +488,6 @@ const Map = ({
     };
   }, [isPickupYandex, city, totalWeightGrams]);
 
-  // Курьер: обычная Яндекс.Карта с меткой, геокодинг, только Москва
   useEffect(() => {
     if (!isCourier) return;
 

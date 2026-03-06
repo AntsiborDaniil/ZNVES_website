@@ -9,6 +9,13 @@ const TELEGRAM_LOGIN_URL = `${API_BASE_URL}/api/auth/telegram-login/`;
 /** Имя бота без @ — для виджета Telegram Login */
 export const TELEGRAM_BOT_USERNAME = "my_znves_bot";
 
+/** Данные о последних адресах доставки пользователя (для CDEK / Яндекс ПВЗ / курьер) */
+export interface AuthUserDeliveryData {
+  cdek_address?: string;
+  yandex_address?: string;
+  courier_address?: string;
+}
+
 /** Ответ ручки GET /api/auth/user/ — данные авторизованного пользователя (куки) */
 export interface AuthUser {
   username: string;
@@ -16,6 +23,8 @@ export interface AuthUser {
   last_name: string;
   email: string;
   phone_number: string;
+  /** Последние использованные адреса доставки (может отсутствовать на старых аккаунтах) */
+  delivery_data?: AuthUserDeliveryData;
 }
 
 export interface TelegramAuthData {
@@ -58,6 +67,7 @@ export const hasAccessTokenCookie = (): boolean => hasAccessToken();
 export const getTelegramLoginCallbackUrl = (): string => TELEGRAM_LOGIN_URL;
 
 const AUTH_USER_URL = `${API_BASE_URL}/api/auth/user/`;
+const AUTH_USER_DELIVERY_URL = `${API_BASE_URL}/api/auth/user/delivery-data/`;
 
 /**
  * Проверка авторизации: GET /api/auth/user/ с credentials (куки).
@@ -99,6 +109,13 @@ export type UpdateUserPayload = {
   phone_number?: string;
 };
 
+/** Тело запроса PATCH /api/auth/user/delivery-data/ — обновление адресов доставки */
+export type UpdateUserDeliveryPayload = {
+  cdek_address?: string;
+  yandex_address?: string;
+  courier_address?: string;
+};
+
 /**
  * Изменение личных данных: PATCH /api/auth/user/ с credentials (куки).
  * Тело — поля для обновления (username, first_name, last_name, email, phone_number).
@@ -132,6 +149,43 @@ export const updateCurrentUser = async (
     throw new Error(message);
   }
   const data = (await response.json()) as AuthUser;
+  return data;
+};
+
+/**
+ * Обновление адресов доставки пользователя:
+ * PATCH /api/auth/user/delivery-data/ с credentials (куки).
+ * Тело — частичное обновление полей cdek_address, yandex_address, courier_address.
+ * Возвращает обновлённый объект delivery_data.
+ */
+export const updateUserDeliveryData = async (
+  payload: UpdateUserDeliveryPayload
+): Promise<AuthUserDeliveryData> => {
+  if (typeof window === "undefined") {
+    throw new Error("Вызов только на клиенте");
+  }
+  const response = await fetch(AUTH_USER_DELIVERY_URL, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const text = await response.text();
+    let message = "Не удалось сохранить адрес доставки";
+    try {
+      const json = JSON.parse(text) as { detail?: string; message?: string };
+      if (typeof json.detail === "string") message = json.detail;
+      else if (typeof json.message === "string") message = json.message;
+    } catch {
+      if (text) message = text;
+    }
+    throw new Error(message);
+  }
+  const data = (await response.json()) as AuthUserDeliveryData;
   return data;
 };
 

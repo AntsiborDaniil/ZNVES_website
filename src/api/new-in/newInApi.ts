@@ -84,13 +84,13 @@ const normalizeCategoryForApi = (category: string): string | undefined => {
   if (category === "All") return undefined;
   
   const categoryMap: Record<string, string> = {
-    "Pants": "pants",
-    "Jeans": "jeans",
+    Pants: "pants",
+    Jeans: "jeans",
     "T-shirts": "t-shirt",
-    "Zip hoodies": "zip hoodies",
-    "Jackets": "jackets",
-    "Hoodies": "hoodies",
-    "Shorts": "shorts",
+    "Zip hoodies": "zip-hoodie",
+    Jackets: "jackets",
+    Hoodies: "hoodies",
+    Shorts: "shorts",
   };
   
   return categoryMap[category] || category.toLowerCase();

@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getProductById } from "../../data/products";
 import { createOrder, getPaymentUrl, getYandexPaymentUrl, invalidateMyOrdersCache, type OrderRequest } from "../../api/order/orderApi";
+import { updateUserDeliveryData } from "../../api/auth/authApi";
 import { fetchCatalogProductRaw, type ApiProductDetail, type ApiWarehouseItem } from "../../api/product/productApi";
 import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 import type { PvzListOption } from "../Map/Map";
@@ -81,7 +82,7 @@ const CheckoutForm = ({
 }: CheckoutFormProps) => {
   const router = useRouter();
   const { items, getTotalPrice, clearCart, appliedPromo, setAppliedPromo } = useCart();
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { width } = useWindowSize();
   const isCartMobilePvz = width > 0 && width < 480 && !showRightColumn;
 
@@ -608,6 +609,32 @@ const CheckoutForm = ({
         setSelectedPvzCoords([addressData.lat, addressData.lon]);
       }
       setShowContinueButtonAgain(false);
+
+      // Сохраняем последний выбранный адрес ПВЗ в профиль пользователя (если авторизован)
+      if (user) {
+        const payload =
+          formData.deliveryType === "cdek"
+            ? { cdek_address: pvzAddr }
+            : formData.deliveryType === "yandex"
+            ? { yandex_address: pvzAddr }
+            : {};
+        if (Object.keys(payload).length > 0) {
+          updateUserDeliveryData(payload).then(
+            (delivery) => {
+              updateUser({
+                ...user,
+                delivery_data: {
+                  ...(user.delivery_data ?? {}),
+                  ...delivery,
+                },
+              });
+            },
+            () => {
+              // игнорируем ошибку сохранения адреса — это не должно ломать оформление заказа
+            }
+          );
+        }
+      }
     } else {
       // Для курьерской доставки сохраняем полный адрес
       const newAddress = {
@@ -620,6 +647,31 @@ const CheckoutForm = ({
         ...prev,
         ...newAddress,
       }));
+
+      // Сохраняем последний адрес курьерской доставки в профиль пользователя (если авторизован)
+      if (user) {
+        const courierFullAddress =
+          fullAddress ||
+          [addressData.street, addressData.house, addressData.city]
+            .filter(Boolean)
+            .join(", ");
+        if (courierFullAddress) {
+          updateUserDeliveryData({ courier_address: courierFullAddress }).then(
+            (delivery) => {
+              updateUser({
+                ...user,
+                delivery_data: {
+                  ...(user.delivery_data ?? {}),
+                  ...delivery,
+                },
+              });
+            },
+            () => {
+              // не блокируем оформление заказа при ошибке PATCH
+            }
+          );
+        }
+      }
     }
 
     // Обновляем поиск по карте только для курьерской доставки; при выборе ПВЗ не трогаем — избегаем «телепорта» карты
