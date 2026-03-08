@@ -28,3 +28,21 @@ body {
 .font-roboto {
   font-family: var(--font-roboto), sans-serif;
 }
+
+/* Скелетон загрузки ПВЗ СДЭК */
+@keyframes cdekPvzShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.cdekPvzSkeletonLine {
+  background: linear-gradient(
+    110deg,
+    rgba(82, 82, 82, 0.06) 25%,
+    rgba(82, 82, 82, 0.12) 50%,
+    rgba(82, 82, 82, 0.06) 75%
+  );
+  background-size: 200% 100%;
+  animation: cdekPvzShimmer 1.4s ease-in-out infinite;
+  border-radius: 4px;
+}

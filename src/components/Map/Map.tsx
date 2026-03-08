@@ -826,14 +826,82 @@ const Map = ({
           </div>
 
           {cdekPvzLoading && (
-            <div style={{ padding: 48, textAlign: "center", color: "#666" }}>
-              Загрузка пунктов выдачи…
+            <div style={{ padding: "0 12px 12px" }}>
+              <div
+                className="cdekPvzSkeletonLine"
+                style={{ height: 42, marginBottom: 12 }}
+                aria-hidden
+              />
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div
+                    key={i}
+                    style={{
+                      padding: "14px 12px",
+                      border: "1px solid #eee",
+                      borderRadius: 6,
+                      background: "#fff",
+                    }}
+                  >
+                    <div
+                      className="cdekPvzSkeletonLine"
+                      style={{
+                        height: 14,
+                        width: "70%",
+                        marginBottom: 8,
+                        animationDelay: `${i * 0.1}s`,
+                      }}
+                      aria-hidden
+                    />
+                    <div
+                      className="cdekPvzSkeletonLine"
+                      style={{
+                        height: 12,
+                        width: "90%",
+                        animationDelay: `${i * 0.1 + 0.05}s`,
+                      }}
+                      aria-hidden
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
           {!cdekPvzLoading && cdekPvzList.length === 0 && (
-            <div style={{ padding: 48, textAlign: "center", color: "#666" }}>
-              Нет пунктов выдачи в этом городе. Проверьте CDEK_ACCOUNT и CDEK_SECURE_PASSWORD в .env.local.
+            <div
+              style={{
+                padding: "48px 24px",
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 16,
+              }}
+            >
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: "50%",
+                  background: "rgba(82, 82, 82, 0.06)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 28,
+                }}
+                aria-hidden
+              >
+                📍
+              </div>
+              <div>
+                <p style={{ margin: 0, fontSize: 16, fontWeight: 500, color: "#525252" }}>
+                  В этом городе пока нет пунктов выдачи СДЭК
+                </p>
+                <p style={{ margin: "8px 0 0", fontSize: 14, color: "#737373", lineHeight: 1.4, maxWidth: 320 }}>
+                  Попробуйте указать другой город или выберите доставку курьером
+                </p>
+              </div>
             </div>
           )}
 
@@ -863,8 +931,16 @@ const Map = ({
                 }}
               >
                 {cdekPvzFiltered.length === 0 ? (
-                  <div style={{ padding: 24, textAlign: "center", color: "#666", fontSize: 14 }}>
-                    По вашему запросу ничего не найдено. Измените строку поиска.
+                  <div
+                    style={{
+                      padding: 32,
+                      textAlign: "center",
+                      color: "#737373",
+                      fontSize: 14,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    По запросу ничего не найдено. Попробуйте другое название улицы или района.
                   </div>
                 ) : (
                 cdekPvzFiltered.map((pvz) => (

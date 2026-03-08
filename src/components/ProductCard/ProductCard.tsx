@@ -51,6 +51,10 @@ const ProductCard = ({
   const [loadedStates, setLoadedStates] = useState<boolean[]>([]);
   const [hoverEnabled, setHoverEnabled] = useState(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const lastTapRef = useRef<{ time: number; x: number; y: number } | null>(null);
+  const touchUsedRef = useRef(false);
+  const DOUBLE_TAP_MS = 350;
+  const DOUBLE_TAP_PX = 40;
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 769px)");
@@ -110,6 +114,50 @@ const ProductCard = ({
   const handlePointerLeave = () => {
     if (hoverEnabled) setCurrentIndex(0);
   };
+
+  // Двойное касание / двойной клик на маленьких экранах — листаем на следующее фото
+  const handleDoubleTapOrClick = useCallback(
+    (clientX: number, clientY: number) => {
+      if (hoverEnabled || imageList.length <= 1) return;
+      const now = Date.now();
+      const prev = lastTapRef.current;
+      const isDoubleTap =
+        prev &&
+        now - prev.time < DOUBLE_TAP_MS &&
+        Math.abs(clientX - prev.x) < DOUBLE_TAP_PX &&
+        Math.abs(clientY - prev.y) < DOUBLE_TAP_PX;
+      if (isDoubleTap) {
+        lastTapRef.current = null;
+        setCurrentIndex((i) => (i + 1) % imageList.length);
+        return;
+      }
+      lastTapRef.current = { time: now, x: clientX, y: clientY };
+    },
+    [hoverEnabled, imageList.length]
+  );
+
+  const handleContainerClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (touchUsedRef.current) return;
+      handleDoubleTapOrClick(e.clientX, e.clientY);
+    },
+    [handleDoubleTapOrClick]
+  );
+
+  const handleContainerTouchStart = useCallback(() => {
+    touchUsedRef.current = true;
+  }, []);
+
+  const handleContainerTouchEnd = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      const touch = e.changedTouches?.[0];
+      if (touch) handleDoubleTapOrClick(touch.clientX, touch.clientY);
+      setTimeout(() => {
+        touchUsedRef.current = false;
+      }, 400);
+    },
+    [handleDoubleTapOrClick]
+  );
 
   // Снять блюр с картинок, уже загруженных из кэша или при позднем decode (onLoad может не сработать)
   const syncLoadedStateFromDom = useCallback(() => {
@@ -185,6 +233,11 @@ const ProductCard = ({
           onPointerEnter={handlePointerEnter}
           onPointerMove={handlePointerMove}
           onPointerLeave={handlePointerLeave}
+          onClick={handleContainerClick}
+          onTouchStart={handleContainerTouchStart}
+          onTouchEnd={handleContainerTouchEnd}
+          role={imageList.length > 1 ? "button" : undefined}
+          aria-label={imageList.length > 1 ? "Двойное нажатие — следующее фото" : undefined}
         >
           {imageList.map((image, index) => {
             const isActive = index === currentIndex;
