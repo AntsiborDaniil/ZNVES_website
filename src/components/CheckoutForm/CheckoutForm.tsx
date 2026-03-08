@@ -9,7 +9,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { getProductById } from "../../data/products";
 import { createOrder, getPaymentUrl, getYandexPaymentUrl, invalidateMyOrdersCache, type OrderRequest } from "../../api/order/orderApi";
-import { updateUserDeliveryData } from "../../api/auth/authApi";
 import { fetchCatalogProductRaw, type ApiProductDetail, type ApiWarehouseItem } from "../../api/product/productApi";
 import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 import type { PvzListOption } from "../Map/Map";
@@ -279,9 +278,10 @@ const CheckoutForm = ({
     };
   }, [items]);
 
-  // Автозаполнение личных данных из личного кабинета (ручка GET /api/auth/user/)
+  // Автозаполнение личных данных и адресов доставки из личного кабинета (GET /api/auth/user/)
   useEffect(() => {
     if (!user) return;
+    const dd = user.delivery_data;
     setFormData((prev) => ({
       ...prev,
       firstName: prev.firstName || user.first_name || "",
@@ -292,8 +292,29 @@ const CheckoutForm = ({
       deliveryLastName: prev.deliveryLastName || user.last_name || "",
       deliveryPhone: prev.deliveryPhone || user.phone_number || "",
       deliveryEmail: prev.deliveryEmail || user.email || "",
+      pvzAddress: prev.pvzAddress || (dd?.cdek_address ?? ""),
     }));
+    if (dd?.cdek_address) {
+      pvzAddressLatestRef.current = dd.cdek_address;
+      setPvzAddressInputValue(dd.cdek_address);
+    }
+    if (dd?.courier_address) {
+      setMapSearchValue(dd.courier_address);
+    }
   }, [user]);
+
+  // При смене типа доставки подставляем сохранённый адрес из профиля (СДЕК ПВЗ / Яндекс ПВЗ)
+  useEffect(() => {
+    if (!user?.delivery_data || formData.deliveryMethod !== "pickup") return;
+    const addr =
+      formData.deliveryType === "cdek"
+        ? user.delivery_data.cdek_address
+        : user.delivery_data.yandex_address;
+    const value = addr ?? "";
+    setFormData((prev) => (prev.pvzAddress === value ? prev : { ...prev, pvzAddress: value }));
+    pvzAddressLatestRef.current = value;
+    setPvzAddressInputValue(value);
+  }, [user?.delivery_data, formData.deliveryType, formData.deliveryMethod]);
 
   // При вставке/автозаполнении — снять фокус с кнопки, чтобы она стала серой
   useEffect(() => {
@@ -608,35 +629,11 @@ const CheckoutForm = ({
       if (typeof addressData.lat === "number" && typeof addressData.lon === "number") {
         setSelectedPvzCoords([addressData.lat, addressData.lon]);
       }
-      setShowContinueButtonAgain(false);
+      setShowContinueButtonAgain(true);
 
-      // Сохраняем последний выбранный адрес ПВЗ в профиль пользователя (если авторизован)
-      if (user) {
-        const payload =
-          formData.deliveryType === "cdek"
-            ? { cdek_address: pvzAddr }
-            : formData.deliveryType === "yandex"
-            ? { yandex_address: pvzAddr }
-            : {};
-        if (Object.keys(payload).length > 0) {
-          updateUserDeliveryData(payload).then(
-            (delivery) => {
-              updateUser({
-                ...user,
-                delivery_data: {
-                  ...(user.delivery_data ?? {}),
-                  ...delivery,
-                },
-              });
-            },
-            () => {
-              // игнорируем ошибку сохранения адреса — это не должно ломать оформление заказа
-            }
-          );
-        }
-      }
+      // При выборе ПВЗ не вызываем delivery-data: адрес сохраняется только в форме заказа, профиль не меняем.
     } else {
-      // Для курьерской доставки сохраняем полный адрес
+      // Для курьерской доставки сохраняем полный адрес только в форме заказа. delivery-data вызывается только в личном кабинете.
       const newAddress = {
         city: addressData.city || "",
         street: addressData.street || "",
@@ -647,31 +644,6 @@ const CheckoutForm = ({
         ...prev,
         ...newAddress,
       }));
-
-      // Сохраняем последний адрес курьерской доставки в профиль пользователя (если авторизован)
-      if (user) {
-        const courierFullAddress =
-          fullAddress ||
-          [addressData.street, addressData.house, addressData.city]
-            .filter(Boolean)
-            .join(", ");
-        if (courierFullAddress) {
-          updateUserDeliveryData({ courier_address: courierFullAddress }).then(
-            (delivery) => {
-              updateUser({
-                ...user,
-                delivery_data: {
-                  ...(user.delivery_data ?? {}),
-                  ...delivery,
-                },
-              });
-            },
-            () => {
-              // не блокируем оформление заказа при ошибке PATCH
-            }
-          );
-        }
-      }
     }
 
     // Обновляем поиск по карте только для курьерской доставки; при выборе ПВЗ не трогаем — избегаем «телепорта» карты
@@ -858,7 +830,8 @@ const CheckoutForm = ({
     }
   }, [formData.deliveryMethod, formData.city, formData.street, formData.house, mapSearchValue]);
 
-  // Синхронизация поля адреса в левом виджете Яндекса с нашим «Адресом пункта выдачи»
+  // Синхронизация поля адреса в левом виджете Яндекса с нашим «Адресом пункта выдачи».
+  // Только присваиваем value, без dispatchEvent — иначе виджет открывает поиск при подстановке.
   useEffect(() => {
     if (formData.deliveryMethod !== "pickup") return;
     const value = formData.pvzAddress.trim();
@@ -868,7 +841,6 @@ const CheckoutForm = ({
       const root = document.getElementById("delivery-widget");
       if (!root) return;
 
-      // Пытаемся найти главное текстовое поле адреса внутри виджета
       const addressInput =
         (root.querySelector('input[type="text"]') as HTMLInputElement | null) ??
         null;
@@ -876,8 +848,6 @@ const CheckoutForm = ({
 
       if (addressInput.value === value) return;
       addressInput.value = value;
-      addressInput.dispatchEvent(new Event("input", { bubbles: true }));
-      addressInput.dispatchEvent(new Event("change", { bubbles: true }));
     } catch {
       // Молча игнорируем, если структура виджета изменилась
     }
@@ -1898,7 +1868,7 @@ const CheckoutForm = ({
                 readOnly={formData.deliveryMethod === "pickup"}
                 value={
                   formData.deliveryMethod === "pickup"
-                    ? pvzAddressInputValue ||
+                    ? (pvzAddressInputValue || formData.pvzAddress || "").trim() ||
                       "Выберите пункт выдачи на карте"
                     : mapSearchValue ||
                       [formData.city, formData.street, formData.house]
@@ -1936,6 +1906,8 @@ const CheckoutForm = ({
                   onAddressSelect={handleAddressSelect}
                   onPvzListLoaded={setPvzOptions}
                   onCdekDeliveryEstimate={setCdekDeliveryEstimate}
+                  onYandexContinueClick={() => setShowContinueButtonAgain(false)}
+                  onYandexWidgetInteraction={() => setShowContinueButtonAgain(true)}
                   searchValue={mapSearchValue}
                   onSearchChange={handleMapSearchChange}
                   deliveryMethod={formData.deliveryMethod}

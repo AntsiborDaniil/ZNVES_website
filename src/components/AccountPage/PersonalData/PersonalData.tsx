@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
-import { updateCurrentUser } from "../../../api/auth/authApi";
+import { updateCurrentUser, updateUserDeliveryData } from "../../../api/auth/authApi";
 import styles from "./PersonalData.module.css";
 
 const emptyProfileData = {
@@ -47,6 +47,9 @@ const PersonalData = () => {
     type: "success" | "error";
     message: string;
   } | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  /** Какой блок подсветить зелёным после сохранения: profile | delivery */
+  const [highlightSection, setHighlightSection] = useState<"profile" | "delivery" | null>(null);
 
   // Подставляем данные из ручки GET /api/auth/user/ в поля личной информации
   useEffect(() => {
@@ -60,6 +63,17 @@ const PersonalData = () => {
     });
   }, [user]);
 
+  // Подставляем адреса доставки из user.delivery_data (cdek_address → СДЕК, yandex_address → ПВЗ Яндекс, courier_address → курьер)
+  useEffect(() => {
+    if (!user?.delivery_data) return;
+    const dd = user.delivery_data;
+    setDeliveryData({
+      sdekAddress: dd.cdek_address ?? "",
+      yandexPvz: dd.yandex_address ?? "",
+      yandexCourier: dd.courier_address ?? "",
+    });
+  }, [user?.delivery_data]);
+
   const handleProfileChange =
     (field: ProfileFieldKey) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,6 +83,7 @@ const PersonalData = () => {
       }));
       setHasUnsavedChanges(true);
       setSaveStatus(null);
+      if (highlightSection === "profile") setHighlightSection(null);
     };
 
   const handleSaveChanges = async () => {
@@ -86,11 +101,10 @@ const PersonalData = () => {
         phone_number: profileData.phone || undefined,
       });
       setHasUnsavedChanges(false);
-      setSaveStatus({
-        type: "success",
-        message: "Изменения сохранены",
-      });
+      setHighlightSection("profile");
+      setShowSuccessModal(true);
       updateUser(updated);
+      setTimeout(() => setHighlightSection(null), 2500);
     } catch (error) {
       setSaveStatus({
         type: "error",
@@ -125,10 +139,48 @@ const PersonalData = () => {
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setDeliveryData((prev) => ({ ...prev, [field]: event.target.value }));
       setHasDeliveryChanges(true);
+      if (highlightSection === "delivery") setHighlightSection(null);
     };
 
+  const handleSaveDelivery = async () => {
+    if (!hasDeliveryChanges) return;
+    setIsSaving(true);
+    setSaveStatus(null);
+    try {
+      const updated = await updateUserDeliveryData({
+        cdek_address: deliveryData.sdekAddress.trim() || undefined,
+        yandex_address: deliveryData.yandexPvz.trim() || undefined,
+        courier_address: deliveryData.yandexCourier.trim() || undefined,
+      });
+      setHasDeliveryChanges(false);
+      setHighlightSection("delivery");
+      setShowSuccessModal(true);
+      updateUser({ ...user!, delivery_data: updated });
+      setTimeout(() => setHighlightSection(null), 2500);
+    } catch (error) {
+      setSaveStatus({
+        type: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Не удалось сохранить адреса доставки",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleResetDelivery = () => {
-    setDeliveryData({ ...emptyDeliveryData });
+    if (user?.delivery_data) {
+      const dd = user.delivery_data;
+      setDeliveryData({
+        sdekAddress: dd.cdek_address ?? "",
+        yandexPvz: dd.yandex_address ?? "",
+        yandexCourier: dd.courier_address ?? "",
+      });
+    } else {
+      setDeliveryData({ ...emptyDeliveryData });
+    }
     setHasDeliveryChanges(false);
   };
 
@@ -158,7 +210,7 @@ const PersonalData = () => {
                   <div className={styles.inputWrapper}>
                     <input
                       id={`profile-${field.key}`}
-                      className={styles.input}
+                      className={`${styles.input} ${highlightSection === "profile" ? styles.inputSuccess : ""}`}
                       type="text"
                       value={profileData[field.key]}
                       onChange={handleProfileChange(field.key)}
@@ -201,7 +253,7 @@ const PersonalData = () => {
                 <div className={styles.inputWrapper}>
                   <input
                     id={`delivery-${key}`}
-                    className={styles.input}
+                    className={`${styles.input} ${highlightSection === "delivery" ? styles.inputSuccess : ""}`}
                     type="text"
                     value={deliveryData[key]}
                     onChange={handleDeliveryChange(key)}
@@ -216,9 +268,10 @@ const PersonalData = () => {
           <button
             type="button"
             className={styles.primaryButton}
-            disabled={!hasDeliveryChanges}
+            disabled={isSaving || !hasDeliveryChanges}
+            onClick={handleSaveDelivery}
           >
-            Сохранить изменения
+            {isSaving ? "Сохранение..." : "Сохранить изменения"}
           </button>
           <button
             type="button"
@@ -228,7 +281,53 @@ const PersonalData = () => {
             Отмена
           </button>
         </div>
+        {saveStatus && saveStatus.type === "error" && (
+          <p className={styles.saveStatusError}>{saveStatus.message}</p>
+        )}
       </section>
+
+      {showSuccessModal && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowSuccessModal(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="success-modal-title"
+        >
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.modalIconWrap}>
+              <svg
+                className={styles.modalIcon}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <h2 id="success-modal-title" className={styles.modalTitle}>
+              Данные сохранены
+            </h2>
+            <p className={styles.modalText}>
+              Изменения успешно применены.
+            </p>
+            <button
+              type="button"
+              className={styles.modalButton}
+              onClick={() => setShowSuccessModal(false)}
+            >
+              Отлично
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

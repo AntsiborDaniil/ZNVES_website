@@ -49,6 +49,10 @@ type MapProps = {
   totalWeightGrams?: number;
   /** Колбэк при изменении расчёта доставки СДЭК (срок и цена) — для отображения в блоке «Доставка» */
   onCdekDeliveryEstimate?: (estimate: { price: number; daysMin: number; daysMax: number } | null) => void;
+  /** Колбэк при клике по кнопке «Продолжить» в виджете Яндекса ПВЗ */
+  onYandexContinueClick?: () => void;
+  /** Колбэк при клике по виджету (не по кнопке «Продолжить») — чтобы снова показать кнопку при выборе другого ПВЗ */
+  onYandexWidgetInteraction?: () => void;
 };
 
 declare global {
@@ -129,6 +133,8 @@ const Map = ({
   deliveryType,
   totalWeightGrams,
   onCdekDeliveryEstimate,
+  onYandexContinueClick,
+  onYandexWidgetInteraction,
 }: MapProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const courierMapRef = useRef<HTMLDivElement>(null);
@@ -166,6 +172,8 @@ const Map = ({
     yaDeliverySourceAddress: string;
     cdekConfigured?: boolean;
   } | null>(null);
+  /** Показывать скелетон «Загрузка пунктов…» для виджета Яндекса ПВЗ */
+  const [yandexWidgetLoading, setYandexWidgetLoading] = useState(false);
 
   const city = (cityProp || "Москва").trim() || "Москва";
 
@@ -333,15 +341,21 @@ const Map = ({
       const fullAddress =
         addr.full_address ||
         [addr.locality, addr.street, addr.house].filter(Boolean).join(", ") ||
+        detail.name ||
+        detail.title ||
+        (detail.id ? `ПВЗ ${detail.id}` : "") ||
         "";
+
+      const widgetRoot = document.getElementById(CONTAINER_ID);
+      if (widgetRoot) widgetRoot.classList.remove("widget-continue-clicked");
 
       if (onAddressSelect) {
         onAddressSelect({
           city: addr.locality || city,
           street: addr.street,
           house: addr.house,
-          fullAddress,
-          pvzAddress: fullAddress,
+          fullAddress: fullAddress || "Пункт выдачи",
+          pvzAddress: fullAddress || "Пункт выдачи",
           pvzId: detail.id,
         });
       }
@@ -349,7 +363,7 @@ const Map = ({
         onPvzListLoaded([
           {
             name: fullAddress || detail.id || "ПВЗ",
-            address: fullAddress,
+            address: fullAddress || "Пункт выдачи",
             id: detail.id,
             city: addr.locality || city,
           },
@@ -373,16 +387,42 @@ const Map = ({
       if (!isInsideWidget) return;
       setTimeout(() => {
         widgetRoot.classList.add("widget-continue-clicked");
+        onYandexContinueClick?.();
       }, 0);
     };
 
     document.addEventListener("click", handleClick, false);
     return () => document.removeEventListener("click", handleClick, false);
-  }, [isPickup]);
+  }, [isPickup, onYandexContinueClick]);
+
+  // При клике по виджету (не по кнопке «Продолжить») снова показываем кнопку — чтобы при выборе другого ПВЗ она появлялась
+  useEffect(() => {
+    if (!isPickupYandex) return;
+    const widgetRoot = document.getElementById(CONTAINER_ID);
+    if (!widgetRoot) return;
+    const handleWidgetClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest?.(".widget__list-button")) return;
+      if (!widgetRoot.contains(target)) return;
+      widgetRoot.classList.remove("widget-continue-clicked");
+      onYandexWidgetInteraction?.();
+    };
+    widgetRoot.addEventListener("click", handleWidgetClick, true);
+    return () => widgetRoot.removeEventListener("click", handleWidgetClick, true);
+  }, [isPickupYandex, onYandexWidgetInteraction]);
 
   // Загрузка скрипта и инициализация виджета ПВЗ (только для Яндекса). Адрес ПВЗ берётся из /api/delivery/config (env на проде читается на сервере).
   useEffect(() => {
     if (!isPickupYandex || !containerRef.current || !deliveryConfig) return;
+
+    setYandexWidgetLoading(true);
+    let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
+    const clearLoadingTimeout = () => {
+      if (loadingTimeout) {
+        clearTimeout(loadingTimeout);
+        loadingTimeout = null;
+      }
+    };
 
     const sourceAddress = deliveryConfig.yaDeliverySourceAddress || DEFAULT_YA_SOURCE_ADDRESS;
 
@@ -445,6 +485,8 @@ const Map = ({
         params,
       });
       console.log("[Map NDD widget] createWidget вызван. Запросы к API идут из скрипта ndd-widget.landpro.site — смотреть вкладку Network (фильтр по landpro / taxi / yandex).");
+      clearLoadingTimeout();
+      loadingTimeout = setTimeout(() => setYandexWidgetLoading(false), 4000);
     }
 
     if (window.YaDelivery) {
@@ -474,6 +516,8 @@ const Map = ({
         }, 50);
         const stopPoll = setTimeout(() => clearInterval(poll), 3000);
         return () => {
+          clearLoadingTimeout();
+          setYandexWidgetLoading(false);
           clearInterval(poll);
           clearTimeout(stopPoll);
           document.removeEventListener("YaNddWidgetLoad", startWidget);
@@ -484,6 +528,8 @@ const Map = ({
         };
       }
       return () => {
+        clearLoadingTimeout();
+        setYandexWidgetLoading(false);
         document.removeEventListener("YaNddWidgetLoad", startWidget);
         widgetInitedRef.current = false;
         const container = document.getElementById(CONTAINER_ID);
@@ -509,6 +555,8 @@ const Map = ({
     console.log("[Map NDD widget] Добавлен script", WIDGET_SCRIPT_URL);
 
     return () => {
+      clearLoadingTimeout();
+      setYandexWidgetLoading(false);
       document.removeEventListener("YaNddWidgetLoad", startWidget);
       widgetInitedRef.current = false;
       const container = document.getElementById(CONTAINER_ID);
@@ -983,7 +1031,26 @@ const Map = ({
 
   if (isPickupYandex) {
     return (
-      <div style={{ width: "100%", minHeight: 400 }}>
+      <div style={{ width: "100%", minHeight: 400, position: "relative" }}>
+        {yandexWidgetLoading && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 10,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "linear-gradient(180deg, #f5f5f5 0%, #eee 100%)",
+              borderRadius: 8,
+              gap: 12,
+            }}
+          >
+            <div className="yandexWidgetLoadingSpinner" />
+            <span style={{ color: "#555", fontSize: 14 }}>Загрузка пунктов выдачи…</span>
+          </div>
+        )}
         <div ref={containerRef} style={{ width: "100%", minHeight: 450 }}>
           <div id={CONTAINER_ID} style={{ width: "100%", height: "100%", minHeight: 450 }} />
         </div>
