@@ -188,10 +188,11 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const orderParam = searchParams?.get("order");
 
   const [products, setProducts] = useState<CatalogProduct[]>([]);
-  const [categories, setCategories] = useState<ApiCatalogCategory[]>(FALLBACK_CATEGORIES);
+  const [categories, setCategories] = useState<ApiCatalogCategory[]>([]);
   const [colors, setColors] = useState<ApiCatalogColor[]>([]);
   const [sizes, setSizes] = useState<ApiCatalogSize[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
 
   const [activeCategory, setActiveCategory] = useState<string>(
     categoryParam ? decodeURIComponent(categoryParam) : "all"
@@ -267,6 +268,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   // Загрузка категорий, цветов и размеров для фильтров
   useEffect(() => {
     const loadFilters = async () => {
+      setIsCategoriesLoading(true);
       try {
         const [colorsData, sizesData, categoriesData] = await Promise.all([
           fetchCatalogColors(),
@@ -277,9 +279,14 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
         setSizes(sizesData);
         if (categoriesData && categoriesData.length > 0) {
           setCategories(categoriesData);
+        } else {
+          setCategories(FALLBACK_CATEGORIES);
         }
       } catch (error) {
         console.error("Error loading filter options:", error);
+        setCategories(FALLBACK_CATEGORIES);
+      } finally {
+        setIsCategoriesLoading(false);
       }
     };
     loadFilters();
@@ -570,42 +577,55 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
       </div>
 
       <div className={styles.categoriesRow}>
-        <nav
-          ref={categoriesRef}
-          className={styles.categories}
-          aria-label="Категории"
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeave}
-        >
-          <button
-            key="all"
-            className={`${styles.categoryButton} ${
-              activeCategory === "all" ? styles.categoryButtonActive : ""
-            }`}
-            onClick={() => handleCategoryChange("all")}
-            type="button"
+        {isCategoriesLoading ? (
+          <div className={styles.categoriesSkeleton} aria-hidden>
+            <div className={styles.categorySkeletonPill} />
+            <div className={styles.categorySkeletonPill} />
+            <div className={styles.categorySkeletonPill} />
+            <div className={styles.categorySkeletonPill} />
+            <div className={styles.categorySkeletonPill} />
+            <div className={styles.categorySkeletonPill} />
+            <div className={styles.categorySkeletonPill} />
+            <div className={styles.categorySkeletonPill} />
+          </div>
+        ) : (
+          <nav
+            ref={categoriesRef}
+            className={styles.categories}
+            aria-label="Категории"
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseLeave}
           >
-            All
-          </button>
-          {categories.map((category) => {
-            const isActive = category.slug === activeCategory;
-            const label = CATEGORY_SLUG_TO_ENGLISH[category.slug] ?? category.name;
-            return (
-              <button
-                key={category.slug}
-                className={`${styles.categoryButton} ${
-                  isActive ? styles.categoryButtonActive : ""
-                }`}
-                onClick={() => handleCategoryChange(category.slug)}
-                type="button"
-              >
-                {label}
-              </button>
-            );
-          })}
-        </nav>
+            <button
+              key="all"
+              className={`${styles.categoryButton} ${
+                activeCategory === "all" ? styles.categoryButtonActive : ""
+              }`}
+              onClick={() => handleCategoryChange("all")}
+              type="button"
+            >
+              All
+            </button>
+            {categories.map((category) => {
+              const isActive = category.slug === activeCategory;
+              const label = CATEGORY_SLUG_TO_ENGLISH[category.slug] ?? category.name;
+              return (
+                <button
+                  key={category.slug}
+                  className={`${styles.categoryButton} ${
+                    isActive ? styles.categoryButtonActive : ""
+                  }`}
+                  onClick={() => handleCategoryChange(category.slug)}
+                  type="button"
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </nav>
+        )}
         <button
           ref={filtersButtonDesktopRef}
           className={styles.filtersButton}

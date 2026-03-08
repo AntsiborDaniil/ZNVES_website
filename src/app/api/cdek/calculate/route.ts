@@ -10,12 +10,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 const CDEK_API = "https://api.cdek.ru/v2";
 
+function getCdekCredentials(): { clientId: string; clientSecret: string } | null {
+  const clientId = process.env.CDEK_ACCOUNT ?? process.env.CDEK_CLIENT_ID;
+  const clientSecret = process.env.CDEK_SECURE_PASSWORD ?? process.env.CDEK_CLIENT_SECRET;
+  if (!clientId?.trim() || !clientSecret?.trim()) return null;
+  return { clientId: clientId.trim(), clientSecret: clientSecret.trim() };
+}
+
 async function getCdekToken(): Promise<string> {
-  const clientId = process.env.CDEK_ACCOUNT;
-  const clientSecret = process.env.CDEK_SECURE_PASSWORD;
-  if (!clientId || !clientSecret) {
-    throw new Error("CDEK_ACCOUNT and CDEK_SECURE_PASSWORD must be set");
-  }
+  const creds = getCdekCredentials();
+  if (!creds) throw new Error("CDEK_ACCOUNT and CDEK_SECURE_PASSWORD must be set");
+  const { clientId, clientSecret } = creds;
   const body = new URLSearchParams({
     grant_type: "client_credentials",
     client_id: clientId,
@@ -67,6 +72,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { error: "Query parameter 'city' is required" },
       { status: 400 }
+    );
+  }
+
+  const creds = getCdekCredentials();
+  if (!creds) {
+    return NextResponse.json(
+      { price: 0, days_min: 2, days_max: 4, from_api: false, reason: "CDEK_NOT_CONFIGURED" },
+      { status: 503 }
     );
   }
 

@@ -9,6 +9,7 @@ const COURIER_MAP_ID = "courier-map";
 const YANDEX_MAPS_SCRIPT =
   "https://api-maps.yandex.ru/2.1/?apikey=&lang=ru_RU";
 const MOSCOW_CENTER: [number, number] = [55.7558, 37.6173];
+const DEFAULT_YA_SOURCE_ADDRESS = "Москва, Промышленная улица, 12А, 115516";
 
 type AddressData = {
   city?: string;
@@ -160,8 +161,40 @@ const Map = ({
   const [selectedCdekPvzCode, setSelectedCdekPvzCode] = useState<string | null>(null);
   const [cdekDeliveryEstimate, setCdekDeliveryEstimate] = useState<{ price: number; daysMin: number; daysMax: number } | null>(null);
   const [cdekPvzSearch, setCdekPvzSearch] = useState("");
+  /** Конфиг доставки с сервера (env читается в runtime на проде) */
+  const [deliveryConfig, setDeliveryConfig] = useState<{
+    yaDeliverySourceAddress: string;
+    cdekConfigured?: boolean;
+  } | null>(null);
 
   const city = (cityProp || "Москва").trim() || "Москва";
+
+  // Загрузка конфига доставки с сервера — на проде env задаётся в настройках хоста
+  useEffect(() => {
+    let cancelled = false;
+    const timeout = setTimeout(() => {
+      if (cancelled) return;
+      setDeliveryConfig((prev) => prev ?? { yaDeliverySourceAddress: DEFAULT_YA_SOURCE_ADDRESS, cdekConfigured: false });
+    }, 4000);
+    fetch("/api/delivery/config")
+      .then((r) => r.json())
+      .then((data: { yaDeliverySourceAddress?: string; cdekConfigured?: boolean }) => {
+        if (cancelled) return;
+        setDeliveryConfig({
+          yaDeliverySourceAddress: (data.yaDeliverySourceAddress ?? DEFAULT_YA_SOURCE_ADDRESS).trim(),
+          cdekConfigured: data.cdekConfigured,
+        });
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setDeliveryConfig((prev) => prev ?? { yaDeliverySourceAddress: DEFAULT_YA_SOURCE_ADDRESS, cdekConfigured: false });
+      })
+      .finally(() => clearTimeout(timeout));
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
+  }, []);
 
   /** Нормализация для поиска: trim, нижний регистр, схлопывание пробелов */
   const normalizeSearch = (s: string) =>
@@ -244,8 +277,8 @@ const Map = ({
     fetch(`/api/cdek/calculate?city=${encodeURIComponent(city)}&weight_grams=${totalWeightGrams ?? 1000}`, {
       signal: ac.signal,
     })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data: { price?: number; days_min?: number; days_max?: number; from_api?: boolean } | null) => {
+      .then((r) => (r.ok || r.status === 503 ? r.json() : null))
+      .then((data: { price?: number; days_min?: number; days_max?: number; from_api?: boolean; reason?: string } | null) => {
         if (data && data.from_api === true && typeof data.price === "number") {
           setCdekDeliveryEstimate({
             price: data.price,
@@ -347,19 +380,15 @@ const Map = ({
     return () => document.removeEventListener("click", handleClick, false);
   }, [isPickup]);
 
-  // Загрузка скрипта и инициализация виджета ПВЗ (только для Яндекса)
+  // Загрузка скрипта и инициализация виджета ПВЗ (только для Яндекса). Адрес ПВЗ берётся из /api/delivery/config (env на проде читается на сервере).
   useEffect(() => {
-    if (!isPickupYandex || !containerRef.current) return;
+    if (!isPickupYandex || !containerRef.current || !deliveryConfig) return;
 
-    const envSourceAddress =
-      typeof window !== "undefined" ? process.env.NEXT_PUBLIC_YA_DELIVERY_SOURCE_ADDRESS : undefined;
-    const sourceAddress =
-      envSourceAddress || "Москва, Промышленная улица, 12А, 115516";
+    const sourceAddress = deliveryConfig.yaDeliverySourceAddress || DEFAULT_YA_SOURCE_ADDRESS;
 
     console.log("[Map NDD widget] Эффект: isPickup=true", {
       city,
       totalWeightGrams_from_props: totalWeightGrams,
-      NEXT_PUBLIC_YA_DELIVERY_SOURCE_ADDRESS: envSourceAddress ?? "(не задан, используется fallback)",
       source_address_used: sourceAddress,
       container_exists: !!document.getElementById(CONTAINER_ID),
     });
@@ -486,7 +515,7 @@ const Map = ({
       if (container) container.innerHTML = "";
       console.log("[Map NDD widget] Cleanup: виджет сброшен");
     };
-  }, [isPickupYandex, city, totalWeightGrams]);
+  }, [isPickupYandex, city, totalWeightGrams, deliveryConfig]);
 
   useEffect(() => {
     if (!isCourier) return;

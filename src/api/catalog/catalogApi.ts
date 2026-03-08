@@ -252,6 +252,13 @@ export const fetchCatalogSizes = async (): Promise<ApiCatalogSize[]> => {
   }
 };
 
+// Предзагрузка категорий и фильтров (заполняет in-memory кеш для быстрого отклика на /catalog и /new-in)
+export const preloadCatalogFilters = (): void => {
+  void fetchCatalogCategories();
+  void fetchCatalogColors();
+  void fetchCatalogSizes();
+};
+
 // Экспорт функции нормализации для использования в компонентах
 export { normalizeCategoryForApi };
 

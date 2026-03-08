@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import NavigationTracker from "../components/NavigationTracker/NavigationTracker";
+import PreloadCatalogFilters from "../components/PreloadCatalogFilters/PreloadCatalogFilters";
 import { CartProvider } from "../contexts/CartContext";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ToastProvider } from "../components/ui/ToastProvider/ToastProvider";
@@ -96,6 +97,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <CartProvider>
             <ToastProvider>
               <NavigationTracker />
+              <PreloadCatalogFilters />
               {children}
             </ToastProvider>
           </CartProvider>
