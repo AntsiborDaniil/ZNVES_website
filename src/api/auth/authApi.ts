@@ -11,9 +11,15 @@ export const TELEGRAM_BOT_USERNAME = "my_znves_bot";
 
 /** Данные о последних адресах доставки пользователя (для CDEK / Яндекс ПВЗ / курьер) */
 export interface AuthUserDeliveryData {
-  cdek_address?: string;
-  yandex_address?: string;
-  courier_address?: string;
+  cdek_full_pvz_address?: string | null;
+  yandex_full_pvz_address?: string | null;
+  city?: string | null;
+  street?: string | null;
+  house?: string | null;
+  apartment?: string | null;
+  floor?: string | null;
+  intercom?: string | null;
+  comment?: string | null;
 }
 
 /** Ответ ручки GET /api/auth/user/ — данные авторизованного пользователя (куки) */
@@ -110,11 +116,17 @@ export type UpdateUserPayload = {
 };
 
 /** Тело запроса PATCH /api/auth/user/delivery-data/ — обновление адресов доставки */
-export type UpdateUserDeliveryPayload = {
-  cdek_address?: string;
-  yandex_address?: string;
-  courier_address?: string;
-};
+export type UpdateUserDeliveryPayload = Partial<{
+  cdek_full_pvz_address: string;
+  yandex_full_pvz_address: string;
+  city: string;
+  street: string;
+  house: string;
+  apartment: string;
+  floor: string;
+  intercom: string;
+  comment: string;
+}>;
 
 /**
  * Изменение личных данных: PATCH /api/auth/user/ с credentials (куки).
@@ -155,7 +167,7 @@ export const updateCurrentUser = async (
 /**
  * Обновление адресов доставки пользователя:
  * PATCH /api/auth/user/delivery-data/ с credentials (куки).
- * Тело — частичное обновление полей cdek_address, yandex_address, courier_address.
+ * Тело — частичное обновление полей доставки (ПВЗ и курьер).
  * Возвращает обновлённый объект delivery_data.
  */
 export const updateUserDeliveryData = async (

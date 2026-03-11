@@ -329,14 +329,15 @@ const CheckoutForm = ({
       deliveryLastName: prev.deliveryLastName || user.last_name || "",
       deliveryPhone: prev.deliveryPhone || user.phone_number || "",
       deliveryEmail: prev.deliveryEmail || user.email || "",
-      pvzAddress: prev.pvzAddress || (dd?.cdek_address ?? ""),
+      pvzAddress: prev.pvzAddress || (dd?.cdek_full_pvz_address ?? ""),
     }));
-    if (dd?.cdek_address) {
-      pvzAddressLatestRef.current = dd.cdek_address;
-      setPvzAddressInputValue(dd.cdek_address);
+    if (dd?.cdek_full_pvz_address) {
+      pvzAddressLatestRef.current = dd.cdek_full_pvz_address;
+      setPvzAddressInputValue(dd.cdek_full_pvz_address);
     }
-    if (dd?.courier_address) {
-      setMapSearchValue(dd.courier_address);
+    if (dd?.street) {
+      const courierAddr = [dd.city, dd.street, dd.house].filter(Boolean).join(", ");
+      if (courierAddr) setMapSearchValue(courierAddr);
     }
   }, [user]);
 
@@ -345,8 +346,8 @@ const CheckoutForm = ({
     if (!user?.delivery_data || formData.deliveryMethod !== "pickup") return;
     const addr =
       formData.deliveryType === "cdek"
-        ? user.delivery_data.cdek_address
-        : user.delivery_data.yandex_address;
+        ? user.delivery_data.cdek_full_pvz_address
+        : user.delivery_data.yandex_full_pvz_address;
     const value = addr ?? "";
     setFormData((prev) => (prev.pvzAddress === value ? prev : { ...prev, pvzAddress: value }));
     pvzAddressLatestRef.current = value;

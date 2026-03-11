@@ -262,6 +262,38 @@
   color: #c93c3c;
 }
 
+.deliveryBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.deliveryBlockTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #525252;
+  margin-top: 12px;
+  line-height: 1.3;
+}
+
+.deliveryBlockTitle svg {
+  flex-shrink: 0;
+  color: #525252;
+}
+
+.deliverySeparator {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 20px 0;
+}
+
+.fieldRowFull {
+  grid-column: 1 / -1;
+}
+
 .saveStatusError {
   color: #c93c3c;
   margin-top: 8px;

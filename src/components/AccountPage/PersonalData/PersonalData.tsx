@@ -27,13 +27,32 @@ const profileFields: Array<{
   { key: "phone", label: "Номер", placeholder: "Введите ваш номер телефона*" },
 ];
 
-const deliveryFieldsList = [
-  { key: "sdekAddress" as const, label: "Адрес СДЕК (ПВЗ)", placeholder: "Введите адрес ПВЗ СДЕК" },
-  { key: "yandexPvz" as const, label: "ПВЗ Яндекс", placeholder: "Введите адрес ПВЗ Яндекс" },
-  { key: "yandexCourier" as const, label: "Яндекс курьер", placeholder: "Введите адрес доставки курьером" },
+const pvzFieldsList = [
+  { key: "cdekPvz" as const, label: "СДЭК (ПВЗ)", placeholder: "Введите адрес ПВЗ СДЭК" },
+  { key: "yandexPvz" as const, label: "Яндекс (ПВЗ)", placeholder: "Введите адрес ПВЗ Яндекс" },
 ];
 
-const emptyDeliveryData = { sdekAddress: "", yandexPvz: "", yandexCourier: "" };
+const courierFieldsList = [
+  { key: "city" as const, label: "Город", placeholder: "Москва" },
+  { key: "street" as const, label: "Улица", placeholder: "ул. Ленина" },
+  { key: "house" as const, label: "Дом", placeholder: "15А" },
+  { key: "apartment" as const, label: "Квартира / офис", placeholder: "42" },
+  { key: "floor" as const, label: "Этаж", placeholder: "3" },
+  { key: "intercom" as const, label: "Домофон", placeholder: "42К1234" },
+  { key: "comment" as const, label: "Комментарий курьеру", placeholder: "Позвонить за 10 минут" },
+];
+
+const emptyDeliveryData = {
+  cdekPvz: "",
+  yandexPvz: "",
+  city: "",
+  street: "",
+  house: "",
+  apartment: "",
+  floor: "",
+  intercom: "",
+  comment: "",
+};
 type DeliveryFieldKey = keyof typeof emptyDeliveryData;
 
 const PersonalData = () => {
@@ -63,14 +82,19 @@ const PersonalData = () => {
     });
   }, [user]);
 
-  // Подставляем адреса доставки из user.delivery_data (cdek_address → СДЕК, yandex_address → ПВЗ Яндекс, courier_address → курьер)
   useEffect(() => {
     if (!user?.delivery_data) return;
     const dd = user.delivery_data;
     setDeliveryData({
-      sdekAddress: dd.cdek_address ?? "",
-      yandexPvz: dd.yandex_address ?? "",
-      yandexCourier: dd.courier_address ?? "",
+      cdekPvz: dd.cdek_full_pvz_address ?? "",
+      yandexPvz: dd.yandex_full_pvz_address ?? "",
+      city: dd.city ?? "",
+      street: dd.street ?? "",
+      house: dd.house ?? "",
+      apartment: dd.apartment ?? "",
+      floor: dd.floor ?? "",
+      intercom: dd.intercom ?? "",
+      comment: dd.comment ?? "",
     });
   }, [user?.delivery_data]);
 
@@ -148,9 +172,15 @@ const PersonalData = () => {
     setSaveStatus(null);
     try {
       const updated = await updateUserDeliveryData({
-        cdek_address: deliveryData.sdekAddress.trim() || undefined,
-        yandex_address: deliveryData.yandexPvz.trim() || undefined,
-        courier_address: deliveryData.yandexCourier.trim() || undefined,
+        cdek_full_pvz_address: deliveryData.cdekPvz.trim() || undefined,
+        yandex_full_pvz_address: deliveryData.yandexPvz.trim() || undefined,
+        city: deliveryData.city.trim() || undefined,
+        street: deliveryData.street.trim() || undefined,
+        house: deliveryData.house.trim() || undefined,
+        apartment: deliveryData.apartment.trim() || undefined,
+        floor: deliveryData.floor.trim() || undefined,
+        intercom: deliveryData.intercom.trim() || undefined,
+        comment: deliveryData.comment.trim() || undefined,
       });
       setHasDeliveryChanges(false);
       setHighlightSection("delivery");
@@ -174,9 +204,15 @@ const PersonalData = () => {
     if (user?.delivery_data) {
       const dd = user.delivery_data;
       setDeliveryData({
-        sdekAddress: dd.cdek_address ?? "",
-        yandexPvz: dd.yandex_address ?? "",
-        yandexCourier: dd.courier_address ?? "",
+        cdekPvz: dd.cdek_full_pvz_address ?? "",
+        yandexPvz: dd.yandex_full_pvz_address ?? "",
+        city: dd.city ?? "",
+        street: dd.street ?? "",
+        house: dd.house ?? "",
+        apartment: dd.apartment ?? "",
+        floor: dd.floor ?? "",
+        intercom: dd.intercom ?? "",
+        comment: dd.comment ?? "",
       });
     } else {
       setDeliveryData({ ...emptyDeliveryData });
@@ -243,9 +279,14 @@ const PersonalData = () => {
 
       <section className={styles.deliveryPanel}>
         <h2 className={styles.subsectionHeading}>Адреса доставки</h2>
-        <div className={styles.infoPanel}>
+
+        <div className={styles.deliveryBlock}>
+          <h3 className={styles.deliveryBlockTitle}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            Пункты выдачи (ПВЗ)
+          </h3>
           <div className={styles.fieldsGrid}>
-            {deliveryFieldsList.map(({ key, label, placeholder }) => (
+            {pvzFieldsList.map(({ key, label, placeholder }) => (
               <div className={styles.fieldRow} key={key}>
                 <label className={styles.fieldLabel} htmlFor={`delivery-${key}`}>
                   {label}
@@ -264,6 +305,38 @@ const PersonalData = () => {
             ))}
           </div>
         </div>
+
+        <div className={styles.deliverySeparator} />
+
+        <div className={styles.deliveryBlock}>
+          <h3 className={styles.deliveryBlockTitle}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Курьерская доставка
+          </h3>
+          <div className={styles.fieldsGrid}>
+            {courierFieldsList.map(({ key, label, placeholder }) => (
+              <div
+                className={`${styles.fieldRow} ${key === "comment" ? styles.fieldRowFull : ""}`}
+                key={key}
+              >
+                <label className={styles.fieldLabel} htmlFor={`courier-${key}`}>
+                  {label}
+                </label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    id={`courier-${key}`}
+                    className={`${styles.input} ${highlightSection === "delivery" ? styles.inputSuccess : ""}`}
+                    type="text"
+                    value={deliveryData[key]}
+                    onChange={handleDeliveryChange(key)}
+                    placeholder={placeholder}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className={styles.actions}>
           <button
             type="button"
