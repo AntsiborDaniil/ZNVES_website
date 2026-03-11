@@ -153,6 +153,43 @@ const CheckoutForm = ({
     daysMax: number;
   } | null>(null);
 
+  type YandexCourierOffer = {
+    id: string;
+    taxiClass: string | null;
+    description: string | null;
+    price: number;
+    deliveryFrom: string | null;
+    deliveryTo: string | null;
+  };
+
+  const [yandexCourierEstimate, setYandexCourierEstimate] = useState<{
+    price: number;
+    description: string;
+    deliveryFrom: string | null;
+    deliveryTo: string | null;
+    loading: boolean;
+  } | null>(null);
+  const [yandexCourierOffers, setYandexCourierOffers] = useState<YandexCourierOffer[] | null>(null);
+  const [selectedCourierOfferId, setSelectedCourierOfferId] = useState<string | null>(null);
+
+  const isCourierAvailableByTime = useMemo(() => {
+    const now = new Date();
+    const moscowHour = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Moscow" })).getHours();
+    return moscowHour >= 8 && moscowHour < 22;
+  }, []);
+  const [courierAvailable, setCourierAvailable] = useState(isCourierAvailableByTime);
+
+  useEffect(() => {
+    const check = () => {
+      const now = new Date();
+      const moscowHour = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Moscow" })).getHours();
+      setCourierAvailable(moscowHour >= 8 && moscowHour < 22);
+    };
+    check();
+    const interval = setInterval(check, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Refs для полей формы
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
@@ -386,13 +423,33 @@ const CheckoutForm = ({
     }
   }, [formData.deliveryMethod]);
 
-  // Стоимость доставки: для СДЭК ПВЗ — из расчёта API, для остальных — 0
+  // Стоимость доставки: ПВЗ — всегда бесплатно; курьер Яндекс — из расчёта B2B API
   const deliveryPrice = useMemo(() => {
-    if (formData.deliveryType === "cdek" && formData.deliveryMethod === "pickup" && cdekDeliveryEstimate) {
-      return cdekDeliveryEstimate.price;
+    if (formData.deliveryMethod === "yandex" && yandexCourierEstimate && !yandexCourierEstimate.loading) {
+      return yandexCourierEstimate.price;
     }
     return 0;
-  }, [formData.deliveryType, formData.deliveryMethod, cdekDeliveryEstimate]);
+  }, [formData.deliveryMethod, yandexCourierEstimate]);
+
+  /** Цена курьера загружается — показываем «рассчитывается» в UI */
+  const isCourierPriceLoading = formData.deliveryMethod === "yandex" && yandexCourierEstimate?.loading === true;
+
+  const handleCourierTariffChange = useCallback(
+    (offerId: string) => {
+      if (!yandexCourierOffers) return;
+      const offer = yandexCourierOffers.find((o) => o.id === offerId);
+      if (!offer) return;
+      setSelectedCourierOfferId(offerId);
+      setYandexCourierEstimate({
+        price: offer.price,
+        description: offer.description ?? "",
+        deliveryFrom: offer.deliveryFrom,
+        deliveryTo: offer.deliveryTo,
+        loading: false,
+      });
+    },
+    [yandexCourierOffers]
+  );
 
   // Расчет итоговой суммы (с учётом промокода и доставки)
   const totalAmount = useMemo(() => {
@@ -475,7 +532,9 @@ const CheckoutForm = ({
         ...(!prev.pickupCity?.trim() ? { pickupCity: "Москва" } : {}),
       }));
       setSelectedPvzCoords(null);
-      // Сбрасываем ошибки доставки при смене типа
+      setYandexCourierEstimate(null);
+      setYandexCourierOffers(null);
+      setSelectedCourierOfferId(null);
       setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors.pvzAddress;
@@ -505,11 +564,14 @@ const CheckoutForm = ({
       setFormData((prev) => ({
         ...prev,
         deliveryMethod: value,
-        // При выборе «Пункт выдачи» по умолчанию город — Москва, если не задан
         ...(value === "pickup" && !prev.pickupCity?.trim() ? { pickupCity: "Москва" } : {}),
       }));
       setSelectedPvzCoords(null);
-      // Сбрасываем ошибки доставки при смене метода
+      if (value === "pickup") {
+        setYandexCourierEstimate(null);
+        setYandexCourierOffers(null);
+        setSelectedCourierOfferId(null);
+      }
       setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors.pvzAddress;
@@ -644,6 +706,89 @@ const CheckoutForm = ({
         ...prev,
         ...newAddress,
       }));
+
+      // Рассчитываем стоимость курьерской доставки через Яндекс B2B API
+      if (fullAddress || (typeof addressData.lat === "number" && typeof addressData.lon === "number")) {
+        setYandexCourierOffers(null);
+        setSelectedCourierOfferId(null);
+        setYandexCourierEstimate({ price: 0, description: "", deliveryFrom: null, deliveryTo: null, loading: true });
+        const params = new URLSearchParams({
+          dest_address: fullAddress || [addressData.street, addressData.house, addressData.city].filter(Boolean).join(", "),
+          weight_grams: String(totalWeightGrams ?? 1000),
+        });
+        if (typeof addressData.lat === "number" && typeof addressData.lon === "number") {
+          params.set("dest_lat", String(addressData.lat));
+          params.set("dest_lon", String(addressData.lon));
+        }
+        fetch(`/api/yandex/courier/calculate?${params.toString()}`)
+          .then((r) => r.json())
+          .then((data: {
+            from_api?: boolean;
+            price?: number;
+            description?: string;
+            delivery_from?: string | null;
+            delivery_to?: string | null;
+            error?: string;
+            offers?: Array<{
+              id: string;
+              taxi_class?: string | null;
+              description?: string | null;
+              price?: number;
+              delivery_from?: string | null;
+              delivery_to?: string | null;
+            }>;
+            best_index?: number;
+            no_offers?: boolean;
+          }) => {
+            if (data.from_api && data.offers && data.offers.length) {
+              const offers: YandexCourierOffer[] = data.offers
+                .filter((o) => typeof o.price === "number")
+                .map((o) => ({
+                  id: String(o.id),
+                  taxiClass: o.taxi_class ?? null,
+                  description: o.description ?? null,
+                  price: o.price as number,
+                  deliveryFrom: o.delivery_from ?? null,
+                  deliveryTo: o.delivery_to ?? null,
+                }));
+
+              if (!offers.length) {
+                console.warn("[CheckoutForm] Яндекс курьер: пришли офферы без цены");
+                setYandexCourierOffers(null);
+                setSelectedCourierOfferId(null);
+                setYandexCourierEstimate(null);
+                return;
+              }
+
+              const bestIndex =
+                typeof data.best_index === "number" && data.best_index >= 0 && data.best_index < offers.length
+                  ? data.best_index
+                  : 0;
+              const best = offers[bestIndex] ?? offers[0];
+
+              setYandexCourierOffers(offers);
+              setSelectedCourierOfferId(best.id);
+              setYandexCourierEstimate({
+                price: best.price,
+                description: best.description ?? "",
+                deliveryFrom: best.deliveryFrom,
+                deliveryTo: best.deliveryTo,
+                loading: false,
+              });
+            } else {
+              console.warn("[CheckoutForm] Яндекс курьер: расчёт не удался:", data.error);
+              setYandexCourierEstimate(null);
+              setYandexCourierOffers(null);
+              setSelectedCourierOfferId(null);
+            }
+          })
+          .catch((err) => {
+            console.warn("[CheckoutForm] Яндекс курьер: fetch ошибка:", err);
+            setYandexCourierEstimate(null);
+            setYandexCourierOffers(null);
+            setSelectedCourierOfferId(null);
+          });
+      }
     }
 
     // Обновляем поиск по карте только для курьерской доставки; при выборе ПВЗ не трогаем — избегаем «телепорта» карты
@@ -1033,6 +1178,10 @@ const CheckoutForm = ({
     }
 
     if (isSubmitting) {
+      return;
+    }
+
+    if (formData.deliveryMethod === "yandex" && !courierAvailable) {
       return;
     }
 
@@ -1508,13 +1657,7 @@ const CheckoutForm = ({
                             : `${cdekDeliveryEstimate.daysMin}–${cdekDeliveryEstimate.daysMax} дн.`
                           : "Послезавтра"}
                       </span>
-                      <span className={styles.deliveryButtonPrice}>
-                        {cdekDeliveryEstimate
-                          ? cdekDeliveryEstimate.price === 0
-                            ? "бесплатно"
-                            : `от ${cdekDeliveryEstimate.price} ₽`
-                          : "бесплатно"}
-                      </span>
+                      <span className={styles.deliveryButtonPrice}>бесплатно</span>
                     </div>
                     <div
                       className={`${styles.deliveryCheckmark} ${
@@ -1593,10 +1736,22 @@ const CheckoutForm = ({
                       </div>
                       <div className={styles.deliveryButtonInfo}>
                         <span className={styles.deliveryButtonSubtext}>
-                          6-7 дней
+                          {!courierAvailable
+                            ? "Недоступно"
+                            : yandexCourierEstimate && !yandexCourierEstimate.loading && yandexCourierEstimate.deliveryTo
+                            ? `до ${new Date(yandexCourierEstimate.deliveryTo).toLocaleDateString("ru-RU", { day: "numeric", month: "short" })}`
+                            : "Сегодня/завтра"}
                         </span>
                         <span className={styles.deliveryButtonPrice}>
-                          бесплатно
+                          {!courierAvailable
+                            ? ""
+                            : isCourierPriceLoading
+                            ? "рассчитывается…"
+                            : yandexCourierEstimate && !yandexCourierEstimate.loading
+                            ? yandexCourierEstimate.price === 0
+                              ? "бесплатно"
+                              : `${formatPrice(yandexCourierEstimate.price)}`
+                            : "от адреса"}
                         </span>
                       </div>
                       <div
@@ -1620,6 +1775,66 @@ const CheckoutForm = ({
               )}
             </div>
           </div>
+
+          {formData.deliveryMethod === "yandex" &&
+            yandexCourierOffers &&
+            yandexCourierOffers.length > 1 && (
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Тариф доставки</h2>
+                <div className={styles.courierTariffs}>
+                  {yandexCourierOffers.map((offer) => {
+                    const isActive = selectedCourierOfferId === offer.id;
+                    const descriptionMap: Record<string, string> = {
+                      "2_hours_delivery": "Доставка за 2 часа",
+                      "4_hours_delivery": "Доставка за 4 часа",
+                      "express_30min_longer": "Экспресс ~30 мин",
+                      "express_60min_longer": "Экспресс ~60 мин",
+                      "same_day_delivery": "Доставка сегодня",
+                      "next_day_delivery": "Доставка завтра",
+                    };
+                    const label =
+                      (offer.description && descriptionMap[offer.description]) ||
+                      (offer.description && offer.description.replace(/_/g, " ")) ||
+                      (offer.taxiClass === "express" ? "Экспресс" : "Курьер");
+                    const deliveryDate = offer.deliveryTo
+                      ? new Date(offer.deliveryTo).toLocaleDateString("ru-RU", { day: "numeric", month: "short" })
+                      : null;
+                    return (
+                      <button
+                        key={offer.id}
+                        type="button"
+                        className={`${styles.courierTariffButton} ${isActive ? styles.courierTariffButtonActive : ""}`}
+                        onClick={() => handleCourierTariffChange(offer.id)}
+                      >
+                        <span className={styles.courierTariffName}>{label}</span>
+                        {deliveryDate && (
+                          <span className={styles.courierTariffDate}>до {deliveryDate}</span>
+                        )}
+                        <span className={styles.courierTariffPrice}>
+                          {offer.price === 0 ? "бесплатно" : formatPrice(offer.price)}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+          {formData.deliveryMethod === "yandex" && !courierAvailable && (
+            <div className={styles.courierUnavailable}>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="9" stroke="#c45e2c" strokeWidth="1.5"/>
+                <path d="M10 6v5" stroke="#c45e2c" strokeWidth="1.5" strokeLinecap="round"/>
+                <circle cx="10" cy="14" r="0.75" fill="#c45e2c"/>
+              </svg>
+              <div>
+                <span className={styles.courierUnavailableTitle}>Курьерская доставка сейчас недоступна</span>
+                <span className={styles.courierUnavailableHint}>
+                  Курьеры работают с 8:00 до 22:00. Попробуйте оформить заказ позже или выберите доставку в пункт выдачи.
+                </span>
+              </div>
+            </div>
+          )}
 
           {formData.deliveryMethod !== "pickup" && (
             <div className={styles.section}>
@@ -2028,7 +2243,7 @@ const CheckoutForm = ({
                   ref={submitButtonRef}
                   type="button"
                   className={`${styles.submitButton} ${styles.submitButtonRight}`}
-                  disabled={!formData.agreeToOffer || !formData.agreeToPrivacy || isSubmitting}
+                  disabled={!formData.agreeToOffer || !formData.agreeToPrivacy || isSubmitting || (formData.deliveryMethod === "yandex" && !courierAvailable)}
                   onClick={handleSubmitOrder}
                   onPointerDown={(e) => {
                     if (e.pointerType === "touch") {
@@ -2166,7 +2381,11 @@ const CheckoutForm = ({
               <div className={styles.summaryRow}>
                 <span className={styles.summaryLabel}>Доставка:</span>
                 <span className={styles.summaryValue}>
-                  {deliveryPrice === 0 ? "Бесплатно" : formatPrice(deliveryPrice)}
+                  {isCourierPriceLoading
+                    ? "рассчитывается…"
+                    : deliveryPrice === 0
+                    ? "Бесплатно"
+                    : formatPrice(deliveryPrice)}
                 </span>
               </div>
               <div className={styles.summaryRow}>
@@ -2204,7 +2423,7 @@ const CheckoutForm = ({
                   ref={submitButtonRef}
                   type="button"
                   className={`${styles.submitButton} ${styles.submitButtonRight}`}
-                  disabled={!formData.agreeToOffer || !formData.agreeToPrivacy || isSubmitting}
+                  disabled={!formData.agreeToOffer || !formData.agreeToPrivacy || isSubmitting || (formData.deliveryMethod === "yandex" && !courierAvailable)}
                   onClick={handleSubmitOrder}
                   onPointerDown={(e) => {
                     if (e.pointerType === "touch") {

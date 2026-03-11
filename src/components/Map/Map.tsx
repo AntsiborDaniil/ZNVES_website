@@ -465,7 +465,7 @@ const Map = ({
             weightGrams,
             price,
           });
-          return `${price} ₽`;
+          return "";
         },
         show_select_button: true,
         filter: {
@@ -857,20 +857,6 @@ const Map = ({
             <span style={{ fontWeight: 600, color: "#333" }}>
               СДЭК · Пункты выдачи · {city}
             </span>
-          {cdekDeliveryEstimate != null && (
-              <span style={{ fontSize: 13, color: "#555" }}>
-                {cdekDeliveryEstimate.daysMin === cdekDeliveryEstimate.daysMax
-                  ? `${cdekDeliveryEstimate.daysMin} дн.`
-                  : `${cdekDeliveryEstimate.daysMin}–${cdekDeliveryEstimate.daysMax} дн.`}
-                {" · "}
-                {cdekDeliveryEstimate.price === 0 ? "бесплатно" : `от ${cdekDeliveryEstimate.price} ₽`}
-              </span>
-            )}
-            {cdekDeliveryEstimate == null && !cdekPvzLoading && cdekPvzList.length > 0 && (
-              <span style={{ fontSize: 13, color: "#777" }}>
-                Срок и стоимость уточняются
-              </span>
-            )}
           </div>
 
           {cdekPvzLoading && (

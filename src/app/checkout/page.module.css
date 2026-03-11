@@ -442,6 +442,105 @@ textarea.input::placeholder {
   color: #525252;
 }
 
+.courierTariffs {
+  display: flex;
+  gap: clamp(8px, 1.5vw, 12px);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.courierTariffs::-webkit-scrollbar {
+  display: none;
+}
+
+.courierTariffButton {
+  flex: 1 1 0;
+  min-width: 0;
+  border: 2px solid rgba(82, 82, 82, 0.2);
+  border-radius: 3px;
+  padding: 12px;
+  background: #ffffff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.courierTariffButton:hover {
+  border-color: #525252;
+}
+
+.courierTariffButtonActive {
+  border-color: #525252;
+  background: #fafafa;
+}
+
+.courierTariffName {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #525252;
+}
+
+.courierTariffButtonActive .courierTariffName {
+  color: #191817;
+  font-weight: 500;
+}
+
+.courierTariffDate {
+  font-size: 12px;
+  line-height: 1.2;
+  color: rgba(82, 82, 82, 0.7);
+}
+
+.courierTariffPrice {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #22a55a;
+}
+
+.courierTariffButtonActive .courierTariffPrice {
+  color: #1a8c4a;
+}
+
+.courierUnavailable {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 6px;
+  background: #fef6f0;
+  border: 1px solid rgba(196, 94, 44, 0.25);
+}
+
+.courierUnavailable svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.courierUnavailable > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.courierUnavailableTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #c45e2c;
+  line-height: 1.3;
+}
+
+.courierUnavailableHint {
+  font-size: 13px;
+  color: rgba(82, 82, 82, 0.8);
+  line-height: 1.4;
+}
+
 .deliveryCheckmark {
   position: absolute;
   bottom: 12px;
