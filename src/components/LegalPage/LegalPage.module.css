@@ -78,8 +78,38 @@
   color: #0a5840;
 }
 
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(10, 88, 64, 0.08);
+}
+
+.subheading {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1f1f1f;
+  margin: 8px 0 0;
+  line-height: 1.4;
+}
+
 .paragraph {
   color: rgba(31, 31, 31, 0.82);
+}
+
+.inlineLink {
+  color: #0a5840;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 500;
+}
+
+.inlineLink:hover {
+  color: #063f2d;
 }
 
 .list {

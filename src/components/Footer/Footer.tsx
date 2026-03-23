@@ -275,6 +275,12 @@ const Footer = () => {
             </div>
           </div>
           <div className={styles.links}>
+            <Link className={styles.link} href="/delivery-payment" prefetch={shouldPrefetch}>
+              Доставка и оплата
+            </Link>
+            <Link className={styles.link} href="/returns" prefetch={shouldPrefetch}>
+              Обмен и возврат
+            </Link>
             <Link className={styles.link} href="/public-offer" prefetch={shouldPrefetch}>
               Публичная оферта
             </Link>

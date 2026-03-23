@@ -1,23 +1,85 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 import styles from "./LegalPage.module.css";
 
-type LegalSection = {
+/** Фрагмент текста с опциональной ссылкой */
+export type LegalRichPart = { text: string; href?: string };
+
+export type LegalBlock =
+  | { type: "paragraph"; text: string }
+  | { type: "paragraphRich"; parts: LegalRichPart[] }
+  | { type: "subheading"; text: string }
+  | { type: "list"; items: string[] };
+
+export type LegalSection = {
   id: string;
   title: string;
-  paragraphs: string[];
-  listItems?: string[];
+  blocks: LegalBlock[];
 };
 
 type LegalPageProps = {
   title: string;
   updatedAt?: string;
+  intro?: LegalBlock[];
   sections: LegalSection[];
 };
 
-const LegalPage = ({ title, updatedAt, sections }: LegalPageProps) => {
+function RichParagraph({ parts }: { parts: LegalRichPart[] }) {
+  return (
+    <p className={styles.paragraph}>
+      {parts.map((p, i) =>
+        p.href ? (
+          <a
+            key={i}
+            href={p.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.inlineLink}
+          >
+            {p.text}
+          </a>
+        ) : (
+          <Fragment key={i}>{p.text}</Fragment>
+        )
+      )}
+    </p>
+  );
+}
+
+function renderBlock(block: LegalBlock, key: string) {
+  switch (block.type) {
+    case "paragraph":
+      return (
+        <p key={key} className={styles.paragraph}>
+          {block.text}
+        </p>
+      );
+    case "paragraphRich":
+      return <RichParagraph key={key} parts={block.parts} />;
+    case "subheading":
+      return (
+        <h3 key={key} className={styles.subheading}>
+          {block.text}
+        </h3>
+      );
+    case "list":
+      return (
+        <ul key={key} className={styles.list}>
+          {block.items.map((item, i) => (
+            <li key={`${key}-li-${i}`} className={styles.listItem}>
+              {item}
+            </li>
+          ))}
+        </ul>
+      );
+    default:
+      return null;
+  }
+}
+
+const LegalPage = ({ title, updatedAt, intro, sections }: LegalPageProps) => {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
 
@@ -30,8 +92,6 @@ const LegalPage = ({ title, updatedAt, sections }: LegalPageProps) => {
       router.push("/");
       return;
     }
-
-    // Используем router.back() - Next.js безопасно обработает это
     router.back();
   };
 
@@ -49,28 +109,19 @@ const LegalPage = ({ title, updatedAt, sections }: LegalPageProps) => {
           )}
         </header>
 
+        {intro && intro.length > 0 && (
+          <div className={styles.intro}>
+            {intro.map((b, i) => renderBlock(b, `intro-${i}`))}
+          </div>
+        )}
+
         <div className={styles.sections}>
-          {sections.map(
-            ({ id, title: sectionTitle, paragraphs, listItems }) => (
-              <section key={id} className={styles.section} id={id}>
-                <h2 className={styles.sectionTitle}>{sectionTitle}</h2>
-                {paragraphs.map((paragraph, index) => (
-                  <p key={`${id}-p-${index}`} className={styles.paragraph}>
-                    {paragraph}
-                  </p>
-                ))}
-                {listItems && listItems.length > 0 && (
-                  <ul className={styles.list}>
-                    {listItems.map((item, index) => (
-                      <li key={`${id}-l-${index}`} className={styles.listItem}>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-            )
-          )}
+          {sections.map(({ id, title: sectionTitle, blocks }) => (
+            <section key={id} className={styles.section} id={id}>
+              <h2 className={styles.sectionTitle}>{sectionTitle}</h2>
+              {blocks.map((block, index) => renderBlock(block, `${id}-b-${index}`))}
+            </section>
+          ))}
         </div>
       </div>
     </main>
