@@ -142,7 +142,6 @@ export const fetchNewInProducts = async (
 
     return transformedProducts;
   } catch (error) {
-    console.error("Error fetching new in products:", error);
     return [];
   }
 };

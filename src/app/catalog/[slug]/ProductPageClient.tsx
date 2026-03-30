@@ -28,7 +28,6 @@ const ProductPageClient = ({ slug }: ProductPageClientProps) => {
         setProduct(data.product);
         setWarehouseItems(data.warehouseItems);
       } catch (error) {
-        console.error("Error loading product:", error);
         notFound();
       } finally {
         setIsLoading(false);

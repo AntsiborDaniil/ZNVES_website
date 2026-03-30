@@ -227,7 +227,6 @@ export const redirectToTelegramBot = (): void => {
   try {
     window.location.href = url;
   } catch (error) {
-    console.error("Error redirecting to Telegram bot:", error);
     window.location.href = `https://t.me/${TELEGRAM_BOT_USERNAME}`;
   }
 };

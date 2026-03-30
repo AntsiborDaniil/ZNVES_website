@@ -213,7 +213,6 @@ export const createOrder = async (
   orderData: OrderRequest
 ): Promise<OrderResponse> => {
   try {
-    console.log("Creating order:", orderData);
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -231,7 +230,6 @@ export const createOrder = async (
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Order creation failed:", response.status, errorText);
       let message = `${response.status} ${response.statusText}`;
       try {
         const errJson = JSON.parse(errorText);
@@ -244,10 +242,8 @@ export const createOrder = async (
     }
 
     const data: OrderResponse = await response.json();
-    console.log("Order created successfully:", data);
     return data;
   } catch (error) {
-    console.error("Error creating order:", error);
     throw error;
   }
 };
@@ -294,7 +290,6 @@ export const getPaymentUrl = async (
       return_url: options?.return_url ?? urls.return_url,
       cancel_url: options?.cancel_url ?? urls.cancel_url,
     };
-    console.log("Getting payment URL for order:", orderId, url);
 
     const payHeaders: Record<string, string> = { "Content-Type": "application/json" };
     const payCsrf = getCsrfToken();
@@ -310,7 +305,6 @@ export const getPaymentUrl = async (
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Payment URL request failed:", response.status, errorText);
       let message = errorText || `${response.status} ${response.statusText}`;
       try {
         const errJson = JSON.parse(errorText);
@@ -320,10 +314,8 @@ export const getPaymentUrl = async (
     }
 
     const data: PaymentResponse = await response.json();
-    console.log("Payment URL received:", data);
     return data;
   } catch (error) {
-    console.error("Error getting payment URL:", error);
     throw error;
   }
 };
@@ -351,7 +343,6 @@ export const getYandexPaymentUrl = async (
       return_url: options?.return_url ?? urls.return_url,
       cancel_url: options?.cancel_url ?? urls.cancel_url,
     };
-    console.log("Getting Yandex payment URL for order:", orderId, "body:", body);
 
     const yandexHeaders: Record<string, string> = { "Content-Type": "application/json" };
     const yandexCsrf = getCsrfToken();
@@ -367,7 +358,6 @@ export const getYandexPaymentUrl = async (
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Yandex payment URL request failed:", response.status, errorText);
       let message = errorText || `${response.status} ${response.statusText}`;
       try {
         const errJson = JSON.parse(errorText);
@@ -377,10 +367,8 @@ export const getYandexPaymentUrl = async (
     }
 
     const data: PaymentResponse = await response.json();
-    console.log("Yandex payment URL received:", data);
     return data;
   } catch (error) {
-    console.error("Error getting Yandex payment URL:", error);
     throw error;
   }
 };

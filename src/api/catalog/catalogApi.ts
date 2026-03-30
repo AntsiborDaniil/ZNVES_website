@@ -160,7 +160,6 @@ export const fetchCatalogProducts = async (
 
     return transformedProducts;
   } catch (error) {
-    console.error("Error fetching catalog products:", error);
     return [];
   }
 };
@@ -201,7 +200,6 @@ export const fetchCatalogCategories = async (): Promise<ApiCatalogCategory[]> =>
     categoriesCacheState = { data: list, timestamp: Date.now() };
     return list;
   } catch (error) {
-    console.error("Error fetching catalog categories:", error);
     return categoriesCacheState?.data ?? [];
   }
 };
@@ -224,7 +222,6 @@ export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
     colorsCacheState = { data, timestamp: Date.now() };
     return data;
   } catch (error) {
-    console.error("Error fetching catalog colors:", error);
     return colorsCacheState?.data ?? [];
   }
 };
@@ -247,7 +244,6 @@ export const fetchCatalogSizes = async (): Promise<ApiCatalogSize[]> => {
     sizesCacheState = { data, timestamp: Date.now() };
     return data;
   } catch (error) {
-    console.error("Error fetching catalog sizes:", error);
     return sizesCacheState?.data ?? [];
   }
 };

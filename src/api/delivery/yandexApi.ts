@@ -126,14 +126,6 @@ export const getYandexPvzByCity = async (
     if (list.length === 0) return getFallbackYandexPvzForCity(city);
     return list;
   } catch (e) {
-    console.warn(
-      "[yandexApi] getYandexPvzByCity failed for city:",
-      city,
-      "url:",
-      url,
-      "error:",
-      e
-    );
     return getFallbackYandexPvzForCity(city);
   }
 };

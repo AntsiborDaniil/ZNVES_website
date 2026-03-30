@@ -58,7 +58,6 @@ export async function GET(request: NextRequest) {
       lon: lonNum,
     });
   } catch (err) {
-    console.error("[reverse-geocode] Error:", err);
     return NextResponse.json({ error: "Geocoder error" }, { status: 502 });
   }
 }

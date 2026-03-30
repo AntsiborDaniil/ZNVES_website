@@ -8,6 +8,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 const CDEK_API = "https://api.cdek.ru/v2";
 
+function withTimeout(ms: number): { signal: AbortSignal; clear: () => void } {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), ms);
+  return { signal: controller.signal, clear: () => clearTimeout(id) };
+}
+
 function getCdekCredentials(): { clientId: string; clientSecret: string } | null {
   const clientId = (process.env.CDEK_ACCOUNT ?? process.env.CDEK_CLIENT_ID)?.trim();
   const clientSecret = (process.env.CDEK_SECURE_PASSWORD ?? process.env.CDEK_CLIENT_SECRET)?.trim();
@@ -26,12 +32,15 @@ async function getCdekToken(): Promise<string> {
     client_secret: clientSecret,
   });
 
+  const { signal: tokenSignal, clear: tokenClear } = withTimeout(8000);
   const res = await fetch(`${CDEK_API}/oauth/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: body.toString(),
+    signal: tokenSignal,
     next: { revalidate: 0 },
   });
+  tokenClear();
 
   if (!res.ok) {
     const text = await res.text();
@@ -49,10 +58,13 @@ async function getCityCode(token: string, cityName: string): Promise<number | nu
   url.searchParams.set("country_codes", "RU");
   url.searchParams.set("size", "5");
 
+  const { signal: citySignal, clear: cityClear } = withTimeout(8000);
   const res = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${token}` },
+    signal: citySignal,
     next: { revalidate: 0 },
   });
+  cityClear();
 
   if (!res.ok) return null;
 
@@ -67,10 +79,13 @@ async function getDeliveryPoints(token: string, cityCode: number): Promise<unkno
   url.searchParams.set("city_code", String(cityCode));
   url.searchParams.set("size", "100");
 
+  const { signal: dpSignal, clear: dpClear } = withTimeout(10000);
   const res = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${token}` },
+    signal: dpSignal,
     next: { revalidate: 0 },
   });
+  dpClear();
 
   if (!res.ok) {
     const text = await res.text();
@@ -140,7 +155,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(list);
   } catch (e) {
     const message = e instanceof Error ? e.message : "CDEK PVZ error";
-    console.error("[api/cdek/pvz]", message, e);
     return NextResponse.json(
       { error: message },
       { status: 502 }

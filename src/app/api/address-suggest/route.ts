@@ -20,6 +20,12 @@ function normalizeSuggestItem(item: any): { displayName: string; value: string }
   return d || v ? { displayName: d || v, value: v || d } : null;
 }
 
+function withTimeout(ms: number): { signal: AbortSignal; clear: () => void } {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), ms);
+  return { signal: controller.signal, clear: () => clearTimeout(id) };
+}
+
 async function fetchGeocoderSuggestions(apiKey: string, query: string): Promise<{ displayName: string; value: string }[]> {
   const url = new URL(GEOCODER_URL);
   url.searchParams.set("apikey", apiKey);
@@ -28,7 +34,9 @@ async function fetchGeocoderSuggestions(apiKey: string, query: string): Promise<
   url.searchParams.set("lang", "ru_RU");
   url.searchParams.set("results", "10");
 
-  const res = await fetch(url.toString(), { next: { revalidate: 0 } });
+  const { signal, clear } = withTimeout(8000);
+  const res = await fetch(url.toString(), { signal, next: { revalidate: 0 } });
+  clear();
   if (!res.ok) return [];
 
   const data = await res.json();
@@ -70,7 +78,9 @@ export async function GET(request: NextRequest) {
     suggestUrl.searchParams.set("types", "geo,street,locality,area,house");
     suggestUrl.searchParams.set("highlight", "0");
 
-    const res = await fetch(suggestUrl.toString(), { next: { revalidate: 0 } });
+    const { signal: sugSignal, clear: sugClear } = withTimeout(8000);
+    const res = await fetch(suggestUrl.toString(), { signal: sugSignal, next: { revalidate: 0 } });
+    sugClear();
     if (res.ok) {
       const data = await res.json();
       const rawList = data?.results ?? data?.suggestions ?? Array.isArray(data) ? data : [];

@@ -33,7 +33,6 @@ export const generateStaticParams = async () => {
   } catch (error) {
     // Если API недоступен на этапе сборки, возвращаем пустой массив
     // Страницы будут обрабатываться на клиенте через клиентскую навигацию
-    console.warn("Could not fetch products for static generation:", error);
   }
 
   // Возвращаем пустой массив, если не удалось получить товары

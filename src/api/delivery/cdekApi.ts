@@ -108,7 +108,6 @@ export const getCdekPvzByCity = async (
     const list = await tryFetch(backendUrl);
     if (list) return list;
   } catch (e) {
-    console.warn("[cdekApi] getCdekPvzByCity backend failed for city:", city, e);
   }
   return getFallbackPvzForCity(city);
 };
@@ -133,7 +132,6 @@ export const getCdekPvzByCoords = async (
     });
     if (res.ok) {
       const data = await res.json();
-      console.log("[cdekApi] getCdekPvzByCoords response:", data);
       const list = extractPvzList(data);
       if (list.length > 0) {
         return sortPvzByDistance(list, lat, lon);

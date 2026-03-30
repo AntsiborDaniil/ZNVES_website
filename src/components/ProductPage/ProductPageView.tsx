@@ -170,7 +170,6 @@ const ProductPageView = ({
           setCurrentImages(product.images);
         }
       } catch (error) {
-        console.error("Error loading images by color:", error);
         // В случае ошибки используем базовые изображения
         setCurrentImages(product.images);
       } finally {
@@ -487,16 +486,7 @@ const ProductPageView = ({
                     });
                     const warehouseProductId = warehouseItem?.id;
                     if (!warehouseProductId) {
-                      console.warn(
-                        "[Add to Cart] warehouse_item не найден! color:",
-                        selectedColor,
-                        "size:",
-                        selectedSize,
-                        "| доступные warehouseItems:",
-                        warehouseItems
-                      );
                     } else {
-                      console.log("[Add to Cart] UUID в корзину:", warehouseProductId);
                     }
                     addItem(
                       catalogProduct,

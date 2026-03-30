@@ -312,7 +312,6 @@ export const fetchProductImagesByColor = async (
   if (!promise) {
     promise = fetchProductImagesByColorInternal(productSlug, colorSlug)
       .catch((err) => {
-        console.error("Error fetching product images by color:", err);
         return [];
       })
       .finally(() => inFlightImages.delete(cacheKey));

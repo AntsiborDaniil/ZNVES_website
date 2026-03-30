@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getProductById } from "../../data/products";
 import { createOrder, getPaymentUrl, getYandexPaymentUrl, invalidateMyOrdersCache, type OrderRequest } from "../../api/order/orderApi";
+import PromoErrorToast from "../PromoErrorToast/PromoErrorToast";
 import { fetchCatalogProductRaw, type ApiProductDetail, type ApiWarehouseItem } from "../../api/product/productApi";
 import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 import type { PvzListOption } from "../Map/Map";
@@ -178,6 +179,7 @@ const CheckoutForm = ({
     return moscowHour >= 8 && moscowHour < 22;
   }, []);
   const [courierAvailable, setCourierAvailable] = useState(isCourierAvailableByTime);
+  const [paymentErrorToast, setPaymentErrorToast] = useState<string | null>(null);
 
   useEffect(() => {
     const check = () => {
@@ -217,7 +219,6 @@ const CheckoutForm = ({
   useEffect(() => {
     if (!items.length) {
       setTotalWeightGrams(undefined);
-      console.log("[Delivery weight] Корзина пуста → totalWeightGrams = undefined");
       return;
     }
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -229,10 +230,6 @@ const CheckoutForm = ({
           : null) ?? item.product?.slug
     ).filter((s): s is string => !!s);
     const uniqueSlugs = Array.from(new Set(slugsFromItems));
-    console.log("[Delivery weight] Старт: items=" + items.length, {
-      slugs: uniqueSlugs,
-      items: items.map((i) => ({ productId: i.productId, color: i.color, size: i.size, quantity: i.quantity, warehouseProduct: i.warehouseProduct })),
-    });
 
     let cancelled = false;
     const slugToProduct: Record<string, ApiProductDetail | null> = {};
@@ -263,7 +260,6 @@ const CheckoutForm = ({
           };
         }
       }
-      console.log("[Delivery weight] Данные товаров загружены:", weightBySlug);
 
       let total = 0;
       for (const item of items) {
@@ -278,18 +274,15 @@ const CheckoutForm = ({
             if (wi && typeof wi.weight === "number") {
               total += wi.weight * item.quantity;
               found = true;
-              console.log("[Delivery weight] По UUID:", { uuid: uuidFromCart, weight: wi.weight, qty: item.quantity, add: wi.weight * item.quantity });
               break;
             }
           }
-          if (!found) console.warn("[Delivery weight] По UUID не найден вес:", { uuid: uuidFromCart, item });
-          continue;
+          if (!found)          continue;
         }
         const fullProduct =
           typeof item.productId === "number" ? getProductById(item.productId) : undefined;
         const productSlug = fullProduct?.slug ?? item.product?.slug;
         if (!productSlug) {
-          console.warn("[Delivery weight] Нет slug у товара:", item);
           continue;
         }
         const productData = slugToProduct[productSlug];
@@ -301,13 +294,10 @@ const CheckoutForm = ({
         const w = warehouseItem?.weight;
         if (typeof w === "number") {
           total += w * item.quantity;
-          console.log("[Delivery weight] По color/size:", { slug: productSlug, color: item.color, size: item.size, weight: w, qty: item.quantity, add: w * item.quantity });
         } else {
-          console.warn("[Delivery weight] По color/size вес не найден:", { slug: productSlug, color: item.color, size: item.size, productData: !!productData, warehouse_items: productData?.warehouse_items?.length });
         }
       }
       const result = total > 0 ? total : undefined;
-      console.log("[Delivery weight] Итого totalWeightGrams =", result, "(г)");
       setTotalWeightGrams(result);
     });
     return () => {
@@ -638,7 +628,6 @@ const CheckoutForm = ({
     lat?: number;
     lon?: number;
   }) => {
-    console.log("[CheckoutForm] handleAddressSelect вызван:", addressData, "deliveryMethod:", formData.deliveryMethod);
     const fullAddress =
       addressData.fullAddress ||
       addressData.pvzAddress ||
@@ -651,7 +640,6 @@ const CheckoutForm = ({
       !isPvzSelection &&
       lastGeocodedAddressRef.current === fullAddress
     ) {
-      console.log("[CheckoutForm] Пропуск: тот же адрес уже обработан:", fullAddress);
       return;
     }
 
@@ -702,7 +690,6 @@ const CheckoutForm = ({
         street: addressData.street || "",
         house: addressData.house || "",
       };
-      console.log("[CheckoutForm] Курьер: обновляем formData:", newAddress);
       setFormData((prev) => ({
         ...prev,
         ...newAddress,
@@ -754,7 +741,6 @@ const CheckoutForm = ({
                 }));
 
               if (!offers.length) {
-                console.warn("[CheckoutForm] Яндекс курьер: пришли офферы без цены");
                 setYandexCourierOffers(null);
                 setSelectedCourierOfferId(null);
                 setYandexCourierEstimate(null);
@@ -777,14 +763,12 @@ const CheckoutForm = ({
                 loading: false,
               });
             } else {
-              console.warn("[CheckoutForm] Яндекс курьер: расчёт не удался:", data.error);
               setYandexCourierEstimate(null);
               setYandexCourierOffers(null);
               setSelectedCourierOfferId(null);
             }
           })
           .catch((err) => {
-            console.warn("[CheckoutForm] Яндекс курьер: fetch ошибка:", err);
             setYandexCourierEstimate(null);
             setYandexCourierOffers(null);
             setSelectedCourierOfferId(null);
@@ -1265,7 +1249,6 @@ const CheckoutForm = ({
               : undefined;
           const productSlug = fullProduct?.slug ?? item.product?.slug;
           if (!productSlug) {
-            console.warn("[Order] Нет slug для позиции:", item);
             return null;
           }
           const productData = slugToProduct[productSlug];
@@ -1283,12 +1266,6 @@ const CheckoutForm = ({
               return { id: idStr, quantity: item.quantity };
             }
           }
-          console.warn(
-            "[Order] Не найден warehouse_item UUID для:",
-            productSlug,
-            item.color,
-            item.size
-          );
           return null;
         }
       );
@@ -1342,10 +1319,8 @@ const CheckoutForm = ({
         };
       }
 
-      console.log("Submitting order:", orderRequest);
       // Создаем заказ
       const orderResponse = await createOrder(orderRequest);
-      console.log("Order created:", orderResponse);
 
       invalidateMyOrdersCache();
 
@@ -1360,7 +1335,6 @@ const CheckoutForm = ({
         // Оплата картой или СБП — return_url/cancel_url формируются в API относительно текущей страницы
         try {
           const paymentResponse = await getPaymentUrl(orderId);
-          console.log("Payment URL:", paymentResponse);
           
           // Используем confirmation_url или payment_url для обратной совместимости
           const paymentUrl = paymentResponse.confirmation_url || paymentResponse.payment_url;
@@ -1371,14 +1345,12 @@ const CheckoutForm = ({
             return;
           }
         } catch (error) {
-          console.error("Failed to get payment URL:", error);
-          // Продолжаем с сохранением заказа в sessionStorage
+          setPaymentErrorToast("Не удалось перейти к оплате. Попробуйте ещё раз или свяжитесь с поддержкой.");
         }
       } else if (formData.paymentMethod === "yandexpay" || formData.paymentMethod === "installment") {
         // Яндекс Pay и Долями — return_url/cancel_url формируются в API относительно текущей страницы
         try {
           const paymentResponse = await getYandexPaymentUrl(orderId);
-          console.log("Yandex Payment URL:", paymentResponse);
           
           const paymentUrl = paymentResponse.confirmation_url || paymentResponse.payment_url;
           
@@ -1387,10 +1359,7 @@ const CheckoutForm = ({
             return;
           }
         } catch (error) {
-          console.error("Failed to get Yandex payment URL:", error);
-          alert(
-            "Ошибка оплаты. Попробуйте оплатить картой или СБП, либо свяжитесь с поддержкой."
-          );
+          setPaymentErrorToast("Не удалось перейти к оплате. Попробуйте оплатить картой или СБП, либо свяжитесь с поддержкой.");
           return;
         }
       }
@@ -1471,7 +1440,6 @@ const CheckoutForm = ({
           orders.push(orderData);
           sessionStorage.setItem("znves:orders", JSON.stringify(orders));
         } catch (error) {
-          console.error("Failed to save order to sessionStorage:", error);
         }
       }
 
@@ -1479,7 +1447,6 @@ const CheckoutForm = ({
         onOrderSubmit(newOrderNumber);
       }
     } catch (error) {
-      console.error("Failed to submit order:", error);
       const message =
         "К сожалению, оформить заказ не удалось: один или несколько товаров отсутствуют в наличии или их количество ограничено. Пожалуйста, обновите корзину и попробуйте оформить заказ повторно либо свяжитесь со службой поддержки.";
       setIsSubmitting(false);
@@ -1491,6 +1458,7 @@ const CheckoutForm = ({
   };
 
   return (
+    <>
     <div className={className}>
       <div ref={formContainerRef} className={styles.content}>
         <div className={styles.leftColumn}>
@@ -1610,7 +1578,7 @@ const CheckoutForm = ({
                   className={styles.radioInput}
                 />
                 <div className={styles.deliveryTypeButtonContent}>
-                  <span className={styles.deliveryTypeText}>ЯНДЕКС.КУРЬЕР</span>
+                  <span className={styles.deliveryTypeText}>ЯНДЕКС</span>
                   <div
                     className={`${styles.deliveryCheckmark} ${
                       formData.deliveryType === "yandex"
@@ -2476,6 +2444,14 @@ const CheckoutForm = ({
         )}
       </div>
     </div>
+    {paymentErrorToast && (
+      <PromoErrorToast
+        message={paymentErrorToast}
+        onClose={() => setPaymentErrorToast(null)}
+        duration={5000}
+      />
+    )}
+    </>
   );
 };
 

@@ -283,7 +283,6 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
           setCategories(FALLBACK_CATEGORIES);
         }
       } catch (error) {
-        console.error("Error loading filter options:", error);
         setCategories(FALLBACK_CATEGORIES);
       } finally {
         setIsCategoriesLoading(false);
@@ -340,7 +339,6 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
           setProducts(catalogProducts);
         }
       } catch (error) {
-        console.error("Error loading products:", error);
         setProducts([]);
       } finally {
         hasLoadedOnceRef.current = true;

@@ -90,7 +90,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             ...(colorLabel != null && { colorLabel }),
           };
           if (warehouseProductId) {
-            console.log("[Cart] UUID в productId (localStorage):", warehouseProductId);
           }
           return updated;
         }
@@ -104,7 +103,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           product,
         };
         if (warehouseProductId) {
-          console.log("[Cart] UUID в productId (localStorage):", warehouseProductId);
         }
         return [...prevItems, newItem];
       });

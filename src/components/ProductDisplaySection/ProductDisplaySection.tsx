@@ -100,7 +100,6 @@ const ProductDisplaySection = ({
           setProducts(catalogProducts);
         }
       } catch (error) {
-        console.error("Error loading products:", error);
         setProducts([]);
       } finally {
         setIsLoading(false);

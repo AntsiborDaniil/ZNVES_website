@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   TELEGRAM_BOT_USERNAME,
   getTelegramLoginCallbackUrl,
 } from "../../api/auth/authApi";
+import styles from "./TelegramLoginWidget.module.css";
 
 const WIDGET_SCRIPT_URL = "https://telegram.org/js/telegram-widget.js?22";
 
@@ -31,6 +32,7 @@ export default function TelegramLoginWidget({
   radius = 8,
 }: TelegramLoginWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -43,6 +45,7 @@ export default function TelegramLoginWidget({
     script.setAttribute("data-auth-url", getTelegramLoginCallbackUrl());
     script.setAttribute("data-size", size);
     script.setAttribute("data-radius", String(radius));
+    script.onload = () => setLoaded(true);
 
     container.appendChild(script);
 
@@ -53,5 +56,10 @@ export default function TelegramLoginWidget({
     };
   }, [size, radius]);
 
-  return <div ref={containerRef} className={className} />;
+  return (
+    <>
+      {!loaded && <div className={styles.skeleton} aria-hidden="true" />}
+      <div ref={containerRef} className={className} />
+    </>
+  );
 }

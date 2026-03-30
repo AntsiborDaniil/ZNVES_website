@@ -32,7 +32,6 @@ export async function GET(request: NextRequest) {
       const body = await res.text();
 
       if (!res.ok) {
-        console.warn("[geocode] Yandex error:", res.status, body.slice(0, 300));
         // Продолжим к Nominatim ниже
       } else {
         const data = JSON.parse(body) as {
@@ -85,7 +84,6 @@ export async function GET(request: NextRequest) {
         }
       }
     } catch (err) {
-      console.warn("[geocode] Yandex request failed:", err);
     }
   }
 
@@ -103,7 +101,6 @@ export async function GET(request: NextRequest) {
     });
 
     if (!res.ok) {
-      console.warn("[geocode] Nominatim error:", res.status);
       return NextResponse.json(
         { error: "Geocoder request failed", details: res.statusText },
         { status: 502 }
@@ -150,7 +147,6 @@ export async function GET(request: NextRequest) {
       house,
     });
   } catch (err) {
-    console.error("[geocode] Error:", err);
     return NextResponse.json({ error: "Geocoder error" }, { status: 502 });
   }
 }

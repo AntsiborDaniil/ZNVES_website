@@ -65,7 +65,6 @@ async function geocodeYandex(address: string): Promise<[number, number] | null> 
 
     return [lon, lat]; // Яндекс B2B ожидает [lon, lat]
   } catch (err) {
-    console.warn("[yandex/courier/calculate] Yandex geocode error:", err);
     return null;
   }
 }
@@ -95,7 +94,6 @@ async function geocodeNominatim(address: string): Promise<[number, number] | nul
 
     return [lon, lat];
   } catch (err) {
-    console.warn("[yandex/courier/calculate] Nominatim geocode error:", err);
     return null;
   }
 }
@@ -127,10 +125,6 @@ async function getSourceCoords(sourceAddress: string): Promise<[number, number]>
   }
 
   // 4. Hardcode-координаты для адреса по умолчанию — не ломаем расчёт при недоступном геокодере
-  console.warn(
-    "[yandex/courier/calculate] Геокодер недоступен, используем координаты по умолчанию для:",
-    sourceAddress
-  );
   cachedSourceCoords = DEFAULT_SOURCE_COORDS;
   cachedSourceAddress = sourceAddress;
   return DEFAULT_SOURCE_COORDS;
@@ -139,7 +133,6 @@ async function getSourceCoords(sourceAddress: string): Promise<[number, number]>
 export async function GET(request: NextRequest) {
   const token = process.env.YA_DELIVERY_TOKEN;
   if (!token) {
-    console.warn("[yandex/courier/calculate] YA_DELIVERY_TOKEN не задан");
     return NextResponse.json(
       { error: "YA_DELIVERY_TOKEN not configured", from_api: false },
       { status: 503 }
@@ -181,7 +174,6 @@ export async function GET(request: NextRequest) {
     destCoords = await geocode(destAddress);
   }
   if (!destCoords) {
-    console.warn("[yandex/courier/calculate] Не удалось геокодировать адрес назначения:", destAddress);
     return NextResponse.json(
       { error: "Failed to geocode destination address", from_api: false },
       { status: 502 }
@@ -219,16 +211,6 @@ export async function GET(request: NextRequest) {
     },
   };
 
-  console.log("[yandex/courier/calculate] Запрос к Яндекс B2B:", {
-    url: YA_B2B_CALCULATE_URL,
-    sourceAddress,
-    destAddress,
-    sourceCoords,
-    destCoords,
-    weightKg,
-    body: JSON.stringify(requestBody),
-  });
-
   try {
     const res = await fetch(YA_B2B_CALCULATE_URL, {
       method: "POST",
@@ -242,8 +224,6 @@ export async function GET(request: NextRequest) {
     });
 
     const rawText = await res.text();
-
-    console.log("[yandex/courier/calculate] Ответ Яндекс B2B:", res.status, rawText.slice(0, 800));
 
     if (!res.ok) {
       return NextResponse.json(
@@ -267,16 +247,6 @@ export async function GET(request: NextRequest) {
     };
 
     const offers = data.offers ?? [];
-    console.log(
-      "[yandex/courier/calculate] Офферы:",
-      offers.length,
-      offers.map((o, idx) => ({
-        idx,
-        taxi_class: o.taxi_class,
-        price: o.price?.total_price,
-        description: o.description,
-      }))
-    );
 
     if (!offers.length) {
       return NextResponse.json({
@@ -330,7 +300,6 @@ export async function GET(request: NextRequest) {
       best_index: bestIndex,
     });
   } catch (err) {
-    console.error("[yandex/courier/calculate] Ошибка:", err);
     return NextResponse.json(
       { error: "Request failed", from_api: false },
       { status: 502 }

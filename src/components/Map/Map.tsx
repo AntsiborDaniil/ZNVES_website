@@ -330,11 +330,6 @@ const Map = ({
         detail?.deliveryTerm ??
         detail?.delivery?.term ??
         null;
-      console.log("[Map NDD widget] YaNddWidgetPointSelected", {
-        raw: detail,
-        deliveryPrice,
-        deliveryTerm,
-      });
       if (!detail) return;
 
       const addr = detail.address || {};
@@ -426,24 +421,14 @@ const Map = ({
 
     const sourceAddress = deliveryConfig.yaDeliverySourceAddress || DEFAULT_YA_SOURCE_ADDRESS;
 
-    console.log("[Map NDD widget] Эффект: isPickup=true", {
-      city,
-      totalWeightGrams_from_props: totalWeightGrams,
-      source_address_used: sourceAddress,
-      container_exists: !!document.getElementById(CONTAINER_ID),
-    });
-
     function startWidget() {
       if (widgetInitedRef.current) {
-        console.log("[Map NDD widget] startWidget пропущен: уже инициализирован");
         return;
       }
       if (!window.YaDelivery) {
-        console.warn("[Map NDD widget] startWidget: window.YaDelivery ещё нет");
         return;
       }
       if (!document.getElementById(CONTAINER_ID)) {
-        console.warn("[Map NDD widget] startWidget: контейнер #" + CONTAINER_ID + " не найден");
         return;
       }
       widgetInitedRef.current = true;
@@ -459,12 +444,6 @@ const Map = ({
         physical_dims_dz: 10,
         delivery_term: 0,
         delivery_price: (price: number) => {
-          console.log("[Map NDD widget] delivery_price callback", {
-            city,
-            sourceAddress,
-            weightGrams,
-            price,
-          });
           return "";
         },
         show_select_button: true,
@@ -475,25 +454,18 @@ const Map = ({
           payment_methods_filter: "or",
         },
       };
-      console.log("[Map NDD widget] Вызов createWidget с params:", {
-        ...params,
-        delivery_price: "(function)",
-      });
 
       window.YaDelivery.createWidget({
         containerId: CONTAINER_ID,
         params,
       });
-      console.log("[Map NDD widget] createWidget вызван. Запросы к API идут из скрипта ndd-widget.landpro.site — смотреть вкладку Network (фильтр по landpro / taxi / yandex).");
       clearLoadingTimeout();
       loadingTimeout = setTimeout(() => setYandexWidgetLoading(false), 4000);
     }
 
     if (window.YaDelivery) {
-      console.log("[Map NDD widget] YaDelivery уже в window → startWidget()");
       startWidget();
     } else {
-      console.log("[Map NDD widget] Ожидаем событие YaNddWidgetLoad");
       document.addEventListener("YaNddWidgetLoad", startWidget);
     }
 
@@ -502,9 +474,6 @@ const Map = ({
     ) as (HTMLScriptElement & { readyState?: string }) | null;
     if (existing) {
       const readyState = existing.readyState ?? "";
-      console.log("[Map NDD widget] Скрипт виджета уже на странице", {
-        readyState: readyState || "(нет)",
-      });
       // Не вызываем startWidget() синхронно: скрипт с async мог ещё не выполниться.
       // Если скрипт уже загружен — событие YaNddWidgetLoad мы могли пропустить; тогда опрашиваем YaDelivery.
       if (readyState === "complete" || readyState === "loaded") {
@@ -524,7 +493,6 @@ const Map = ({
           widgetInitedRef.current = false;
           const container = document.getElementById(CONTAINER_ID);
           if (container) container.innerHTML = "";
-          console.log("[Map NDD widget] Cleanup: виджет сброшен");
         };
       }
       return () => {
@@ -534,7 +502,6 @@ const Map = ({
         widgetInitedRef.current = false;
         const container = document.getElementById(CONTAINER_ID);
         if (container) container.innerHTML = "";
-        console.log("[Map NDD widget] Cleanup: виджет сброшен");
       };
     }
 
@@ -542,17 +509,11 @@ const Map = ({
     script.src = WIDGET_SCRIPT_URL;
     script.async = true;
     script.onload = () => {
-      console.log("[Map NDD widget] Скрипт загружен:", WIDGET_SCRIPT_URL);
       startWidget();
     };
     script.onerror = () => {
-      console.error(
-        "[Map NDD widget] Ошибка загрузки виджета:",
-        WIDGET_SCRIPT_URL
-      );
     };
     document.body.appendChild(script);
-    console.log("[Map NDD widget] Добавлен script", WIDGET_SCRIPT_URL);
 
     return () => {
       clearLoadingTimeout();
@@ -561,17 +522,11 @@ const Map = ({
       widgetInitedRef.current = false;
       const container = document.getElementById(CONTAINER_ID);
       if (container) container.innerHTML = "";
-      console.log("[Map NDD widget] Cleanup: виджет сброшен");
     };
   }, [isPickupYandex, city, totalWeightGrams, deliveryConfig]);
 
   useEffect(() => {
     if (!isCourier) return;
-
-    console.log("[Map] Courier effect: isCourier=true", {
-      hasRef: !!courierMapRef.current,
-      containerId: COURIER_MAP_ID,
-    });
 
     const apiKey =
       (typeof window !== "undefined" &&
@@ -584,27 +539,17 @@ const Map = ({
     const initCourierMap = (retryCount = 0) => {
       const el = document.getElementById(COURIER_MAP_ID);
       const rect = el?.getBoundingClientRect();
-      console.log("[Map] initCourierMap:", {
-        hasYmaps: !!window.ymaps,
-        hasRef: !!courierMapRef.current,
-        hasElement: !!el,
-        elRect: rect,
-        retry: retryCount,
-      });
 
       if (!window.ymaps) {
-        console.warn("[Map] window.ymaps не загружен");
         return;
       }
       if (!el) {
-        console.warn("[Map] Элемент #" + COURIER_MAP_ID + " не найден");
         if (retryCount < 3) {
           setTimeout(() => initCourierMap(retryCount + 1), 100);
         }
         return;
       }
       if (rect && rect.width === 0 && rect.height === 0 && retryCount < 5) {
-        console.warn("[Map] Контейнер нулевого размера, повтор через 150ms");
         setTimeout(() => initCourierMap(retryCount + 1), 150);
         return;
       }
@@ -612,7 +557,6 @@ const Map = ({
       window.ymaps.ready(() => {
         const el2 = document.getElementById(COURIER_MAP_ID);
         if (!el2 || !window.ymaps) {
-          console.warn("[Map] ymaps.ready: элемент или ymaps пропал");
           return;
         }
 
@@ -626,7 +570,6 @@ const Map = ({
           courierMapInstanceRef.current = null;
         }
 
-        console.log("[Map] Создаём карту в", COURIER_MAP_ID);
         const map = new window.ymaps!.Map(COURIER_MAP_ID, {
           center: MOSCOW_CENTER,
           zoom: 12,
@@ -652,9 +595,7 @@ const Map = ({
           coords: [number, number],
           addr: { city: string; street: string; house: string; fullAddress: string }
         ) => {
-          console.log("[Map] applyAddress вызван:", { coords, addr });
           if (!isInMoscow(addr)) {
-            console.log("[Map] Адрес вне Москвы, пропускаем");
             onSearchChangeRef.current?.("Доставка только по Москве");
             return;
           }
@@ -666,12 +607,10 @@ const Map = ({
             lat: coords[0],
             lon: coords[1],
           };
-          console.log("[Map] Вызываем onAddressSelect с:", payload);
           onAddressSelectRef.current?.(payload);
         };
 
         const reverseGeocode = (coords: [number, number]) => {
-          console.log("[Map] reverseGeocode:", coords);
           const [lat, lon] = coords;
           const base = typeof window !== "undefined" ? window.location.origin : "";
           const url = `${base}/api/reverse-geocode?lat=${lat}&lon=${lon}`;
@@ -680,7 +619,6 @@ const Map = ({
             .then((r) => r.json())
             .then((data: { city?: string; street?: string; house?: string; fullAddress?: string; error?: string }) => {
               if (data.error || !data.fullAddress) {
-                console.warn("[Map] Геокод: пустой результат или ошибка", data);
                 return;
               }
               const addr = {
@@ -689,11 +627,9 @@ const Map = ({
                 house: data.house ?? "",
                 fullAddress: data.fullAddress ?? "",
               };
-              console.log("[Map] Геокод успех:", addr);
               applyAddress(coords, addr);
             })
             .catch((err: unknown) => {
-              console.error("[Map] Ошибка геокодера:", err);
             });
         };
 
@@ -701,7 +637,6 @@ const Map = ({
           const ev = e as { get?: (key: string) => unknown };
           const target = ev.get?.("target") as { geometry?: { getCoordinates?: () => number[] } } | undefined;
           const coords = target?.geometry?.getCoordinates?.();
-          console.log("[Map] dragend метки:", coords);
           if (coords && coords.length >= 2) {
             reverseGeocode([coords[0], coords[1]]);
           }
@@ -710,14 +645,12 @@ const Map = ({
         map.events.add("click", (e: unknown) => {
           const ev = e as { get?: (key: string) => unknown };
           const coords = (ev.get?.("coords") as number[] | undefined) ?? [];
-          console.log("[Map] клик по карте:", coords);
           if (coords.length < 2) return;
           placemark.geometry.setCoordinates(coords);
           reverseGeocode([coords[0], coords[1]]);
         });
 
         courierMapInstanceRef.current = { map, placemark };
-        console.log("[Map] Карта курьера создана");
       });
     };
 
@@ -750,7 +683,6 @@ const Map = ({
       script.async = true;
       script.onload = runInit;
       script.onerror = () => {
-        console.error("[Map] Ошибка загрузки Яндекс.Карт");
       };
       document.body.appendChild(script);
     }
@@ -800,7 +732,6 @@ const Map = ({
           inst2.placemark.geometry.setCoordinates(coords);
           inst2.map.setCenter(coords);
         } catch (e) {
-          console.error("[Map] Ошибка при перемещении метки:", e);
         }
         onAddressSelectRef.current?.({
           city: "Москва",
@@ -830,7 +761,6 @@ const Map = ({
         })
         .catch((err: unknown) => {
           if ((err as { name?: string })?.name === "AbortError") return;
-          console.error("[Map] Ошибка геокодера:", err);
         });
     }, delay);
 

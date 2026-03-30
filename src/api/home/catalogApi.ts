@@ -132,7 +132,6 @@ export const fetchCatalogProducts = async (
 
     return transformedProducts;
   } catch (error) {
-    console.error("Error fetching catalog products:", error);
     // Возвращаем пустой массив в случае ошибки
     return [];
   }

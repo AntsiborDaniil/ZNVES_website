@@ -144,7 +144,6 @@ export async function fetchCatalogServer(
 
     return catalogProducts;
   } catch (error) {
-    console.error("Error fetching catalog on server:", error);
     throw error;
   }
 }
@@ -159,7 +158,6 @@ export async function fetchProductByIdServer(
     const product = allProducts.find((p) => p.id === id);
     return product || null;
   } catch (error) {
-    console.error("Error fetching product by id on server:", error);
     return null;
   }
 }
