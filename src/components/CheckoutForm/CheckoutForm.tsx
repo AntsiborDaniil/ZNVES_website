@@ -32,6 +32,8 @@ const productRawCache = new Map<string, ApiProductDetail | null>();
 
 interface CheckoutFormProps {
   onOrderSubmit?: (orderNumber: string) => void;
+  /** Вызывается при ошибке заказа, когда форма встроена в родительскую страницу (минует sessionStorage + router.push) */
+  onOrderError?: (message: string) => void;
   showRightColumn?: boolean;
   className?: string;
   /** Цвета с каталога (с cart), чтобы не дублировать запрос при открытии формы на cart */
@@ -76,6 +78,7 @@ function filterPvzByCityAddressDetails(
 
 const CheckoutForm = ({
   onOrderSubmit,
+  onOrderError,
   showRightColumn = true,
   className = "",
   initialColorSlugToLabel: initialColors = {},
@@ -87,6 +90,10 @@ const CheckoutForm = ({
   const isCartMobilePvz = width > 0 && width < 480 && !showRightColumn;
 
   const redirectToCartWithError = (message: string) => {
+    if (onOrderError) {
+      onOrderError(message);
+      return;
+    }
     if (typeof window !== "undefined") {
       try {
         sessionStorage.setItem(ORDER_ERROR_STORAGE_KEY, message);

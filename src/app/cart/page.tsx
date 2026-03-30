@@ -468,6 +468,10 @@ const CartPageContent = () => {
               <div ref={checkoutFormRef} id="checkout-form" className={styles.checkoutFormContainer}>
                 <CheckoutForm
                   onOrderSubmit={handleOrderSubmit}
+                  onOrderError={(msg) => {
+                    setShowCheckoutForm(false);
+                    setOrderError(msg);
+                  }}
                   showRightColumn={false}
                   initialColorSlugToLabel={colorSlugToLabel}
                 />
