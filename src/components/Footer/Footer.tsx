@@ -315,7 +315,7 @@ const Footer = () => {
       )}
 
       <div className={styles.lower}>
-        <p className={styles.copyright}>© 2025 Все права защищены</p>
+        <p className={styles.copyright}>© 2026 Все права защищены</p>
         <p className={styles.copyrightInsta}>
           * Instagram принадлежит компании Meta, признанной экстремистской
           организацией <br/> и запрещенной в РФ
