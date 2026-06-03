@@ -542,7 +542,16 @@
   }
 
   .main {
-    padding-top: 5px;
+    padding-top: 28px;
+  }
+
+  .telegramLoginBlock {
+    justify-content: flex-start;
+    padding-top: 8px;
+  }
+
+  .loadingStubWrap {
+    padding-top: 8px;
   }
 
   .mobileNavSeparator {
@@ -579,7 +588,7 @@
 
 @media (max-width: 480px) {
   .mobileNav {
-    margin-top: 20px;
+    margin-top: 28px;
   }
 
   .accountPage {
@@ -588,8 +597,17 @@
 
   .main {
     width: 100%;
+    padding-top: 32px;
     padding-left: 16px;
     padding-right: 16px;
+  }
+
+  .telegramLoginBlock {
+    padding-top: 16px;
+  }
+
+  .loadingStubWrap {
+    padding-top: 16px;
   }
 
   .accountPage {
