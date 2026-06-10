@@ -13,7 +13,7 @@ import LoadingStub from "../../components/LoadingStub/LoadingStub";
 import styles from "./page.module.css";
 
 const AccountPage = () => {
-  const { isAuthenticated, isLoading, checkAuth, redirectToBot } = useAuth();
+  const { isAuthenticated, isLoading, checkAuth } = useAuth();
   const [activeTab, setActiveTab] = useState<"account" | "profile" | "orders">(
     "account"
   );
@@ -78,13 +78,6 @@ const AccountPage = () => {
             <p className={styles.telegramLoginHint}>
               Если после входа вас не перенаправило в Telegram — обновите страницу и нажмите кнопку ещё раз.
             </p>
-            <button
-              type="button"
-              className={styles.telegramLoginRetry}
-              onClick={redirectToBot}
-            >
-              Открыть бота вручную
-            </button>
           </div>
         </main>
         <div className={styles.footerWrapper}>
