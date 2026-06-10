@@ -66,6 +66,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Кеш с TTL: при гидрации читаем sessionStorage; если данные свежие (< 10 мин) — API не вызываем.
   useEffect(() => {
     const { user: storedUser, savedAt } = getAuthFromStorage();
+    // Куки/токен пропали — не доверяем кешу из sessionStorage
+    if (storedUser && !hasAccessToken()) {
+      saveAuthToStorage(null);
+      setUser(null);
+      setIsHydrated(true);
+      setIsLoading(false);
+      setCacheFreshOnLoad(false);
+      return;
+    }
     setUser(storedUser);
     setIsHydrated(true);
     setIsLoading(false);
@@ -121,13 +130,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const handleFocus = () => {
-      // Проверяем авторизацию при возврате на страницу
-      checkAuth();
+      checkAuth(true);
     };
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        checkAuth();
+        checkAuth(true);
       }
     };
 
@@ -140,8 +148,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [isHydrated, checkAuth]);
 
-  // Авторизован, если есть данные пользователя с бэка или есть access_token (куки или Storage)
-  const isAuthenticated = !!user || hasAccessToken();
+  // Авторизован только при подтверждённых данных пользователя с бэка (GET /api/auth/user/)
+  const isAuthenticated = !!user;
 
   return (
     <AuthContext.Provider

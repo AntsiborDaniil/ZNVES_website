@@ -13,18 +13,34 @@ import LoadingStub from "../../components/LoadingStub/LoadingStub";
 import styles from "./page.module.css";
 
 const AccountPage = () => {
-  const { isAuthenticated, isLoading, checkAuth } = useAuth();
+  const { isAuthenticated, isLoading, checkAuth, redirectToBot } = useAuth();
   const [activeTab, setActiveTab] = useState<"account" | "profile" | "orders">(
     "account"
   );
   const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>(
     undefined
   );
+  const [widgetKey, setWidgetKey] = useState(0);
 
   // При загрузке/перезагрузке страницы аккаунта всегда запрашиваем данные пользователя с бэка (GET /api/auth/user/)
   useEffect(() => {
     checkAuth(true);
   }, [checkAuth]);
+
+  // После возврата на вкладку перемонтируем виджет (checkAuth на focus — в AuthContext)
+  useEffect(() => {
+    if (isAuthenticated) return;
+    const handleReturn = () => {
+      if (document.visibilityState !== "visible") return;
+      setWidgetKey((k) => k + 1);
+    };
+    window.addEventListener("focus", handleReturn);
+    document.addEventListener("visibilitychange", handleReturn);
+    return () => {
+      window.removeEventListener("focus", handleReturn);
+      document.removeEventListener("visibilitychange", handleReturn);
+    };
+  }, [isAuthenticated]);
 
   // Пока не получили ответ от бэка — показываем заглушку загрузки
   if (isLoading) {
@@ -52,9 +68,23 @@ const AccountPage = () => {
           <div className={styles.telegramLoginBlock}>
             <h1 className={styles.telegramLoginTitle}>Войдите через Telegram</h1>
             <p className={styles.telegramLoginDescription}>
-              Нажмите кнопку ниже — откроется сервис Telegram; после входа вас вернёт на сайт.
+              Нажмите кнопку ниже — откроется сервис Telegram; после входа вас перенаправит в бота для завершения регистрации.
             </p>
-            <TelegramLoginWidget size="large" className={styles.telegramLoginWidget} />
+            <TelegramLoginWidget
+              key={`tg-widget-${widgetKey}`}
+              size="large"
+              className={styles.telegramLoginWidget}
+            />
+            <p className={styles.telegramLoginHint}>
+              Если после входа вас не перенаправило в Telegram — обновите страницу и нажмите кнопку ещё раз.
+            </p>
+            <button
+              type="button"
+              className={styles.telegramLoginRetry}
+              onClick={redirectToBot}
+            >
+              Открыть бота вручную
+            </button>
           </div>
         </main>
         <div className={styles.footerWrapper}>

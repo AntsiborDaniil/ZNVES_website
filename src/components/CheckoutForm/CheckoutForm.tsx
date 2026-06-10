@@ -1472,7 +1472,7 @@ const CheckoutForm = ({
           <div className={styles.telegramSection}>
             <h1 className={styles.title}>Оформление заказа</h1>
             <div className={styles.telegramWidgetWrap}>
-              <TelegramLoginWidgetLazy size="large" />
+              <TelegramLoginWidgetLazy key={user ? "tg-authed" : "tg-guest"} size="large" />
             </div>
           </div>
 
