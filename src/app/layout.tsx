@@ -50,11 +50,8 @@ export const metadata: Metadata = {
   },
   description: defaultDescription,
   icons: {
-    icon: [
-      { url: "/icon.png", type: "image/png" },
-      { url: "/images/logo.png", type: "image/png", sizes: "any" },
-    ],
-    apple: "/icon.png",
+    icon: [{ url: "/icon.png", type: "image/png", sizes: "512x512" }],
+    apple: [{ url: "/icon.png", type: "image/png", sizes: "512x512" }],
   },
   openGraph: {
     type: "website",

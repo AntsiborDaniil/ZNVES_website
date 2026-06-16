@@ -143,12 +143,16 @@ const Footer = () => {
                   isMenuOpen ? styles.columnListOpen : ""
                 }`}
               >
+                <li className={styles.columnLi}>
                   <Link className={styles.columnItem} href="/account" prefetch={shouldPrefetch}>
                     Личный кабинет
                   </Link>
+                </li>
+                <li className={styles.columnLi}>
                   <Link className={styles.columnItem} href="/cart" prefetch={shouldPrefetch}>
                     Корзина
                   </Link>
+                </li>
               </ul>
             </div>
             <div className={styles.column}>
@@ -173,68 +177,84 @@ const Footer = () => {
                     isCatalogOpen ? styles.columnListOpen : ""
                   }`}
                 >
-                  <Link
-                    className={styles.columnItem}
-                    href="/new-in"
-                    prefetch={shouldPrefetch}
-                  >
-                    New in
-                  </Link>
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=t-shirts"
-                    prefetch={shouldPrefetch}
-                  >
-                    T-shirt
-                  </Link>
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=hoodies"
-                    prefetch={shouldPrefetch}
-                  >
-                    Hoodies
-                  </Link>
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=zip%20hoodies"
-                    prefetch={shouldPrefetch}
-                  >
-                    Zip hoodies
-                  </Link>
+                  <li className={styles.columnLi}>
+                    <Link
+                      className={styles.columnItem}
+                      href="/new-in"
+                      prefetch={shouldPrefetch}
+                    >
+                      New in
+                    </Link>
+                  </li>
+                  <li className={styles.columnLi}>
+                    <Link
+                      className={styles.columnItem}
+                      href="/catalog?category=t-shirts"
+                      prefetch={shouldPrefetch}
+                    >
+                      T-shirt
+                    </Link>
+                  </li>
+                  <li className={styles.columnLi}>
+                    <Link
+                      className={styles.columnItem}
+                      href="/catalog?category=hoodies"
+                      prefetch={shouldPrefetch}
+                    >
+                      Hoodies
+                    </Link>
+                  </li>
+                  <li className={styles.columnLi}>
+                    <Link
+                      className={styles.columnItem}
+                      href="/catalog?category=zip%20hoodies"
+                      prefetch={shouldPrefetch}
+                    >
+                      Zip hoodies
+                    </Link>
+                  </li>
                 </ul>
                 <ul
                   className={`${styles.columnList} ${
                     isCatalogOpen ? styles.columnListOpen : ""
                   }`}
                 >
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=jeans"
-                    prefetch={shouldPrefetch}
-                  >
-                    Jeans
-                  </Link>
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=pants"
-                    prefetch={shouldPrefetch}
-                  >
-                    Pants
-                  </Link>
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=shorts"
-                    prefetch={shouldPrefetch}
-                  >
-                    Shorts
-                  </Link>
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=jackets"
-                    prefetch={shouldPrefetch}
-                  >
-                    Jackets
-                  </Link>
+                  <li className={styles.columnLi}>
+                    <Link
+                      className={styles.columnItem}
+                      href="/catalog?category=jeans"
+                      prefetch={shouldPrefetch}
+                    >
+                      Jeans
+                    </Link>
+                  </li>
+                  <li className={styles.columnLi}>
+                    <Link
+                      className={styles.columnItem}
+                      href="/catalog?category=pants"
+                      prefetch={shouldPrefetch}
+                    >
+                      Pants
+                    </Link>
+                  </li>
+                  <li className={styles.columnLi}>
+                    <Link
+                      className={styles.columnItem}
+                      href="/catalog?category=shorts"
+                      prefetch={shouldPrefetch}
+                    >
+                      Shorts
+                    </Link>
+                  </li>
+                  <li className={styles.columnLi}>
+                    <Link
+                      className={styles.columnItem}
+                      href="/catalog?category=jackets"
+                      prefetch={shouldPrefetch}
+                    >
+                      Jackets
+                    </Link>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -255,6 +275,7 @@ const Footer = () => {
                   isContactOpen ? styles.columnListOpen : ""
                 }`}
               >
+                <li className={styles.columnLi}>
                   <Link
                     href="https://t.me/znves"
                     target="_blank"
@@ -263,6 +284,8 @@ const Footer = () => {
                   >
                     Telegram
                   </Link>
+                </li>
+                <li className={styles.columnLi}>
                   <Link
                     href="https://www.instagram.com/real.ponama?igsh=b2w5YWdoNmJ2djVo"
                     target="_blank"
@@ -271,6 +294,7 @@ const Footer = () => {
                   >
                     Instagram*
                   </Link>
+                </li>
               </ul>
             </div>
           </div>
@@ -317,8 +341,8 @@ const Footer = () => {
       <div className={styles.lower}>
         <p className={styles.copyright}>© 2026 Все права защищены</p>
         <p className={styles.copyrightInsta}>
-          * Instagram принадлежит компании Meta, признанной экстремистской
-          организацией <br/> и запрещенной в РФ
+          <span>* Instagram принадлежит компании Meta, признанной экстремистской организацией</span>
+          <span> и запрещенной в РФ</span>
         </p>
       </div>
     </footer>
