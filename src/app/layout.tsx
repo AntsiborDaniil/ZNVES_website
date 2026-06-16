@@ -7,6 +7,7 @@ import PreloadCatalogFilters from "../components/PreloadCatalogFilters/PreloadCa
 import { CartProvider } from "../contexts/CartContext";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ToastProvider } from "../components/ui/ToastProvider/ToastProvider";
+import CookieBanner from "../components/CookieBanner/CookieBanner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -96,6 +97,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <NavigationTracker />
               <PreloadCatalogFilters />
               {children}
+              <CookieBanner />
             </ToastProvider>
           </CartProvider>
         </AuthProvider>

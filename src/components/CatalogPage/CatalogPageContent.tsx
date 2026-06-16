@@ -9,6 +9,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
 import styles from "./CatalogPage.module.css";
 import ProductCard from "../ProductCard/ProductCard";
 import CatalogSkeleton from "./CatalogSkeleton";
@@ -29,6 +30,14 @@ import {
   fetchNewInProducts,
   normalizeCategoryForApi as normalizeCategoryForNewInApi,
 } from "../../api/new-in/newInApi";
+import { useAuth } from "../../contexts/AuthContext";
+
+const TelegramAuthModal = dynamic(
+  () => import("../TelegramAuthModal/TelegramAuthModal"),
+  { ssr: false }
+);
+
+const CATALOG_AUTH_MODAL_KEY = "znves:catalog_auth_modal_shown";
 
 type CatalogPageContentProps = {
   title: string;
@@ -161,6 +170,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
   const categoryParam = searchParams?.get("category");
   const colorParam = searchParams?.get("color");
@@ -173,6 +183,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const [sizes, setSizes] = useState<ApiCatalogSize[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const [activeCategory, setActiveCategory] = useState<string>(
     categoryParam ? decodeURIComponent(categoryParam) : "all"
@@ -190,6 +201,22 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+
+  // Показываем модалку авторизации один раз за сессию для неавторизованных
+  useEffect(() => {
+    if (isAuthLoading || isAuthenticated) return;
+    const alreadyShown = sessionStorage.getItem(CATALOG_AUTH_MODAL_KEY);
+    if (alreadyShown) return;
+
+    const timer = setTimeout(() => {
+      setShowAuthModal(true);
+      sessionStorage.setItem(CATALOG_AUTH_MODAL_KEY, "1");
+    }, 900);
+
+    return () => clearTimeout(timer);
+  }, [isAuthenticated, isAuthLoading]);
+
+  const handleCloseAuthModal = useCallback(() => setShowAuthModal(false), []);
 
   // Закрываем панель фильтров при клике вне её
   useEffect(() => {
@@ -713,6 +740,10 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
           </>
         )}
       </section>
+
+      {showAuthModal && (
+        <TelegramAuthModal onClose={handleCloseAuthModal} />
+      )}
     </>
   );
 };
