@@ -21,6 +21,8 @@ import {
   fetchCatalogColors,
   fetchCatalogSizes,
   fetchCatalogCategories,
+  FALLBACK_CATALOG_CATEGORIES,
+  getCatalogCategoryLabel,
   type ApiCatalogCategory,
 } from "../../api/catalog/catalogApi";
 import {
@@ -30,28 +32,6 @@ import {
 
 type CatalogPageContentProps = {
   title: string;
-};
-
-// Фолбэк-категории на случай, если API временно недоступно (названия на английском)
-const FALLBACK_CATEGORIES: ApiCatalogCategory[] = [
-  { slug: "pants", name: "Pants" },
-  { slug: "jeans", name: "Jeans" },
-  { slug: "t-shirt", name: "T-shirts" },
-  { slug: "zip-hoodie", name: "Zip hoodies" },
-  { slug: "jackets", name: "Jackets" },
-  { slug: "hoodies", name: "Hoodies" },
-  { slug: "shorts", name: "Shorts" },
-];
-
-// Отображение названий категорий на английском (slug → label)
-const CATEGORY_SLUG_TO_ENGLISH: Record<string, string> = {
-  pants: "Pants",
-  jeans: "Jeans",
-  "t-shirt": "T-shirts",
-  "zip-hoodie": "Zip hoodies",
-  jackets: "Jackets",
-  hoodies: "Hoodies",
-  shorts: "Shorts",
 };
 
 type FilterOption = {
@@ -280,10 +260,10 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
         if (categoriesData && categoriesData.length > 0) {
           setCategories(categoriesData);
         } else {
-          setCategories(FALLBACK_CATEGORIES);
+          setCategories(FALLBACK_CATALOG_CATEGORIES);
         }
       } catch (error) {
-        setCategories(FALLBACK_CATEGORIES);
+        setCategories(FALLBACK_CATALOG_CATEGORIES);
       } finally {
         setIsCategoriesLoading(false);
       }
@@ -608,7 +588,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
             </button>
             {categories.map((category) => {
               const isActive = category.slug === activeCategory;
-              const label = CATEGORY_SLUG_TO_ENGLISH[category.slug] ?? category.name;
+              const label = getCatalogCategoryLabel(category);
               return (
                 <button
                   key={category.slug}

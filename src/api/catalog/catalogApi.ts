@@ -12,6 +12,36 @@ export type ApiCatalogCategory = {
   name: string;
 };
 
+/** Отображение названий категорий на английском (slug → label) */
+export const CATEGORY_SLUG_TO_ENGLISH: Record<string, string> = {
+  pants: "Pants",
+  jeans: "Jeans",
+  "t-shirt": "T-shirts",
+  "zip-hoodie": "Zip hoodies",
+  jackets: "Jackets",
+  hoodies: "Hoodies",
+  shorts: "Shorts",
+};
+
+/** Фолбэк, если API категорий временно недоступно */
+export const FALLBACK_CATALOG_CATEGORIES: ApiCatalogCategory[] = [
+  { slug: "pants", name: "Pants" },
+  { slug: "jeans", name: "Jeans" },
+  { slug: "t-shirt", name: "T-shirts" },
+  { slug: "zip-hoodie", name: "Zip hoodies" },
+  { slug: "jackets", name: "Jackets" },
+  { slug: "hoodies", name: "Hoodies" },
+  { slug: "shorts", name: "Shorts" },
+];
+
+export function getCatalogCategoryLabel(category: ApiCatalogCategory): string {
+  return CATEGORY_SLUG_TO_ENGLISH[category.slug] ?? category.name;
+}
+
+export function buildCatalogCategoryHref(slug: string): string {
+  return `/catalog?category=${encodeURIComponent(slug)}`;
+}
+
 export type ApiCatalogColor = {
   slug: string;
   value: string;

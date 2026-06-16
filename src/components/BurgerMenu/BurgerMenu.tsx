@@ -6,22 +6,18 @@ import { useCallback, useEffect, useId, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import styles from "./BurgerMenu.module.css";
 import { useKeyboardEvent } from "../../hooks/useKeyboardEvent";
+import {
+  buildCatalogCategoryHref,
+  fetchCatalogCategories,
+  FALLBACK_CATALOG_CATEGORIES,
+  getCatalogCategoryLabel,
+  type ApiCatalogCategory,
+} from "../../api/catalog/catalogApi";
 
 type BurgerMenuProps = {
   isOpen: boolean;
   onToggle: () => void;
 };
-
-const CATALOG_CATEGORIES = [
-  { label: "All", href: "/catalog" },
-  { label: "Pants", href: "/catalog?category=pants" },
-  { label: "Jeans", href: "/catalog?category=jeans" },
-  { label: "T-Shirt", href: "/catalog?category=t-shirts" },
-  { label: "Zip Hoodies", href: "/catalog?category=zip%20hoodies" },
-  { label: "Jackets", href: "/catalog?category=jackets" },
-  { label: "Hoodies", href: "/catalog?category=hoodies" },
-  { label: "Shorts", href: "/catalog?category=shorts" },
-] as const;
 
 const SOCIAL_LINKS = [
   { label: "Telegram", href: "#telegram" },
@@ -33,6 +29,13 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+  const [catalogCategories, setCatalogCategories] = useState<ApiCatalogCategory[]>([]);
+
+  useEffect(() => {
+    void fetchCatalogCategories().then((data) => {
+      setCatalogCategories(data.length > 0 ? data : FALLBACK_CATALOG_CATEGORIES);
+    });
+  }, []);
 
   // Автоматически открываем каталог при открытии меню
   useEffect(() => {
@@ -77,6 +80,15 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
   const isCartActive = pathname === "/cart";
 
   const currentCategory = searchParams.get("category");
+
+  const isCategorySlugActive = useCallback(
+    (slug: string) => {
+      if (!currentCategory) return false;
+      return currentCategory.toLowerCase() === slug.toLowerCase();
+    },
+    [currentCategory]
+  );
+
   const shouldPrefetch =
     pathname !== "/checkout" &&
     pathname !== "/cart" &&
@@ -151,51 +163,36 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
               </Link>
               {isCatalogOpen && (
                 <ul className={styles.catalogSubmenu}>
-                  {CATALOG_CATEGORIES.map((category) => {
-                    // Определяем активную категорию
-                    let isCategoryActive = false;
-
-                    if (category.href === "/catalog") {
-                      // Для "All" проверяем, что мы на /catalog без параметров
-                      isCategoryActive =
-                        pathname === "/catalog" && !currentCategory;
-                    } else {
-                      // Для остальных категорий извлекаем параметр category из href
-                      const categoryParam =
-                        category.href.split("?category=")[1];
-                      if (categoryParam && currentCategory) {
-                        // Декодируем параметр из URL (может быть закодирован)
-                        let decodedCategory = categoryParam;
-                        try {
-                          decodedCategory = decodeURIComponent(categoryParam);
-                        } catch (e) {
-                          // Если ошибка декодирования, используем как есть
-                        }
-                        const decodedLower = decodedCategory.toLowerCase();
-                        // currentCategory уже декодирован из URL через searchParams.get()
-                        const currentCategoryLower =
-                          currentCategory.toLowerCase();
-                        // Сравниваем без учета регистра
-                        isCategoryActive =
-                          currentCategoryLower === decodedLower;
-                      }
-                    }
-
-                    return (
-                      <li key={category.href} className={styles.catalogItem}>
-                        <Link
-                          href={category.href}
-                          className={`${styles.catalogLink} ${
-                            isCategoryActive ? styles.catalogLinkActive : ""
-                          }`}
-                          onClick={handleLinkClick}
-                          prefetch={shouldPrefetch}
-                        >
-                          {category.label}
-                        </Link>
-                      </li>
-                    );
-                  })}
+                  <li className={styles.catalogItem}>
+                    <Link
+                      href="/catalog"
+                      className={`${styles.catalogLink} ${
+                        pathname === "/catalog" && !currentCategory
+                          ? styles.catalogLinkActive
+                          : ""
+                      }`}
+                      onClick={handleLinkClick}
+                      prefetch={shouldPrefetch}
+                    >
+                      All
+                    </Link>
+                  </li>
+                  {catalogCategories.map((category) => (
+                    <li key={category.slug} className={styles.catalogItem}>
+                      <Link
+                        href={buildCatalogCategoryHref(category.slug)}
+                        className={`${styles.catalogLink} ${
+                          isCategorySlugActive(category.slug)
+                            ? styles.catalogLinkActive
+                            : ""
+                        }`}
+                        onClick={handleLinkClick}
+                        prefetch={shouldPrefetch}
+                      >
+                        {getCatalogCategoryLabel(category)}
+                      </Link>
+                    </li>
+                  ))}
                 </ul>
               )}
             </div>
