@@ -75,6 +75,95 @@ export const getTelegramLoginCallbackUrl = (): string => TELEGRAM_LOGIN_URL;
 const AUTH_USER_URL = `${API_BASE_URL}/api/auth/user/`;
 const AUTH_USER_DELIVERY_URL = `${API_BASE_URL}/api/auth/user/delivery-data/`;
 
+const REGISTER_URL = `${API_BASE_URL}/register/`;
+const REGISTER_VERIFY_URL = `${API_BASE_URL}/register/verify/`;
+const LOGIN_URL = `${API_BASE_URL}/login/`;
+const LOGIN_VERIFY_URL = `${API_BASE_URL}/login/verify/`;
+const RESEND_CODE_URL = `${API_BASE_URL}/api/auth/register/resend-code/`;
+
+export type RegisterPayload = {
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+};
+
+export type VerifyPayload = {
+  email: string;
+  code: string;
+};
+
+export type LoginPayload = {
+  email: string;
+  password: string;
+};
+
+const parseApiError = async (response: Response, fallback: string): Promise<string> => {
+  const text = await response.text();
+  try {
+    const json = JSON.parse(text) as Record<string, unknown>;
+    if (typeof json.detail === "string") return json.detail;
+    if (typeof json.message === "string") return json.message;
+    if (typeof json.email === "string") return json.email;
+    if (Array.isArray(json.email) && typeof json.email[0] === "string") {
+      return json.email[0];
+    }
+    if (typeof json.non_field_errors === "object" && Array.isArray(json.non_field_errors)) {
+      const first = json.non_field_errors[0];
+      if (typeof first === "string") return first;
+    }
+  } catch {
+    if (text) return text;
+  }
+  return fallback;
+};
+
+const authPost = async (url: string, payload: object): Promise<void> => {
+  if (typeof window === "undefined") {
+    throw new Error("Вызов только на клиенте");
+  }
+
+  const response = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseApiError(response, "Не удалось выполнить запрос"));
+  }
+};
+
+/** Шаг 1 регистрации — отправляет код на почту */
+export const registerUser = async (payload: RegisterPayload): Promise<void> => {
+  await authPost(REGISTER_URL, payload);
+};
+
+/** Шаг 2 регистрации — подтверждение кода, создание пользователя и токены */
+export const verifyRegistration = async (payload: VerifyPayload): Promise<void> => {
+  await authPost(REGISTER_VERIFY_URL, payload);
+};
+
+/** Шаг 1 входа — отправляет код на почту */
+export const loginUser = async (payload: LoginPayload): Promise<void> => {
+  await authPost(LOGIN_URL, payload);
+};
+
+/** Шаг 2 входа — подтверждение кода и получение токенов */
+export const verifyLogin = async (payload: VerifyPayload): Promise<void> => {
+  await authPost(LOGIN_VERIFY_URL, payload);
+};
+
+/** Повторная отправка кода на почту */
+export const resendAuthCode = async (email: string): Promise<void> => {
+  await authPost(RESEND_CODE_URL, { email });
+};
+
 /**
  * Проверка авторизации: GET /api/auth/user/ с credentials (куки).
  * Вызывать только на клиенте — на сервере кук нет, запрос всегда даст 403.

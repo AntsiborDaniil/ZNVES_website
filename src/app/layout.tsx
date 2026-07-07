@@ -80,14 +80,6 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ru">
-      <head>
-        {/* Предзагрузка скрипта виджета Telegram — при переходе на /account или checkout кнопка уже в кэше */}
-        <link
-          rel="preload"
-          href="https://telegram.org/js/telegram-widget.js?22"
-          as="script"
-        />
-      </head>
       <body
         className={`${roboto.variable} ${inter.variable} ${montserrat.variable} ${plusJakarta.variable}`}
       >

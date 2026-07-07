@@ -154,6 +154,27 @@
   align-items: center;
 }
 
+.authPrompt {
+  color: #525252c9;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 320px;
+  text-align: right;
+}
+
+.authPromptLink {
+  color: #0a5840;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.authPromptLink:hover {
+  opacity: 0.8;
+}
+
 .telegramDescription {
   color: #525252;
   font-weight: 400;

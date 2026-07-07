@@ -8,77 +8,28 @@ import Footer from "../../components/Footer/Footer";
 import PersonalData from "../../components/AccountPage/PersonalData/PersonalData";
 import MyAccount from "../../components/AccountPage/MyAccount/MyAccount";
 import Orders from "../../components/AccountPage/Orders/Orders";
-import TelegramLoginWidget from "../../components/TelegramLoginWidget/TelegramLoginWidget";
-import LoadingStub from "../../components/LoadingStub/LoadingStub";
+import AccountAuth from "../../components/AccountAuth/AccountAuth";
 import styles from "./page.module.css";
 
 const AccountPage = () => {
-  const { isAuthenticated, isLoading, checkAuth } = useAuth();
+  const { isAuthenticated, checkAuth } = useAuth();
   const [activeTab, setActiveTab] = useState<"account" | "profile" | "orders">(
     "account"
   );
   const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>(
     undefined
   );
-  const [widgetKey, setWidgetKey] = useState(0);
 
-  // При загрузке/перезагрузке страницы аккаунта всегда запрашиваем данные пользователя с бэка (GET /api/auth/user/)
   useEffect(() => {
     checkAuth(true);
   }, [checkAuth]);
 
-  // После возврата на вкладку перемонтируем виджет (checkAuth на focus — в AuthContext)
-  useEffect(() => {
-    if (isAuthenticated) return;
-    const handleReturn = () => {
-      if (document.visibilityState !== "visible") return;
-      setWidgetKey((k) => k + 1);
-    };
-    window.addEventListener("focus", handleReturn);
-    document.addEventListener("visibilitychange", handleReturn);
-    return () => {
-      window.removeEventListener("focus", handleReturn);
-      document.removeEventListener("visibilitychange", handleReturn);
-    };
-  }, [isAuthenticated]);
-
-  // Пока не получили ответ от бэка — показываем заглушку загрузки
-  if (isLoading) {
-    return (
-      <div className={styles.accountPage}>
-        <Header variant="green" />
-        <main className={styles.main}>
-          <div className={styles.loadingStubWrap}>
-            <LoadingStub label="Проверка авторизации…" />
-          </div>
-        </main>
-        <div className={styles.footerWrapper}>
-          <Footer />
-        </div>
-      </div>
-    );
-  }
-
-  // Бэк вернул не 200 или без данных — показываем виджет входа
   if (!isAuthenticated) {
     return (
       <div className={styles.accountPage}>
         <Header variant="green" />
         <main className={styles.main}>
-          <div className={styles.telegramLoginBlock}>
-            <h1 className={styles.telegramLoginTitle}>Войдите через Telegram</h1>
-            <p className={styles.telegramLoginDescription}>
-              Нажмите кнопку ниже — откроется сервис Telegram; после входа вас перенаправит в бота для завершения регистрации.
-            </p>
-            <TelegramLoginWidget
-              key={`tg-widget-${widgetKey}`}
-              size="large"
-              className={styles.telegramLoginWidget}
-            />
-            <p className={styles.telegramLoginHint}>
-              Если после входа вас не перенаправило в Telegram — обновите страницу и нажмите кнопку ещё раз.
-            </p>
-          </div>
+          <AccountAuth />
         </main>
         <div className={styles.footerWrapper}>
           <Footer />

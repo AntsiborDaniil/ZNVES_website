@@ -1,0 +1,56 @@
+const GMAIL_DOMAINS = ["gmail.com", "googlemail.com"];
+
+export const isGmailAddress = (email: string): boolean => {
+  const domain = email.trim().toLowerCase().split("@")[1];
+  return !!domain && GMAIL_DOMAINS.includes(domain);
+};
+
+export const validateEmail = (email: string): string | true => {
+  const trimmed = email.trim();
+  if (!trimmed) return "Введите email";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+    return "Введите корректный email";
+  }
+  if (isGmailAddress(trimmed)) {
+    return "Регистрация через Gmail недоступна. Используйте другой email";
+  }
+  return true;
+};
+
+export const validateLoginEmail = (email: string): string | true => {
+  const trimmed = email.trim();
+  if (!trimmed) return "Введите email";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+    return "Введите корректный email";
+  }
+  return true;
+};
+
+export const validatePassword = (password: string): string | true => {
+  if (!password) return "Введите пароль";
+  if (password.length < 8) return "Пароль должен содержать минимум 8 символов";
+  return true;
+};
+
+export const validatePhone = (phone: string): string | true => {
+  const digits = phone.replace(/\D/g, "");
+  if (!digits) return "Введите номер телефона";
+  if (digits.length < 10 || digits.length > 15) {
+    return "Введите корректный номер телефона";
+  }
+  return true;
+};
+
+export const validateRequiredName = (value: string, label: string): string | true => {
+  const trimmed = value.trim();
+  if (!trimmed) return `Введите ${label}`;
+  if (trimmed.length < 2) return `${label} слишком короткое`;
+  return true;
+};
+
+export const validateCode = (code: string): string | true => {
+  const trimmed = code.trim();
+  if (!trimmed) return "Введите код из письма";
+  if (!/^\d{4,8}$/.test(trimmed)) return "Код должен содержать от 4 до 8 цифр";
+  return true;
+};

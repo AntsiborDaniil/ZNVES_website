@@ -43,7 +43,7 @@ const CookieBanner = () => {
               opacity="0.45"
             />
             {/* Шоколадные капли — аккуратные */}
-            <ellipse cx="28" cy="24" rx="4" ry="3.5" fill="#4a2810" rx2="4" ry2="3" transform="rotate(-15 28 24)"/>
+            <ellipse cx="28" cy="24" rx="4" ry="3.5" fill="#4a2810" transform="rotate(-15 28 24)"/>
             <ellipse cx="44" cy="20" rx="3.5" ry="3" fill="#4a2810" transform="rotate(10 44 20)"/>
             <ellipse cx="20" cy="38" rx="3.5" ry="3" fill="#4a2810" transform="rotate(-20 20 38)"/>
             <ellipse cx="36" cy="34" rx="4" ry="3.5" fill="#4a2810" transform="rotate(5 36 34)"/>

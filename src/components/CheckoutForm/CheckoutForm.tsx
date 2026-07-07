@@ -22,11 +22,6 @@ const MapLazy = dynamic(
   { ssr: false }
 );
 
-const TelegramLoginWidgetLazy = dynamic(
-  () => import("../TelegramLoginWidget/TelegramLoginWidget").then((m) => ({ default: m.default })),
-  { ssr: false }
-);
-
 /** Кеш по slug на время сессии — меньше повторных запросов при оформлении заказа */
 const productRawCache = new Map<string, ApiProductDetail | null>();
 
@@ -1471,9 +1466,14 @@ const CheckoutForm = ({
         <div className={styles.leftColumn}>
           <div className={styles.telegramSection}>
             <h1 className={styles.title}>Оформление заказа</h1>
-            <div className={styles.telegramWidgetWrap}>
-              <TelegramLoginWidgetLazy key={user ? "tg-authed" : "tg-guest"} size="large" />
-            </div>
+            {!user && (
+              <p className={styles.authPrompt}>
+                <Link href="/account" className={styles.authPromptLink}>
+                  Войдите в личный кабинет
+                </Link>
+                , чтобы отслеживать заказы и быстрее оформлять покупки.
+              </p>
+            )}
           </div>
 
           <div className={styles.section}>
