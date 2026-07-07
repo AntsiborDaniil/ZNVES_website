@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { asRecord, parseLatLonFromUnknown, readString } from "../../../../lib/recordUtils";
 
 const CDEK_API = "https://api.cdek.ru/v2";
 
@@ -96,7 +97,7 @@ async function getDeliveryPoints(token: string, cityCode: number): Promise<unkno
   return Array.isArray(data) ? data : (data as { items?: unknown[] }).items ?? [];
 }
 
-function mapCdekPointToPvz(raw: any): {
+function mapCdekPointToPvz(raw: unknown): {
   code: string;
   name: string;
   address: string;
@@ -104,25 +105,32 @@ function mapCdekPointToPvz(raw: any): {
   work_time: string;
   address_comment?: string;
 } | null {
-  if (!raw || typeof raw !== "object") return null;
+  const record = asRecord(raw);
+  if (!record) return null;
 
-  const lat = raw.latitude ?? raw.location?.latitude ?? raw.lat;
-  const lon = raw.longitude ?? raw.location?.longitude ?? raw.lon ?? raw.lng;
-  if (typeof lat !== "number" || typeof lon !== "number") return null;
+  const locationRecord = asRecord(record.location);
+  const coords =
+    parseLatLonFromUnknown(record.location) ??
+    parseLatLonFromUnknown({
+      lat: record.latitude ?? record.lat,
+      lon: record.longitude ?? record.lon ?? record.lng,
+    });
+  if (!coords) return null;
 
   const address =
-    raw.address_full ??
-    raw.address ??
-    [raw.location?.city, raw.location?.address].filter(Boolean).join(", ") ??
+    readString(record, "address_full", "address") ??
+    [readString(locationRecord ?? {}, "city"), readString(locationRecord ?? {}, "address")]
+      .filter(Boolean)
+      .join(", ") ??
     "";
 
   return {
-    code: String(raw.code ?? raw.code_s ?? raw.sale_point_code ?? ""),
-    name: String(raw.name ?? raw.title ?? ""),
-    address: String(address).trim() || String(raw.name ?? ""),
-    location: { lat, lon },
-    work_time: String(raw.work_time ?? raw.work_time_list ?? ""),
-    address_comment: raw.address_comment ?? raw.comment,
+    code: String(readString(record, "code", "code_s", "sale_point_code") ?? ""),
+    name: String(readString(record, "name", "title") ?? ""),
+    address: String(address).trim() || String(readString(record, "name") ?? ""),
+    location: coords,
+    work_time: String(readString(record, "work_time", "work_time_list") ?? ""),
+    address_comment: readString(record, "address_comment", "comment"),
   };
 }
 

@@ -19,7 +19,6 @@ import styles from "./ProductPageView.module.css";
 import ProductDisplaySection from "../ProductDisplaySection/ProductDisplaySection";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { Swiper, SwiperSlide } from "swiper/react";
-// @ts-ignore
 import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -245,7 +244,6 @@ const ProductPageView = ({
                 <Swiper
                   slidesPerView={1}
                   spaceBetween={20}
-                  // @ts-ignore
                   pagination={{ clickable: true }}
                   modules={[Pagination]}
                   className={styles.imageSlider}

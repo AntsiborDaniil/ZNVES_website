@@ -105,84 +105,12 @@
   flex-shrink: 0;
 }
 
-.telegramSection {
+.checkoutHeader {
   display: flex;
   flex-direction: row;
   width: 100%;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-}
-
-.telegramButton {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  color: #525252;
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 32px;
-  letter-spacing: 0%;
-  text-decoration: underline;
-  text-decoration-style: solid;
-  text-underline-offset: 5px;
-  text-decoration-thickness: 7%;
-  text-decoration-skip-ink: auto;
-  text-align: left;
-  transition: color 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.telegramButton:hover {
-  color: #1f1f1f;
-}
-
-.telegramIcon {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.telegramWidgetWrap {
-  display: flex;
-  align-items: center;
-}
-
-.authPrompt {
-  color: #525252c9;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 1.5;
-  margin: 0;
-  max-width: 320px;
-  text-align: right;
-}
-
-.authPromptLink {
-  color: #0a5840;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.authPromptLink:hover {
-  opacity: 0.8;
-}
-
-.telegramDescription {
-  color: #525252;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 23.93px;
-  letter-spacing: 0%;
-  margin: 0;
-  margin-top: 0;
 }
 
 .title {
@@ -1790,14 +1718,12 @@ textarea.input::placeholder {
     height: 50px;
   }
 
-  .title,
-  .telegramButton,
-  .telegramWidgetWrap {
+  .title {
     text-wrap: nowrap;
     margin-bottom: 15px;
   }
 
-  .telegramSection {
+  .checkoutHeader {
     flex-direction: column;
     align-items: normal;
   }

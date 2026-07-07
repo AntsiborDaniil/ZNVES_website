@@ -6,6 +6,12 @@
 import type { MapBounds } from "./cdekApi";
 
 import { API_BASE_URL } from "../../lib/apiConfig";
+import {
+  asRecord,
+  parseLatLonFromUnknown,
+  readArray,
+  readString,
+} from "../../lib/recordUtils";
 
 const API_BASE = `${API_BASE_URL}/api/delivery`;
 
@@ -18,61 +24,48 @@ export type YandexPvzPoint = {
   phones?: string[];
 };
 
-function parseLocation(loc: any): { lat: number; lon: number } | null {
-  if (!loc || typeof loc !== "object") return null;
-  const lat =
-    loc.lat ?? loc.latitude ?? loc.coordinates?.lat ?? loc.coordinates?.latitude;
-  const lon =
-    loc.lon ??
-    loc.lng ??
-    loc.longitude ??
-    loc.coordinates?.lon ??
-    loc.coordinates?.lng ??
-    loc.coordinates?.longitude;
-  if (typeof lat !== "number" || typeof lon !== "number") return null;
-  return { lat, lon };
+function parseLocation(loc: unknown): { lat: number; lon: number } | null {
+  return parseLatLonFromUnknown(loc);
 }
 
-function normalizePvzItem(raw: any): YandexPvzPoint | null {
-  if (!raw || typeof raw !== "object") return null;
+function normalizePvzItem(raw: unknown): YandexPvzPoint | null {
+  const record = asRecord(raw);
+  if (!record) return null;
   const address =
-    raw.address ??
-    raw.full_address ??
-    raw.fullAddress ??
-    [raw.city, raw.street, raw.house].filter(Boolean).join(", ") ??
-    "";
-  const id = raw.id ?? raw.pvz_id ?? raw.code ?? raw.uuid ?? String(raw.id || "");
-  const location = parseLocation(raw.location ?? raw.coordinates ?? raw.coords);
+    readString(record, "address", "full_address", "fullAddress") ??
+    [readString(record, "city"), readString(record, "street"), readString(record, "house")]
+      .filter(Boolean)
+      .join(", ");
+  const id = readString(record, "id", "pvz_id", "code", "uuid") ?? String(record.id ?? "");
+  const location = parseLocation(record.location ?? record.coordinates ?? record.coords);
   if (!location) return null;
+  const phone = readString(record, "phone");
   return {
     id: String(id),
-    name: raw.name ?? raw.title ?? "",
-    address: String(address).trim() || String(raw.name || raw.title || ""),
+    name: readString(record, "name", "title") ?? "",
+    address: String(address).trim() || String(readString(record, "name", "title") ?? ""),
     location,
-    work_time: raw.work_time ?? raw.workTime ?? raw.schedule ?? "",
-    phones: raw.phones ?? raw.phone ? [raw.phone] : undefined,
+    work_time: readString(record, "work_time", "workTime", "schedule") ?? "",
+    phones: Array.isArray(record.phones)
+      ? record.phones.filter((item): item is string => typeof item === "string")
+      : phone
+        ? [phone]
+        : undefined,
   };
 }
 
-function extractPvzList(data: any): YandexPvzPoint[] {
+function extractPvzList(data: unknown): YandexPvzPoint[] {
   if (Array.isArray(data)) {
     return data.map(normalizePvzItem).filter((p): p is YandexPvzPoint => p !== null);
   }
-  if (data && typeof data === "object") {
-    const arr =
-      data.data ?? data.results ?? data.items ?? data.pvz ?? data.points ?? [];
-    if (Array.isArray(arr)) {
-      return arr.map(normalizePvzItem).filter((p): p is YandexPvzPoint => p !== null);
-    }
-  }
-  return [];
+  const record = asRecord(data);
+  if (!record) return [];
+  const arr = readArray(record, "data", "results", "items", "pvz", "points");
+  return arr.map(normalizePvzItem).filter((p): p is YandexPvzPoint => p !== null);
 }
 
 function getPvzCoords(p: YandexPvzPoint): { lat: number; lon: number } | null {
-  const loc = p.location;
-  if (!loc) return null;
-  const lat = (loc as any).lat ?? (loc as any).latitude;
-  const lon = (loc as any).lon ?? (loc as any).longitude;
+  const { lat, lon } = p.location;
   if (typeof lat !== "number" || typeof lon !== "number") return null;
   return { lat, lon };
 }

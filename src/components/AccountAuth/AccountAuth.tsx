@@ -125,30 +125,6 @@ const PasswordToggleButton = ({
   </button>
 );
 
-type AuthMode = "login" | "register";
-
-type LoginFormValues = {
-  email: string;
-  password: string;
-};
-
-type RegisterFormValues = {
-  email: string;
-  password: string;
-  confirmPassword: string;
-  first_name: string;
-  last_name: string;
-  phone_number: string;
-};
-
-type VerifyFormValues = {
-  code: string;
-};
-
-type AccountAuthProps = {
-  onAuthenticated?: () => void;
-};
-
 const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
   const { checkAuth } = useAuth();
   const [mode, setMode] = useState<AuthMode>("login");

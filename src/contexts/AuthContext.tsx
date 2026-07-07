@@ -8,7 +8,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import { checkTelegramAuth, hasAccessToken, redirectToTelegramBot, type AuthUser } from "../api/auth/authApi";
+import { getCurrentUser, hasAccessToken, type AuthUser } from "../api/auth/authApi";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -17,16 +17,13 @@ interface AuthContextType {
   hasAccessToken: () => boolean;
   checkAuth: (forceRefresh?: boolean) => Promise<void>;
   updateUser: (user: AuthUser | null) => void;
-  redirectToBot: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AUTH_STORAGE_KEY = "znves:auth";
-/** Кеш при загрузке: если данные сохранены не более N минут назад — не дергаем API. */
-const CACHE_TTL_MS = 10 * 60 * 1000; // 10 мин
-/** При focus/visibility не делаем запрос, если последняя проверка была не более N минут назад. */
-const RECHECK_INTERVAL_MS = 15 * 60 * 1000; // 15 мин
+const CACHE_TTL_MS = 10 * 60 * 1000;
+const RECHECK_INTERVAL_MS = 15 * 60 * 1000;
 
 type StoredAuth = { user: AuthUser | null; savedAt: number };
 
@@ -52,7 +49,7 @@ const saveAuthToStorage = (user: AuthUser | null) => {
     const payload: StoredAuth = { user, savedAt: Date.now() };
     sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(payload));
   } catch {
-    // Ignore storage errors
+    return;
   }
 };
 
@@ -60,13 +57,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
-  /** При загрузке был свежий кеш — не дергаем API при mount. */
   const [cacheFreshOnLoad, setCacheFreshOnLoad] = useState(false);
 
-  // Кеш с TTL: при гидрации читаем sessionStorage; если данные свежие (< 10 мин) — API не вызываем.
   useEffect(() => {
     const { user: storedUser, savedAt } = getAuthFromStorage();
-    // Куки/токен пропали — не доверяем кешу из sessionStorage
     if (storedUser && !hasAccessToken()) {
       saveAuthToStorage(null);
       setUser(null);
@@ -82,23 +76,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setCacheFreshOnLoad(fresh);
   }, []);
 
-  // Проверка авторизации только на клиенте. Редкий re-check: не дергаем API, если недавно уже проверяли. forceRefresh=true — всегда запрос (например после PATCH профиля).
   const checkAuth = useCallback(async (forceRefresh?: boolean) => {
     if (typeof window === "undefined" || !isHydrated) return;
 
     if (!forceRefresh) {
       const { savedAt } = getAuthFromStorage();
       if (savedAt && Date.now() - savedAt < RECHECK_INTERVAL_MS) {
-        return; // уже проверяли недавно
+        return;
       }
     }
 
     setIsLoading(true);
     try {
-      const authData = await checkTelegramAuth();
+      const authData = await getCurrentUser();
       setUser(authData);
       saveAuthToStorage(authData);
-      // Не редиректим на /account при заходе на сайт — пользователь остаётся на текущей странице.
     } catch {
       setUser(null);
       saveAuthToStorage(null);
@@ -107,7 +99,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [isHydrated]);
 
-  // При загрузке вызываем API только если кеш пустой или протух (иначе уже подставили из кеша).
   useEffect(() => {
     if (!isHydrated || cacheFreshOnLoad) return;
     checkAuth();
@@ -118,12 +109,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     saveAuthToStorage(newUser);
   }, []);
 
-  // Перенаправление на бота
-  const redirectToBot = useCallback(() => {
-    redirectToTelegramBot();
-  }, []);
-
-  // Проверяем авторизацию только при возврате из бота (фокус/вкладка), не при каждой перезагрузке
   useEffect(() => {
     if (!isHydrated) {
       return;
@@ -148,7 +133,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [isHydrated, checkAuth]);
 
-  // Авторизован только при подтверждённых данных пользователя с бэка (GET /api/auth/user/)
   const isAuthenticated = !!user;
 
   return (
@@ -160,7 +144,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         hasAccessToken,
         checkAuth,
         updateUser,
-        redirectToBot,
       }}
     >
       {children}
@@ -175,4 +158,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

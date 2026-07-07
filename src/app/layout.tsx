@@ -8,6 +8,7 @@ import { CartProvider } from "../contexts/CartContext";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ToastProvider } from "../components/ui/ToastProvider/ToastProvider";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
+import MockProvider from "../components/MockProvider/MockProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -83,16 +84,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body
         className={`${roboto.variable} ${inter.variable} ${montserrat.variable} ${plusJakarta.variable}`}
       >
-        <AuthProvider>
-          <CartProvider>
-            <ToastProvider>
-              <NavigationTracker />
-              <PreloadCatalogFilters />
-              {children}
-              <CookieBanner />
-            </ToastProvider>
-          </CartProvider>
-        </AuthProvider>
+        <MockProvider>
+          <AuthProvider>
+            <CartProvider>
+              <ToastProvider>
+                <NavigationTracker />
+                <PreloadCatalogFilters />
+                {children}
+                <CookieBanner />
+              </ToastProvider>
+            </CartProvider>
+          </AuthProvider>
+        </MockProvider>
       </body>
     </html>
   );

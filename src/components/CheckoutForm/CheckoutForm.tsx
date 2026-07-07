@@ -1464,16 +1464,8 @@ const CheckoutForm = ({
     <div className={className}>
       <div ref={formContainerRef} className={styles.content}>
         <div className={styles.leftColumn}>
-          <div className={styles.telegramSection}>
+          <div className={styles.checkoutHeader}>
             <h1 className={styles.title}>Оформление заказа</h1>
-            {!user && (
-              <p className={styles.authPrompt}>
-                <Link href="/account" className={styles.authPromptLink}>
-                  Войдите в личный кабинет
-                </Link>
-                , чтобы отслеживать заказы и быстрее оформлять покупки.
-              </p>
-            )}
           </div>
 
           <div className={styles.section}>

@@ -32,8 +32,8 @@ import {
 } from "../../api/new-in/newInApi";
 import { useAuth } from "../../contexts/AuthContext";
 
-const TelegramAuthModal = dynamic(
-  () => import("../TelegramAuthModal/TelegramAuthModal"),
+const AccountAuthPromptModal = dynamic(
+  () => import("../AccountAuthPromptModal/AccountAuthPromptModal"),
   { ssr: false }
 );
 
@@ -742,7 +742,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
       </section>
 
       {showAuthModal && (
-        <TelegramAuthModal onClose={handleCloseAuthModal} />
+        <AccountAuthPromptModal onClose={handleCloseAuthModal} />
       )}
     </>
   );

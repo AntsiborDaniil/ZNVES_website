@@ -3,6 +3,9 @@
 import type { ProductDetail } from "../../types/products";
 import type { ProductColorOption } from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
+import { resolveApiImageUrl } from "../../lib/imageUrl";
+import { shouldUseMocks } from "../../mocks/config";
+import { getMockProductDetailBySlug } from "../../mocks/catalogMocks";
 
 const CATALOG_API_URL = `${API_BASE_URL}/api/catalog/`;
 
@@ -74,8 +77,7 @@ const transformApiProduct = (
 
   const images = (apiProduct.images ?? []).map((img) => {
     if (typeof img !== "string") return "";
-    if (img.startsWith("http")) return img;
-    return img.startsWith("/") ? `${baseUrl}${img}` : `${baseUrl}/${img}`;
+    return resolveApiImageUrl(img, baseUrl);
   });
 
   const priceValue =
@@ -199,6 +201,14 @@ const hashString = (str: string): number => {
 };
 
 const fetchProductBySlugInternal = async (slug: string): Promise<ProductDetail | null> => {
+  if (shouldUseMocks()) {
+    const data = getMockProductDetailBySlug(slug);
+    if (!data) return null;
+    const transformedProduct = transformApiProduct(data, slug);
+    cache.set(slug, { data: transformedProduct, timestamp: Date.now() });
+    return transformedProduct;
+  }
+
   const url = `${CATALOG_API_URL}${slug}/`;
   const response = await fetch(url, {
     method: "GET",
@@ -250,6 +260,13 @@ export const fetchCatalogProductRaw = async (slug: string): Promise<ApiProductDe
   if (!promise) {
     promise = (async () => {
       try {
+        if (shouldUseMocks()) {
+          const data = getMockProductDetailBySlug(slug);
+          if (!data) return null;
+          rawCache.set(slug, { data, timestamp: Date.now() });
+          return data;
+        }
+
         const url = `${CATALOG_API_URL}${slug}/`;
         const response = await fetch(url, {
           method: "GET",
@@ -292,9 +309,7 @@ const fetchProductImagesByColorInternal = async (
     throw new Error(`API error: ${response.status} ${response.statusText}`);
   }
   const imagePaths: string[] = await response.json();
-  const images = imagePaths.map((img) =>
-    img.startsWith("http") ? img : img.startsWith("/") ? `${baseUrl}${img}` : `${baseUrl}/${img}`
-  );
+  const images = imagePaths.map((img) => resolveApiImageUrl(img, baseUrl));
   colorImagesCache.set(`${productSlug}-${colorSlug}`, { data: images, timestamp: Date.now() });
   return images;
 };

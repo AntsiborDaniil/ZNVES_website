@@ -203,7 +203,7 @@ export interface PaymentResponse {
   payment_id?: string;
   confirmation_url?: string;
   payment_url?: string; // Для обратной совместимости
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**

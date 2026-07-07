@@ -11,6 +11,23 @@ const YANDEX_MAPS_SCRIPT =
 const MOSCOW_CENTER: [number, number] = [55.7558, 37.6173];
 const DEFAULT_YA_SOURCE_ADDRESS = "Москва, Промышленная улица, 12А, 115516";
 
+type YaNddWidgetPointDetail = {
+  id?: string;
+  name?: string;
+  title?: string;
+  address?: {
+    full_address?: string;
+    locality?: string;
+    street?: string;
+    house?: string;
+  };
+  delivery_price?: number;
+  deliveryPrice?: number;
+  delivery?: { price?: number; term?: unknown };
+  delivery_term?: unknown;
+  deliveryTerm?: unknown;
+};
+
 type AddressData = {
   city?: string;
   street?: string;
@@ -318,8 +335,8 @@ const Map = ({
     if (!isPickupYandex) return;
 
     const handler = (event: Event) => {
-      const e = event as CustomEvent;
-      const detail = e.detail as any;
+      const e = event as CustomEvent<YaNddWidgetPointDetail>;
+      const detail = e.detail;
       const deliveryPrice =
         detail?.delivery_price ??
         detail?.deliveryPrice ??
@@ -661,7 +678,7 @@ const Map = ({
     };
 
     const COURIER_SCRIPT_ID = "ymaps-courier-api";
-    let ourScript = document.getElementById(COURIER_SCRIPT_ID) as HTMLScriptElement | null;
+    const ourScript = document.getElementById(COURIER_SCRIPT_ID) as HTMLScriptElement | null;
 
     if (ourScript) {
       if (window.ymaps) {

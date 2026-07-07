@@ -76,63 +76,6 @@
   min-height: 40vh;
 }
 
-.telegramLoginBlock {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  max-width: 480px;
-  margin: 0 auto;
-}
-
-.telegramLoginTitle {
-  font-family: inherit;
-  color: #525252;
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 1.3;
-  margin: 0 0 12px 0;
-}
-
-.telegramLoginDescription,
-.telegramLoginHint {
-  font-family: inherit;
-  color: #525252c9;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 1.5;
-}
-
-.telegramLoginDescription {
-  margin: 0 0 24px 0;
-}
-
-.telegramLoginWidget {
-  min-height: 44px;
-}
-
-.telegramLoginButton {
-  display: inline-block;
-  padding: 12px 24px;
-  background-color: #0088cc;
-  color: #fff;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 1.4;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
-}
-
-.telegramLoginButton:hover {
-  background-color: #006699;
-}
-
-.telegramLoginHint {
-  margin: 16px 0 0 0;
-}
-
 .aside {
   flex-shrink: 0;
   margin-right: 75px;
@@ -528,11 +471,6 @@
     padding-top: 28px;
   }
 
-  .telegramLoginBlock {
-    justify-content: flex-start;
-    padding-top: 8px;
-  }
-
   .loadingStubWrap {
     padding-top: 8px;
   }
@@ -583,10 +521,6 @@
     padding-top: 32px;
     padding-left: 16px;
     padding-right: 16px;
-  }
-
-  .telegramLoginBlock {
-    padding-top: 16px;
   }
 
   .loadingStubWrap {

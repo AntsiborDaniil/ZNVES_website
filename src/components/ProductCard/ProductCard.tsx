@@ -259,6 +259,7 @@ const ProductCard = ({
                 loading={isSliderCard && index === 0 ? "eager" : "lazy"}
                 onLoad={() => markImageLoaded(index)}
                 quality={80}
+                unoptimized={image.endsWith(".svg")}
               />
             );
           })}

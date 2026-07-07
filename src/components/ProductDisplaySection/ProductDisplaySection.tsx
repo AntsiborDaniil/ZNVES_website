@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type ComponentType,
 } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -287,7 +288,7 @@ const ProductDisplaySection = ({
           <SliderSkeleton />
         ) : products.length > 0 ? (
           createElement(
-            Swiper as any,
+            Swiper as ComponentType<Record<string, unknown>>,
             {
               className: styles.slider,
               modules: [FreeMode, Mousewheel],

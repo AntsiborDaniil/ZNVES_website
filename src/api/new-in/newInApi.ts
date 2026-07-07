@@ -3,6 +3,9 @@
 import type { ApiProduct } from "../../types/api";
 import type { CatalogProduct } from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
+import { resolveApiImageUrl } from "../../lib/imageUrl";
+import { shouldUseMocks } from "../../mocks/config";
+import { getMockCatalogList } from "../../mocks/catalogMocks";
 
 const CATALOG_API_URL = `${API_BASE_URL}/api/catalog/`;
 
@@ -14,12 +17,7 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
 const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProduct => {
   const baseUrl = API_BASE_URL;
   
-  const images = apiProduct.images.map((img) => {
-    if (img.startsWith("http")) {
-      return img;
-    }
-    return img.startsWith("/") ? `${baseUrl}${img}` : `${baseUrl}/${img}`;
-  });
+  const images = apiProduct.images.map((img) => resolveApiImageUrl(img, baseUrl));
 
   const priceValue = parseFloat(apiProduct.price.replace(/\s/g, "").replace(",", ".")) || 0;
   const formattedPrice = `${Math.round(priceValue).toLocaleString("ru-RU")} ₽`;
@@ -106,6 +104,21 @@ export const fetchNewInProducts = async (
   
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
     return cached.data;
+  }
+
+  if (shouldUseMocks()) {
+    const data = getMockCatalogList({
+      category: normalizedCategory,
+      is_new: true,
+    });
+    const transformedProducts = data.map((product, index) =>
+      transformApiProduct(product, index)
+    );
+    cache.set(cacheKey, {
+      data: transformedProducts,
+      timestamp: Date.now(),
+    });
+    return transformedProducts;
   }
 
   try {

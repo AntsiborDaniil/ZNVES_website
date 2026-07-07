@@ -156,6 +156,7 @@ const CatalogGridCard = ({ product }: CatalogGridCardProps) => {
                   loading="lazy"
                   onLoad={() => markImageLoaded(index)}
                   quality={80}
+                  unoptimized={image.endsWith(".svg")}
                 />
               );
             })}

@@ -3,6 +3,14 @@
 import type { ApiProduct, CatalogApiParams } from "../../types/api";
 import type { CatalogProduct } from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
+import { resolveApiImageUrl } from "../../lib/imageUrl";
+import { shouldUseMocks } from "../../mocks/config";
+import {
+  getMockCatalogCategories,
+  getMockCatalogColors,
+  getMockCatalogList,
+  getMockCatalogSizes,
+} from "../../mocks/catalogMocks";
 
 const CATALOG_API_URL = `${API_BASE_URL}/api/catalog/`;
 
@@ -61,12 +69,7 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
 const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProduct => {
   const baseUrl = API_BASE_URL;
   
-  const images = apiProduct.images.map((img) => {
-    if (img.startsWith("http")) {
-      return img;
-    }
-    return img.startsWith("/") ? `${baseUrl}${img}` : `${baseUrl}/${img}`;
-  });
+  const images = apiProduct.images.map((img) => resolveApiImageUrl(img, baseUrl));
 
   const priceValue = parseFloat(apiProduct.price.replace(/\s/g, "").replace(",", ".")) || 0;
   const formattedPrice = `${Math.round(priceValue).toLocaleString("ru-RU")} ₽`;
@@ -154,6 +157,18 @@ export const fetchCatalogProducts = async (
     return cached.data;
   }
 
+  if (shouldUseMocks()) {
+    const data = getMockCatalogList(params);
+    const transformedProducts = data.map((product, index) =>
+      transformApiProduct(product, index)
+    );
+    cache.set(cacheKey, {
+      data: transformedProducts,
+      timestamp: Date.now(),
+    });
+    return transformedProducts;
+  }
+
   try {
     const url = new URL(CATALOG_API_URL);
     
@@ -216,6 +231,11 @@ export const fetchCatalogCategories = async (): Promise<ApiCatalogCategory[]> =>
   if (categoriesCacheState && Date.now() - categoriesCacheState.timestamp < FILTERS_CACHE_DURATION) {
     return categoriesCacheState.data;
   }
+  if (shouldUseMocks()) {
+    const list = getMockCatalogCategories();
+    categoriesCacheState = { data: list, timestamp: Date.now() };
+    return list;
+  }
   try {
     const response = await fetch(`${CATALOG_API_URL}categories/`, {
       method: "GET",
@@ -239,6 +259,11 @@ export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
   if (colorsCacheState && Date.now() - colorsCacheState.timestamp < FILTERS_CACHE_DURATION) {
     return colorsCacheState.data;
   }
+  if (shouldUseMocks()) {
+    const data = getMockCatalogColors();
+    colorsCacheState = { data, timestamp: Date.now() };
+    return data;
+  }
   try {
     const response = await fetch(`${CATALOG_API_URL}colors/`, {
       method: "GET",
@@ -260,6 +285,11 @@ export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
 export const fetchCatalogSizes = async (): Promise<ApiCatalogSize[]> => {
   if (sizesCacheState && Date.now() - sizesCacheState.timestamp < FILTERS_CACHE_DURATION) {
     return sizesCacheState.data;
+  }
+  if (shouldUseMocks()) {
+    const data = getMockCatalogSizes();
+    sizesCacheState = { data, timestamp: Date.now() };
+    return data;
   }
   try {
     const response = await fetch(`${CATALOG_API_URL}sizes/`, {

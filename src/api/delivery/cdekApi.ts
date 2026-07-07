@@ -5,6 +5,12 @@
  */
 
 import { API_BASE_URL } from "../../lib/apiConfig";
+import {
+  asRecord,
+  parseLatLonFromUnknown,
+  readArray,
+  readString,
+} from "../../lib/recordUtils";
 
 const API_BASE = `${API_BASE_URL}/api/delivery`;
 const APP_CDEK_PVZ_PATH = "/api/cdek/pvz";
@@ -18,57 +24,40 @@ export type CdekPvzPoint = {
   address_comment?: string;
 };
 
-function parseLocation(loc: any): { lat: number; lon: number } | null {
-  if (!loc || typeof loc !== "object") return null;
-  const lat =
-    loc.lat ?? loc.latitude ?? loc.coordinates?.lat ?? loc.coordinates?.latitude;
-  const lon =
-    loc.lon ??
-    loc.lng ??
-    loc.longitude ??
-    loc.coordinates?.lon ??
-    loc.coordinates?.lng ??
-    loc.coordinates?.longitude;
-  if (typeof lat !== "number" || typeof lon !== "number") return null;
-  return { lat, lon };
+function parseLocation(loc: unknown): { lat: number; lon: number } | null {
+  return parseLatLonFromUnknown(loc);
 }
 
-/** Нормализация одного пункта из ответа API */
-function normalizePvzItem(raw: any): CdekPvzPoint | null {
-  if (!raw || typeof raw !== "object") return null;
+function normalizePvzItem(raw: unknown): CdekPvzPoint | null {
+  const record = asRecord(raw);
+  if (!record) return null;
   const address =
-    raw.address ??
-    raw.full_address ??
-    raw.fullAddress ??
-    [raw.city, raw.street, raw.house].filter(Boolean).join(", ") ??
-    "";
+    readString(record, "address", "full_address", "fullAddress") ??
+    [readString(record, "city"), readString(record, "street"), readString(record, "house")]
+      .filter(Boolean)
+      .join(", ");
   const code =
-    raw.code ?? raw.pvz_code ?? raw.id ?? raw.uuid ?? String(raw.code || "");
-  const location = parseLocation(raw.location ?? raw.coordinates ?? raw.coords);
+    readString(record, "code", "pvz_code", "id", "uuid") ?? String(record.code ?? "");
+  const location = parseLocation(record.location ?? record.coordinates ?? record.coords);
   if (!location) return null;
   return {
     code: String(code),
-    name: raw.name ?? raw.title ?? "",
-    address: String(address).trim() || String(raw.name || raw.title || ""),
+    name: readString(record, "name", "title") ?? "",
+    address: String(address).trim() || String(readString(record, "name", "title") ?? ""),
     location,
-    work_time: raw.work_time ?? raw.workTime ?? raw.schedule ?? "",
-    address_comment: raw.address_comment ?? raw.addressComment,
+    work_time: readString(record, "work_time", "workTime", "schedule") ?? "",
+    address_comment: readString(record, "address_comment", "addressComment"),
   };
 }
 
-/** Извлечь массив пунктов из ответа (массив или объект с полем data/results/items) */
-function extractPvzList(data: any): CdekPvzPoint[] {
+function extractPvzList(data: unknown): CdekPvzPoint[] {
   if (Array.isArray(data)) {
     return data.map(normalizePvzItem).filter((p): p is CdekPvzPoint => p !== null);
   }
-  if (data && typeof data === "object") {
-    const arr =
-      data.data ?? data.results ?? data.items ?? data.pvz ?? data.points ?? [];
-    if (Array.isArray(arr)) {
-      return arr.map(normalizePvzItem).filter((p): p is CdekPvzPoint => p !== null);
-    }
-  }
-  return [];
+  const record = asRecord(data);
+  if (!record) return [];
+  const arr = readArray(record, "data", "results", "items", "pvz", "points");
+  return arr.map(normalizePvzItem).filter((p): p is CdekPvzPoint => p !== null);
 }
 
 /**
@@ -148,10 +137,7 @@ export const getCdekPvzByCoords = async (
 };
 
 function getPvzCoords(p: CdekPvzPoint): { lat: number; lon: number } | null {
-  const loc = p.location;
-  if (!loc) return null;
-  const lat = (loc as any).lat ?? (loc as any).latitude;
-  const lon = (loc as any).lon ?? (loc as any).longitude;
+  const { lat, lon } = p.location;
   if (typeof lat !== "number" || typeof lon !== "number") return null;
   return { lat, lon };
 }

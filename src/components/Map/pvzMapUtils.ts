@@ -38,19 +38,15 @@ export function scheduleScore(workTime: string | undefined): number {
 
 /** Индекс типа для чередования (постаматы, пункты выдачи, курьерские) */
 function typeIndex(p: PvzLike): number {
-  const t = (p as any).type;
+  const t = p.type;
   if (t === "postamat") return 0;
   if (t === "pickup") return 1;
   if (t === "courier") return 2;
-  return 1; // default pickup
+  return 1;
 }
 
-/** Координаты точки */
 function getCoords(p: PvzLike): { lat: number; lon: number } | null {
-  const loc = p.location;
-  if (!loc) return null;
-  const lat = (loc as any).lat ?? (loc as any).latitude;
-  const lon = (loc as any).lon ?? (loc as any).longitude;
+  const { lat, lon } = p.location;
   if (typeof lat !== "number" || typeof lon !== "number") return null;
   return { lat, lon };
 }
@@ -152,8 +148,8 @@ export function pickOnePerGridCell(
       const typeA = typeIndex(a);
       const typeB = typeIndex(b);
       if (typeA !== typeB) return typeA - typeB;
-      const idA = (a as any).code ?? (a as any).id ?? "";
-      const idB = (b as any).code ?? (b as any).id ?? "";
+      const idA = a.code ?? a.id ?? "";
+      const idB = b.code ?? b.id ?? "";
       return idA.localeCompare(idB);
     });
     result.push(sorted[0]);

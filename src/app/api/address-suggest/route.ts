@@ -1,19 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
+import { asRecord, readString } from "../../../lib/recordUtils";
 
 const SUGGEST_URL = "https://suggest-maps.yandex.ru/v1/suggest";
 const GEOCODER_URL = "https://geocode-maps.yandex.ru/v1/";
 
-function normalizeSuggestItem(item: any): { displayName: string; value: string } | null {
+function normalizeSuggestItem(item: unknown): { displayName: string; value: string } | null {
+  const record = asRecord(item);
+  if (!record) return null;
+  const title = asRecord(record.title);
+  const subtitle = asRecord(record.subtitle);
+  const address = asRecord(record.address);
   const displayName =
-    item?.title?.text ??
-    (typeof item?.title === "string" ? item.title : "") ??
-    item?.displayName ??
+    readString(title ?? {}, "text") ??
+    (typeof record.title === "string" ? record.title : undefined) ??
+    readString(record, "displayName") ??
     "";
   const value =
-    item?.subtitle?.text ??
-    (typeof item?.subtitle === "string" ? item.subtitle : "") ??
-    item?.address?.formatted_address ??
-    item?.value ??
+    readString(subtitle ?? {}, "text") ??
+    (typeof record.subtitle === "string" ? record.subtitle : undefined) ??
+    readString(address ?? {}, "formatted_address") ??
+    readString(record, "value") ??
     displayName;
   const d = String(displayName || value);
   const v = String(value || displayName);
@@ -42,11 +48,14 @@ async function fetchGeocoderSuggestions(apiKey: string, query: string): Promise<
   const data = await res.json();
   const members = data?.response?.GeoObjectCollection?.featureMember ?? [];
   return members
-    .map((m: any) => {
-      const geo = m?.GeoObject;
+    .map((member: unknown) => {
+      const memberRecord = asRecord(member);
+      const geo = asRecord(memberRecord?.GeoObject);
       if (!geo) return null;
-      const name = geo?.name ?? "";
-      const text = geo?.metaDataProperty?.GeocoderMetaData?.text ?? name;
+      const name = readString(geo, "name") ?? "";
+      const meta = asRecord(geo.metaDataProperty);
+      const geocoderMeta = asRecord(meta?.GeocoderMetaData);
+      const text = readString(geocoderMeta ?? {}, "text") ?? name;
       return name || text ? { displayName: String(name), value: String(text || name) } : null;
     })
     .filter(Boolean);
