@@ -9,6 +9,7 @@ import PersonalData from "../../components/AccountPage/PersonalData/PersonalData
 import MyAccount from "../../components/AccountPage/MyAccount/MyAccount";
 import Orders from "../../components/AccountPage/Orders/Orders";
 import AccountAuth from "../../components/AccountAuth/AccountAuth";
+import AccountAuthCheckFallback from "../../components/AccountPage/AccountAuthCheckFallback/AccountAuthCheckFallback";
 import styles from "./page.module.css";
 
 const AccountPage = () => {
@@ -32,9 +33,7 @@ const AccountPage = () => {
     return (
       <div className={styles.accountPage}>
         <Header variant="green" />
-        <main className={styles.main}>
-          <p className={styles.loadingText}>Загрузка…</p>
-        </main>
+        <AccountAuthCheckFallback />
         <div className={styles.footerWrapper}>
           <Footer />
         </div>

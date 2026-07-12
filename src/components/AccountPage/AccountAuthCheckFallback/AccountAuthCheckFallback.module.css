@@ -1,0 +1,225 @@
+.root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  animation: fadeIn 0.28s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    110deg,
+    rgba(82, 82, 82, 0.07) 25%,
+    rgba(82, 82, 82, 0.13) 50%,
+    rgba(82, 82, 82, 0.07) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.45s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.mobileNav {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin: 20px auto 21px;
+}
+
+.navPill {
+  display: block;
+  width: 88px;
+  height: 14px;
+  border-radius: 4px;
+  background: rgba(82, 82, 82, 0.1);
+}
+
+.navSep {
+  width: 1px;
+  height: 9px;
+  margin: 0 11px;
+  background: #d3d3d3;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  padding: 20px 210px 90px 200px;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.aside {
+  flex-shrink: 0;
+  width: 220px;
+  margin-right: 51px;
+}
+
+.backLine {
+  width: 120px;
+  height: 12px;
+  margin-bottom: 23px;
+}
+
+.titleLine {
+  width: 180px;
+  height: 28px;
+  margin-bottom: 35px;
+}
+
+.navLines {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 8px;
+}
+
+.navLine {
+  width: 130px;
+  height: 14px;
+}
+
+.card {
+  flex: 1;
+  padding: 124px 0 40px;
+}
+
+.cardInner {
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.spinnerWrap {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(10, 88, 64, 0.12);
+  border-top-color: #0a5840;
+  border-radius: 50%;
+  animation: spin 0.85s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.label {
+  margin: 0 0 28px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #525252;
+  letter-spacing: 0.01em;
+}
+
+.contentBlock {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.blockLineWide {
+  width: 100%;
+  height: 48px;
+  border-radius: 3px;
+}
+
+.blockLine {
+  width: 100%;
+  height: 14px;
+}
+
+.blockLineShort {
+  width: 62%;
+  height: 14px;
+  align-self: center;
+}
+
+@media (max-width: 1500px) {
+  .main {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .main {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .aside {
+    display: none;
+  }
+
+  .main {
+    padding-top: 28px;
+  }
+
+  .mobileNav {
+    display: flex;
+  }
+
+  .card {
+    padding-top: 0;
+  }
+
+  .cardInner {
+    max-width: 480px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobileNav {
+    margin-top: 28px;
+  }
+
+  .main {
+    padding: 32px 16px 48px;
+  }
+
+  .label {
+    font-size: 14px;
+    margin-bottom: 22px;
+  }
+
+  .blockLineWide {
+    height: 44px;
+  }
+}
