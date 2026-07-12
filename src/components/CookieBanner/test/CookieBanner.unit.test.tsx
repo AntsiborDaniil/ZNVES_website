@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import CookieBanner from "../CookieBanner";
@@ -59,5 +59,30 @@ describe("CookieBanner", () => {
         screen.queryByRole("region", { name: "Уведомление об использовании cookie" })
       ).not.toBeInTheDocument();
     });
+  });
+
+  it("auto-dismisses after 5 seconds and stores consent", async () => {
+    vi.useFakeTimers();
+
+    render(<CookieBanner />);
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(
+      screen.getByRole("region", { name: "Уведомление об использовании cookie" })
+    ).toBeInTheDocument();
+
+    await act(async () => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    expect(
+      screen.queryByRole("region", { name: "Уведомление об использовании cookie" })
+    ).not.toBeInTheDocument();
+    expect(localStorage.getItem(STORAGE_KEY)).toBe("1");
+
+    vi.useRealTimers();
   });
 });

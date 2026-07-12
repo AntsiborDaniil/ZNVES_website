@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "../../contexts/AuthContext";
 import Header from "../../components/Header/Header";
@@ -20,7 +20,11 @@ const AccountPage = () => {
     undefined
   );
 
+  const authCheckedRef = useRef(false);
+
   useEffect(() => {
+    if (authCheckedRef.current) return;
+    authCheckedRef.current = true;
     void checkAuth(true);
   }, [checkAuth]);
 

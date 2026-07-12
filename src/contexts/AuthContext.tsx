@@ -79,7 +79,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }
 
-    setIsLoading(true);
+    const shouldShowLoading = !forceRefresh || user !== null;
+    if (shouldShowLoading) {
+      setIsLoading(true);
+    }
+
     try {
       const authData = await getCurrentUser();
       setUser(authData);
@@ -88,9 +92,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
       saveAuthToStorage(null);
     } finally {
-      setIsLoading(false);
+      if (shouldShowLoading) {
+        setIsLoading(false);
+      }
     }
-  }, [isHydrated]);
+  }, [isHydrated, user]);
 
   useEffect(() => {
     if (!isHydrated || cacheFreshOnLoad) return;

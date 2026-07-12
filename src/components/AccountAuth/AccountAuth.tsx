@@ -24,6 +24,12 @@ import {
   validateRegistrationPassword,
   validateRequiredName,
 } from "../../lib/authValidation";
+import {
+  clearPendingAccountAuthFlow,
+  getPendingAccountAuthFlow,
+  getResendCooldownRemaining,
+  savePendingAccountAuthFlow,
+} from "./accountAuthFlowStorage";
 import styles from "./AccountAuth.module.css";
 
 type AuthMode = "login" | "register";
@@ -48,6 +54,37 @@ type VerifyFormValues = {
 
 type AccountAuthProps = {
   onAuthenticated?: () => void;
+};
+
+const getInitialAuthState = () => {
+  if (typeof window === "undefined") {
+    return {
+      mode: "login" as AuthMode,
+      step: "credentials" as const,
+      pendingEmail: "",
+      loginPassword: "",
+      resendCooldown: 0,
+    };
+  }
+
+  const pending = getPendingAccountAuthFlow();
+  if (!pending) {
+    return {
+      mode: "login" as AuthMode,
+      step: "credentials" as const,
+      pendingEmail: "",
+      loginPassword: "",
+      resendCooldown: 0,
+    };
+  }
+
+  return {
+    mode: pending.mode,
+    step: "verify" as const,
+    pendingEmail: pending.pendingEmail,
+    loginPassword: pending.loginPassword ?? "",
+    resendCooldown: getResendCooldownRemaining(pending.resendCooldownEndsAt),
+  };
 };
 
 const PasswordToggleButton = ({
@@ -133,16 +170,17 @@ const PasswordToggleButton = ({
 const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
   const router = useRouter();
   const { checkAuth, updateUser } = useAuth();
-  const [mode, setMode] = useState<AuthMode>("login");
-  const [step, setStep] = useState<"credentials" | "verify">("credentials");
-  const [pendingEmail, setPendingEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
+  const [initialAuth] = useState(getInitialAuthState);
+  const [mode, setMode] = useState<AuthMode>(initialAuth.mode);
+  const [step, setStep] = useState<"credentials" | "verify">(initialAuth.step);
+  const [pendingEmail, setPendingEmail] = useState(initialAuth.pendingEmail);
+  const [loginPassword, setLoginPassword] = useState(initialAuth.loginPassword);
   const [formError, setFormError] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendCooldown, setResendCooldown] = useState(initialAuth.resendCooldown);
 
   const formOptions = {
     mode: "onChange" as const,
@@ -180,6 +218,22 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
     }
   }, [registerPassword, confirmPasswordTouched, registerForm]);
 
+  useEffect(() => {
+    if (step !== "verify" || !pendingEmail) {
+      clearPendingAccountAuthFlow();
+      return;
+    }
+
+    savePendingAccountAuthFlow({
+      step: "verify",
+      mode,
+      pendingEmail,
+      loginPassword: mode === "login" ? loginPassword : undefined,
+      resendCooldownEndsAt:
+        resendCooldown > 0 ? Date.now() + resendCooldown * 1000 : undefined,
+    });
+  }, [step, mode, pendingEmail, loginPassword, resendCooldown]);
+
   const startResendCooldown = useCallback(() => {
     setResendCooldown(AUTH_RESEND_COOLDOWN_SECONDS);
   }, []);
@@ -198,10 +252,12 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
     setFormError(null);
     setInfoMessage(null);
     setResendCooldown(0);
+    clearPendingAccountAuthFlow();
     verifyForm.reset();
   };
 
   const completeAuth = async (verifiedUser: AuthUser) => {
+    clearPendingAccountAuthFlow();
     updateUser(verifiedUser);
     await checkAuth(true);
     onAuthenticated?.();
@@ -300,6 +356,7 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
     setFormError(null);
     setInfoMessage(null);
     setResendCooldown(0);
+    clearPendingAccountAuthFlow();
     verifyForm.reset();
   };
 
@@ -369,11 +426,6 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
               Назад
             </button>
           </div>
-          {resendCooldown > 0 && (
-            <p className={styles.resendHint}>
-              Новый код можно запросить через {formatResendCooldown(resendCooldown)}
-            </p>
-          )}
         </form>
       </div>
     );
