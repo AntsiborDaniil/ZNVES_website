@@ -41,15 +41,12 @@ export const createAuthHandlers = () => {
       const result = verifyCode(body.email, body.code);
       if (!result.ok) return jsonError(result.error);
 
-      return HttpResponse.json(
-        {},
-        {
-          status: 200,
-          headers: {
-            "Set-Cookie": buildSessionCookies(result.token).join(", "),
-          },
-        }
-      );
+      return HttpResponse.json(result.user, {
+        status: 200,
+        headers: {
+          "Set-Cookie": buildSessionCookies(result.token).join(", "),
+        },
+      });
     }),
 
     http.post(`${base}/api/auth/login/`, async ({ request }) => {
@@ -64,15 +61,12 @@ export const createAuthHandlers = () => {
       const result = verifyCode(body.email, body.code);
       if (!result.ok) return jsonError(result.error);
 
-      return HttpResponse.json(
-        {},
-        {
-          status: 200,
-          headers: {
-            "Set-Cookie": buildSessionCookies(result.token).join(", "),
-          },
-        }
-      );
+      return HttpResponse.json(result.user, {
+        status: 200,
+        headers: {
+          "Set-Cookie": buildSessionCookies(result.token).join(", "),
+        },
+      });
     }),
 
     http.post(`${base}/api/auth/register/resend-code/`, async ({ request }) => {

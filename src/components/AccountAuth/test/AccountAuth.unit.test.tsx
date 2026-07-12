@@ -4,9 +4,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AccountAuth from "../AccountAuth";
 
 const checkAuth = vi.fn();
+const updateUser = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
+}));
 
 vi.mock("../../../contexts/AuthContext", () => ({
-  useAuth: () => ({ checkAuth }),
+  useAuth: () => ({ checkAuth, updateUser }),
 }));
 
 vi.mock("next/link", () => ({
@@ -26,6 +31,7 @@ describe("AccountAuth", () => {
 
   beforeEach(() => {
     checkAuth.mockReset();
+    updateUser.mockReset();
   });
 
   it("renders login form by default", () => {

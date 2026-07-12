@@ -31,13 +31,15 @@ import {
   normalizeCategoryForApi as normalizeCategoryForNewInApi,
 } from "../../api/new-in/newInApi";
 import { useAuth } from "../../contexts/AuthContext";
+import {
+  dismissCatalogAuthModal,
+  isCatalogAuthModalDismissed,
+} from "../AccountAuthPromptModal/catalogAuthPromptStorage";
 
 const AccountAuthPromptModal = dynamic(
   () => import("../AccountAuthPromptModal/AccountAuthPromptModal"),
   { ssr: false }
 );
-
-const CATALOG_AUTH_MODAL_KEY = "znves:catalog_auth_modal_shown";
 
 type CatalogPageContentProps = {
   title: string;
@@ -202,21 +204,27 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
-  // Показываем модалку авторизации один раз за сессию для неавторизованных
+  // Модалка входа — только для неавторизованных, пока пользователь не отказался навсегда
   useEffect(() => {
-    if (isAuthLoading || isAuthenticated) return;
-    const alreadyShown = sessionStorage.getItem(CATALOG_AUTH_MODAL_KEY);
-    if (alreadyShown) return;
+    if (isAuthLoading || isAuthenticated) {
+      setShowAuthModal(false);
+      return;
+    }
+    if (isCatalogAuthModalDismissed()) return;
 
-    const timer = setTimeout(() => {
+    const timer = window.setTimeout(() => {
       setShowAuthModal(true);
-      sessionStorage.setItem(CATALOG_AUTH_MODAL_KEY, "1");
     }, 900);
 
-    return () => clearTimeout(timer);
+    return () => window.clearTimeout(timer);
   }, [isAuthenticated, isAuthLoading]);
 
   const handleCloseAuthModal = useCallback(() => setShowAuthModal(false), []);
+
+  const handleSkipAuthModal = useCallback(() => {
+    dismissCatalogAuthModal();
+    setShowAuthModal(false);
+  }, []);
 
   // Закрываем панель фильтров при клике вне её
   useEffect(() => {
@@ -741,8 +749,11 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
         )}
       </section>
 
-      {showAuthModal && (
-        <AccountAuthPromptModal onClose={handleCloseAuthModal} />
+      {showAuthModal && !isAuthenticated && (
+        <AccountAuthPromptModal
+          onClose={handleCloseAuthModal}
+          onSkip={handleSkipAuthModal}
+        />
       )}
     </>
   );

@@ -1,22 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   loginUser,
   registerUser,
   resendAuthCode,
   verifyLogin,
   verifyRegistration,
+  type AuthUser,
 } from "../../api/auth/authApi";
 import { useAuth } from "../../contexts/AuthContext";
 import {
+  AUTH_RESEND_COOLDOWN_SECONDS,
+  formatResendCooldown,
   validateCode,
   validateEmail,
   validateLoginEmail,
   validatePassword,
   validatePhone,
+  validateRegistrationPassword,
   validateRequiredName,
 } from "../../lib/authValidation";
 import styles from "./AccountAuth.module.css";
@@ -126,7 +131,8 @@ const PasswordToggleButton = ({
 );
 
 const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
-  const { checkAuth } = useAuth();
+  const router = useRouter();
+  const { checkAuth, updateUser } = useAuth();
   const [mode, setMode] = useState<AuthMode>("login");
   const [step, setStep] = useState<"credentials" | "verify">("credentials");
   const [pendingEmail, setPendingEmail] = useState("");
@@ -136,12 +142,20 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  const formOptions = {
+    mode: "onChange" as const,
+    reValidateMode: "onChange" as const,
+  };
 
   const loginForm = useForm<LoginFormValues>({
+    ...formOptions,
     defaultValues: { email: "", password: "" },
   });
 
   const registerForm = useForm<RegisterFormValues>({
+    ...formOptions,
     defaultValues: {
       email: "",
       password: "",
@@ -153,20 +167,45 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
   });
 
   const verifyForm = useForm<VerifyFormValues>({
+    ...formOptions,
     defaultValues: { code: "" },
   });
+
+  const registerPassword = registerForm.watch("password");
+  const confirmPasswordTouched = registerForm.formState.touchedFields.confirmPassword;
+
+  useEffect(() => {
+    if (confirmPasswordTouched) {
+      void registerForm.trigger("confirmPassword");
+    }
+  }, [registerPassword, confirmPasswordTouched, registerForm]);
+
+  const startResendCooldown = useCallback(() => {
+    setResendCooldown(AUTH_RESEND_COOLDOWN_SECONDS);
+  }, []);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = window.setTimeout(() => {
+      setResendCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   const switchMode = (nextMode: AuthMode) => {
     setMode(nextMode);
     setStep("credentials");
     setFormError(null);
     setInfoMessage(null);
+    setResendCooldown(0);
     verifyForm.reset();
   };
 
-  const completeAuth = async () => {
+  const completeAuth = async (verifiedUser: AuthUser) => {
+    updateUser(verifiedUser);
     await checkAuth(true);
     onAuthenticated?.();
+    router.replace("/account");
   };
 
   const handleLoginSubmit = loginForm.handleSubmit(async (values) => {
@@ -181,6 +220,7 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
       setLoginPassword(values.password);
       setStep("verify");
       verifyForm.reset();
+      startResendCooldown();
       setInfoMessage("Код подтверждения отправлен на вашу почту");
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "Не удалось выполнить вход");
@@ -201,6 +241,7 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
       setPendingEmail(values.email.trim());
       setStep("verify");
       verifyForm.reset();
+      startResendCooldown();
       setInfoMessage("Код подтверждения отправлен на вашу почту");
     } catch (error) {
       setFormError(
@@ -218,13 +259,12 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
         code: values.code.trim(),
       };
 
-      if (mode === "login") {
-        await verifyLogin(payload);
-      } else {
-        await verifyRegistration(payload);
-      }
+      const verifiedUser =
+        mode === "login"
+          ? await verifyLogin(payload)
+          : await verifyRegistration(payload);
 
-      await completeAuth();
+      await completeAuth(verifiedUser);
     } catch (error) {
       setFormError(
         error instanceof Error ? error.message : "Не удалось подтвердить код"
@@ -233,6 +273,8 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
   });
 
   const handleResendCode = async () => {
+    if (resendCooldown > 0) return;
+
     setFormError(null);
     setInfoMessage(null);
     try {
@@ -244,6 +286,7 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
           password: loginPassword,
         });
       }
+      startResendCooldown();
       setInfoMessage("Код отправлен повторно");
     } catch (error) {
       setFormError(
@@ -256,6 +299,7 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
     setStep("credentials");
     setFormError(null);
     setInfoMessage(null);
+    setResendCooldown(0);
     verifyForm.reset();
   };
 
@@ -311,9 +355,11 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
               type="button"
               className={styles.textButton}
               onClick={handleResendCode}
-              disabled={verifyForm.formState.isSubmitting}
+              disabled={verifyForm.formState.isSubmitting || resendCooldown > 0}
             >
-              Отправить код повторно
+              {resendCooldown > 0
+                ? `Повторная отправка через ${formatResendCooldown(resendCooldown)}`
+                : "Отправить код повторно"}
             </button>
             <button
               type="button"
@@ -323,6 +369,11 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
               Назад
             </button>
           </div>
+          {resendCooldown > 0 && (
+            <p className={styles.resendHint}>
+              Новый код можно запросить через {formatResendCooldown(resendCooldown)}
+            </p>
+          )}
         </form>
       </div>
     );
@@ -541,12 +592,12 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
                   id="register-password"
                   type={showRegisterPassword ? "text" : "password"}
                   autoComplete="new-password"
-                  placeholder="Минимум 8 символов"
+                  placeholder="Минимум 8 символов, Aa и цифра"
                   className={`${styles.input} ${
                     registerForm.formState.errors.password ? styles.inputError : ""
                   }`}
                   {...registerForm.register("password", {
-                    validate: validatePassword,
+                    validate: validateRegistrationPassword,
                   })}
                 />
                 <PasswordToggleButton
@@ -558,6 +609,11 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
               {registerForm.formState.errors.password && (
                 <span className={styles.fieldError}>
                   {registerForm.formState.errors.password.message}
+                </span>
+              )}
+              {!registerForm.formState.errors.password && registerPassword && (
+                <span className={styles.fieldHint}>
+                  Минимум 8 символов, заглавная и строчная буква, цифра
                 </span>
               )}
             </div>

@@ -8,13 +8,12 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import { getCurrentUser, hasAccessToken, type AuthUser } from "../api/auth/authApi";
+import { getCurrentUser, type AuthUser } from "../api/auth/authApi";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   user: AuthUser | null;
   isLoading: boolean;
-  hasAccessToken: () => boolean;
   checkAuth: (forceRefresh?: boolean) => Promise<void>;
   updateUser: (user: AuthUser | null) => void;
 }
@@ -61,19 +60,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const { user: storedUser, savedAt } = getAuthFromStorage();
-    if (storedUser && !hasAccessToken()) {
-      saveAuthToStorage(null);
-      setUser(null);
-      setIsHydrated(true);
-      setIsLoading(false);
-      setCacheFreshOnLoad(false);
-      return;
-    }
     setUser(storedUser);
     setIsHydrated(true);
-    setIsLoading(false);
     const fresh = !!(storedUser && savedAt && Date.now() - savedAt <= CACHE_TTL_MS);
     setCacheFreshOnLoad(fresh);
+    if (fresh) {
+      setIsLoading(false);
+    }
   }, []);
 
   const checkAuth = useCallback(async (forceRefresh?: boolean) => {
@@ -101,7 +94,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!isHydrated || cacheFreshOnLoad) return;
-    checkAuth();
+    void checkAuth();
   }, [isHydrated, cacheFreshOnLoad, checkAuth]);
 
   const updateUser = useCallback((newUser: AuthUser | null) => {
@@ -115,12 +108,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const handleFocus = () => {
-      checkAuth(true);
+      void checkAuth(true);
     };
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        checkAuth(true);
+        void checkAuth(true);
       }
     };
 
@@ -141,7 +134,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated,
         user,
         isLoading,
-        hasAccessToken,
         checkAuth,
         updateUser,
       }}

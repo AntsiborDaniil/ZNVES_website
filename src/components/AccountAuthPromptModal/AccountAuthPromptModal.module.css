@@ -6,39 +6,53 @@
   align-items: center;
   justify-content: center;
   z-index: 10000;
-  padding: 20px;
+  padding: 24px;
+  box-sizing: border-box;
   animation: overlayIn 0.22s ease;
 }
 
 @keyframes overlayIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .content {
+  box-sizing: border-box;
   background-color: #f2f0ec;
   border: 1px solid #bcb4a5;
   border-radius: 3px;
-  padding: 60px 40px 36px;
-  max-width: 520px;
-  width: 100%;
+  padding: 56px 32px 32px;
+  width: min(100%, 520px);
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   text-align: center;
+  margin: auto;
   animation: contentIn 0.25s ease;
 }
 
 @keyframes contentIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .closeBtn {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 14px;
+  right: 14px;
   background: none;
   border: none;
   cursor: pointer;
@@ -48,6 +62,7 @@
   padding: 2px;
   transition: opacity 0.2s ease;
   line-height: 0;
+  flex-shrink: 0;
 }
 
 .closeBtn:hover {
@@ -61,6 +76,7 @@
   letter-spacing: 0;
   color: #525252;
   margin: 0 0 14px;
+  padding: 0 28px;
 }
 
 .description {
@@ -68,8 +84,9 @@
   font-size: 15px;
   line-height: 1.6;
   color: #525252b0;
-  margin: 0 0 30px;
+  margin: 0 auto 28px;
   max-width: 360px;
+  width: 100%;
 }
 
 .primaryBtn {
@@ -77,7 +94,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 50px;
+  min-height: 50px;
   border: none;
   border-radius: 3px;
   background-color: #0a5840;
@@ -88,7 +105,7 @@
   text-decoration: none;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .primaryBtn:hover {
@@ -105,8 +122,9 @@
   color: #525252;
   text-decoration: underline;
   text-underline-offset: 3px;
-  padding: 4px 0;
+  padding: 8px 0;
   transition: opacity 0.2s ease;
+  align-self: center;
 }
 
 .skipBtn:hover {
@@ -116,27 +134,35 @@
 @media (max-width: 480px) {
   .overlay {
     padding: 16px;
-    align-items: flex-end;
+    align-items: center;
+    justify-content: center;
   }
 
   .content {
-    padding: 50px 24px 28px;
-    border-radius: 3px 3px 0 0;
-    max-width: 100%;
+    padding: 48px 20px 24px;
+    width: 100%;
+    max-height: calc(100dvh - 32px);
   }
 
   .title {
     font-size: 20px;
+    padding: 0 24px;
   }
 
   .description {
     font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .primaryBtn {
+    min-height: 48px;
+    font-size: 15px;
   }
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
   .content {
-    padding: 52px 32px 30px;
-    max-width: 480px;
+    padding: 52px 28px 28px;
+    width: min(100%, 480px);
   }
 }

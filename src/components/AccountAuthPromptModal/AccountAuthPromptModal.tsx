@@ -7,9 +7,10 @@ import styles from "./AccountAuthPromptModal.module.css";
 
 type AccountAuthPromptModalProps = {
   onClose: () => void;
+  onSkip?: () => void;
 };
 
-const AccountAuthPromptModal = ({ onClose }: AccountAuthPromptModalProps) => {
+const AccountAuthPromptModal = ({ onClose, onSkip }: AccountAuthPromptModalProps) => {
   useEffect(() => {
     document.body.style.overflow = "hidden";
 
@@ -60,7 +61,17 @@ const AccountAuthPromptModal = ({ onClose }: AccountAuthPromptModalProps) => {
           Перейти ко входу
         </Link>
 
-        <button type="button" className={styles.skipBtn} onClick={onClose}>
+        <button
+          type="button"
+          className={styles.skipBtn}
+          onClick={() => {
+            if (onSkip) {
+              onSkip();
+              return;
+            }
+            onClose();
+          }}
+        >
           Продолжить без входа
         </button>
       </div>

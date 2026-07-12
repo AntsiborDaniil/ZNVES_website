@@ -13,27 +13,13 @@ export interface AuthUserDeliveryData {
 }
 
 export interface AuthUser {
-  username: string;
+  username?: string;
   first_name: string;
   last_name: string;
   email: string;
   phone_number: string;
-  delivery_data?: AuthUserDeliveryData;
+  delivery_data?: AuthUserDeliveryData | null;
 }
-
-const ACCESS_TOKEN_KEY = "access-token";
-
-export const hasAccessToken = (): boolean => {
-  if (typeof window === "undefined") return false;
-  if (/(?:^|;\s*)access-token\s*=\s*[^;]+/.test(document.cookie)) return true;
-  try {
-    if (localStorage.getItem(ACCESS_TOKEN_KEY)) return true;
-    if (sessionStorage.getItem(ACCESS_TOKEN_KEY)) return true;
-  } catch {
-    return false;
-  }
-  return false;
-};
 
 const AUTH_BASE_URL = `${API_BASE_URL}/api/auth`;
 
@@ -62,6 +48,25 @@ export type VerifyPayload = {
 export type LoginPayload = {
   email: string;
   password: string;
+};
+
+export const parseAuthUser = (data: unknown): AuthUser | null => {
+  if (!data || typeof data !== "object") return null;
+
+  const record = data as Record<string, unknown>;
+  if (typeof record.email !== "string" || !record.email.trim()) return null;
+
+  return {
+    username: typeof record.username === "string" ? record.username : undefined,
+    first_name: typeof record.first_name === "string" ? record.first_name : "",
+    last_name: typeof record.last_name === "string" ? record.last_name : "",
+    email: record.email,
+    phone_number: typeof record.phone_number === "string" ? record.phone_number : "",
+    delivery_data:
+      record.delivery_data === null || record.delivery_data === undefined
+        ? record.delivery_data
+        : (record.delivery_data as AuthUserDeliveryData),
+  };
 };
 
 const parseApiError = async (response: Response, fallback: string): Promise<string> => {
@@ -104,20 +109,47 @@ const authPost = async (url: string, payload: object): Promise<void> => {
   }
 };
 
+const authPostUser = async (url: string, payload: object): Promise<AuthUser> => {
+  if (typeof window === "undefined") {
+    throw new Error("Вызов только на клиенте");
+  }
+
+  const response = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseApiError(response, "Не удалось выполнить запрос"));
+  }
+
+  const data = (await response.json()) as unknown;
+  const user = parseAuthUser(data);
+  if (!user) {
+    throw new Error("Некорректный ответ сервера");
+  }
+  return user;
+};
+
 export const registerUser = async (payload: RegisterPayload): Promise<void> => {
   await authPost(REGISTER_URL, payload);
 };
 
-export const verifyRegistration = async (payload: VerifyPayload): Promise<void> => {
-  await authPost(REGISTER_VERIFY_URL, payload);
+export const verifyRegistration = async (payload: VerifyPayload): Promise<AuthUser> => {
+  return authPostUser(REGISTER_VERIFY_URL, payload);
 };
 
 export const loginUser = async (payload: LoginPayload): Promise<void> => {
   await authPost(LOGIN_URL, payload);
 };
 
-export const verifyLogin = async (payload: VerifyPayload): Promise<void> => {
-  await authPost(LOGIN_VERIFY_URL, payload);
+export const verifyLogin = async (payload: VerifyPayload): Promise<AuthUser> => {
+  return authPostUser(LOGIN_VERIFY_URL, payload);
 };
 
 export const resendAuthCode = async (email: string): Promise<void> => {
@@ -135,8 +167,8 @@ export const getCurrentUser = async (): Promise<AuthUser | null> => {
       headers: { Accept: "application/json" },
     });
     if (!response.ok) return null;
-    const data = (await response.json()) as AuthUser;
-    return data && typeof data.username === "string" ? data : null;
+    const data = (await response.json()) as unknown;
+    return parseAuthUser(data);
   } catch {
     return null;
   }
@@ -189,8 +221,12 @@ export const updateCurrentUser = async (
     }
     throw new Error(message);
   }
-  const data = (await response.json()) as AuthUser;
-  return data;
+  const data = (await response.json()) as unknown;
+  const user = parseAuthUser(data);
+  if (!user) {
+    throw new Error("Некорректный ответ сервера");
+  }
+  return user;
 };
 
 export const updateUserDeliveryData = async (

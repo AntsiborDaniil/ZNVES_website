@@ -41,7 +41,19 @@ describe("AccountAuthPromptModal", () => {
     );
   });
 
-  it("calls onClose when skip is clicked", async () => {
+  it("calls onSkip when skip is clicked", async () => {
+    const onClose = vi.fn();
+    const onSkip = vi.fn();
+    const user = userEvent.setup();
+
+    render(<AccountAuthPromptModal onClose={onClose} onSkip={onSkip} />);
+    await user.click(screen.getByRole("button", { name: "Продолжить без входа" }));
+
+    expect(onSkip).toHaveBeenCalledTimes(1);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("calls onClose when skip is clicked without onSkip", async () => {
     const onClose = vi.fn();
     const user = userEvent.setup();
 
