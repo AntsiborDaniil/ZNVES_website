@@ -1,4 +1,7 @@
 import { API_BASE_URL } from "../../lib/apiConfig";
+import { parseAuthApiErrorResponse } from "./authApiErrors";
+
+export { AuthApiError, humanizeAuthErrorMessage, parseAuthApiErrorBody } from "./authApiErrors";
 
 export interface AuthUserDeliveryData {
   cdek_full_pvz_address?: string | null;
@@ -69,26 +72,6 @@ export const parseAuthUser = (data: unknown): AuthUser | null => {
   };
 };
 
-const parseApiError = async (response: Response, fallback: string): Promise<string> => {
-  const text = await response.text();
-  try {
-    const json = JSON.parse(text) as Record<string, unknown>;
-    if (typeof json.detail === "string") return json.detail;
-    if (typeof json.message === "string") return json.message;
-    if (typeof json.email === "string") return json.email;
-    if (Array.isArray(json.email) && typeof json.email[0] === "string") {
-      return json.email[0];
-    }
-    if (typeof json.non_field_errors === "object" && Array.isArray(json.non_field_errors)) {
-      const first = json.non_field_errors[0];
-      if (typeof first === "string") return first;
-    }
-  } catch {
-    if (text) return text;
-  }
-  return fallback;
-};
-
 const authPost = async (url: string, payload: object): Promise<void> => {
   if (typeof window === "undefined") {
     throw new Error("Вызов только на клиенте");
@@ -105,7 +88,7 @@ const authPost = async (url: string, payload: object): Promise<void> => {
   });
 
   if (!response.ok) {
-    throw new Error(await parseApiError(response, "Не удалось выполнить запрос"));
+    throw await parseAuthApiErrorResponse(response, "Не удалось выполнить запрос");
   }
 };
 
@@ -125,7 +108,7 @@ const authPostVerify = async (url: string, payload: object): Promise<AuthUser> =
   });
 
   if (!response.ok) {
-    throw new Error(await parseApiError(response, "Не удалось выполнить запрос"));
+    throw await parseAuthApiErrorResponse(response, "Не удалось выполнить запрос");
   }
 
   const data = (await response.json()) as unknown;

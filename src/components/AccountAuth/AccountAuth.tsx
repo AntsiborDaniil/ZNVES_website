@@ -30,6 +30,7 @@ import {
   getResendCooldownRemaining,
   savePendingAccountAuthFlow,
 } from "./accountAuthFlowStorage";
+import { applyAuthApiError } from "./applyAuthApiError";
 import styles from "./AccountAuth.module.css";
 
 type AuthMode = "login" | "register";
@@ -265,6 +266,7 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
   };
 
   const handleLoginSubmit = loginForm.handleSubmit(async (values) => {
+    loginForm.clearErrors();
     setFormError(null);
     setInfoMessage(null);
     try {
@@ -279,11 +281,18 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
       startResendCooldown();
       setInfoMessage("Код подтверждения отправлен на вашу почту");
     } catch (error) {
-      setFormError(error instanceof Error ? error.message : "Не удалось выполнить вход");
+      applyAuthApiError({
+        error,
+        form: loginForm,
+        fieldMap: { email: "email", password: "password" },
+        setFormError,
+        fallback: "Не удалось выполнить вход",
+      });
     }
   });
 
   const handleRegisterSubmit = registerForm.handleSubmit(async (values) => {
+    registerForm.clearErrors();
     setFormError(null);
     setInfoMessage(null);
     try {
@@ -300,13 +309,24 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
       startResendCooldown();
       setInfoMessage("Код подтверждения отправлен на вашу почту");
     } catch (error) {
-      setFormError(
-        error instanceof Error ? error.message : "Не удалось зарегистрироваться"
-      );
+      applyAuthApiError({
+        error,
+        form: registerForm,
+        fieldMap: {
+          email: "email",
+          password: "password",
+          first_name: "first_name",
+          last_name: "last_name",
+          phone_number: "phone_number",
+        },
+        setFormError,
+        fallback: "Не удалось зарегистрироваться",
+      });
     }
   });
 
   const handleVerifySubmit = verifyForm.handleSubmit(async (values) => {
+    verifyForm.clearErrors();
     setFormError(null);
     setInfoMessage(null);
     try {
@@ -322,15 +342,20 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
 
       await completeAuth(verifiedUser);
     } catch (error) {
-      setFormError(
-        error instanceof Error ? error.message : "Не удалось подтвердить код"
-      );
+      applyAuthApiError({
+        error,
+        form: verifyForm,
+        fieldMap: { code: "code" },
+        setFormError,
+        fallback: "Не удалось подтвердить код",
+      });
     }
   });
 
   const handleResendCode = async () => {
     if (resendCooldown > 0) return;
 
+    verifyForm.clearErrors();
     setFormError(null);
     setInfoMessage(null);
     try {
@@ -345,9 +370,13 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
       startResendCooldown();
       setInfoMessage("Код отправлен повторно");
     } catch (error) {
-      setFormError(
-        error instanceof Error ? error.message : "Не удалось отправить код повторно"
-      );
+      applyAuthApiError({
+        error,
+        form: verifyForm,
+        fieldMap: { code: "code" },
+        setFormError,
+        fallback: "Не удалось отправить код повторно",
+      });
     }
   };
 
@@ -397,7 +426,11 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
           </div>
 
           {infoMessage && <p className={styles.infoMessage}>{infoMessage}</p>}
-          {formError && <p className={styles.errorMessage}>{formError}</p>}
+          {formError && (
+            <p className={styles.errorMessage} role="alert">
+              {formError}
+            </p>
+          )}
 
           <button
             type="submit"
@@ -522,7 +555,11 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
               )}
             </div>
 
-            {formError && <p className={styles.errorMessage}>{formError}</p>}
+            {formError && (
+            <p className={styles.errorMessage} role="alert">
+              {formError}
+            </p>
+          )}
 
             <button
               type="submit"
@@ -705,7 +742,11 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
               )}
             </div>
 
-            {formError && <p className={styles.errorMessage}>{formError}</p>}
+            {formError && (
+            <p className={styles.errorMessage} role="alert">
+              {formError}
+            </p>
+          )}
 
             <button
               type="submit"
