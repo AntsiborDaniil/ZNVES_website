@@ -2,31 +2,26 @@
 
 import { useEffect, useRef, useState } from "react";
 import { getCdekPvzByCity, type CdekPvzPoint } from "../../api/delivery/cdekApi";
+import {
+  buildCdekPvzSelection,
+  buildYaDeliveryWidgetParams,
+  COURIER_MAP_CONTAINER_ID,
+  DEFAULT_YA_SOURCE_ADDRESS,
+  filterCdekPvzPoints,
+  getMapDeliveryMode,
+  isInMoscow,
+  MOSCOW_CENTER,
+  parseAddressFromGeoObject,
+  parseYaNddWidgetSelection,
+  type PvzListOption,
+  type YaNddWidgetPointDetail,
+  YANDEX_PVZ_CONTAINER_ID,
+  YANDEX_WIDGET_SCRIPT_URL,
+} from "./mapWidgetUtils";
 
-const WIDGET_SCRIPT_URL = "https://ndd-widget.landpro.site/widget.js";
-const CONTAINER_ID = "delivery-widget";
-const COURIER_MAP_ID = "courier-map";
-const YANDEX_MAPS_SCRIPT =
-  "https://api-maps.yandex.ru/2.1/?apikey=&lang=ru_RU";
-const MOSCOW_CENTER: [number, number] = [55.7558, 37.6173];
-const DEFAULT_YA_SOURCE_ADDRESS = "Москва, Промышленная улица, 12А, 115516";
-
-type YaNddWidgetPointDetail = {
-  id?: string;
-  name?: string;
-  title?: string;
-  address?: {
-    full_address?: string;
-    locality?: string;
-    street?: string;
-    house?: string;
-  };
-  delivery_price?: number;
-  deliveryPrice?: number;
-  delivery?: { price?: number; term?: unknown };
-  delivery_term?: unknown;
-  deliveryTerm?: unknown;
-};
+const WIDGET_SCRIPT_URL = YANDEX_WIDGET_SCRIPT_URL;
+const CONTAINER_ID = YANDEX_PVZ_CONTAINER_ID;
+const COURIER_MAP_ID = COURIER_MAP_CONTAINER_ID;
 
 type AddressData = {
   city?: string;
@@ -40,15 +35,7 @@ type AddressData = {
   lon?: number;
 };
 
-export type PvzListOption = {
-  name: string;
-  address: string;
-  code?: string;
-  id?: string;
-  city?: string;
-  lat?: number;
-  lon?: number;
-};
+export type { PvzListOption };
 
 type MapProps = {
   address?: string;
@@ -96,46 +83,6 @@ declare global {
   }
 }
 
-function parseAddressFromGeoObject(geoObject: {
-  properties: { get: (key: string) => unknown };
-  getAddressLine?: () => string;
-}): { city: string; street: string; house: string; fullAddress: string } {
-  let city = "Москва";
-  let street = "";
-  let house = "";
-  let fullAddress = "";
-
-  try {
-    const metaProp = geoObject.properties.get("metaDataProperty") as
-      | { GeocoderMetaData?: { Address?: { Components?: Array<{ kind?: string; name?: string }> }; text?: string } }
-      | undefined;
-    const meta = metaProp?.GeocoderMetaData;
-    fullAddress = (meta?.text as string) || (geoObject.getAddressLine?.() as string) || "";
-
-    const components = meta?.Address?.Components ?? [];
-    for (const c of components) {
-      const k = (c.kind || "").toLowerCase();
-      const n = c.name || "";
-      if (k === "locality" || k === "area") city = n || city;
-      if (k === "street" || k === "thoroughfare") street = n || street;
-      if (k === "house") house = n || house;
-    }
-  } catch {
-    /* ignore */
-  }
-
-  return { city, street, house, fullAddress };
-}
-
-function isInMoscow(addr: { city?: string }): boolean {
-  const city = (addr.city || "").toLowerCase();
-  return (
-    city.includes("москва") ||
-    city === "moscow" ||
-    city.includes("московск")
-  );
-}
-
 /**
  * Map component: для ПВЗ — виджет ndd-widget; для курьера — обычная Яндекс.Карта с меткой.
  * Курьерская доставка только по Москве.
@@ -165,19 +112,11 @@ const Map = ({
   onAddressSelectRef.current = onAddressSelect;
   onSearchChangeRef.current = onSearchChange;
 
-  const isPickup =
-    deliveryMethod === "pickup" &&
-    (deliveryType === "cdek" || deliveryType === "yandex");
-
-  /** ПВЗ Яндекса — показываем виджет «Я Доставка» */
-  const isPickupYandex =
-    deliveryMethod === "pickup" && deliveryType === "yandex";
-
-  /** ПВЗ СДЭК — показываем список из нашего API (ключи в env) */
-  const isPickupCdek =
-    deliveryMethod === "pickup" && deliveryType === "cdek";
-
-  const isCourier = deliveryMethod === "yandex";
+  const deliveryMode = getMapDeliveryMode(deliveryMethod, deliveryType);
+  const isPickupYandex = deliveryMode === "pickup-yandex";
+  const isPickupCdek = deliveryMode === "pickup-cdek";
+  const isCourier = deliveryMode === "courier";
+  const isPickup = isPickupYandex || isPickupCdek;
 
   const [cdekPvzList, setCdekPvzList] = useState<CdekPvzPoint[]>([]);
   const [cdekPvzLoading, setCdekPvzLoading] = useState(false);
@@ -221,51 +160,13 @@ const Map = ({
     };
   }, []);
 
-  /** Нормализация для поиска: trim, нижний регистр, схлопывание пробелов */
-  const normalizeSearch = (s: string) =>
-    (s || "")
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, " ");
-
-  const cdekPvzFiltered = cdekPvzSearch.trim()
-    ? cdekPvzList.filter((p) => {
-        const q = normalizeSearch(cdekPvzSearch);
-        if (!q) return true;
-        const address = normalizeSearch(p.address ?? "");
-        const name = normalizeSearch(p.name ?? "");
-        const code = normalizeSearch(p.code ?? "");
-        const workTime = normalizeSearch(p.work_time ?? "");
-        return (
-          address.includes(q) ||
-          name.includes(q) ||
-          code.includes(q) ||
-          workTime.includes(q)
-        );
-      })
-    : cdekPvzList;
+  const cdekPvzFiltered = filterCdekPvzPoints(cdekPvzList, cdekPvzSearch);
 
   const selectCdekPvz = (pvz: CdekPvzPoint) => {
     setSelectedCdekPvzCode(pvz.code);
-    const payload = {
-      city,
-      pvzAddress: pvz.address,
-      pvzCode: pvz.code,
-      fullAddress: pvz.address,
-      lat: pvz.location?.lat,
-      lon: pvz.location?.lon,
-    };
-    onAddressSelectRef.current?.(payload);
-    onPvzListLoaded?.([
-      {
-        name: pvz.name || pvz.address,
-        address: pvz.address,
-        code: pvz.code,
-        city,
-        lat: pvz.location?.lat,
-        lon: pvz.location?.lon,
-      },
-    ]);
+    const { addressData, pvzOption } = buildCdekPvzSelection(pvz, city);
+    onAddressSelectRef.current?.(addressData);
+    onPvzListLoaded?.([pvzOption]);
   };
 
   // Загрузка списка ПВЗ СДЭК по городу (наш API с ключами из env)
@@ -336,51 +237,14 @@ const Map = ({
 
     const handler = (event: Event) => {
       const e = event as CustomEvent<YaNddWidgetPointDetail>;
-      const detail = e.detail;
-      const deliveryPrice =
-        detail?.delivery_price ??
-        detail?.deliveryPrice ??
-        detail?.delivery?.price ??
-        null;
-      const deliveryTerm =
-        detail?.delivery_term ??
-        detail?.deliveryTerm ??
-        detail?.delivery?.term ??
-        null;
-      if (!detail) return;
-
-      const addr = detail.address || {};
-      const fullAddress =
-        addr.full_address ||
-        [addr.locality, addr.street, addr.house].filter(Boolean).join(", ") ||
-        detail.name ||
-        detail.title ||
-        (detail.id ? `ПВЗ ${detail.id}` : "") ||
-        "";
+      const selection = parseYaNddWidgetSelection(e.detail, city);
+      if (!selection) return;
 
       const widgetRoot = document.getElementById(CONTAINER_ID);
       if (widgetRoot) widgetRoot.classList.remove("widget-continue-clicked");
 
-      if (onAddressSelect) {
-        onAddressSelect({
-          city: addr.locality || city,
-          street: addr.street,
-          house: addr.house,
-          fullAddress: fullAddress || "Пункт выдачи",
-          pvzAddress: fullAddress || "Пункт выдачи",
-          pvzId: detail.id,
-        });
-      }
-      if (onPvzListLoaded) {
-        onPvzListLoaded([
-          {
-            name: fullAddress || detail.id || "ПВЗ",
-            address: fullAddress || "Пункт выдачи",
-            id: detail.id,
-            city: addr.locality || city,
-          },
-        ]);
-      }
+      onAddressSelect?.(selection.addressData);
+      onPvzListLoaded?.([selection.pvzOption]);
     };
 
     document.addEventListener("YaNddWidgetPointSelected", handler);
@@ -450,27 +314,7 @@ const Map = ({
       }
       widgetInitedRef.current = true;
 
-      const weightGrams = Math.max(100, totalWeightGrams ?? 10000);
-      const params = {
-        city,
-        size: { height: "450px", width: "100%" },
-        source_address: sourceAddress,
-        physical_dims_weight_gross: weightGrams,
-        physical_dims_dx: 30,
-        physical_dims_dy: 20,
-        physical_dims_dz: 10,
-        delivery_term: 0,
-        delivery_price: (price: number) => {
-          return "";
-        },
-        show_select_button: true,
-        filter: {
-          type: ["pickup_point", "terminal"],
-          is_yandex_branded: false,
-          payment_methods: ["already_paid", "card_on_receipt"],
-          payment_methods_filter: "or",
-        },
-      };
+      const params = buildYaDeliveryWidgetParams(city, sourceAddress, totalWeightGrams);
 
       window.YaDelivery.createWidget({
         containerId: CONTAINER_ID,

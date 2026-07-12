@@ -22,7 +22,7 @@ export const createAuthHandlers = () => {
   const base = getMockApiBase();
 
   return [
-    http.post(`${base}/register/`, async ({ request }) => {
+    http.post(`${base}/api/auth/register/`, async ({ request }) => {
       const body = await readJson<{
         email: string;
         password: string;
@@ -36,7 +36,7 @@ export const createAuthHandlers = () => {
       return HttpResponse.json({}, { status: 200 });
     }),
 
-    http.post(`${base}/register/verify/`, async ({ request }) => {
+    http.post(`${base}/api/auth/register/verify/`, async ({ request }) => {
       const body = await readJson<{ email: string; code: string }>(request);
       const result = verifyCode(body.email, body.code);
       if (!result.ok) return jsonError(result.error);
@@ -52,14 +52,14 @@ export const createAuthHandlers = () => {
       );
     }),
 
-    http.post(`${base}/login/`, async ({ request }) => {
+    http.post(`${base}/api/auth/login/`, async ({ request }) => {
       const body = await readJson<{ email: string; password: string }>(request);
       const result = startLogin(body);
       if (!result.ok) return jsonError(result.error, 401);
       return HttpResponse.json({}, { status: 200 });
     }),
 
-    http.post(`${base}/login/verify/`, async ({ request }) => {
+    http.post(`${base}/api/auth/login/verify/`, async ({ request }) => {
       const body = await readJson<{ email: string; code: string }>(request);
       const result = verifyCode(body.email, body.code);
       if (!result.ok) return jsonError(result.error);

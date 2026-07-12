@@ -53,7 +53,7 @@ describe("mock API handlers", () => {
     });
 
     const verifyResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://test-znves.ru"}/login/verify/`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://test-znves.ru"}/api/auth/login/verify/`,
       {
         method: "POST",
         credentials: "include",
@@ -79,7 +79,7 @@ describe("mock API handlers", () => {
     });
 
     const verifyResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://test-znves.ru"}/register/verify/`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://test-znves.ru"}/api/auth/register/verify/`,
       {
         method: "POST",
         credentials: "include",

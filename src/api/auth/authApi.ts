@@ -35,14 +35,16 @@ export const hasAccessToken = (): boolean => {
   return false;
 };
 
-const AUTH_USER_URL = `${API_BASE_URL}/api/auth/user/`;
-const AUTH_USER_DELIVERY_URL = `${API_BASE_URL}/api/auth/user/delivery-data/`;
+const AUTH_BASE_URL = `${API_BASE_URL}/api/auth`;
 
-const REGISTER_URL = `${API_BASE_URL}/register/`;
-const REGISTER_VERIFY_URL = `${API_BASE_URL}/register/verify/`;
-const LOGIN_URL = `${API_BASE_URL}/login/`;
-const LOGIN_VERIFY_URL = `${API_BASE_URL}/login/verify/`;
-const RESEND_CODE_URL = `${API_BASE_URL}/api/auth/register/resend-code/`;
+const AUTH_USER_URL = `${AUTH_BASE_URL}/user/`;
+const AUTH_USER_DELIVERY_URL = `${AUTH_BASE_URL}/user/delivery-data/`;
+
+const REGISTER_URL = `${AUTH_BASE_URL}/register/`;
+const REGISTER_VERIFY_URL = `${AUTH_BASE_URL}/register/verify/`;
+const LOGIN_URL = `${AUTH_BASE_URL}/login/`;
+const LOGIN_VERIFY_URL = `${AUTH_BASE_URL}/login/verify/`;
+const RESEND_CODE_URL = `${AUTH_BASE_URL}/register/resend-code/`;
 
 export type RegisterPayload = {
   email: string;
