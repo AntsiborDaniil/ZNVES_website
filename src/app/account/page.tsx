@@ -12,7 +12,7 @@ import AccountAuth from "../../components/AccountAuth/AccountAuth";
 import styles from "./page.module.css";
 
 const AccountPage = () => {
-  const { isAuthenticated, isLoading, checkAuth } = useAuth();
+  const { isAuthenticated, isLoading, isAuthReady, checkAuth } = useAuth();
   const [activeTab, setActiveTab] = useState<"account" | "profile" | "orders">(
     "account"
   );
@@ -23,12 +23,12 @@ const AccountPage = () => {
   const authCheckedRef = useRef(false);
 
   useEffect(() => {
-    if (authCheckedRef.current) return;
+    if (!isAuthReady || authCheckedRef.current) return;
     authCheckedRef.current = true;
     void checkAuth(true);
-  }, [checkAuth]);
+  }, [isAuthReady, checkAuth]);
 
-  if (isLoading && !isAuthenticated) {
+  if (!isAuthReady || (isLoading && !isAuthenticated)) {
     return (
       <div className={styles.accountPage}>
         <Header variant="green" />

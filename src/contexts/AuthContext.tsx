@@ -14,6 +14,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   user: AuthUser | null;
   isLoading: boolean;
+  isAuthReady: boolean;
   checkAuth: (forceRefresh?: boolean) => Promise<void>;
   updateUser: (user: AuthUser | null) => void;
 }
@@ -73,8 +74,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (typeof window === "undefined" || !isHydrated) return;
 
     if (!forceRefresh) {
-      const { savedAt } = getAuthFromStorage();
-      if (savedAt && Date.now() - savedAt < RECHECK_INTERVAL_MS) {
+      const { user: cachedUser, savedAt } = getAuthFromStorage();
+      if (
+        cachedUser &&
+        savedAt &&
+        Date.now() - savedAt < RECHECK_INTERVAL_MS
+      ) {
+        setIsLoading(false);
         return;
       }
     }
@@ -92,9 +98,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
       saveAuthToStorage(null);
     } finally {
-      if (shouldShowLoading) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     }
   }, [isHydrated, user]);
 
@@ -106,6 +110,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const updateUser = useCallback((newUser: AuthUser | null) => {
     setUser(newUser);
     saveAuthToStorage(newUser);
+    if (newUser) {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -140,6 +147,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated,
         user,
         isLoading,
+        isAuthReady: isHydrated,
         checkAuth,
         updateUser,
       }}

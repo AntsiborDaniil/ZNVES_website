@@ -109,7 +109,7 @@ const authPost = async (url: string, payload: object): Promise<void> => {
   }
 };
 
-const authPostUser = async (url: string, payload: object): Promise<AuthUser> => {
+const authPostVerify = async (url: string, payload: object): Promise<AuthUser> => {
   if (typeof window === "undefined") {
     throw new Error("Вызов только на клиенте");
   }
@@ -129,11 +129,18 @@ const authPostUser = async (url: string, payload: object): Promise<AuthUser> => 
   }
 
   const data = (await response.json()) as unknown;
-  const user = parseAuthUser(data);
-  if (!user) {
-    throw new Error("Некорректный ответ сервера");
+  const userFromResponse = parseAuthUser(data);
+  if (userFromResponse) {
+    return userFromResponse;
   }
-  return user;
+
+  // Бэкенд может вернуть только { detail: "Вход выполнен." } — cookie уже установлена
+  const userFromProfile = await getCurrentUser();
+  if (userFromProfile) {
+    return userFromProfile;
+  }
+
+  throw new Error("Не удалось получить данные пользователя после подтверждения");
 };
 
 export const registerUser = async (payload: RegisterPayload): Promise<void> => {
@@ -141,7 +148,7 @@ export const registerUser = async (payload: RegisterPayload): Promise<void> => {
 };
 
 export const verifyRegistration = async (payload: VerifyPayload): Promise<AuthUser> => {
-  return authPostUser(REGISTER_VERIFY_URL, payload);
+  return authPostVerify(REGISTER_VERIFY_URL, payload);
 };
 
 export const loginUser = async (payload: LoginPayload): Promise<void> => {
@@ -149,7 +156,7 @@ export const loginUser = async (payload: LoginPayload): Promise<void> => {
 };
 
 export const verifyLogin = async (payload: VerifyPayload): Promise<AuthUser> => {
-  return authPostUser(LOGIN_VERIFY_URL, payload);
+  return authPostVerify(LOGIN_VERIFY_URL, payload);
 };
 
 export const resendAuthCode = async (email: string): Promise<void> => {
