@@ -2,10 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { useToast } from "../ui/ToastProvider/ToastProvider";
 import { subscribeToMailing } from "../../api/mailing/mailingApi";
+import {
+  buildCatalogCategoryHref,
+  fetchCatalogCategories,
+  FALLBACK_CATALOG_CATEGORIES,
+  getCatalogCategoryLabel,
+  type ApiCatalogCategory,
+} from "../../api/catalog/catalogApi";
 import styles from "./Footer.module.css";
 
 const Footer = () => {
@@ -21,6 +28,21 @@ const Footer = () => {
   const [isModalClosing, setIsModalClosing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const autoCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [catalogCategories, setCatalogCategories] = useState<ApiCatalogCategory[]>([]);
+
+  useEffect(() => {
+    void fetchCatalogCategories().then((data) => {
+      setCatalogCategories(data.length > 0 ? data : FALLBACK_CATALOG_CATEGORIES);
+    });
+  }, []);
+
+  const catalogColumnSplit = useMemo(() => {
+    const midpoint = Math.ceil(catalogCategories.length / 2);
+    return {
+      first: catalogCategories.slice(0, midpoint),
+      second: catalogCategories.slice(midpoint),
+    };
+  }, [catalogCategories]);
 
   const closeModal = useCallback(() => {
     if (isModalClosing) return;
@@ -167,6 +189,7 @@ const Footer = () => {
                 className={`${styles.catalogColumns} ${
                   isCatalogOpen ? styles.catalogColumnsOpen : ""
                 }`}
+                data-testid="footer-catalog"
               >
                 <ul
                   className={`${styles.columnList} ${
@@ -180,61 +203,32 @@ const Footer = () => {
                   >
                     New in
                   </Link>
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=t-shirts"
-                    prefetch={shouldPrefetch}
-                  >
-                    T-shirt
-                  </Link>
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=hoodies"
-                    prefetch={shouldPrefetch}
-                  >
-                    Hoodies
-                  </Link>
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=zip%20hoodies"
-                    prefetch={shouldPrefetch}
-                  >
-                    Zip hoodies
-                  </Link>
+                  {catalogColumnSplit.first.map((category) => (
+                    <Link
+                      key={category.slug}
+                      className={styles.columnItem}
+                      href={buildCatalogCategoryHref(category.slug)}
+                      prefetch={shouldPrefetch}
+                    >
+                      {getCatalogCategoryLabel(category)}
+                    </Link>
+                  ))}
                 </ul>
                 <ul
                   className={`${styles.columnList} ${
                     isCatalogOpen ? styles.columnListOpen : ""
                   }`}
                 >
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=jeans"
-                    prefetch={shouldPrefetch}
-                  >
-                    Jeans
-                  </Link>
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=pants"
-                    prefetch={shouldPrefetch}
-                  >
-                    Pants
-                  </Link>
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=shorts"
-                    prefetch={shouldPrefetch}
-                  >
-                    Shorts
-                  </Link>
-                  <Link
-                    className={styles.columnItem}
-                    href="/catalog?category=jackets"
-                    prefetch={shouldPrefetch}
-                  >
-                    Jackets
-                  </Link>
+                  {catalogColumnSplit.second.map((category) => (
+                    <Link
+                      key={category.slug}
+                      className={styles.columnItem}
+                      href={buildCatalogCategoryHref(category.slug)}
+                      prefetch={shouldPrefetch}
+                    >
+                      {getCatalogCategoryLabel(category)}
+                    </Link>
+                  ))}
                 </ul>
               </div>
             </div>
