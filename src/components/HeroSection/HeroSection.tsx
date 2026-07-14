@@ -11,7 +11,7 @@ const HeroSection = () => {
   return (
     <section className={styles.hero}>
       <div className={styles.heroContent}>
-        <Link href="/catalog" className={styles.catalogButton}>
+        <Link href="/catalog" className={styles.catalogButton} prefetch={false}>
           catalog
         </Link>
       </div>
@@ -39,8 +39,7 @@ const HeroSection = () => {
           src="/images/heroMobile.png"
           alt="Hero Background Mobile"
           fill
-          priority
-          fetchPriority="high"
+          loading="lazy"
           className={styles.heroBackgroundImageMobile}
           sizes="100vw"
           quality={85}

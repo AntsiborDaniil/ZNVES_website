@@ -4,18 +4,6 @@ import ProductDisplaySection from "../components/ProductDisplaySection/ProductDi
 import Footer from "../components/Footer/Footer";
 import styles from "./page.module.css";
 
-export const metadata = {
-  links: [
-    { rel: "preload", href: "/images/hero-background.png", as: "image" },
-    {
-      rel: "preload",
-      href: "/images/heroMobile.png",
-      as: "image",
-      media: "(max-width: 768px)",
-    },
-  ],
-};
-
 export default function HomePage() {
     return (
         <div className={styles.app}>

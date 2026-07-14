@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, Suspense } from "react";
-import { usePathname } from "next/navigation";
 import BurgerMenu from "../BurgerMenu/BurgerMenu";
 import CartIcon from "../ui/CartIcon/CartIcon";
 import AccountIcon from "../ui/AccountIcon/AccountIcon";
@@ -17,9 +16,6 @@ type HeaderProps = {
 
 const Header = ({ variant = "transparent" }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const pathname = usePathname();
-  const shouldPrefetch =
-    pathname !== "/checkout" && pathname !== "/cart" && pathname !== "/account";
 
   const headerClassName = `${styles.header} ${
     variant === "green" ? styles.headerGreen : ""
@@ -39,7 +35,7 @@ const Header = ({ variant = "transparent" }: HeaderProps) => {
         href="/"
         className={styles.logoLink}
         aria-label="Go to homepage"
-        prefetch={shouldPrefetch}
+        prefetch={false}
       >
         <Image
           src="/images/logo.png"

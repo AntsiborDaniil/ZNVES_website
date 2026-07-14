@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { usePathname } from "next/navigation";
 import { useToast } from "../ui/ToastProvider/ToastProvider";
 import { subscribeToMailing } from "../../api/mailing/mailingApi";
 import {
@@ -16,9 +15,7 @@ import {
 import styles from "./Footer.module.css";
 
 const Footer = () => {
-  const pathname = usePathname();
   const { showToast } = useToast();
-  const shouldPrefetch = pathname !== "/account";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
@@ -141,7 +138,7 @@ const Footer = () => {
           <h2 className={styles.politics}>
             Нажимая на кнопку «Подписаться», вы даете согласие на обработку
             персональных данных в соответствии с{" "}
-            <Link href="/privacy" className={styles.politicsLink} prefetch={shouldPrefetch}>
+            <Link href="/privacy" className={styles.politicsLink} prefetch={false}>
               Политикой конфиденциальности
             </Link>
           </h2>
@@ -165,10 +162,10 @@ const Footer = () => {
                   isMenuOpen ? styles.columnListOpen : ""
                 }`}
               >
-                  <Link className={styles.columnItem} href="/account" prefetch={shouldPrefetch}>
+                  <Link className={styles.columnItem} href="/account" prefetch={false}>
                     Личный кабинет
                   </Link>
-                  <Link className={styles.columnItem} href="/cart" prefetch={shouldPrefetch}>
+                  <Link className={styles.columnItem} href="/cart" prefetch={false}>
                     Корзина
                   </Link>
               </ul>
@@ -199,7 +196,7 @@ const Footer = () => {
                   <Link
                     className={styles.columnItem}
                     href="/new-in"
-                    prefetch={shouldPrefetch}
+                    prefetch={false}
                   >
                     New in
                   </Link>
@@ -208,7 +205,7 @@ const Footer = () => {
                       key={category.slug}
                       className={styles.columnItem}
                       href={buildCatalogCategoryHref(category.slug)}
-                      prefetch={shouldPrefetch}
+                      prefetch={false}
                     >
                       {getCatalogCategoryLabel(category)}
                     </Link>
@@ -224,7 +221,7 @@ const Footer = () => {
                       key={category.slug}
                       className={styles.columnItem}
                       href={buildCatalogCategoryHref(category.slug)}
-                      prefetch={shouldPrefetch}
+                      prefetch={false}
                     >
                       {getCatalogCategoryLabel(category)}
                     </Link>
@@ -269,16 +266,16 @@ const Footer = () => {
             </div>
           </div>
           <div className={styles.links}>
-            <Link className={styles.link} href="/delivery-payment" prefetch={shouldPrefetch}>
+            <Link className={styles.link} href="/delivery-payment" prefetch={false}>
               Доставка и оплата
             </Link>
-            <Link className={styles.link} href="/returns" prefetch={shouldPrefetch}>
+            <Link className={styles.link} href="/returns" prefetch={false}>
               Обмен и возврат
             </Link>
-            <Link className={styles.link} href="/public-offer" prefetch={shouldPrefetch}>
+            <Link className={styles.link} href="/public-offer" prefetch={false}>
               Публичная оферта
             </Link>
-            <Link className={styles.link} href="/privacy" prefetch={shouldPrefetch}>
+            <Link className={styles.link} href="/privacy" prefetch={false}>
               Политика конфиденциальности
             </Link>
           </div>

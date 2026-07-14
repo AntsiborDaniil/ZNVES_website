@@ -2,22 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useCart } from "../../../contexts/CartContext";
 import styles from "./CartIcon.module.css";
 
 const CartIcon = () => {
-  const pathname = usePathname();
   const { getTotalItems } = useCart();
   const totalItems = getTotalItems();
-  const shouldPrefetch = pathname !== "/checkout" && pathname !== "/cart";
 
   return (
     <Link
       href="/cart"
       className={styles.cartIcon}
       aria-label="Корзина"
-      prefetch={shouldPrefetch}
+      prefetch={false}
     >
       <div className={styles.cartIconWrapper}>
         <Image

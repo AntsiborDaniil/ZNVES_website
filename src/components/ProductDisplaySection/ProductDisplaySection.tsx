@@ -11,7 +11,6 @@ import {
 } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import ProductCard from "../ProductCard/ProductCard";
 import SliderSkeleton from "./SliderSkeleton";
 import styles from "./ProductDisplaySection.module.css";
@@ -50,9 +49,6 @@ const ProductDisplaySection = ({
   const [isMobile, setIsMobile] = useState(false);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
-  const hasPrefetchedProductsRef = useRef(false);
-  const hasPrefetchedShopNowRef = useRef(false);
   const { width } = useWindowSize();
 
   useEffect(() => {
@@ -177,32 +173,6 @@ const ProductDisplaySection = ({
     };
   }, [slidesForSwiper.length]);
 
-  useEffect(() => {
-    if (hasPrefetchedProductsRef.current) {
-      return;
-    }
-
-    const prefetchCount = Math.min(products.length, 3);
-    const routesToPrefetch = products
-      .slice(0, prefetchCount)
-      .map((product) => `/catalog/${product.slug || product.id}`);
-
-    routesToPrefetch.forEach((route) => {
-      void router.prefetch(route);
-    });
-
-    hasPrefetchedProductsRef.current = true;
-  }, [products, router]);
-
-  useEffect(() => {
-    if (hasPrefetchedShopNowRef.current || !showShopNow) {
-      return;
-    }
-
-    void router.prefetch(shopNowHref);
-    hasPrefetchedShopNowRef.current = true;
-  }, [router, shopNowHref, showShopNow]);
-
   return (
     <section
       id={id}
@@ -212,7 +182,7 @@ const ProductDisplaySection = ({
         <h1 className={styles.title}>{title}</h1>
         <div className={styles.headerRight}>
           {showShopNow && (
-            <Link href={shopNowHref} className={styles.shopNow}>
+            <Link href={shopNowHref} className={styles.shopNow} prefetch={false}>
               SHOP NOW
               <Image
                 src="/images/catalogs/shopArrow.png"
@@ -342,6 +312,7 @@ const ProductDisplaySection = ({
                     href={`/catalog/${product.slug || product.id}`}
                     className={styles.slideLink}
                     aria-label={`Перейти к товару ${product.title}`}
+                    prefetch={false}
                   >
                     <ProductCard
                       title={product.title}
