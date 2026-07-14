@@ -33,6 +33,20 @@ type ProductPageViewProps = {
   warehouseItems?: ApiWarehouseItem[];
 };
 
+const findWarehouseItem = (
+  warehouseItems: ApiWarehouseItem[],
+  colorSlug: string,
+  sizeSlug: string
+): ApiWarehouseItem | null => {
+  const item = warehouseItems.find((wi) => {
+    const wiColor = (wi.color ?? wi.color_slug ?? "").toLowerCase().trim();
+    const wiSize = (wi.size ?? wi.size_slug ?? "").toLowerCase().trim();
+    return wiColor === colorSlug && wiSize === sizeSlug;
+  });
+  if (!item || (item.quantity ?? 0) <= 0) return null;
+  return item;
+};
+
 const ProductPageView = ({
   product,
   warehouseItems = [],
@@ -101,17 +115,26 @@ const ProductPageView = ({
       const key = (opt.value ?? "").toLowerCase().trim();
       return colorToSizesFromWarehouse.has(key) && (colorToSizesFromWarehouse.get(key)?.size ?? 0) > 0;
     });
-    return withStock.length > 0 ? withStock : product.availableColors;
-  }, [product.availableColors, colorToSizesFromWarehouse]);
+    if (withStock.length > 0) return withStock;
+    if (warehouseItems.length > 0) return [];
+    return product.availableColors;
+  }, [product.availableColors, colorToSizesFromWarehouse, warehouseItems.length]);
 
   // Размеры, доступные для выбранного цвета (по warehouse)
   const availableSizesForSelectedColor = useMemo(() => {
     const key = (selectedColor ?? "").toLowerCase().trim();
     const set = colorToSizesFromWarehouse.get(key);
-    if (!set || set.size === 0) return product.availableSizes;
+    if (!set || set.size === 0) {
+      return warehouseItems.length > 0 ? [] : product.availableSizes;
+    }
     const list = Array.from(set);
     return product.availableSizes.filter((s) => list.includes((s ?? "").toLowerCase().trim()));
-  }, [selectedColor, colorToSizesFromWarehouse, product.availableSizes]);
+  }, [
+    selectedColor,
+    colorToSizesFromWarehouse,
+    product.availableSizes,
+    warehouseItems.length,
+  ]);
 
   useEffect(() => {
     fetchCatalogColors().then((colors) => {
@@ -232,6 +255,60 @@ const ProductPageView = ({
       } as CSSProperties),
     [selectedColorOption]
   );
+
+  const selectedWarehouseItem = useMemo(
+    () =>
+      findWarehouseItem(
+        warehouseItems,
+        (selectedColor ?? "").toLowerCase().trim(),
+        (selectedSize ?? "").toLowerCase().trim()
+      ),
+    [warehouseItems, selectedColor, selectedSize]
+  );
+
+  const hasWarehouseData = warehouseItems.length > 0;
+  const isFullyOutOfStock =
+    hasWarehouseData && colorToSizesFromWarehouse.size === 0;
+  const canAddToCart = !!selectedWarehouseItem;
+
+  const addButtonLabel = !hasWarehouseData
+    ? "Нет данных о наличии"
+    : isFullyOutOfStock || !canAddToCart
+      ? "Нет в наличии"
+      : "Добавить в корзину";
+
+  const handleAddToCart = useCallback(() => {
+    if (!selectedWarehouseItem) {
+      showToast(
+        !hasWarehouseData
+          ? "Товар недоступен для заказа"
+          : "Выбранный размер или цвет отсутствует на складе"
+      );
+      return;
+    }
+
+    addItem(
+      toCatalogProduct(product),
+      selectedSize,
+      selectedColor,
+      1,
+      selectedWarehouseItem.id,
+      colorSlugToLabel[selectedColor] ??
+        selectedColorOption.label ??
+        selectedColor
+    );
+    showToast("Добавлено в корзину");
+  }, [
+    addItem,
+    colorSlugToLabel,
+    hasWarehouseData,
+    product,
+    selectedColor,
+    selectedColorOption.label,
+    selectedSize,
+    selectedWarehouseItem,
+    showToast,
+  ]);
 
   return (
     <div className={styles.page}>
@@ -472,35 +549,19 @@ const ProductPageView = ({
               <div className={styles.countAndBuy}>
                 <button
                   type="button"
-                  className={styles.addToCartButton}
-                  onClick={() => {
-                    const catalogProduct = toCatalogProduct(product);
-                    const colorSlug = (selectedColor || "").toLowerCase();
-                    const sizeSlug = (selectedSize || "").toLowerCase();
-                    const warehouseItem = warehouseItems.find((wi) => {
-                      const wiColor = (wi.color ?? wi.color_slug ?? "").toLowerCase();
-                      const wiSize = (wi.size ?? wi.size_slug ?? "").toLowerCase();
-                      return wiColor === colorSlug && wiSize === sizeSlug;
-                    });
-                    const warehouseProductId = warehouseItem?.id;
-                    if (!warehouseProductId) {
-                    } else {
-                    }
-                    addItem(
-                      catalogProduct,
-                      selectedSize,
-                      selectedColor,
-                      1,
-                      warehouseProductId,
-                      colorSlugToLabel[selectedColor] ??
-                        selectedColorOption.label ??
-                        selectedColor
-                    );
-                    showToast("Добавлено в корзину");
-                  }}
+                  className={`${styles.addToCartButton} ${
+                    !canAddToCart ? styles.addToCartButtonDisabled : ""
+                  }`}
+                  disabled={!canAddToCart}
+                  aria-disabled={!canAddToCart}
+                  onClick={handleAddToCart}
                 >
-                  Добавить в корзину
+                  {addButtonLabel}
                 </button>
+                {selectedWarehouseItem &&
+                  selectedWarehouseItem.quantity <= 3 && (
+                    <p className={styles.stockHint}>Осталось мало</p>
+                  )}
               </div>
 
               {isSizeGuideOpen && sizeGuideSection && (

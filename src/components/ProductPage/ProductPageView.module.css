@@ -631,6 +631,27 @@
   border-color: #525252;
 }
 
+.addToCartButtonDisabled,
+.addToCartButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.addToCartButtonDisabled:hover,
+.addToCartButton:disabled:hover {
+  background-color: #525252;
+  color: #f2f0ec;
+  border-color: #525252;
+}
+
+.stockHint {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #525252;
+  text-align: center;
+}
+
 .accordion {
   display: flex;
   flex-direction: column;
