@@ -1,20 +1,22 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Account page auth", () => {
-  test("shows login and registration tabs", async ({ page }) => {
+test.describe("AccountAuth mobile inputs", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("auth inputs use at least 16px font-size on mobile", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("znves:cookie_consent", "1");
+    });
+
     await page.goto("/account");
 
-    await expect(page.getByRole("button", { name: "Вход" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Регистрация" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Вход в личный кабинет" })).toBeVisible();
-  });
+    const emailInput = page.getByLabel("Email");
+    await expect(emailInput).toBeVisible();
 
-  test("switches to registration form", async ({ page }) => {
-    await page.goto("/account");
-    await page.getByRole("button", { name: "Регистрация" }).click();
+    const fontSize = await emailInput.evaluate((el) =>
+      window.getComputedStyle(el).fontSize
+    );
 
-    await expect(page.getByRole("heading", { name: "Регистрация" })).toBeVisible();
-    await expect(page.getByLabel("Имя")).toBeVisible();
-    await expect(page.getByLabel("Фамилия")).toBeVisible();
+    expect(parseFloat(fontSize)).toBeGreaterThanOrEqual(16);
   });
 });

@@ -314,6 +314,10 @@
     font-size: 20px;
   }
 
+  .input {
+    font-size: 16px;
+  }
+
   .row {
     grid-template-columns: 1fr;
   }

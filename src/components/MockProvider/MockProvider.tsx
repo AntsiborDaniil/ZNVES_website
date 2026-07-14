@@ -10,7 +10,10 @@ type MockProviderProps = {
 export default function MockProvider({ children }: MockProviderProps) {
   useEffect(() => {
     if (!shouldUseMocks()) {
-      void import("../../mocks/browser").then(({ stopMockWorker }) => stopMockWorker());
+      void import("../../mocks/browser").then(({ stopMockWorker, unregisterMockServiceWorker }) => {
+        void stopMockWorker();
+        void unregisterMockServiceWorker();
+      });
       return;
     }
 
