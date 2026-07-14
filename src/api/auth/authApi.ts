@@ -1,7 +1,13 @@
 import { API_BASE_URL } from "../../lib/apiConfig";
-import { parseAuthApiErrorResponse } from "./authApiErrors";
+import { AuthApiError, parseAuthApiErrorResponse } from "./authApiErrors";
 
 export { AuthApiError, humanizeAuthErrorMessage, parseAuthApiErrorBody } from "./authApiErrors";
+
+export const AUTH_VERIFY_SESSION_ERROR_MESSAGE =
+  "Вход выполнен, но сессия не сохранилась. Попробуйте ещё раз или обновите страницу.";
+
+const VERIFY_USER_RETRY_ATTEMPTS = 3;
+const VERIFY_USER_RETRY_DELAY_MS = 150;
 
 export interface AuthUserDeliveryData {
   cdek_full_pvz_address?: string | null;
@@ -118,12 +124,12 @@ const authPostVerify = async (url: string, payload: object): Promise<AuthUser> =
   }
 
   // Бэкенд может вернуть только { detail: "Вход выполнен." } — cookie уже установлена
-  const userFromProfile = await getCurrentUser();
+  const userFromProfile = await getCurrentUserWithRetry();
   if (userFromProfile) {
     return userFromProfile;
   }
 
-  throw new Error("Не удалось получить данные пользователя после подтверждения");
+  throw new AuthApiError(AUTH_VERIFY_SESSION_ERROR_MESSAGE);
 };
 
 export const registerUser = async (payload: RegisterPayload): Promise<void> => {
@@ -162,6 +168,25 @@ export const getCurrentUser = async (): Promise<AuthUser | null> => {
   } catch {
     return null;
   }
+};
+
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+export const getCurrentUserWithRetry = async (
+  attempts = VERIFY_USER_RETRY_ATTEMPTS,
+  delayMs = VERIFY_USER_RETRY_DELAY_MS
+): Promise<AuthUser | null> => {
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    const user = await getCurrentUser();
+    if (user) return user;
+    if (attempt < attempts - 1) {
+      await sleep(delayMs * (attempt + 1));
+    }
+  }
+  return null;
 };
 
 export type UpdateUserPayload = {
