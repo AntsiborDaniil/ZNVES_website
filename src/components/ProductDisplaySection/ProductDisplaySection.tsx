@@ -348,10 +348,7 @@ const ProductDisplaySection = ({
                       price={product.price}
                       images={product.images}
                       isNew={product.isNew}
-                      productId={product.id}
-                      showAddToCart={false}
                       isSliderCard={true}
-                      colorLabel={product.colors?.[0]?.value ?? product.color}
                     />
                   </Link>
                 </SwiperSlide>

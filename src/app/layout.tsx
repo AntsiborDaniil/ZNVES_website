@@ -85,16 +85,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         className={`${roboto.variable} ${inter.variable} ${montserrat.variable} ${plusJakarta.variable}`}
       >
         <MockProvider>
-          <AuthProvider>
-            <CartProvider>
-              <ToastProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <CartProvider>
                 <NavigationTracker />
                 <PreloadCatalogFilters />
                 {children}
                 <CookieBanner />
-              </ToastProvider>
-            </CartProvider>
-          </AuthProvider>
+              </CartProvider>
+            </AuthProvider>
+          </ToastProvider>
         </MockProvider>
       </body>
     </html>

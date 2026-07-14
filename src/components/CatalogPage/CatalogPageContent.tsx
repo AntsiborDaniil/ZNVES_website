@@ -713,8 +713,6 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
                     price={product.price}
                     images={product.images}
                     isNew={product.isNew}
-                    productId={product.id}
-                    showAddToCart={false}
                     variant="grid"
                   />
                 </Link>

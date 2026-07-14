@@ -1,0 +1,119 @@
+.page {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(
+            180% 140% at 10% -20%,
+            rgba(249, 224, 157, 0.18) 0%,
+            rgba(249, 224, 157, 0) 60%
+        ),
+        linear-gradient(135deg, #05281d 0%, #0a5840 55%, #0d3b2b 100%);
+    color: #fff7df;
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 32px 80px;
+}
+
+.card {
+    width: min(100%, 720px);
+    padding: 48px;
+    border-radius: 32px;
+    border: 1px solid rgba(255, 247, 223, 0.2);
+    background: rgba(7, 55, 40, 0.68);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 247, 223, 0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    text-align: center;
+}
+
+.code {
+    font-family: var(--font-inter), sans-serif;
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -2px;
+    color: rgba(249, 224, 157, 0.9);
+}
+
+.title {
+    font-family: var(--font-montserrat), sans-serif;
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 600;
+    margin: 0;
+}
+
+.description {
+    font-family: var(--font-inter), sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(255, 247, 223, 0.82);
+    margin: 0;
+    max-width: 480px;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.primaryButton,
+.secondaryButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 28px;
+    border-radius: 999px;
+    font-family: var(--font-inter), sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.primaryButton {
+    background: #f9e09d;
+    color: #0a5840;
+}
+
+.primaryButton:hover {
+    transform: translateY(-1px);
+    background: #fff7df;
+}
+
+.secondaryButton {
+    border: 1px solid rgba(255, 247, 223, 0.35);
+    color: #fff7df;
+}
+
+.secondaryButton:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 247, 223, 0.08);
+}
+
+@media (max-width: 600px) {
+    .main {
+        padding: 100px 20px 60px;
+    }
+
+    .card {
+        padding: 32px 24px;
+    }
+
+    .code {
+        font-size: 56px;
+    }
+}

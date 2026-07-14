@@ -1,11 +1,45 @@
+import type { Metadata } from "next";
 import ProductPageClient from "./ProductPageClient";
 import { API_BASE_URL } from "../../../lib/apiConfig";
+import { fetchProductBySlug } from "../../../api/product/productApi";
 
 type ProductPageProps = {
   params: Promise<{
     slug: string;
   }>;
 };
+
+export async function generateMetadata({
+  params,
+}: ProductPageProps): Promise<Metadata> {
+  const { slug } = await params;
+
+  try {
+    const product = await fetchProductBySlug(slug);
+    if (!product) {
+      return { title: "Товар не найден" };
+    }
+
+    const descriptionSection = product.sections.find(
+      (section) => section.id === "description"
+    );
+    const rawDescription = descriptionSection?.content ?? product.title;
+    const description = rawDescription.replace(/\s+/g, " ").trim().slice(0, 160);
+    const image = product.images[0];
+
+    return {
+      title: product.title,
+      description,
+      openGraph: {
+        title: product.title,
+        description,
+        ...(image ? { images: [{ url: image, alt: product.title }] } : {}),
+      },
+    };
+  } catch {
+    return { title: "Товар" };
+  }
+}
 
 // Для статического экспорта требуется generateStaticParams
 // Пытаемся получить список товаров для генерации страниц

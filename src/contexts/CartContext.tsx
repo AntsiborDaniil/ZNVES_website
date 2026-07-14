@@ -6,14 +6,18 @@ import {
   useState,
   useCallback,
   useEffect,
+  useRef,
   type ReactNode,
 } from "react";
 import type { CartItem, CartContextType, AppliedPromo } from "../types/cart";
 import type { CatalogProduct } from "../types/products";
+import { useToast } from "../components/ui/ToastProvider/ToastProvider";
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_STORAGE_KEY = "znves:cart";
+const PROMO_RESET_TOAST =
+  "Промокод сброшен — изменился состав корзины";
 
 const getCartFromStorage = (): CartItem[] => {
   if (typeof window === "undefined") {
@@ -39,10 +43,11 @@ const saveCartToStorage = (items: CartItem[]) => {
 };
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  // Инициализируем с пустым массивом для SSR совместимости
+  const { showToast } = useToast();
   const [items, setItems] = useState<CartItem[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null);
+  const skipPromoResetRef = useRef(true);
 
   // Загружаем данные из localStorage только после монтирования на клиенте
   useEffect(() => {
@@ -58,10 +63,22 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [items, isHydrated]);
 
-  // Сбрасываем применённый промокод при изменении состава корзины
+  // Сбрасываем промокод при изменении состава корзины и уведомляем пользователя
   useEffect(() => {
-    setAppliedPromo(null);
-  }, [items]);
+    if (!isHydrated) return;
+
+    if (skipPromoResetRef.current) {
+      skipPromoResetRef.current = false;
+      return;
+    }
+
+    setAppliedPromo((currentPromo) => {
+      if (currentPromo) {
+        showToast(PROMO_RESET_TOAST);
+      }
+      return null;
+    });
+  }, [items, isHydrated, showToast]);
 
   const addItem = useCallback(
     async (
