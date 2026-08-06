@@ -58,7 +58,7 @@ describe("authValidation", () => {
   });
 
   it("validates verification code", () => {
-    expect(validateCode("123")).toBe("Код должен содержать от 4 до 8 цифр");
+    expect(validateCode("123")).toBe("Введите 6-значный код из письма");
     expect(validateCode("123456")).toBe(true);
   });
 

@@ -60,7 +60,8 @@ export const formatResendCooldown = (seconds: number): string => {
 export const validatePhone = (phone: string): string | true => {
   const digits = phone.replace(/\D/g, "");
   if (!digits) return "Введите номер телефона";
-  if (digits.length < 10 || digits.length > 15) {
+  // Код страны (1–3) + национальный номер СНГ (обычно 8–10)
+  if (digits.length < 11 || digits.length > 15) {
     return "Введите корректный номер телефона";
   }
   return true;
@@ -76,6 +77,6 @@ export const validateRequiredName = (value: string, label: string): string | tru
 export const validateCode = (code: string): string | true => {
   const trimmed = code.trim();
   if (!trimmed) return "Введите код из письма";
-  if (!/^\d{4,8}$/.test(trimmed)) return "Код должен содержать от 4 до 8 цифр";
+  if (!/^\d{6}$/.test(trimmed)) return "Введите 6-значный код из письма";
   return true;
 };

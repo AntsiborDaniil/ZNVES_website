@@ -1,0 +1,138 @@
+.wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: 48px;
+  border-radius: 3px;
+  border: 1px solid #bcb4a5;
+  background: #ffffff;
+  transition: border-color 0.2s ease;
+}
+
+.wrap:focus-within {
+  border-color: #0a5840;
+}
+
+.wrapError {
+  border-color: #c93c3c;
+}
+
+.countryBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 0 10px 0 12px;
+  border: none;
+  border-right: 1px solid #e0d9cc;
+  background: #f7f5f1;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  color: #2d2d2d;
+  border-radius: 2px 0 0 2px;
+  transition: background-color 0.15s ease;
+}
+
+.countryBtn:hover {
+  background: #efece6;
+}
+
+.flag {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.dialCode {
+  font-size: 14px;
+  font-weight: 500;
+  color: #525252;
+  white-space: nowrap;
+}
+
+.chevron {
+  display: block;
+  flex-shrink: 0;
+  color: #7a7a79;
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  background: transparent;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 15px;
+  color: #2d2d2d;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.input::placeholder {
+  color: #7a7a79;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  width: min(100%, 280px);
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid #bcb4a5;
+  border-radius: 3px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(45, 45, 45, 0.1);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 2px;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  color: #2d2d2d;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.option:hover,
+.optionActive {
+  background: #f0ebe3;
+}
+
+.optionName {
+  flex: 1;
+  min-width: 0;
+}
+
+.optionDial {
+  color: #7a7a79;
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .input {
+    font-size: 16px;
+  }
+}

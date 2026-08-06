@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -12,6 +12,8 @@ import {
   verifyRegistration,
   type AuthUser,
 } from "../../api/auth/authApi";
+import OtpInput from "../OtpInput/OtpInput";
+import PhoneInput from "../PhoneInput/PhoneInput";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   AUTH_RESEND_COOLDOWN_SECONDS,
@@ -402,21 +404,24 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
 
         <form className={styles.form} onSubmit={handleVerifySubmit} noValidate>
           <div className={styles.field}>
-            <label htmlFor="verify-code" className={styles.label}>
+            <span className={styles.label} id="verify-code-label">
               Код подтверждения
-            </label>
-            <input
-              id="verify-code"
-              type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder="Введите код"
-              className={`${styles.input} ${
-                verifyForm.formState.errors.code ? styles.inputError : ""
-              }`}
-              {...verifyForm.register("code", {
-                validate: validateCode,
-              })}
+            </span>
+            <Controller
+              name="code"
+              control={verifyForm.control}
+              rules={{ validate: validateCode }}
+              render={({ field }) => (
+                <OtpInput
+                  id="verify-code"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  error={!!verifyForm.formState.errors.code}
+                  disabled={verifyForm.formState.isSubmitting}
+                  aria-label="Код подтверждения из письма"
+                />
+              )}
             />
             {verifyForm.formState.errors.code && (
               <span className={styles.fieldError}>
@@ -653,17 +658,20 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
               <label htmlFor="register-phone" className={styles.label}>
                 Телефон
               </label>
-              <input
-                id="register-phone"
-                type="tel"
-                autoComplete="tel"
-                placeholder="+7 (999) 123-45-67"
-                className={`${styles.input} ${
-                  registerForm.formState.errors.phone_number ? styles.inputError : ""
-                }`}
-                {...registerForm.register("phone_number", {
-                  validate: validatePhone,
-                })}
+              <Controller
+                name="phone_number"
+                control={registerForm.control}
+                rules={{ validate: validatePhone }}
+                render={({ field }) => (
+                  <PhoneInput
+                    id="register-phone"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={!!registerForm.formState.errors.phone_number}
+                    disabled={registerForm.formState.isSubmitting}
+                  />
+                )}
               />
               {registerForm.formState.errors.phone_number && (
                 <span className={styles.fieldError}>
