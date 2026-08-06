@@ -8,13 +8,28 @@ test.describe("Cookie banner", () => {
 
     await page.goto("/");
 
-    const banner = page.getByRole("region", { name: "Уведомление об использовании cookie" });
+    const banner = page.getByRole("dialog", { name: "Мы используем cookie" });
     await expect(banner).toBeVisible();
 
-    await page.getByRole("button", { name: "Понятно" }).click();
+    await page.getByRole("button", { name: "Принять" }).click();
     await expect(banner).toBeHidden();
 
     const consent = await page.evaluate(() => localStorage.getItem("znves:cookie_consent"));
     expect(consent).toBe("1");
+  });
+
+  test("stays visible after navigating to another page", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.removeItem("znves:cookie_consent");
+    });
+
+    await page.goto("/");
+
+    const banner = page.getByRole("dialog", { name: "Мы используем cookie" });
+    await expect(banner).toBeVisible();
+
+    await page.locator('a[href="/catalog"]').first().click();
+    await expect(page).toHaveURL(/\/catalog/);
+    await expect(banner).toBeVisible();
   });
 });

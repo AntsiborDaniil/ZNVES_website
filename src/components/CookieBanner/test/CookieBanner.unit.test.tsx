@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import CookieBanner from "../CookieBanner";
@@ -13,6 +13,12 @@ vi.mock("next/link", () => ({
   }) => <a href={href}>{children}</a>,
 }));
 
+const mockPathname = vi.fn(() => "/");
+
+vi.mock("next/navigation", () => ({
+  usePathname: () => mockPathname(),
+}));
+
 const STORAGE_KEY = "znves:cookie_consent";
 
 describe("CookieBanner", () => {
@@ -22,6 +28,7 @@ describe("CookieBanner", () => {
 
   beforeEach(() => {
     localStorage.clear();
+    mockPathname.mockReturnValue("/");
   });
 
   it("shows banner when consent is missing", async () => {
@@ -29,7 +36,7 @@ describe("CookieBanner", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole("region", { name: "Уведомление об использовании cookie" })
+        screen.getByRole("dialog", { name: "Мы используем cookie" })
       ).toBeInTheDocument();
     });
   });
@@ -39,14 +46,14 @@ describe("CookieBanner", () => {
     render(<CookieBanner />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Понятно" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Принять" })).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole("button", { name: "Понятно" }));
+    await user.click(screen.getByRole("button", { name: "Принять" }));
 
     expect(localStorage.getItem(STORAGE_KEY)).toBe("1");
     expect(
-      screen.queryByRole("region", { name: "Уведомление об использовании cookie" })
+      screen.queryByRole("dialog", { name: "Мы используем cookie" })
     ).not.toBeInTheDocument();
   });
 
@@ -56,33 +63,27 @@ describe("CookieBanner", () => {
 
     await waitFor(() => {
       expect(
-        screen.queryByRole("region", { name: "Уведомление об использовании cookie" })
+        screen.queryByRole("dialog", { name: "Мы используем cookie" })
       ).not.toBeInTheDocument();
     });
   });
 
-  it("auto-dismisses after 5 seconds and stores consent", async () => {
-    vi.useFakeTimers();
+  it("keeps banner visible after route change when consent is missing", async () => {
+    const { rerender } = render(<CookieBanner />);
 
-    render(<CookieBanner />);
-
-    await act(async () => {
-      await Promise.resolve();
+    await waitFor(() => {
+      expect(
+        screen.getByRole("dialog", { name: "Мы используем cookie" })
+      ).toBeInTheDocument();
     });
 
-    expect(
-      screen.getByRole("region", { name: "Уведомление об использовании cookie" })
-    ).toBeInTheDocument();
+    mockPathname.mockReturnValue("/catalog");
+    rerender(<CookieBanner />);
 
-    await act(async () => {
-      vi.advanceTimersByTime(5000);
+    await waitFor(() => {
+      expect(
+        screen.getByRole("dialog", { name: "Мы используем cookie" })
+      ).toBeInTheDocument();
     });
-
-    expect(
-      screen.queryByRole("region", { name: "Уведомление об использовании cookie" })
-    ).not.toBeInTheDocument();
-    expect(localStorage.getItem(STORAGE_KEY)).toBe("1");
-
-    vi.useRealTimers();
   });
 });
