@@ -5,14 +5,14 @@ import { getMockApiBase } from "../config";
 
 describe("resolveApiImageUrl", () => {
   it("keeps local public images relative", () => {
-    expect(resolveApiImageUrl("/images/catalogs/voyage.png", "https://test-znves.ru")).toBe(
+    expect(resolveApiImageUrl("/images/catalogs/voyage.png", "https://api.znves.ru")).toBe(
       "/images/catalogs/voyage.png"
     );
   });
 
   it("prepends API base for backend media paths", () => {
-    expect(resolveApiImageUrl("/media/product.jpg", "https://test-znves.ru")).toBe(
-      "https://test-znves.ru/media/product.jpg"
+    expect(resolveApiImageUrl("/media/product.jpg", "https://api.znves.ru")).toBe(
+      "https://api.znves.ru/media/product.jpg"
     );
   });
 });
@@ -43,6 +43,6 @@ describe("delivery mock handlers", () => {
   it("uses same fallback data as cdekApi helper", () => {
     const fallback = getFallbackPvzForCity("Москва");
     expect(fallback[0]?.code).toBeTruthy();
-    expect(getMockApiBase()).toContain("test-znves.ru");
+    expect(getMockApiBase()).toContain("api.znves.ru");
   });
 });

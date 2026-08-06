@@ -17,7 +17,7 @@
 | `CDEK_SECURE_PASSWORD` | Пароль (client_secret) СДЭК API | Да |
 | `YA_DELIVERY_SOURCE_ADDRESS` | Адрес ПВЗ «откуда везём», напр. «Москва, Промышленная улица, 12А, 115516» | Нет |
 | `NEXT_PUBLIC_SITE_URL` | URL сайта, напр. `https://znves.ru` | Нет |
-| `NEXT_PUBLIC_API_BASE_URL` | URL бэкенда, напр. `https://test-znves.ru` | Нет |
+| `NEXT_PUBLIC_API_BASE_URL` | URL бэкенда, напр. `https://api.znves.ru` | Нет |
 
 3. Сохраните и **пересоберите проект** (Redeploy).
 
