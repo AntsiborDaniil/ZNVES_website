@@ -43,6 +43,23 @@ const color = (slug: string): ApiCatalogColor =>
 const sizesFor = (...slugs: string[]): ApiCatalogSize[] =>
   MOCK_CATALOG_SIZES.filter((item) => slugs.includes(item.slug));
 
+/** Детерминированный UUID v4-like для warehouse_item (нужен фронту для заказа/промо). */
+export const mockWarehouseUuid = (key: string): string => {
+  let hash = 2166136261;
+  for (let i = 0; i < key.length; i += 1) {
+    hash ^= key.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  const hex = "0123456789abcdef";
+  const chars: string[] = [];
+  for (let i = 0; i < 32; i += 1) {
+    hash = Math.imul(hash ^ (hash >>> 13), 1274126177);
+    chars.push(hex[(hash >>> 0) % 16]!);
+  }
+  const s = chars.join("");
+  return `${s.slice(0, 8)}-${s.slice(8, 12)}-4${s.slice(13, 16)}-a${s.slice(17, 20)}-${s.slice(20, 32)}`;
+};
+
 const warehouseItems = (
   prefix: string,
   colorSlug: string,
@@ -50,7 +67,7 @@ const warehouseItems = (
   weight: number
 ): ApiWarehouseItem[] =>
   sizeSlugs.map((sizeSlug) => ({
-    id: `wh-${prefix}-${colorSlug}-${sizeSlug}`,
+    id: mockWarehouseUuid(`${prefix}-${colorSlug}-${sizeSlug}`),
     color_slug: colorSlug,
     size_slug: sizeSlug,
     quantity: 8,

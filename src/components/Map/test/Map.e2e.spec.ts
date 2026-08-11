@@ -1,30 +1,9 @@
 import { test, expect } from "@playwright/test";
-
-const cartItem = {
-  productId: 1,
-  size: "m",
-  color: "green",
-  quantity: 1,
-  product: {
-    id: 1,
-    title: "T-SHIRT VOYAGE",
-    price: "4990 ₽",
-    priceValue: 4990,
-    images: ["/images/catalogs/mock/tshirt-green.svg"],
-    isNew: true,
-    category: "t-shirt",
-    color: "green",
-    size: "M",
-    sortOrder: 1,
-  },
-};
+import { mockCartItem, preparePage } from "../../../test-utils/e2e/fixtures";
 
 test.describe("Checkout delivery widgets", () => {
   test.beforeEach(async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.addInitScript((item) => {
-      localStorage.setItem("znves:cart", JSON.stringify([item]));
-    }, cartItem);
+    await preparePage(page, { cartItems: [mockCartItem] });
   });
 
   test("shows CDEK PVZ list on checkout by default", async ({ page }) => {
@@ -40,7 +19,7 @@ test.describe("Checkout delivery widgets", () => {
   test("switches to Yandex PVZ widget", async ({ page }) => {
     await page.goto("/checkout");
 
-    await page.getByRole("radio", { name: /ЯНДЕКС/i }).check();
+    await page.getByText("ЯНДЕКС", { exact: true }).click();
 
     await expect(page.locator("#delivery-widget")).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText("Загрузка пунктов выдачи…")).toBeHidden({
@@ -57,5 +36,14 @@ test.describe("Checkout delivery widgets", () => {
     await search.fill("арбат");
     await expect(page.getByRole("button", { name: /Арбат/ })).toBeVisible();
     await expect(page.getByRole("button", { name: /Тверская/ })).toHaveCount(0);
+  });
+
+  test("selects PVZ point from list", async ({ page }) => {
+    await page.goto("/checkout");
+
+    const pvz = page.getByRole("button", { name: /Тверская/ });
+    await expect(pvz).toBeVisible({ timeout: 15_000 });
+    await pvz.click();
+    await expect(pvz).toBeVisible();
   });
 });

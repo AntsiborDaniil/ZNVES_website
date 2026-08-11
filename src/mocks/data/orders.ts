@@ -16,7 +16,7 @@ export const MOCK_INITIAL_ORDERS: ApiMyOrderItem[] = [
     },
     positions: [
       {
-        id: "wh-tshirt-green-m",
+        id: "a1b2c3d4-e5f6-4789-a012-3456789abc01",
         product_name: "T-SHIRT VOYAGE",
         color: "green",
         size: "m",

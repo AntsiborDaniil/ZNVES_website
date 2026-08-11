@@ -21,6 +21,8 @@ const pendingVerifications = new Map<string, PendingVerification>();
 const sessions = new Map<string, string>();
 
 let sessionCounter = 0;
+/** Последняя успешная сессия — fallback для browser MSW, где Set-Cookie с API-домена не ставится. */
+let lastSessionToken: string | null = null;
 
 const emailKey = (email: string): string => email.trim().toLowerCase();
 
@@ -59,6 +61,7 @@ export const resetAuthStore = (): void => {
   pendingVerifications.clear();
   sessions.clear();
   sessionCounter = 0;
+  lastSessionToken = null;
   seedDevUser();
 };
 
@@ -133,6 +136,7 @@ export const verifyCode = (
     pendingVerifications.delete(key);
     const token = `mock-session-${++sessionCounter}`;
     sessions.set(token, key);
+    lastSessionToken = token;
     return { ok: true, token, user };
   }
 
@@ -144,14 +148,26 @@ export const verifyCode = (
   pendingVerifications.delete(key);
   const token = `mock-session-${++sessionCounter}`;
   sessions.set(token, key);
+  lastSessionToken = token;
   return { ok: true, token, user: stored.user };
 };
 
 export const getUserByToken = (token: string | null): AuthUser | null => {
-  if (!token) return null;
-  const email = sessions.get(token);
-  if (!email) return null;
-  return users.get(email)?.user ?? null;
+  if (token) {
+    const email = sessions.get(token);
+    if (email) {
+      return users.get(email)?.user ?? null;
+    }
+  }
+
+  if (lastSessionToken && lastSessionToken !== token) {
+    const email = sessions.get(lastSessionToken);
+    if (email) {
+      return users.get(email)?.user ?? null;
+    }
+  }
+
+  return null;
 };
 
 export const updateUserByToken = (

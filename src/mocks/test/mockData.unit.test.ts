@@ -28,7 +28,7 @@ describe("orderStore", () => {
         email: "order@znves.ru",
         phone: "+79998887766",
       },
-      positions: [{ id: "wh-hoodie-green-m", quantity: 2 }],
+      positions: [{ id: "a1b2c3d4-e5f6-4789-a012-3456789abcde", quantity: 2 }],
       yandex_delivery_data: { full_address: "СПб, тест" },
     });
 

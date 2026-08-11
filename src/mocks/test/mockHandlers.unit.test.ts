@@ -109,7 +109,7 @@ describe("mock API handlers", () => {
         pvz_code: "MSK1",
         full_address: "Москва, тест",
       },
-      positions: [{ id: "wh-tshirt-green-m", quantity: 1 }],
+      positions: [{ id: "a1b2c3d4-e5f6-4789-a012-3456789abcde", quantity: 1 }],
     });
 
     expect(created.id).toBeTruthy();

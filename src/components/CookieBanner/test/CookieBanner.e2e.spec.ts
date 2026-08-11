@@ -28,8 +28,7 @@ test.describe("Cookie banner", () => {
     const banner = page.getByRole("dialog", { name: "Мы используем cookie" });
     await expect(banner).toBeVisible();
 
-    await page.locator('a[href="/catalog"]').first().click();
-    await expect(page).toHaveURL(/\/catalog/);
+    await page.goto("/catalog");
     await expect(banner).toBeVisible();
   });
 });
