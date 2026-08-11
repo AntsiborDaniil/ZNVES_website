@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logUpstreamError, logUpstreamHttpError } from "../../../lib/upstreamLog";
+import { parseYandexPointPos } from "../../../lib/yandexGeocode";
 
 const YANDEX_GEOCODER_URL = "https://geocode-maps.yandex.ru/v1/";
 const NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search";
@@ -32,7 +34,7 @@ export async function GET(request: NextRequest) {
       const body = await res.text();
 
       if (!res.ok) {
-        // Продолжим к Nominatim ниже
+        logUpstreamHttpError("geocode/yandex", res.status, body, { address });
       } else {
         const data = JSON.parse(body) as {
           response?: {
@@ -55,10 +57,9 @@ export async function GET(request: NextRequest) {
         const members = data?.response?.GeoObjectCollection?.featureMember ?? [];
         const first = members[0]?.GeoObject;
         if (first?.Point?.pos) {
-          const parts = first.Point.pos.trim().split(/\s+/);
-          const lat = parseFloat(parts[0]);
-          const lon = parseFloat(parts[1] ?? parts[0]);
-          if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
+          // Yandex Point.pos is "lon lat"
+          const coords = parseYandexPointPos(first.Point.pos);
+          if (coords) {
             const meta = first.metaDataProperty?.GeocoderMetaData;
             const fullAddress = meta?.text ?? "";
             const components = meta?.Address?.Components ?? [];
@@ -73,8 +74,8 @@ export async function GET(request: NextRequest) {
               if (k === "house") house = n || house;
             }
             return NextResponse.json({
-              lat,
-              lon,
+              lat: coords.lat,
+              lon: coords.lon,
               fullAddress: fullAddress || [city, street, house].filter(Boolean).join(", "),
               city,
               street,
@@ -84,6 +85,7 @@ export async function GET(request: NextRequest) {
         }
       }
     } catch (err) {
+      logUpstreamError("geocode/yandex", err, { address });
     }
   }
 
@@ -101,6 +103,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!res.ok) {
+      logUpstreamHttpError("geocode/nominatim", res.status, res.statusText, { address });
       return NextResponse.json(
         { error: "Geocoder request failed", details: res.statusText },
         { status: 502 }
@@ -147,6 +150,7 @@ export async function GET(request: NextRequest) {
       house,
     });
   } catch (err) {
+    logUpstreamError("geocode/nominatim", err, { address });
     return NextResponse.json({ error: "Geocoder error" }, { status: 502 });
   }
 }

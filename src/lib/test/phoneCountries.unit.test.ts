@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_CIS_COUNTRY,
+  applyNationalInput,
   buildFullPhone,
   formatNationalNumber,
   parseFullPhone,
@@ -16,6 +17,23 @@ describe("phoneCountries", () => {
     expect(formatNationalNumber("9991234567", DEFAULT_CIS_COUNTRY)).toBe(
       "(999) 123-45-67"
     );
+    expect(formatNationalNumber("312", DEFAULT_CIS_COUNTRY)).toBe("(312");
+    expect(formatNationalNumber("3121", DEFAULT_CIS_COUNTRY)).toBe("(312) 1");
+  });
+
+  it("deletes a digit when backspace hits a mask character", () => {
+    // Старая маска закрывала ")" на 3 цифрах — Backspace снимал ")" без смены digits
+    expect(
+      applyNationalInput("(312", "312", "(312)", DEFAULT_CIS_COUNTRY)
+    ).toBe("31");
+    // Пробел после кода: "(312) 1" → стёрли пробел → "(312)1"
+    expect(
+      applyNationalInput("(312)1", "3121", "(312) 1", DEFAULT_CIS_COUNTRY)
+    ).toBe("312");
+    // Обычное удаление цифры
+    expect(
+      applyNationalInput("(31", "312", "(312", DEFAULT_CIS_COUNTRY)
+    ).toBe("31");
   });
 
   it("builds full phone with dial code", () => {

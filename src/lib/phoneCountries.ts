@@ -36,14 +36,6 @@ export const CIS_COUNTRIES: CisCountry[] = [
     placeholder: "(701) 123-45-67",
   },
   {
-    iso: "UA",
-    name: "Украина",
-    dialCode: "380",
-    flag: "🇺🇦",
-    nationalLength: 9,
-    placeholder: "(67) 123-45-67",
-  },
-  {
     iso: "AM",
     name: "Армения",
     dialCode: "374",
@@ -113,6 +105,28 @@ export const DEFAULT_CIS_COUNTRY = CIS_COUNTRIES[0];
 
 export const digitsOnly = (value: string): string => value.replace(/\D/g, "");
 
+/**
+ * Извлекает национальные цифры из ввода с маской.
+ * Если пользователь стёр только служебный символ (")", "-", пробел),
+ * а набор цифр не изменился — удаляем последнюю цифру.
+ */
+export const applyNationalInput = (
+  raw: string,
+  previousNational: string,
+  previousDisplay: string,
+  country: CisCountry
+): string => {
+  let next = digitsOnly(raw).slice(0, country.nationalLength);
+  if (
+    previousNational.length > 0 &&
+    next.length === previousNational.length &&
+    raw.length < previousDisplay.length
+  ) {
+    next = previousNational.slice(0, -1);
+  }
+  return next;
+};
+
 /** Форматирование национальных цифр для отображения в инпуте. */
 export const formatNationalNumber = (digits: string, country: CisCountry): string => {
   const d = digitsOnly(digits).slice(0, country.nationalLength);
@@ -122,29 +136,35 @@ export const formatNationalNumber = (digits: string, country: CisCountry): strin
     const p2 = d.slice(3, 6);
     const p3 = d.slice(6, 8);
     const p4 = d.slice(8, 10);
-    if (d.length <= 3) return p1 ? `(${p1}` + (d.length === 3 ? ")" : "") : "";
+    // Закрывающую ")" ставим только когда есть цифры после кода —
+    // иначе Backspace по ")" «залипает» на одном и том же "(312)".
+    if (d.length === 0) return "";
+    if (d.length < 3) return `(${p1}`;
+    if (d.length === 3) return `(${p1}`;
     if (d.length <= 6) return `(${p1}) ${p2}`;
     if (d.length <= 8) return `(${p1}) ${p2}-${p3}`;
     return `(${p1}) ${p2}-${p3}-${p4}`;
   }
 
-  if (country.dialCode === "375" || country.dialCode === "380") {
+  if (country.dialCode === "375") {
     const p1 = d.slice(0, 2);
     const p2 = d.slice(2, 5);
     const p3 = d.slice(5, 7);
     const p4 = d.slice(7, 9);
-    if (d.length <= 2) return p1 ? `(${p1}` + (d.length === 2 ? ")" : "") : "";
+    if (d.length === 0) return "";
+    if (d.length <= 2) return `(${p1}`;
     if (d.length <= 5) return `(${p1}) ${p2}`;
     if (d.length <= 7) return `(${p1}) ${p2}-${p3}`;
     return `(${p1}) ${p2}-${p3}-${p4}`;
   }
 
   // Общий шаблон: (XX…) остаток с дефисами по 2–3
-  if (d.length <= 2) return d ? `(${d}` : "";
+  if (d.length === 0) return "";
+  if (d.length <= 2) return `(${d}`;
   const areaLen = Math.min(3, Math.max(2, Math.floor(country.nationalLength / 3)));
   const p1 = d.slice(0, areaLen);
   const rest = d.slice(areaLen);
-  if (!rest) return `(${p1}` + (d.length >= areaLen ? ")" : "");
+  if (!rest) return `(${p1}`;
   const chunks: string[] = [];
   for (let i = 0; i < rest.length; i += 3) {
     chunks.push(rest.slice(i, i + 3));

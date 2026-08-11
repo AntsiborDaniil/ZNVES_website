@@ -10,7 +10,8 @@ test.describe("Account page", () => {
     await loginAsDevUser(page);
 
     await expect(page.getByRole("heading", { name: "Личные данные" })).toBeVisible();
-    await expect(page.getByText(/Активные заказы|Нет активных заказов/)).toBeVisible();
+    // Секция всегда есть; пустое состояние даёт второй heading — не матчим оба одним getByText
+    await expect(page.getByRole("heading", { name: "Активные заказы" })).toBeVisible();
   });
 
   test("opens orders tab with seed order", async ({ page }) => {

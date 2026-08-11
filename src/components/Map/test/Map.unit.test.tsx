@@ -22,17 +22,12 @@ const mockPvzList: CdekPvzPoint[] = [
   },
 ];
 
-const getCdekPvzByCity = vi.fn();
+const getRegionPvzCdek = vi.fn();
 
-vi.mock("../../../api/delivery/cdekApi", async () => {
-  const actual = await vi.importActual<typeof import("../../../api/delivery/cdekApi")>(
-    "../../../api/delivery/cdekApi"
-  );
-  return {
-    ...actual,
-    getCdekPvzByCity: (...args: unknown[]) => getCdekPvzByCity(...args),
-  };
-});
+vi.mock("../../../api/delivery/pvzRegionCache", () => ({
+  getRegionPvzCdek: (...args: unknown[]) => getRegionPvzCdek(...args),
+  getRegionPvzYandex: vi.fn(),
+}));
 
 describe("Map", () => {
   const createWidget = vi.fn();
@@ -44,8 +39,8 @@ describe("Map", () => {
   });
 
   beforeEach(() => {
-    getCdekPvzByCity.mockReset();
-    getCdekPvzByCity.mockResolvedValue(mockPvzList);
+    getRegionPvzCdek.mockReset();
+    getRegionPvzCdek.mockResolvedValue(mockPvzList);
     createWidget.mockReset();
     window.YaDelivery = { createWidget };
     vi.spyOn(global, "fetch").mockResolvedValue({
@@ -62,7 +57,7 @@ describe("Map", () => {
     expect(screen.getByText("Выберите способ доставки.")).toBeInTheDocument();
   });
 
-  it("renders CDEK PVZ list and handles search and selection", async () => {
+  it("loads CDEK PVZ via region cache and handles search and selection", async () => {
     const user = userEvent.setup();
     const onAddressSelect = vi.fn();
 
@@ -79,7 +74,7 @@ describe("Map", () => {
       expect(screen.getByText(/СДЭК · Пункты выдачи · Москва/)).toBeInTheDocument();
     });
 
-    expect(getCdekPvzByCity).toHaveBeenCalledWith("Москва", expect.any(AbortSignal));
+    expect(getRegionPvzCdek).toHaveBeenCalledWith("Москва", expect.any(AbortSignal));
     expect(screen.getByRole("button", { name: /Тверская/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Арбат/ })).toBeInTheDocument();
 
@@ -124,6 +119,37 @@ describe("Map", () => {
         })
       );
     });
+  });
+
+  it("does not re-create Yandex widget when only weight changes", async () => {
+    const { rerender } = render(
+      <Map
+        city="Москва"
+        deliveryMethod="pickup"
+        deliveryType="yandex"
+        totalWeightGrams={500}
+      />
+    );
+
+    await waitFor(() => {
+      expect(createWidget).toHaveBeenCalledTimes(1);
+    });
+
+    rerender(
+      <Map
+        city="Москва"
+        deliveryMethod="pickup"
+        deliveryType="yandex"
+        totalWeightGrams={2500}
+      />
+    );
+
+    await waitFor(() => {
+      expect(document.getElementById(YANDEX_PVZ_CONTAINER_ID)).toBeInTheDocument();
+    });
+
+    // cleanup+recreate would bump createWidget; weight-only update must not
+    expect(createWidget).toHaveBeenCalledTimes(1);
   });
 
   it("forwards Yandex widget point selection event", async () => {

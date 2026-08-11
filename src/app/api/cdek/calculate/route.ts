@@ -7,44 +7,13 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-
-const CDEK_API = "https://api.cdek.ru/v2";
+import { CDEK_API, getCachedCdekToken, getCdekCredentials } from "../../../../lib/cdekAuth";
+import { logUpstreamError, logUpstreamHttpError } from "../../../../lib/upstreamLog";
 
 function withTimeout(ms: number): { signal: AbortSignal; clear: () => void } {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), ms);
   return { signal: controller.signal, clear: () => clearTimeout(id) };
-}
-
-function getCdekCredentials(): { clientId: string; clientSecret: string } | null {
-  const clientId = process.env.CDEK_ACCOUNT ?? process.env.CDEK_CLIENT_ID;
-  const clientSecret = process.env.CDEK_SECURE_PASSWORD ?? process.env.CDEK_CLIENT_SECRET;
-  if (!clientId?.trim() || !clientSecret?.trim()) return null;
-  return { clientId: clientId.trim(), clientSecret: clientSecret.trim() };
-}
-
-async function getCdekToken(): Promise<string> {
-  const creds = getCdekCredentials();
-  if (!creds) throw new Error("CDEK_ACCOUNT and CDEK_SECURE_PASSWORD must be set");
-  const { clientId, clientSecret } = creds;
-  const body = new URLSearchParams({
-    grant_type: "client_credentials",
-    client_id: clientId,
-    client_secret: clientSecret,
-  });
-  const { signal: tokenSignal, clear: tokenClear } = withTimeout(8000);
-  const res = await fetch(`${CDEK_API}/oauth/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString(),
-    signal: tokenSignal,
-    next: { revalidate: 0 },
-  });
-  tokenClear();
-  if (!res.ok) throw new Error(`CDEK token: ${res.status}`);
-  const data = (await res.json()) as { access_token?: string };
-  if (!data.access_token) throw new Error("CDEK token missing");
-  return data.access_token;
 }
 
 type CityItem = { code?: number };
@@ -63,17 +32,27 @@ async function getCityCode(token: string, cityName: string): Promise<number | nu
   url.searchParams.set("country_codes", "RU");
   url.searchParams.set("size", "5");
   const { signal: citySignal, clear: cityClear } = withTimeout(8000);
-  const res = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${token}` },
-    signal: citySignal,
-    next: { revalidate: 0 },
-  });
-  cityClear();
-  if (!res.ok) return null;
-  const data = (await res.json()) as unknown;
-  const items = parseCityItems(data);
-  const first = items[0];
-  return first?.code != null ? first.code : null;
+  try {
+    const res = await fetch(url.toString(), {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: citySignal,
+      next: { revalidate: 0 },
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      logUpstreamHttpError("cdek/calculate/cities", res.status, text, { city: cityName });
+      return null;
+    }
+    const data = (await res.json()) as unknown;
+    const items = parseCityItems(data);
+    const first = items[0];
+    return first?.code != null ? first.code : null;
+  } catch (err) {
+    logUpstreamError("cdek/calculate/cities", err, { city: cityName });
+    return null;
+  } finally {
+    cityClear();
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -96,7 +75,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const token = await getCdekToken();
+    const token = await getCachedCdekToken();
     const fromCode = await getCityCode(token, "Москва");
     const toCode = await getCityCode(token, city);
     if (fromCode == null || toCode == null) {
@@ -130,20 +109,25 @@ export async function GET(request: NextRequest) {
     };
 
     const { signal: calcSignal, clear: calcClear } = withTimeout(10000);
-    const calcRes = await fetch(`${CDEK_API}/calculator/tarifflist`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-      signal: calcSignal,
-      next: { revalidate: 0 },
-    });
-    calcClear();
+    let calcRes: Response;
+    try {
+      calcRes = await fetch(`${CDEK_API}/calculator/tarifflist`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+        signal: calcSignal,
+        next: { revalidate: 0 },
+      });
+    } finally {
+      calcClear();
+    }
 
     if (!calcRes.ok) {
       const text = await calcRes.text();
+      logUpstreamHttpError("cdek/calculate/tarifflist", calcRes.status, text, { city, weightGrams });
       let reason = `СДЭК API: ${calcRes.status}`;
       try {
         const errBody = JSON.parse(text) as { errors?: Array<{ message?: string }> };
@@ -227,6 +211,7 @@ export async function GET(request: NextRequest) {
       selected_tariff_code: best.tariff_code ?? null,
     });
   } catch (e) {
+    logUpstreamError("cdek/calculate", e, { city, weightGrams });
     const message = e instanceof Error ? e.message : "CDEK calculate error";
     return NextResponse.json(
       { price: 0, days_min: 2, days_max: 4, from_api: false, reason: message },

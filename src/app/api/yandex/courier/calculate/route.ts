@@ -10,6 +10,8 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { logUpstreamError, logUpstreamHttpError } from "../../../../../lib/upstreamLog";
+import { parseYandexPointPos } from "../../../../../lib/yandexGeocode";
 
 const YA_B2B_CALCULATE_URL =
   "https://b2b.taxi.yandex.net/b2b/cargo/integration/v2/offers/calculate";
@@ -44,7 +46,10 @@ async function geocodeYandex(address: string): Promise<[number, number] | null> 
     url.searchParams.set("results", "1");
 
     const res = await fetch(url.toString(), { next: { revalidate: 86400 } });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      logUpstreamHttpError("yandex/courier/geocode", res.status, undefined, { address });
+      return null;
+    }
 
     const data = (await res.json()) as {
       response?: {
@@ -57,14 +62,12 @@ async function geocodeYandex(address: string): Promise<[number, number] | null> 
     const pos = data?.response?.GeoObjectCollection?.featureMember?.[0]?.GeoObject?.Point?.pos;
     if (!pos) return null;
 
-    const parts = pos.trim().split(/\s+/);
-    // Яндекс возвращает "lon lat" в pos
-    const lon = parseFloat(parts[0]);
-    const lat = parseFloat(parts[1] ?? parts[0]);
-    if (isNaN(lon) || isNaN(lat)) return null;
+    const coords = parseYandexPointPos(pos);
+    if (!coords) return null;
 
-    return [lon, lat]; // Яндекс B2B ожидает [lon, lat]
+    return [coords.lon, coords.lat]; // Яндекс B2B ожидает [lon, lat]
   } catch (err) {
+    logUpstreamError("yandex/courier/geocode", err, { address });
     return null;
   }
 }
@@ -83,7 +86,10 @@ async function geocodeNominatim(address: string): Promise<[number, number] | nul
       signal: AbortSignal.timeout(5000),
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      logUpstreamHttpError("yandex/courier/geocode-nominatim", res.status, undefined, { address });
+      return null;
+    }
 
     const list = (await res.json()) as Array<{ lat?: string; lon?: string }>;
     if (!list?.[0]?.lat || !list?.[0]?.lon) return null;
@@ -94,6 +100,7 @@ async function geocodeNominatim(address: string): Promise<[number, number] | nul
 
     return [lon, lat];
   } catch (err) {
+    logUpstreamError("yandex/courier/geocode-nominatim", err, { address });
     return null;
   }
 }
@@ -226,6 +233,9 @@ export async function GET(request: NextRequest) {
     const rawText = await res.text();
 
     if (!res.ok) {
+      logUpstreamHttpError("yandex/courier/calculate", res.status, rawText, {
+        destAddress,
+      });
       return NextResponse.json(
         {
           error: `Яндекс B2B API: ${res.status}`,
@@ -300,6 +310,7 @@ export async function GET(request: NextRequest) {
       best_index: bestIndex,
     });
   } catch (err) {
+    logUpstreamError("yandex/courier/calculate", err, { destAddress });
     return NextResponse.json(
       { error: "Request failed", from_api: false },
       { status: 502 }

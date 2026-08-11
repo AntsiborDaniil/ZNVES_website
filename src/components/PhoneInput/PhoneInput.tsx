@@ -4,8 +4,8 @@ import { useEffect, useId, useRef, useState } from "react";
 import {
   CIS_COUNTRIES,
   DEFAULT_CIS_COUNTRY,
+  applyNationalInput,
   buildFullPhone,
-  digitsOnly,
   formatNationalNumber,
   parseFullPhone,
 } from "../../lib/phoneCountries";
@@ -18,6 +18,7 @@ type PhoneInputProps = {
   onBlur?: () => void;
   error?: boolean;
   disabled?: boolean;
+  className?: string;
   "aria-invalid"?: boolean;
 };
 
@@ -28,6 +29,7 @@ const PhoneInput = ({
   onBlur,
   error = false,
   disabled = false,
+  className = "",
   "aria-invalid": ariaInvalid,
 }: PhoneInputProps) => {
   const listId = useId();
@@ -37,11 +39,13 @@ const PhoneInput = ({
     () => parseFullPhone(value).country.iso
   );
 
-  // Внешний reset формы
+  // Синхронизация страны при внешней подстановке/сбросе значения
   useEffect(() => {
     if (!value) {
       setCountryIso(DEFAULT_CIS_COUNTRY.iso);
+      return;
     }
+    setCountryIso((prev) => parseFullPhone(value, prev).country.iso);
   }, [value]);
 
   useEffect(() => {
@@ -68,7 +72,7 @@ const PhoneInput = ({
   const display = formatNationalNumber(national, country);
 
   const handleNationalChange = (raw: string) => {
-    const next = digitsOnly(raw).slice(0, country.nationalLength);
+    const next = applyNationalInput(raw, national, display, country);
     onChange(buildFullPhone(country, next));
   };
 
@@ -84,7 +88,7 @@ const PhoneInput = ({
   return (
     <div
       ref={wrapRef}
-      className={`${styles.wrap} ${error ? styles.wrapError : ""}`}
+      className={`${styles.wrap} ${error ? styles.wrapError : ""} ${className}`.trim()}
     >
       <button
         type="button"

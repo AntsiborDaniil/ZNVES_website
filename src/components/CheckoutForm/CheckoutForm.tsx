@@ -15,6 +15,8 @@ import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 import type { PvzListOption } from "../Map/Map";
 import { getAddressSuggestions, type AddressSuggestion } from "../../api/delivery/addressSuggestApi";
 import { useWindowSize } from "../../hooks/useWindowSize";
+import PhoneInput from "../PhoneInput/PhoneInput";
+import { validatePhone } from "../../lib/authValidation";
 import styles from "../../app/checkout/page.module.css";
 
 const MapLazy = dynamic(
@@ -142,6 +144,8 @@ const CheckoutForm = ({
   const [selectedPvzCoords, setSelectedPvzCoords] = useState<[number, number] | null>(null);
   const addressSuggestTimerRef = useRef<NodeJS.Timeout | null>(null);
   const addressSuggestThrottleRef = useRef(0);
+  const addressSuggestAbortRef = useRef<AbortController | null>(null);
+  const courierCalcAbortRef = useRef<AbortController | null>(null);
   const isUpdatingFromMapRef = useRef(false);
   const lastGeocodedAddressRef = useRef<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -197,11 +201,11 @@ const CheckoutForm = ({
   // Refs для полей формы
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
-  const phoneRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLDivElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const deliveryFirstNameRef = useRef<HTMLInputElement>(null);
   const deliveryLastNameRef = useRef<HTMLInputElement>(null);
-  const deliveryPhoneRef = useRef<HTMLInputElement>(null);
+  const deliveryPhoneRef = useRef<HTMLDivElement>(null);
   const deliveryEmailRef = useRef<HTMLInputElement>(null);
   const cityRef = useRef<HTMLInputElement>(null);
   const streetRef = useRef<HTMLInputElement>(null);
@@ -476,24 +480,18 @@ const CheckoutForm = ({
       .join(" ");
   };
 
-  /** Форматирование телефона: +7 (XXX) XXX-XX-XX. 8 заменяется на +7 */
-  const formatPhone = (value: string) => {
-    const digits = value.replace(/\D/g, "");
-    if (digits.length === 0) return "";
-    let num = digits;
-    if (num.startsWith("8")) num = "7" + num.slice(1);
-    else if (!num.startsWith("7")) num = "7" + num;
-    num = num.slice(0, 11);
-    if (num.length <= 1) return num === "7" ? "+7" : "+7 " + num;
-    const match = num.slice(1).match(/^(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})$/);
-    if (!match) return "+7";
-    const [, a, b, c, d] = match;
-    let out = "+7";
-    if (a) out += ` (${a}`;
-    if (b) out += `) ${b}`;
-    if (c) out += `-${c}`;
-    if (d) out += `-${d}`;
-    return out;
+  const handlePhoneChange = (name: "phone" | "deliveryPhone") => (value: string) => {
+    if (submitButtonRef.current && document.activeElement === submitButtonRef.current) {
+      submitButtonRef.current.blur();
+    }
+    if (errors[name]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleInputChange = (
@@ -583,8 +581,6 @@ const CheckoutForm = ({
           name === "deliveryLastName"
         ) {
           processedValue = capitalizeName(value as string);
-        } else if (name === "phone" || name === "deliveryPhone") {
-          processedValue = formatPhone(value as string);
         }
       }
       setFormData((prev) => ({
@@ -710,7 +706,12 @@ const CheckoutForm = ({
           params.set("dest_lat", String(addressData.lat));
           params.set("dest_lon", String(addressData.lon));
         }
-        fetch(`/api/yandex/courier/calculate?${params.toString()}`)
+        courierCalcAbortRef.current?.abort();
+        const courierAc = new AbortController();
+        courierCalcAbortRef.current = courierAc;
+        fetch(`/api/yandex/courier/calculate?${params.toString()}`, {
+          signal: courierAc.signal,
+        })
           .then((r) => r.json())
           .then((data: {
             from_api?: boolean;
@@ -730,6 +731,7 @@ const CheckoutForm = ({
             best_index?: number;
             no_offers?: boolean;
           }) => {
+            if (courierAc.signal.aborted) return;
             if (data.from_api && data.offers && data.offers.length) {
               const offers: YandexCourierOffer[] = data.offers
                 .filter((o) => typeof o.price === "number")
@@ -771,6 +773,7 @@ const CheckoutForm = ({
             }
           })
           .catch((err) => {
+            if (err?.name === "AbortError" || courierAc.signal.aborted) return;
             setYandexCourierEstimate(null);
             setYandexCourierOffers(null);
             setSelectedCourierOfferId(null);
@@ -879,6 +882,7 @@ const CheckoutForm = ({
     const query = formData.pvzAddress.trim();
     if (query.length < 2) {
       setAddressSuggestions([]);
+      addressSuggestAbortRef.current?.abort();
       return;
     }
     if (addressSuggestTimerRef.current) {
@@ -890,15 +894,24 @@ const CheckoutForm = ({
       const now = Date.now();
       if (now - addressSuggestThrottleRef.current < ADDRESS_SUGGEST_THROTTLE_MS) return;
       addressSuggestThrottleRef.current = now;
-      getAddressSuggestions(query).then((list) => {
-        setAddressSuggestions(list);
-      });
+      addressSuggestAbortRef.current?.abort();
+      const ac = new AbortController();
+      addressSuggestAbortRef.current = ac;
+      getAddressSuggestions(query, ac.signal)
+        .then((list) => {
+          if (!ac.signal.aborted) setAddressSuggestions(list);
+        })
+        .catch((err) => {
+          if (err?.name === "AbortError" || ac.signal.aborted) return;
+          setAddressSuggestions([]);
+        });
     }, ADDRESS_SUGGEST_DEBOUNCE_MS);
     return () => {
       if (addressSuggestTimerRef.current) {
         clearTimeout(addressSuggestTimerRef.current);
         addressSuggestTimerRef.current = null;
       }
+      addressSuggestAbortRef.current?.abort();
     };
   }, [formData.pvzAddress, formData.deliveryMethod]);
 
@@ -1007,7 +1020,7 @@ const CheckoutForm = ({
     if (!formData.lastName.trim()) {
       newErrors.lastName = true;
     }
-    if (!formData.phone.trim()) {
+    if (!formData.phone.trim() || validatePhone(formData.phone) !== true) {
       newErrors.phone = true;
     }
     if (!formData.email.trim()) {
@@ -1023,7 +1036,7 @@ const CheckoutForm = ({
       if (!formData.deliveryLastName.trim()) {
         newErrors.deliveryLastName = true;
       }
-      if (!formData.deliveryPhone.trim()) {
+      if (!formData.deliveryPhone.trim() || validatePhone(formData.deliveryPhone) !== true) {
         newErrors.deliveryPhone = true;
       }
       if (!formData.deliveryEmail.trim()) {
@@ -1503,19 +1516,15 @@ const CheckoutForm = ({
               </div>
             </div>
             <div className={styles.infoInputs}>
-              <div className={styles.inputWrapper}>
+              <div className={styles.inputWrapper} ref={phoneRef}>
                 <label htmlFor="phone" className={styles.label}>
                   Телефон
                 </label>
-                <input
-                  type="tel"
+                <PhoneInput
                   id="phone"
-                  name="phone"
-                  placeholder="+7 (___) ___-__-__"
                   value={formData.phone}
-                  onChange={handleInputChange}
-                  className={`${styles.input} ${errors.phone ? styles.inputError : ""}`}
-                  ref={phoneRef}
+                  onChange={handlePhoneChange("phone")}
+                  error={!!errors.phone}
                 />
               </div>
               <div className={styles.inputWrapper}>
@@ -1855,19 +1864,15 @@ const CheckoutForm = ({
                     </div>
                   </div>
                   <div className={styles.infoInputs}>
-                    <div className={styles.inputWrapper}>
+                    <div className={styles.inputWrapper} ref={deliveryPhoneRef}>
                       <label htmlFor="deliveryPhone" className={styles.label}>
                         Телефон получателя
                       </label>
-                      <input
-                        type="tel"
+                      <PhoneInput
                         id="deliveryPhone"
-                        name="deliveryPhone"
-                        placeholder="+7 (___) ___-__-__"
                         value={formData.deliveryPhone}
-                        onChange={handleInputChange}
-                        className={`${styles.input} ${errors.deliveryPhone ? styles.inputError : ""}`}
-                        ref={deliveryPhoneRef}
+                        onChange={handlePhoneChange("deliveryPhone")}
+                        error={!!errors.deliveryPhone}
                       />
                     </div>
                     <div className={styles.inputWrapper}>

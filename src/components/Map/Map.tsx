@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { getCdekPvzByCity, type CdekPvzPoint } from "../../api/delivery/cdekApi";
+import type { CdekPvzPoint } from "../../api/delivery/cdekApi";
+import { getRegionPvzCdek } from "../../api/delivery/pvzRegionCache";
 import {
   buildCdekPvzSelection,
   buildYaDeliveryWidgetParams,
@@ -175,7 +176,7 @@ const Map = ({
     const ac = new AbortController();
     setCdekPvzLoading(true);
     setSelectedCdekPvzCode(null);
-    getCdekPvzByCity(city, ac.signal)
+    getRegionPvzCdek(city, ac.signal)
       .then((list) => {
         setCdekPvzList(list);
         if (onPvzListLoaded && list.length > 0) {
@@ -287,9 +288,16 @@ const Map = ({
     return () => widgetRoot.removeEventListener("click", handleWidgetClick, true);
   }, [isPickupYandex, onYandexWidgetInteraction]);
 
-  // Загрузка скрипта и инициализация виджета ПВЗ (только для Яндекса). Адрес ПВЗ берётся из /api/delivery/config (env на проде читается на сервере).
+  // Загрузка скрипта и инициализация виджета ПВЗ (только для Яндекса).
+  // Вес берём из ref — не пересоздаём виджет при каждом изменении totalWeightGrams.
+  const totalWeightGramsRef = useRef(totalWeightGrams);
+  totalWeightGramsRef.current = totalWeightGrams;
+  const yaSourceAddress =
+    deliveryConfig?.yaDeliverySourceAddress?.trim() || DEFAULT_YA_SOURCE_ADDRESS;
+  const deliveryConfigReady = Boolean(deliveryConfig);
+
   useEffect(() => {
-    if (!isPickupYandex || !containerRef.current || !deliveryConfig) return;
+    if (!isPickupYandex || !containerRef.current || !deliveryConfigReady) return;
 
     setYandexWidgetLoading(true);
     let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -300,7 +308,7 @@ const Map = ({
       }
     };
 
-    const sourceAddress = deliveryConfig.yaDeliverySourceAddress || DEFAULT_YA_SOURCE_ADDRESS;
+    const sourceAddress = yaSourceAddress;
 
     function startWidget() {
       if (widgetInitedRef.current) {
@@ -314,7 +322,11 @@ const Map = ({
       }
       widgetInitedRef.current = true;
 
-      const params = buildYaDeliveryWidgetParams(city, sourceAddress, totalWeightGrams);
+      const params = buildYaDeliveryWidgetParams(
+        city,
+        sourceAddress,
+        totalWeightGramsRef.current
+      );
 
       window.YaDelivery.createWidget({
         containerId: CONTAINER_ID,
@@ -384,7 +396,7 @@ const Map = ({
       const container = document.getElementById(CONTAINER_ID);
       if (container) container.innerHTML = "";
     };
-  }, [isPickupYandex, city, totalWeightGrams, deliveryConfig]);
+  }, [isPickupYandex, city, yaSourceAddress, deliveryConfigReady]);
 
   useEffect(() => {
     if (!isCourier) return;

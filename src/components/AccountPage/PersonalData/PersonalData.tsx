@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { updateCurrentUser, updateUserDeliveryData } from "../../../api/auth/authApi";
+import PhoneInput from "../../PhoneInput/PhoneInput";
 import styles from "./PersonalData.module.css";
 
 const emptyProfileData = {
@@ -109,6 +110,13 @@ const PersonalData = () => {
       setSaveStatus(null);
       if (highlightSection === "profile") setHighlightSection(null);
     };
+
+  const handlePhoneChange = (value: string) => {
+    setProfileData((prev) => ({ ...prev, phone: value }));
+    setHasUnsavedChanges(true);
+    setSaveStatus(null);
+    if (highlightSection === "profile") setHighlightSection(null);
+  };
 
   const handleSaveChanges = async () => {
     if (!hasUnsavedChanges) return;
@@ -244,14 +252,25 @@ const PersonalData = () => {
                   </label>
 
                   <div className={styles.inputWrapper}>
-                    <input
-                      id={`profile-${field.key}`}
-                      className={`${styles.input} ${highlightSection === "profile" ? styles.inputSuccess : ""}`}
-                      type="text"
-                      value={profileData[field.key]}
-                      onChange={handleProfileChange(field.key)}
-                      placeholder={field.placeholder}
-                    />
+                    {field.key === "phone" ? (
+                      <PhoneInput
+                        id={`profile-${field.key}`}
+                        value={profileData.phone}
+                        onChange={handlePhoneChange}
+                        className={
+                          highlightSection === "profile" ? styles.inputSuccess : ""
+                        }
+                      />
+                    ) : (
+                      <input
+                        id={`profile-${field.key}`}
+                        className={`${styles.input} ${highlightSection === "profile" ? styles.inputSuccess : ""}`}
+                        type="text"
+                        value={profileData[field.key]}
+                        onChange={handleProfileChange(field.key)}
+                        placeholder={field.placeholder}
+                      />
+                    )}
                   </div>
                 </div>
               ))}

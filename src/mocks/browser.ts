@@ -12,7 +12,8 @@ export const startMockWorker = async (): Promise<void> => {
     worker = setupWorker(...mockHandlers);
     startPromise = worker
       .start({
-        onUnhandledRequest: "warn",
+        // Don't warn on Next assets (/_next/image, pages) — only API has handlers
+        onUnhandledRequest: "bypass",
         quiet: true,
         serviceWorker: {
           url: "/mockServiceWorker.js",

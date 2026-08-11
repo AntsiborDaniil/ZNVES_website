@@ -8,12 +8,15 @@ export type AddressSuggestion = {
   value: string;
 };
 
-export async function getAddressSuggestions(query: string): Promise<AddressSuggestion[]> {
+export async function getAddressSuggestions(
+  query: string,
+  signal?: AbortSignal
+): Promise<AddressSuggestion[]> {
   const q = query.trim();
   if (q.length < 2) return [];
 
   const params = new URLSearchParams({ q });
-  const res = await fetch(`/api/address-suggest?${params.toString()}`);
+  const res = await fetch(`/api/address-suggest?${params.toString()}`, { signal });
   if (!res.ok) return [];
 
   const data = await res.json();

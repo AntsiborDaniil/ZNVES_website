@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logUpstreamError, logUpstreamHttpError } from "../../../lib/upstreamLog";
 
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org/reverse";
 
@@ -25,6 +26,10 @@ export async function GET(request: NextRequest) {
       headers: { "User-Agent": "ZNVES-Delivery/1.0" },
     });
     if (!res.ok) {
+      logUpstreamHttpError("reverse-geocode/nominatim", res.status, res.statusText, {
+        lat: latNum,
+        lon: lonNum,
+      });
       return NextResponse.json({ error: "Geocoder request failed" }, { status: 502 });
     }
     const data = (await res.json()) as {
@@ -58,6 +63,7 @@ export async function GET(request: NextRequest) {
       lon: lonNum,
     });
   } catch (err) {
+    logUpstreamError("reverse-geocode/nominatim", err, { lat: latNum, lon: lonNum });
     return NextResponse.json({ error: "Geocoder error" }, { status: 502 });
   }
 }

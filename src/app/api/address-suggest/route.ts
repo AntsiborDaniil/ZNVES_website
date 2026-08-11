@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { asRecord, readString } from "../../../lib/recordUtils";
+import { logUpstreamError, logUpstreamHttpError } from "../../../lib/upstreamLog";
 
 const SUGGEST_URL = "https://suggest-maps.yandex.ru/v1/suggest";
 const GEOCODER_URL = "https://geocode-maps.yandex.ru/v1/";
@@ -41,24 +42,30 @@ async function fetchGeocoderSuggestions(apiKey: string, query: string): Promise<
   url.searchParams.set("results", "10");
 
   const { signal, clear } = withTimeout(8000);
-  const res = await fetch(url.toString(), { signal, next: { revalidate: 0 } });
-  clear();
-  if (!res.ok) return [];
+  try {
+    const res = await fetch(url.toString(), { signal, next: { revalidate: 0 } });
+    if (!res.ok) {
+      logUpstreamHttpError("address-suggest/geocoder", res.status, undefined, { query });
+      return [];
+    }
 
-  const data = await res.json();
-  const members = data?.response?.GeoObjectCollection?.featureMember ?? [];
-  return members
-    .map((member: unknown) => {
-      const memberRecord = asRecord(member);
-      const geo = asRecord(memberRecord?.GeoObject);
-      if (!geo) return null;
-      const name = readString(geo, "name") ?? "";
-      const meta = asRecord(geo.metaDataProperty);
-      const geocoderMeta = asRecord(meta?.GeocoderMetaData);
-      const text = readString(geocoderMeta ?? {}, "text") ?? name;
-      return name || text ? { displayName: String(name), value: String(text || name) } : null;
-    })
-    .filter(Boolean);
+    const data = await res.json();
+    const members = data?.response?.GeoObjectCollection?.featureMember ?? [];
+    return members
+      .map((member: unknown) => {
+        const memberRecord = asRecord(member);
+        const geo = asRecord(memberRecord?.GeoObject);
+        if (!geo) return null;
+        const name = readString(geo, "name") ?? "";
+        const meta = asRecord(geo.metaDataProperty);
+        const geocoderMeta = asRecord(meta?.GeocoderMetaData);
+        const text = readString(geocoderMeta ?? {}, "text") ?? name;
+        return name || text ? { displayName: String(name), value: String(text || name) } : null;
+      })
+      .filter(Boolean);
+  } finally {
+    clear();
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -88,23 +95,28 @@ export async function GET(request: NextRequest) {
     suggestUrl.searchParams.set("highlight", "0");
 
     const { signal: sugSignal, clear: sugClear } = withTimeout(8000);
-    const res = await fetch(suggestUrl.toString(), { signal: sugSignal, next: { revalidate: 0 } });
-    sugClear();
-    if (res.ok) {
-      const data = await res.json();
-      const rawList = data?.results ?? data?.suggestions ?? Array.isArray(data) ? data : [];
-      const parsed = rawList.map(normalizeSuggestItem).filter(Boolean) as { displayName: string; value: string }[];
-      if (parsed.length > 0) suggestions = parsed;
+    try {
+      const res = await fetch(suggestUrl.toString(), { signal: sugSignal, next: { revalidate: 0 } });
+      if (res.ok) {
+        const data = await res.json();
+        const rawList = data?.results ?? data?.suggestions ?? Array.isArray(data) ? data : [];
+        const parsed = rawList.map(normalizeSuggestItem).filter(Boolean) as { displayName: string; value: string }[];
+        if (parsed.length > 0) suggestions = parsed;
+      } else {
+        logUpstreamHttpError("address-suggest/yandex", res.status, undefined, { query });
+      }
+    } finally {
+      sugClear();
     }
-  } catch {
-    // ignore
+  } catch (err) {
+    logUpstreamError("address-suggest/yandex", err, { query });
   }
 
   if (suggestions.length === 0) {
     try {
       suggestions = await fetchGeocoderSuggestions(apiKey, query);
-    } catch {
-      // ignore
+    } catch (err) {
+      logUpstreamError("address-suggest/geocoder-fallback", err, { query });
     }
   }
 
