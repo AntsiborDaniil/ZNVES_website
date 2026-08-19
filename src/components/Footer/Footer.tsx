@@ -2,44 +2,25 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useToast } from "../ui/ToastProvider/ToastProvider";
-import { subscribeToMailing } from "../../api/mailing/mailingApi";
-import {
-  buildCatalogCategoryHref,
-  fetchCatalogCategories,
-  FALLBACK_CATALOG_CATEGORIES,
-  getCatalogCategoryLabel,
-  type ApiCatalogCategory,
-} from "../../api/catalog/catalogApi";
+import { useState, useEffect, useRef, useCallback } from "react";
+import NewsletterForm from "../NewsletterForm/NewsletterForm";
 import styles from "./Footer.module.css";
 
+const SERVICE_LINKS = [
+  { href: "/delivery-payment", label: "Доставка и оплата" },
+  { href: "/returns", label: "Обмен и возврат" },
+] as const;
+
+const NAV_LINKS = [
+  { href: "/catalog", label: "Каталог" },
+  { href: "/cart", label: "Корзина" },
+  { href: "/account", label: "Личный кабинет" },
+] as const;
+
 const Footer = () => {
-  const { showToast } = useToast();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCatalogOpen, setIsCatalogOpen] = useState(false);
-  const [isContactOpen, setIsContactOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState<string | null>(null);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [isModalClosing, setIsModalClosing] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const autoCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [catalogCategories, setCatalogCategories] = useState<ApiCatalogCategory[]>([]);
-
-  useEffect(() => {
-    void fetchCatalogCategories().then((data) => {
-      setCatalogCategories(data.length > 0 ? data : FALLBACK_CATALOG_CATEGORIES);
-    });
-  }, []);
-
-  const catalogColumnSplit = useMemo(() => {
-    const midpoint = Math.ceil(catalogCategories.length / 2);
-    return {
-      first: catalogCategories.slice(0, midpoint),
-      second: catalogCategories.slice(midpoint),
-    };
-  }, [catalogCategories]);
 
   const closeModal = useCallback(() => {
     if (isModalClosing) return;
@@ -71,216 +52,81 @@ const Footer = () => {
         autoCloseTimerRef.current = null;
       }
     };
-  }, [showSubscribeModal]);
-
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const value = email.trim();
-    if (isSubmitting) return;
-    setEmailError(null);
-    if (!value) return;
-    if (!value.includes("@")) {
-      setEmailError("Введите корректный email (должен содержать @)");
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      await subscribeToMailing(value);
-      setShowSubscribeModal(true);
-      setEmail("");
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : "Не удалось подписаться на рассылку");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  }, [showSubscribeModal, closeModal]);
 
   return (
     <footer className={styles.footer}>
+      <Image
+        src="/images/logo-white.svg"
+        className={styles.logoMobile}
+        alt="ZNVES"
+        width={64}
+        height={31}
+        unoptimized
+      />
       <div className={styles.upper}>
-        <div className={styles.upperLeft}>
+        <div className={styles.brand}>
           <Image
-            src="/images/logo.png"
+            src="/images/logo-white.svg"
             className={styles.logo}
-            alt="logo"
-            width={65}
-            height={31}
-            loading="lazy"
+            alt="ZNVES"
+            width={86}
+            height={41}
+            unoptimized
           />
-          <h1 className={styles.subText}>
-            Подпишитесь на получение рассылки рекламно-информационных материалов
-          </h1>
-          <form className={styles.inputContainer} onSubmit={handleSubscribe}>
-            <div className={styles.inputWrap}>
-              <input
-                type="email"
-                className={`${styles.input} ${emailError ? styles.inputError : ""}`}
-                placeholder="Введите ваш email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (emailError) setEmailError(null);
-                }}
-                required
-                aria-invalid={!!emailError}
-                aria-describedby={emailError ? "footer-email-error" : undefined}
-              />
-              {emailError && (
-                <span id="footer-email-error" className={styles.inputErrorMsg} role="alert">
-                  {emailError}
-                </span>
-              )}
-            </div>
-            <button type="submit" className={styles.button} disabled={isSubmitting}>
-              {isSubmitting ? "Отправка…" : "Подписаться"}
-            </button>
-          </form>
-          <h2 className={styles.politics}>
-            Нажимая на кнопку «Подписаться», вы даете согласие на обработку
-            персональных данных в соответствии с{" "}
-            <Link href="/privacy" className={styles.politicsLink} prefetch={false}>
-              Политикой конфиденциальности
-            </Link>
-          </h2>
+          <NewsletterForm
+            layout="row"
+            onSuccess={() => setShowSubscribeModal(true)}
+          />
         </div>
-        <div className={styles.upperRight}>
-          <div className={styles.rowColumns}>
-            <div className={styles.column}>
-              <button
-                type="button"
-                className={styles.columnTitleButton}
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                aria-expanded={isMenuOpen}
-              >
-                <h1 className={styles.columnTitle}>MENU</h1>
-                <span className={styles.columnToggle}>
-                  {isMenuOpen ? "−" : "+"}
-                </span>
-              </button>
-              <ul
-                className={`${styles.columnList} ${
-                  isMenuOpen ? styles.columnListOpen : ""
-                }`}
-              >
-                  <Link className={styles.columnItem} href="/account" prefetch={false}>
-                    Личный кабинет
-                  </Link>
-                  <Link className={styles.columnItem} href="/cart" prefetch={false}>
-                    Корзина
-                  </Link>
-              </ul>
-            </div>
-            <div className={styles.column}>
-              <button
-                type="button"
-                className={styles.columnTitleButton}
-                onClick={() => setIsCatalogOpen(!isCatalogOpen)}
-                aria-expanded={isCatalogOpen}
-              >
-                <h1 className={styles.columnTitle}>CATALOG</h1>
-                <span className={styles.columnToggle}>
-                  {isCatalogOpen ? "−" : "+"}
-                </span>
-              </button>
-              <div
-                className={`${styles.catalogColumns} ${
-                  isCatalogOpen ? styles.catalogColumnsOpen : ""
-                }`}
-                data-testid="footer-catalog"
-              >
-                <ul
-                  className={`${styles.columnList} ${
-                    isCatalogOpen ? styles.columnListOpen : ""
-                  }`}
-                >
-                  <Link
-                    className={styles.columnItem}
-                    href="/new-in"
-                    prefetch={false}
-                  >
-                    New in
-                  </Link>
-                  {catalogColumnSplit.first.map((category) => (
-                    <Link
-                      key={category.slug}
-                      className={styles.columnItem}
-                      href={buildCatalogCategoryHref(category.slug)}
-                      prefetch={false}
-                    >
-                      {getCatalogCategoryLabel(category)}
-                    </Link>
-                  ))}
-                </ul>
-                <ul
-                  className={`${styles.columnList} ${
-                    isCatalogOpen ? styles.columnListOpen : ""
-                  }`}
-                >
-                  {catalogColumnSplit.second.map((category) => (
-                    <Link
-                      key={category.slug}
-                      className={styles.columnItem}
-                      href={buildCatalogCategoryHref(category.slug)}
-                      prefetch={false}
-                    >
-                      {getCatalogCategoryLabel(category)}
-                    </Link>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className={styles.column}>
-              <button
-                type="button"
-                className={styles.columnTitleButton}
-                onClick={() => setIsContactOpen(!isContactOpen)}
-                aria-expanded={isContactOpen}
-              >
-                <h1 className={styles.columnTitle}>CONTACT</h1>
-                <span className={styles.columnToggle}>
-                  {isContactOpen ? "−" : "+"}
-                </span>
-              </button>
-              <ul
-                className={`${styles.columnList} ${
-                  isContactOpen ? styles.columnListOpen : ""
-                }`}
-              >
-                  <Link
-                    href="https://t.me/znves"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.columnItem}
-                  >
-                    Telegram
-                  </Link>
-                  <Link
-                    href="https://www.instagram.com/real.ponama?igsh=b2w5YWdoNmJ2djVo"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.columnInst}
-                  >
-                    Instagram*
-                  </Link>
-              </ul>
-            </div>
-          </div>
-          <div className={styles.links}>
-            <Link className={styles.link} href="/delivery-payment" prefetch={false}>
-              Доставка и оплата
+
+        <div className={styles.columns}>
+          <ul className={styles.column}>
+            {SERVICE_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link className={styles.columnItem} href={link.href} prefetch={false}>
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <ul className={styles.column} data-testid="footer-catalog">
+            {NAV_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link className={styles.columnItem} href={link.href} prefetch={false}>
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <div className={styles.column}>
+            <Link
+              href="https://t.me/znves"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.columnItem}
+            >
+              Telegram
             </Link>
-            <Link className={styles.link} href="/returns" prefetch={false}>
-              Обмен и возврат
+            <Link
+              href="https://www.instagram.com/real.ponama?igsh=b2w5YWdoNmJ2djVo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.columnInst}
+            >
+              Instagram*
             </Link>
-            <Link className={styles.link} href="/public-offer" prefetch={false}>
-              Публичная оферта
-            </Link>
-            <Link className={styles.link} href="/privacy" prefetch={false}>
-              Политика конфиденциальности
-            </Link>
+            <p className={styles.instagramNote}>
+              *запрещёны в России,
+              <br />
+              принадлежат Meta
+            </p>
           </div>
         </div>
       </div>
+
       {showSubscribeModal && (
         <div
           className={`${styles.modalOverlay} ${isModalClosing ? styles.modalOverlayClosing : ""}`}
@@ -306,11 +152,13 @@ const Footer = () => {
       )}
 
       <div className={styles.lower}>
-        <p className={styles.copyright}>© 2026 Все права защищены</p>
-        <p className={styles.copyrightInsta}>
-          * Instagram принадлежит компании Meta, признанной экстремистской
-          организацией <br/> и запрещенной в РФ
-        </p>
+        <p className={styles.copyright}>© ZNVES: 2026г все права защищены</p>
+        <Link className={styles.lowerLink} href="/privacy" prefetch={false}>
+          Политика конфиденциальности
+        </Link>
+        <Link className={styles.lowerLink} href="/public-offer" prefetch={false}>
+          Публичная оферта
+        </Link>
       </div>
     </footer>
   );

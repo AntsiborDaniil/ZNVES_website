@@ -18,12 +18,13 @@ const CartIcon = () => {
     >
       <div className={styles.cartIconWrapper}>
         <Image
-          src="/images/cart.png"
-          alt="Корзина"
-          width={12}
-          height={11.5}
+        src="/images/icons/cart.svg"
+        alt="Корзина"
+        width={24}
+        height={24}
           className={styles.cartImage}
           loading="lazy"
+          unoptimized
         />
         {totalItems > 0 && (
           <span className={styles.cartBadge}>{totalItems}</span>

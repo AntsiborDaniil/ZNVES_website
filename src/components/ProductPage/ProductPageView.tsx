@@ -1,16 +1,19 @@
 "use client";
 
 import {
+  createElement,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
+  type ComponentType,
 } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
+import Button from "../ui/Button/Button";
 import type { ProductDetail } from "../../types/products";
 import { useCart } from "../../contexts/CartContext";
 import { useToast } from "../ui/ToastProvider/ToastProvider";
@@ -19,9 +22,8 @@ import styles from "./ProductPageView.module.css";
 import ProductDisplaySection from "../ProductDisplaySection/ProductDisplaySection";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination } from "swiper/modules";
+import type { Swiper as SwiperInstance } from "swiper";
 import "swiper/css";
-import "swiper/css/pagination";
 import {
   fetchProductImagesByColor,
   type ApiWarehouseItem,
@@ -31,6 +33,13 @@ import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 type ProductPageViewProps = {
   product: ProductDetail;
   warehouseItems?: ApiWarehouseItem[];
+};
+
+const MAX_VISIBLE_THUMBS = 7;
+
+const isLightHex = (hex?: string) => {
+  const value = (hex ?? "").toLowerCase();
+  return value === "#fff" || value === "#ffffff" || value === "white";
 };
 
 const findWarehouseItem = (
@@ -59,43 +68,14 @@ const ProductPageView = ({
   );
   const [currentImages, setCurrentImages] = useState<string[]>(product.images);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
-  const [isColorListOpen, setIsColorListOpen] = useState(false);
-  const colorPickerRef = useRef<HTMLDivElement>(null);
-  const [isSizeListOpen, setIsSizeListOpen] = useState(false);
-  const sizePickerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        colorPickerRef.current &&
-        !colorPickerRef.current.contains(event.target as Node)
-      ) {
-        setIsColorListOpen(false);
-      }
-      if (
-        sizePickerRef.current &&
-        !sizePickerRef.current.contains(event.target as Node)
-      ) {
-        setIsSizeListOpen(false);
-      }
-    };
-
-    if (isColorListOpen || isSizeListOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isColorListOpen, isSizeListOpen]);
-  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const [isSizeGuideOpen] = useState(false);
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>({});
-
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const gallerySwiperRef = useRef<SwiperInstance | null>(null);
   const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // Соответствие цветов и размеров по warehouse: только комбинации с quantity > 0
   const colorToSizesFromWarehouse = useMemo(() => {
     const map = new Map<string, Set<string>>();
     warehouseItems.forEach((wi) => {
@@ -109,7 +89,6 @@ const ProductPageView = ({
     return map;
   }, [warehouseItems]);
 
-  // Цвета, у которых есть хотя бы один размер в наличии (по warehouse)
   const colorOptions = useMemo(() => {
     const withStock = product.availableColors.filter((opt) => {
       const key = (opt.value ?? "").toLowerCase().trim();
@@ -120,7 +99,6 @@ const ProductPageView = ({
     return product.availableColors;
   }, [product.availableColors, colorToSizesFromWarehouse, warehouseItems.length]);
 
-  // Размеры, доступные для выбранного цвета (по warehouse)
   const availableSizesForSelectedColor = useMemo(() => {
     const key = (selectedColor ?? "").toLowerCase().trim();
     const set = colorToSizesFromWarehouse.get(key);
@@ -156,7 +134,6 @@ const ProductPageView = ({
     }
   }, [product.availableColors, colorOptions, selectedColor]);
 
-  // Синхронизация размера с доступными для выбранного цвета (по warehouse)
   useEffect(() => {
     const key = (selectedColor ?? "").toLowerCase().trim();
     const allowed = colorToSizesFromWarehouse.get(key);
@@ -169,11 +146,9 @@ const ProductPageView = ({
     }
   }, [selectedColor, selectedSize, colorToSizesFromWarehouse, product.availableSizes]);
 
-  // Загрузка изображений при изменении цвета
   useEffect(() => {
     const loadImagesByColor = async () => {
       if (!product.slug || !selectedColor) {
-        // Если нет slug или цвета, используем базовые изображения
         setCurrentImages(product.images);
         return;
       }
@@ -184,15 +159,13 @@ const ProductPageView = ({
           product.slug,
           selectedColor
         );
-        
-        // Если получили изображения, используем их, иначе используем базовые
+
         if (colorImages.length > 0) {
           setCurrentImages(colorImages);
         } else {
           setCurrentImages(product.images);
         }
-      } catch (error) {
-        // В случае ошибки используем базовые изображения
+      } catch {
         setCurrentImages(product.images);
       } finally {
         setIsLoadingImages(false);
@@ -201,6 +174,11 @@ const ProductPageView = ({
 
     loadImagesByColor();
   }, [product.slug, selectedColor, product.images]);
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+    gallerySwiperRef.current?.slideTo(0);
+  }, [currentImages]);
 
   const handleToggleSection = (id: string) => {
     setSelectedSection(id);
@@ -247,14 +225,6 @@ const ProductPageView = ({
   const sizeGuideSection = useMemo(() => {
     return product.sections.find((section) => section.id === "size-chart");
   }, [product.sections]);
-
-  const colorSelectStyle = useMemo(
-    () =>
-      ({
-        "--color-dot": selectedColorOption.hex ?? "#d1cdcb",
-      } as CSSProperties),
-    [selectedColorOption]
-  );
 
   const selectedWarehouseItem = useMemo(
     () =>
@@ -310,254 +280,231 @@ const ProductPageView = ({
     showToast,
   ]);
 
+  const hasOverflow = currentImages.length > MAX_VISIBLE_THUMBS;
+  const overflowCount = hasOverflow
+    ? currentImages.length - (MAX_VISIBLE_THUMBS - 1)
+    : 0;
+  const visibleThumbs =
+    overflowCount > 0
+      ? currentImages.slice(0, MAX_VISIBLE_THUMBS)
+      : currentImages;
+
+  const goToImage = (index: number) => {
+    setActiveImageIndex(index);
+    gallerySwiperRef.current?.slideTo(index);
+  };
+
+  const skuLabel = product.sku ? `Арт.${product.sku}` : null;
+  const categoryHref = product.category
+    ? `/catalog?category=${encodeURIComponent(product.category)}`
+    : "/catalog";
+
   return (
     <div className={styles.page}>
       <Header variant="green" />
       <main className={styles.main}>
+        <nav className={styles.breadcrumbs} aria-label="Хлебные крошки">
+          <Link href="/" className={styles.breadcrumbLink}>
+            Главная
+          </Link>
+          <span className={styles.breadcrumbSep} aria-hidden>
+            /
+          </span>
+          <Link href={categoryHref} className={styles.breadcrumbLink}>
+            {product.category || "Каталог"}
+          </Link>
+          <span className={styles.breadcrumbSep} aria-hidden>
+            /
+          </span>
+          <span className={styles.breadcrumbCurrent}>{product.title}</span>
+        </nav>
+
         <section className={styles.content}>
           <div className={styles.gallery} aria-live="polite">
-            <div className={styles.imageViewport}>
-              <div className={styles.imageSliderWrap}>
-                <Swiper
-                  slidesPerView={1}
-                  spaceBetween={20}
-                  pagination={{ clickable: true }}
-                  modules={[Pagination]}
-                  className={styles.imageSlider}
-                >
-                  {currentImages.map((image, index) => (
+            <div className={styles.imageSliderWrap}>
+              <div className={styles.heroWrap}>
+                {currentImages.length > 1 && (
+                  <button
+                    type="button"
+                    className={`${styles.galleryArrow} ${styles.galleryPrev}`}
+                    aria-label="Предыдущее фото"
+                    onClick={() => gallerySwiperRef.current?.slidePrev()}
+                  >
+                    <Image
+                      src="/images/product/gallery-arrow.svg"
+                      alt=""
+                      width={6}
+                      height={11}
+                      className={styles.galleryArrowIcon}
+                      unoptimized
+                    />
+                  </button>
+                )}
+                {createElement(
+                  Swiper as ComponentType<Record<string, unknown>>,
+                  {
+                    slidesPerView: 1,
+                    spaceBetween: 0,
+                    className: styles.imageSlider,
+                    onSwiper: (swiper: SwiperInstance) => {
+                      gallerySwiperRef.current = swiper;
+                    },
+                    onSlideChange: (swiper: SwiperInstance) => {
+                      setActiveImageIndex(swiper.activeIndex);
+                    },
+                  },
+                  currentImages.map((image, index) => (
                     <SwiperSlide key={image + index}>
-                      <div className={styles.imageSlide}>
-                        <div className={styles.imageSlideInner}>
-                          <img
-                            src={image}
-                            alt={`${product.title} — фото ${index + 1}`}
-                            className={styles.mainImage}
-                            loading={index <= 2 ? "eager" : "lazy"}
-                            decoding="async"
-                          />
-                        </div>
+                      <div className={styles.heroSlide}>
+                        <img
+                          src={image}
+                          alt={`${product.title} — фото ${index + 1}`}
+                          className={styles.heroImage}
+                          loading={index === 0 ? "eager" : "lazy"}
+                          decoding="async"
+                        />
                       </div>
                     </SwiperSlide>
-                  ))}
-                </Swiper>
+                  ))
+                )}
+                {currentImages.length > 1 && (
+                  <button
+                    type="button"
+                    className={`${styles.galleryArrow} ${styles.galleryNext}`}
+                    aria-label="Следующее фото"
+                    onClick={() => gallerySwiperRef.current?.slideNext()}
+                  >
+                    <Image
+                      src="/images/product/gallery-arrow.svg"
+                      alt=""
+                      width={6}
+                      height={11}
+                      className={styles.galleryArrowIcon}
+                      unoptimized
+                    />
+                  </button>
+                )}
               </div>
-              <div className={styles.imageColumn}>
-                {currentImages.map((image, index) => (
-                  <div key={image + index} className={styles.imageSlide}>
-                    <div className={styles.imageSlideInner}>
-                      <img
-                        src={image}
-                        alt={`${product.title} — фото ${index + 1}`}
-                        className={styles.mainImage}
-                        loading={index <= 2 ? "eager" : "lazy"}
-                        decoding="async"
-                      />
-                    </div>
-                  </div>
-                ))}
+              <div className={styles.thumbs} role="tablist" aria-label="Фотографии товара">
+                {visibleThumbs.map((image, index) => {
+                  const isLastOverflow =
+                    overflowCount > 0 && index === visibleThumbs.length - 1;
+                  return (
+                    <button
+                      key={image + index}
+                      type="button"
+                      className={`${styles.thumb} ${
+                        activeImageIndex === index ? styles.thumbActive : ""
+                      }`}
+                      onClick={() => goToImage(index)}
+                      aria-label={
+                        isLastOverflow
+                          ? `Ещё ${overflowCount} фото`
+                          : `Фото ${index + 1}`
+                      }
+                    >
+                      <img src={image} alt="" className={styles.thumbImage} />
+                      {isLastOverflow && (
+                        <span className={styles.thumbMore}>+{overflowCount}</span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
+
+            <div
+              className={`${styles.imageGrid} ${
+                isLoadingImages ? styles.imageGridLoading : ""
+              }`}
+            >
+              {currentImages.map((image, index) => (
+                <div key={image + index} className={styles.imageCell}>
+                  <img
+                    src={image}
+                    alt={`${product.title} — фото ${index + 1}`}
+                    className={styles.gridImage}
+                    loading={index <= 3 ? "eager" : "lazy"}
+                    decoding="async"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
+
           <div className={styles.info}>
-            <div className={styles.titleRow}>
+            <div className={styles.heading}>
+              {skuLabel && <p className={styles.sku}>{skuLabel}</p>}
               <h1 className={styles.title}>{product.title}</h1>
               <span className={styles.price}>{product.price}</span>
             </div>
 
             <div className={styles.variantGroup}>
-              <div className={styles.variantGroupRow}>
-                {colorOptions.length > 0 && (
-                <div
-                  className={`${styles.variantRow} ${styles.variantRowCompact}`}
-                >
-                  <label className={styles.label}>Цвет</label>
-                  <div
-                    className={`${styles.colorPickerWrapper} ${
-                      isColorListOpen ? styles.colorPickerWrapperOpen : ""
-                    } ${
-                      selectedColorOption.hex === "#ffffff" ||
-                      selectedColorOption.hex === "#fff"
-                        ? styles.colorPickerWrapperWhite
-                        : ""
-                    }`}
-                    ref={colorPickerRef}
-                  >
-                    <button
-                      type="button"
-                      className={styles.sizePickerButton}
-                      onClick={() => setIsColorListOpen((prev) => !prev)}
-                      aria-label="Выбрать цвет"
-                      style={colorSelectStyle}
-                    >
-                      <span className={styles.colorPickerButtonDot} />
-                      <span className={styles.colorPickerButtonText}>
-                        {selectedColorOption.label}
-                      </span>
-                      <svg
-                        width="14"
-                        height="9"
-                        viewBox="0 0 14 9"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className={styles.colorPickerArrow}
-                      >
-                        <path
-                          d="M1 1l6 6 6-6"
-                          stroke="#525252"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    </button>
-                    {isColorListOpen && (
-                      <ul className={styles.colorList}>
-                        {colorOptions.map((color) => {
-                          const isSelected = selectedColor === color.value;
-                          return (
-                            <li
-                              key={color.value}
-                              className={styles.colorListItem}
-                            >
-                              <button
-                                type="button"
-                                className={`${styles.colorListItemButton} ${
-                                  isSelected
-                                    ? styles.colorListItemButtonSelected
-                                    : ""
-                                }`}
-                                onClick={() => {
-                                  setSelectedColor(color.value);
-                                  setIsColorListOpen(false);
-                                }}
-                                aria-label={`Выбрать цвет ${color.label}`}
-                              >
-                                <span
-                                  className={styles.colorListItemDot}
-                                  style={{
-                                    backgroundColor: color.hex ?? "#d1cdcb",
-                                    border:
-                                      color.hex === "#ffffff" ||
-                                      color.hex === "#fff"
-                                        ? "1px solid #d4d1cb"
-                                        : "1px solid #ffffff80",
-                                  }}
-                                />
-                                <span className={styles.colorListItemLabel}>
-                                  {color.label}
-                                </span>
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
+              {colorOptions.length > 0 && (
+                <div className={styles.variantRow}>
+                  <span className={styles.label}>Выбрать цвет</span>
+                  <div className={styles.swatches}>
+                    {colorOptions.map((color) => {
+                      const isSelected = selectedColor === color.value;
+                      return (
+                        <button
+                          key={color.value}
+                          type="button"
+                          className={`${styles.swatch} ${
+                            isSelected ? styles.swatchSelected : ""
+                          }`}
+                          onClick={() => setSelectedColor(color.value)}
+                          aria-label={`Выбрать цвет ${color.label}`}
+                          aria-pressed={isSelected}
+                        >
+                          <span
+                            className={`${styles.swatchFill} ${
+                              isLightHex(color.hex) ? styles.swatchFillLight : ""
+                            }`}
+                            style={{ backgroundColor: color.hex ?? "#d1cdcb" }}
+                          />
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-                )}
-                {availableSizesForSelectedColor.length > 0 && (
-                <div
-                  className={`${styles.variantRow} ${styles.variantRowCompact}`}
-                >
-                  <label className={styles.label}>Размер</label>
-                  <div
-                    className={`${styles.sizePickerWrapper} ${
-                      isSizeListOpen ? styles.sizePickerWrapperOpen : ""
-                    }`}
-                    ref={sizePickerRef}
-                  >
-                    <button
-                      type="button"
-                      className={styles.sizePickerButton}
-                      onClick={() => setIsSizeListOpen((prev) => !prev)}
-                      aria-label="Выбрать размер"
-                    >
-                      <span className={styles.sizePickerButtonText}>
-                        {selectedSize.toUpperCase()}
-                      </span>
-                      <svg
-                        width="14"
-                        height="9"
-                        viewBox="0 0 14 9"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className={styles.sizePickerArrow}
-                      >
-                        <path
-                          d="M1 1l6 6 6-6"
-                          stroke="#525252"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    </button>
-                    {isSizeListOpen && (
-                      <ul className={styles.sizeList}>
-                        {availableSizesForSelectedColor.map((size) => {
-                          const isSelected = selectedSize === size;
-                          return (
-                            <li key={size} className={styles.sizeListItem}>
-                              <button
-                                type="button"
-                                className={`${styles.sizeListItemButton} ${
-                                  isSelected
-                                    ? styles.sizeListItemButtonSelected
-                                    : ""
-                                }`}
-                                onClick={() => {
-                                  setSelectedSize(size);
-                                  setIsSizeListOpen(false);
-                                }}
-                                aria-label={`Выбрать размер ${size}`}
-                              >
-                                {isSelected && (
-                                  <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 16 16"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className={styles.sizeListItemCheckmark}
-                                  >
-                                    <path
-                                      d="M13 4L6 11L3 8"
-                                      stroke="#525252"
-                                      strokeWidth="2"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  </svg>
-                                )}
-                                {!isSelected && (
-                                  <span
-                                    className={styles.sizeListItemPlaceholder}
-                                  />
-                                )}
-                                <span className={styles.sizeListItemLabel}>
-                                  {size.toUpperCase()}
-                                </span>
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
+              )}
+
+              {availableSizesForSelectedColor.length > 0 && (
+                <div className={styles.variantRow}>
+                  <span className={styles.label}>Выбрать размер</span>
+                  <div className={styles.sizeChips}>
+                    {availableSizesForSelectedColor.map((size) => {
+                      const isSelected = selectedSize === size;
+                      return (
+                        <button
+                          key={size}
+                          type="button"
+                          className={`${styles.sizeChip} ${
+                            isSelected ? styles.sizeChipSelected : ""
+                          }`}
+                          onClick={() => setSelectedSize(size)}
+                          aria-pressed={isSelected}
+                          aria-label={`Выбрать размер ${size}`}
+                        >
+                          {size}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-                )}
-              </div>
+              )}
+
               <div className={styles.countAndBuy}>
-                <button
-                  type="button"
-                  className={`${styles.addToCartButton} ${
-                    !canAddToCart ? styles.addToCartButtonDisabled : ""
-                  }`}
+                <Button
+                  variant="dark"
+                  fullWidth
                   disabled={!canAddToCart}
                   aria-disabled={!canAddToCart}
                   onClick={handleAddToCart}
                 >
                   {addButtonLabel}
-                </button>
+                </Button>
                 {selectedWarehouseItem &&
                   selectedWarehouseItem.quantity <= 3 && (
                     <p className={styles.stockHint}>Осталось мало</p>
@@ -583,25 +530,31 @@ const ProductPageView = ({
             <div className={styles.accordion}>
               {product.sections.map((section) => {
                 const isOpen = openSection === section.id;
-                const isSelected = selectedSection === section.id;
                 return (
                   <div key={section.id} className={styles.accordionItem}>
                     <button
                       type="button"
-                      className={`${styles.accordionButton} ${
-                        isOpen ? styles.accordionButtonSelected : ""
-                      } ${isOpen ? styles.accordionButtonOpen : ""}`}
+                      className={styles.accordionButton}
                       onClick={() => handleToggleSection(section.id)}
                       aria-expanded={isOpen}
                     >
                       {section.title}
-                      <Image
-                        className={styles.accordionIcon}
-                        src="/images/catalogs/diogonal.png"
-                        alt="accordion-icon"
-                        width={36}
-                        height={36}
-                      />
+                      <span className={styles.accordionIcon} aria-hidden>
+                        <Image
+                          src={
+                            isOpen
+                              ? "/images/product/minus.svg"
+                              : "/images/product/plus.svg"
+                          }
+                          alt=""
+                          width={16}
+                          height={isOpen ? 2 : 16}
+                          className={
+                            isOpen ? styles.accordionMinus : styles.accordionPlus
+                          }
+                          unoptimized
+                        />
+                      </span>
                     </button>
                     <div
                       ref={(node) => {
@@ -627,9 +580,9 @@ const ProductPageView = ({
       </main>
       <div className={styles.suggestions}>
         <ProductDisplaySection
-          title="BESTSELLER"
+          title="Вам также может понравиться"
           showShopNow={false}
-          isBestseller={true}
+          headerAlign="center"
         />
       </div>
       <Footer />

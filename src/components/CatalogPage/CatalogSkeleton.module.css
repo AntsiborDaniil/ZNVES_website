@@ -1,7 +1,7 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 30px 10px;
+  gap: 20px;
   position: relative;
   z-index: 1;
 }
@@ -9,17 +9,14 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  background-color: #5252520f;
-  padding: 92px 0 0 0;
+  gap: 20px;
 }
 
 .imageWrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 335 / 358;
   overflow: hidden;
-  padding: 0 21px;
 }
 
 .image {
@@ -27,68 +24,51 @@
   height: 100%;
   background: linear-gradient(
     110deg,
-    rgba(82, 82, 82, 0.08) 25%,
-    rgba(82, 82, 82, 0.14) 50%,
-    rgba(82, 82, 82, 0.08) 75%
+    var(--color-grey-5) 25%,
+    #e4e4e4 50%,
+    var(--color-grey-5) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
-  border-radius: 4px;
 }
 
 .info {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 0 21px 26px 21px;
   justify-content: space-between;
-  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
 }
 
 .titleLine {
-  height: 22px;
+  height: 18px;
   width: 75%;
   max-width: 180px;
   background: linear-gradient(
     110deg,
-    rgba(82, 82, 82, 0.08) 25%,
-    rgba(82, 82, 82, 0.14) 50%,
-    rgba(82, 82, 82, 0.08) 75%
+    var(--color-grey-5) 25%,
+    #e4e4e4 50%,
+    var(--color-grey-5) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite 0.15s;
-  border-radius: 4px;
 }
 
 .titleLineShort {
-  height: 18px;
-  width: 50%;
-  max-width: 120px;
-  background: linear-gradient(
-    110deg,
-    rgba(82, 82, 82, 0.08) 25%,
-    rgba(82, 82, 82, 0.14) 50%,
-    rgba(82, 82, 82, 0.08) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.4s ease-in-out infinite 0.25s;
-  border-radius: 4px;
+  display: none;
 }
 
 .priceLine {
-  height: 22px;
+  height: 18px;
   width: 35%;
-  max-width: 90px;
-  margin-top: 4px;
+  max-width: 86px;
   background: linear-gradient(
     110deg,
-    rgba(82, 82, 82, 0.08) 25%,
-    rgba(82, 82, 82, 0.14) 50%,
-    rgba(82, 82, 82, 0.08) 75%
+    var(--color-grey-5) 25%,
+    #e4e4e4 50%,
+    var(--color-grey-5) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite 0.35s;
-  border-radius: 4px;
 }
 
 @keyframes shimmer {
@@ -100,51 +80,34 @@
   }
 }
 
-@media (max-width: 1440px) {
-  .grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 30px 8px;
-  }
-}
-
 @media (min-width: 768px) and (max-width: 1024px) {
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 30px 6px;
   }
 }
 
 @media (max-width: 768px) {
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px 6px;
+    gap: 20px;
   }
 
   .card {
-    gap: 18px;
-    padding-top: 28px;
+    gap: 6px;
   }
 
   .imageWrap {
-    padding: 0 18px;
+    aspect-ratio: 184 / 224;
   }
 
   .info {
-    padding: 0 18px 22px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
   }
 
-  .titleLine {
-    height: 16px;
-    max-width: 140px;
-  }
-
-  .titleLineShort {
-    height: 14px;
-    max-width: 90px;
-  }
-
+  .titleLine,
   .priceLine {
-    height: 16px;
-    max-width: 70px;
+    height: 12px;
   }
 }

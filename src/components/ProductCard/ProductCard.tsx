@@ -18,6 +18,7 @@ type ProductCardProps = {
   isNew: boolean;
   isSliderCard?: boolean;
   variant?: "slider" | "grid";
+  zoomOnHover?: boolean;
 };
 
 const ProductCard = ({
@@ -27,6 +28,7 @@ const ProductCard = ({
   isNew,
   isSliderCard = false,
   variant = "slider",
+  zoomOnHover = false,
 }: ProductCardProps) => {
   const imageList = useMemo(() => {
     if (images.length === 0) {
@@ -172,7 +174,9 @@ const ProductCard = ({
     <div
       className={`${styles.productCard} ${
         isSliderCard ? styles.sliderCard : ""
-      } ${variant === "grid" ? styles.gridCard : ""}`}
+      } ${variant === "grid" ? styles.gridCard : ""} ${
+        zoomOnHover ? styles.zoomOnHover : ""
+      }`}
     >
       <div className={styles.imageWrapper}>
         <div
@@ -211,7 +215,7 @@ const ProductCard = ({
               />
             );
           })}
-          {isNew && <div className={styles.newBadge}>new</div>}
+          {isNew && <div className={styles.newBadge}>NEW</div>}
         </div>
       </div>
       <div className={styles.productInfo}>

@@ -147,6 +147,17 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
 
             <div className={styles.menuSection}>
               <Link
+                href="/#collections"
+                className={styles.menuHeader}
+                onClick={handleLinkClick}
+                prefetch={false}
+              >
+                КОЛЛЕКЦИИ
+              </Link>
+            </div>
+
+            <div className={styles.menuSection}>
+              <Link
                 href="/catalog"
                 className={`${styles.menuHeader} ${
                   isCatalogActive ? styles.menuHeaderActive : ""

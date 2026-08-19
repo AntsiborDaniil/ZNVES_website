@@ -77,6 +77,8 @@ const extractCategoryFromSlug = (slug: string): string | null => {
   if (slugLower.includes("jacket")) return "Jackets";
   if (slugLower.includes("hoodie")) return "Hoodies";
   if (slugLower.includes("short")) return "Shorts";
+  if (slugLower.includes("bag") || slugLower.includes("сумк")) return "Bags";
+  if (slugLower.includes("ski") || slugLower.includes("suit")) return "Jackets";
   
   return null;
 };

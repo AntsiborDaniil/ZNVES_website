@@ -2,10 +2,12 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: #1a1a1a;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
     transition: opacity 0.2s ease;
 }
 
@@ -14,19 +16,7 @@
 }
 
 .accountImage {
-    width: 13px;
-    height: 13px;
-}
-
-@media (max-width: 1440px) {
-    .accountImage {
-        width: 13px;
-        height: 13px;
-    }
-}
-
-@media (max-width: 1024px) {
-    .accountImage {
-        display: none;
-    }
+    width: 16px;
+    height: 20px;
+    object-fit: contain;
 }

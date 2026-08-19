@@ -16,72 +16,43 @@ async function prepareHomePage(page: import("@playwright/test").Page) {
   await page.goto("/");
 }
 
-async function openFooterCatalog(page: import("@playwright/test").Page) {
-  const footer = page.getByRole("contentinfo");
-  await footer.scrollIntoViewIfNeeded();
-
-  const catalogToggle = footer.getByRole("button", { name: "CATALOG" });
-  if (await catalogToggle.isVisible()) {
-    const expanded = await catalogToggle.getAttribute("aria-expanded");
-    if (expanded === "false") {
-      await catalogToggle.click();
-    }
-  }
-}
-
-test.describe("Footer catalog links", () => {
-  test("renders categories from API with correct hrefs", async ({ page }) => {
+test.describe("Footer links", () => {
+  test("renders service, catalog and legal links", async ({ page }) => {
     await prepareHomePage(page);
-    await openFooterCatalog(page);
 
-    const catalog = page.getByTestId("footer-catalog");
-    await expect(catalog).toBeVisible();
+    const footer = page.getByRole("contentinfo");
+    await footer.scrollIntoViewIfNeeded();
 
-    await expect(catalog.getByRole("link", { name: "New in", exact: true })).toHaveAttribute(
+    await expect(footer.getByRole("link", { name: "Каталог", exact: true })).toHaveAttribute(
       "href",
-      "/new-in"
+      "/catalog"
     );
-    await expect(catalog.getByRole("link", { name: "Hoodies", exact: true })).toHaveAttribute(
+    await expect(footer.getByRole("link", { name: "Корзина", exact: true })).toHaveAttribute(
       "href",
-      "/catalog?category=hoodies"
+      "/cart"
     );
-    await expect(catalog.getByRole("link", { name: "Jeans", exact: true })).toHaveAttribute(
-      "href",
-      "/catalog?category=jeans"
-    );
-    await expect(catalog.getByRole("link", { name: "Shorts", exact: true })).toHaveAttribute(
-      "href",
-      "/catalog?category=shorts"
-    );
+    await expect(
+      footer.getByRole("link", { name: "Личный кабинет", exact: true })
+    ).toHaveAttribute("href", "/account");
+    await expect(
+      footer.getByRole("link", { name: "Доставка и оплата", exact: true })
+    ).toHaveAttribute("href", "/delivery-payment");
+    await expect(
+      footer.getByRole("link", { name: "Обмен и возврат", exact: true })
+    ).toHaveAttribute("href", "/returns");
+    await expect(
+      footer.getByRole("link", { name: "Политика конфиденциальности" }).first()
+    ).toHaveAttribute("href", "/privacy");
+    await expect(
+      footer.getByRole("link", { name: "Публичная оферта", exact: true })
+    ).toHaveAttribute("href", "/public-offer");
   });
 
-  test("navigates to catalog category from footer link", async ({ page }) => {
+  test("navigates to catalog from footer", async ({ page }) => {
     await prepareHomePage(page);
-    await openFooterCatalog(page);
-
-    await page.getByTestId("footer-catalog").getByRole("link", { name: "Jackets", exact: true }).click();
-    await expect(page).toHaveURL(/\/catalog\?category=jackets/);
-  });
-
-  test("shows all mock categories in footer catalog", async ({ page }) => {
-    await prepareHomePage(page);
-    await openFooterCatalog(page);
-
-    const expectedLabels = [
-      "New in",
-      "T-shirts",
-      "Hoodies",
-      "Zip hoodies",
-      "Jeans",
-      "Jackets",
-      "Pants",
-      "Shorts",
-    ];
-
-    for (const label of expectedLabels) {
-      await expect(
-        page.getByTestId("footer-catalog").getByRole("link", { name: label, exact: true })
-      ).toBeVisible();
-    }
+    const footer = page.getByRole("contentinfo");
+    await footer.scrollIntoViewIfNeeded();
+    await footer.getByRole("link", { name: "Каталог", exact: true }).click();
+    await expect(page).toHaveURL(/\/catalog/);
   });
 });

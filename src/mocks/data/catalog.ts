@@ -16,6 +16,7 @@ export const MOCK_CATALOG_CATEGORIES: ApiCatalogCategory[] = [
   { slug: "jackets", name: "Jackets" },
   { slug: "pants", name: "Pants" },
   { slug: "shorts", name: "Shorts" },
+  { slug: "bags", name: "Bags" },
 ];
 
 export const MOCK_CATALOG_COLORS: ApiCatalogColor[] = [
@@ -89,6 +90,95 @@ type MockProductSeed = {
 };
 
 const PRODUCT_SEEDS: MockProductSeed[] = [
+  {
+    slug: "znves-ski-suit",
+    name: "ZNVES SKI SUIT",
+    price: "22900",
+    is_new: true,
+    image: "/images/catalogs/mock/ski-suit-1.png",
+    gallery: [
+      "/images/catalogs/mock/ski-suit-1.png",
+      "/images/catalogs/mock/ski-suit-2.png",
+      "/images/catalogs/mock/ski-suit-m.png",
+    ],
+    colors: ["black", "navy"],
+    sizes: ["s", "m", "l", "xl"],
+    variants: [
+      { color_slug: "black", size_slugs: ["s", "m", "l", "xl"] },
+      { color_slug: "navy", size_slugs: ["m", "l", "xl"] },
+    ],
+    description: "Горнолыжный костюм ZNVES из плотной мембранной ткани.",
+    weight: 1400,
+  },
+  {
+    slug: "znves-bag",
+    name: "ZNVES BAG",
+    price: "4490",
+    is_new: true,
+    image: "/images/catalogs/mock/bag-1.png",
+    gallery: [
+      "/images/catalogs/mock/bag-1.png",
+      "/images/catalogs/mock/bag-2.png",
+      "/images/catalogs/mock/bag-m.png",
+    ],
+    colors: ["green", "gray"],
+    sizes: ["s", "m"],
+    variants: [
+      { color_slug: "green", size_slugs: ["s", "m"] },
+      { color_slug: "gray", size_slugs: ["s", "m"] },
+    ],
+    description: "Сумка ZNVES из плотного текстиля.",
+    weight: 380,
+  },
+  {
+    slug: "znves-bag-low",
+    name: "ZNVES BAG LOW",
+    price: "3390",
+    is_new: true,
+    image: "/images/catalogs/mock/bag-low-1.png",
+    gallery: [
+      "/images/catalogs/mock/bag-low-1.png",
+      "/images/catalogs/mock/bag-low-2.png",
+    ],
+    colors: ["green", "sand"],
+    sizes: ["s", "m"],
+    variants: [
+      { color_slug: "green", size_slugs: ["s", "m"] },
+      { color_slug: "sand", size_slugs: ["s", "m"] },
+    ],
+    description: "Компактная сумка ZNVES низкого силуэта.",
+    weight: 280,
+  },
+  {
+    slug: "znves-bag-sport",
+    name: "ZNVES BAG SPORT",
+    price: "4490",
+    is_new: true,
+    image: "/images/catalogs/mock/bag-sport.png",
+    colors: ["black", "olive"],
+    sizes: ["s", "m", "l"],
+    variants: [
+      { color_slug: "black", size_slugs: ["s", "m", "l"] },
+      { color_slug: "olive", size_slugs: ["m", "l"] },
+    ],
+    description: "Спортивная сумка ZNVES.",
+    weight: 420,
+  },
+  {
+    slug: "znves-bag-square",
+    name: "ZNVES BAG SQUARE",
+    price: "5390",
+    is_new: true,
+    image: "/images/catalogs/mock/bag-square.png",
+    colors: ["green", "black"],
+    sizes: ["s", "m"],
+    variants: [
+      { color_slug: "green", size_slugs: ["s", "m"] },
+      { color_slug: "black", size_slugs: ["s", "m"] },
+    ],
+    description: "Квадратная сумка ZNVES.",
+    weight: 360,
+  },
   {
     slug: "t-shirt-voyage",
     name: "T-SHIRT VOYAGE",
@@ -327,7 +417,8 @@ export const filterMockCatalogProducts = (params: {
         product.slug.includes(cat) ||
         product.slug.startsWith(cat) ||
         (cat === "hoodies" && product.slug.includes("hoodie")) ||
-        (cat === "zip-hoodie" && product.slug.includes("zip-hoodie"))
+        (cat === "zip-hoodie" && product.slug.includes("zip-hoodie")) ||
+        (cat === "bags" && product.slug.includes("bag"))
     );
   }
 

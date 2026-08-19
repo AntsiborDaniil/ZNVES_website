@@ -33,7 +33,7 @@
   width: 19px;
   height: 2px;
   font-weight: 400;
-  background-color: #fff7df;
+  background-color: var(--color-white);
   border-radius: 999px;
   display: block;
 }
@@ -43,7 +43,7 @@
   inset: 0 auto 0 0;
   width: min(360px, 80vw);
   padding: 0;
-  background-color: #1f4c38;
+  background-color: var(--color-black);
   transform: translateX(-100%);
   transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
   z-index: 1001;
@@ -103,7 +103,7 @@
 
 .menuHeader {
   text-decoration: none;
-  color: #fff7df;
+  color: #ffffff;
   font-weight: 300;
   font-size: 20px;
   letter-spacing: 0%;
@@ -119,7 +119,7 @@
 
 .menuHeaderButton {
   cursor: pointer;
-  color: #fff7df;
+  color: #ffffff;
 
   font-weight: 300;
   font-style: Regular;
@@ -135,11 +135,11 @@
 }
 
 .menuHeaderActive {
-  color: #fff7df;
+  color: #ffffff;
 }
 
 .catalogSubmenu {
-  color: #fff7df;
+  color: #ffffff;
 
   list-style: none;
   padding: 0;
@@ -216,7 +216,7 @@
 
 .catalogLink {
   text-decoration: none;
-  color: #fff7df;
+  color: #ffffff;
   font-weight: 300;
   font-size: 12px;
   line-height: 22.6px;
@@ -228,11 +228,11 @@
 
 .catalogLink:hover,
 .catalogLink:focus-visible {
-  color: #fff7df80;
+  color: #ffffff80;
 }
 
 .catalogLinkActive {
-  color: #fff7df80;
+  color: #ffffff80;
   font-weight: 300;
   position: relative;
 }
@@ -251,7 +251,7 @@
 
 .menuItemWithIcon {
   text-decoration: none;
-  color: #fff7df;
+  color: #ffffff;
   font-weight: 300;
   font-size: 18px;
   line-height: 24.8px;
@@ -288,7 +288,7 @@
 
 .socialLink {
   text-decoration: none;
-  color: #fff7df;
+  color: #ffffff;
   font-weight: 300;
   font-size: 14px;
   line-height: 14.4px;

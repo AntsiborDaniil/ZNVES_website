@@ -9,9 +9,9 @@ import {
   useState,
   type ComponentType,
 } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "../ProductCard/ProductCard";
+import SectionHeader from "../SectionHeader/SectionHeader";
 import SliderSkeleton from "./SliderSkeleton";
 import styles from "./ProductDisplaySection.module.css";
 import type { CatalogProduct } from "../../types/products";
@@ -24,79 +24,60 @@ import "swiper/css/mousewheel";
 import type { Swiper as SwiperInstance } from "swiper";
 import { useWindowSize } from "../../hooks/useWindowSize";
 
-type ActiveArrow = "prev" | "next" | null;
-
 type ProductDisplaySectionProps = {
   title: string;
   showShopNow: boolean;
   id?: string;
   isBestseller?: boolean;
+  headerAlign?: "split" | "center";
 };
+
+const isNewInTitle = (title: string) =>
+  title === "NEW IN" || title === "Bestsellers";
 
 const ProductDisplaySection = ({
   title,
   showShopNow,
   id,
   isBestseller = false,
+  headerAlign = "split",
 }: ProductDisplaySectionProps) => {
   const swiperRef = useRef<SwiperInstance | null>(null);
-  const [activeArrow, setActiveArrow] = useState<ActiveArrow>(null);
-  const [isBeginning, setIsBeginning] = useState(true);
-  const [isEnd, setIsEnd] = useState(false);
   const [maxVisible, setMaxVisible] = useState<number | "auto">(4);
-  const [spaceBetween, setSpaceBetween] = useState(30);
-  const [slidesOffsetAfter, setSlidesOffsetAfter] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const [spaceBetween, setSpaceBetween] = useState(20);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const { width } = useWindowSize();
 
   useEffect(() => {
     if (width === 0) return;
 
-    if (width <= 480) {
-      setMaxVisible("auto");
+    if (width <= 768) {
+      setMaxVisible(2);
       setSpaceBetween(8);
-      setIsMobile(false);
-      setSlidesOffsetAfter(Math.min(120, Math.floor(width * 0.25)));
-    } else if (width <= 768) {
-      setMaxVisible("auto");
-      setSpaceBetween(10);
-      setIsMobile(false);
-      setSlidesOffsetAfter(Math.min(80, Math.floor(width * 0.15)));
     } else if (width <= 1200) {
       setMaxVisible(3);
-      setSpaceBetween(10);
-      setIsMobile(false);
-      setSlidesOffsetAfter(0);
+      setSpaceBetween(16);
     } else {
       setMaxVisible(4);
-      setSpaceBetween(10);
-      setIsMobile(false);
-      setSlidesOffsetAfter(0);
+      setSpaceBetween(20);
     }
   }, [width]);
 
-  useEffect(() => {
-    if (width > 0 && width <= 480 && swiperRef.current) {
-      const t = setTimeout(() => swiperRef.current?.update(), 100);
-      return () => clearTimeout(t);
-    }
-  }, [width]);
-
-  // Загрузка товаров из API (с кешем в catalogApi)
   useEffect(() => {
     const loadProducts = async () => {
       setIsLoading(true);
       try {
-        if (title === "NEW IN") {
+        if (isNewInTitle(title)) {
           const newInProducts = await fetchNewInProducts();
           setProducts(newInProducts);
         } else {
           const catalogProducts = await fetchAllCatalogProducts();
           setProducts(catalogProducts);
         }
-      } catch (error) {
+      } catch {
         setProducts([]);
       } finally {
         setIsLoading(false);
@@ -105,20 +86,6 @@ const ProductDisplaySection = ({
 
     loadProducts();
   }, [title]);
-
-  const handlePrev = () => {
-    if (!isBeginning && swiperRef.current) {
-      swiperRef.current.slidePrev();
-      setActiveArrow("prev");
-    }
-  };
-
-  const handleNext = () => {
-    if (swiperRef.current) {
-      swiperRef.current.slideNext();
-      setActiveArrow("next");
-    }
-  };
 
   const MIN_SLIDES_FOR_LOOP = 16;
 
@@ -132,127 +99,64 @@ const ProductDisplaySection = ({
     return repeated;
   }, [products]);
 
-  const canNavigate =
-    slidesForSwiper.length >
-    (typeof maxVisible === "number" ? maxVisible : 2);
+  const shopNowHref = isNewInTitle(title) ? "/new-in" : "/catalog";
+  const uniqueCount = Math.max(products.length, 1);
 
-  const shopNowHref =
-    title === "NEW IN"
-      ? "/new-in"
-      : title === "CATALOG"
-      ? "/catalog"
-      : "/catalog";
+  const syncSwiperState = useCallback(
+    (swiper: SwiperInstance) => {
+      const real = swiper.realIndex ?? 0;
+      setActiveIndex(real % uniqueCount);
+      setProgress(Math.min(100, Math.max(8, (swiper.progress || 0) * 100)));
+    },
+    [uniqueCount]
+  );
 
-  const handleSwiper = useCallback((swiper: SwiperInstance) => {
-    swiperRef.current = swiper;
-    setIsBeginning(swiper.isBeginning);
-    setIsEnd(swiper.isEnd);
-    if (width > 0 && width <= 480) {
-      requestAnimationFrame(() => {
-        swiper.update();
-      });
-    }
-  }, [width]);
+  const handleSwiper = useCallback(
+    (swiper: SwiperInstance) => {
+      swiperRef.current = swiper;
+      syncSwiperState(swiper);
+    },
+    [syncSwiperState]
+  );
 
-  const handleSlideChange = useCallback((swiper: SwiperInstance) => {
-    setIsBeginning(swiper.isBeginning);
-    setIsEnd(swiper.isEnd);
-    setActiveArrow(null);
-  }, []);
+  const handleSlideChange = useCallback(
+    (swiper: SwiperInstance) => {
+      syncSwiperState(swiper);
+    },
+    [syncSwiperState]
+  );
 
-  const handleBeforeInit = useCallback((swiper: SwiperInstance) => {
-    const params = swiper.params as unknown as Record<string, unknown>;
-    params.preloadImages = true;
-    params.loopedSlides = Math.max(slidesForSwiper.length, 8);
-    params.loopAdditionalSlides = 4;
-    params.lazy = {
-      enabled: true,
-      loadOnTransitionStart: true,
-      loadPrevNext: true,
-      loadPrevNextAmount: 3,
-    };
-  }, [slidesForSwiper.length]);
+  const handleBeforeInit = useCallback(
+    (swiper: SwiperInstance) => {
+      const params = swiper.params as unknown as Record<string, unknown>;
+      params.preloadImages = true;
+      params.loopedSlides = Math.max(slidesForSwiper.length, 8);
+      params.loopAdditionalSlides = 4;
+      params.lazy = {
+        enabled: true,
+        loadOnTransitionStart: true,
+        loadPrevNext: true,
+        loadPrevNextAmount: 3,
+      };
+    },
+    [slidesForSwiper.length]
+  );
+
+  const goToSlide = (index: number) => {
+    swiperRef.current?.slideToLoop(index);
+  };
 
   return (
     <section
       id={id}
       className={`${styles.section} ${isBestseller ? styles.isBestseller : ""}`}
     >
-      <div className={styles.header}>
-        <h1 className={styles.title}>{title}</h1>
-        <div className={styles.headerRight}>
-          {showShopNow && (
-            <Link href={shopNowHref} className={styles.shopNow} prefetch={false}>
-              SHOP NOW
-              <Image
-                src="/images/catalogs/shopArrow.png"
-                alt="Arrow Right"
-                width={24}
-                height={24}
-                className={styles.shopArrow}
-                loading="lazy"
-              />
-            </Link>
-          )}
-
-          {canNavigate && (
-            <div className={styles.arrows}>
-              <button
-                className={`${styles.arrowButton} ${
-                  activeArrow === "prev"
-                    ? styles.arrowButtonActive
-                    : styles.arrowButtonInactive
-                }`}
-                onClick={handlePrev}
-                aria-label="Previous"
-                type="button"
-                disabled={isBeginning}
-              >
-                <svg
-                  width="35"
-                  height="30"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  stroke="currentColor"
-                  className={
-                    activeArrow === "prev"
-                      ? styles.arrowSvgActive
-                      : styles.arrowSvgInactive
-                  }
-                >
-                  <path d="M12 15l-5-5 5-5" />
-                </svg>
-              </button>
-              <button
-                className={`${styles.arrowButton} ${
-                  activeArrow === "next"
-                    ? styles.arrowButtonActive
-                    : styles.arrowButtonInactive
-                }`}
-                onClick={handleNext}
-                aria-label="Next"
-                type="button"
-                disabled={isEnd}
-              >
-                <svg
-                  width="35"
-                  height="30"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  stroke="currentColor"
-                  className={
-                    activeArrow === "next"
-                      ? styles.arrowSvgActive
-                      : styles.arrowSvgInactive
-                  }
-                >
-                  <path d="M8 15l5-5-5-5" />
-                </svg>
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+      <SectionHeader
+        title={title}
+        href={showShopNow ? shopNowHref : undefined}
+        actionLabel="Смотреть больше"
+        align={headerAlign}
+      />
       <div className={styles.sliderContainer}>
         {isLoading ? (
           <SliderSkeleton />
@@ -264,16 +168,13 @@ const ProductDisplaySection = ({
               modules: [FreeMode, Mousewheel],
               loop: true,
               spaceBetween,
-              slidesOffsetAfter,
               slidesPerView: maxVisible,
               slidesPerGroup: 1,
-              centeredSlides: isMobile,
-              speed: width > 0 && width <= 480 ? 400 : 1100,
+              speed: width > 0 && width <= 768 ? 400 : 1100,
               followFinger: true,
-              touchRatio: width > 0 && width <= 480 ? 1.2 : 1,
-              longSwipesRatio: width > 0 && width <= 480 ? 0.3 : 0.15,
+              touchRatio: 1,
               resistance: true,
-              resistanceRatio: width > 0 && width <= 480 ? 0.6 : 0.7,
+              resistanceRatio: 0.65,
               freeMode: {
                 enabled: true,
                 momentum: true,
@@ -294,13 +195,8 @@ const ProductDisplaySection = ({
               watchOverflow: false,
               onSwiper: handleSwiper,
               onSlideChange: handleSlideChange,
+              onProgress: syncSwiperState,
               onBeforeInit: handleBeforeInit,
-              lazy: {
-                enabled: true,
-                loadOnTransitionStart: true,
-                loadPrevNext: true,
-                loadPrevNextAmount: 3,
-              },
             },
             [
               ...slidesForSwiper.map((product, index) => (
@@ -330,61 +226,25 @@ const ProductDisplaySection = ({
           <div className={styles.emptyState}>Товары не найдены</div>
         )}
       </div>
-      {canNavigate && (
-        <div className={styles.arrowsBottom}>
-          <button
-            className={`${styles.arrowButton} ${
-              activeArrow === "prev"
-                ? styles.arrowButtonActive
-                : styles.arrowButtonInactive
-            } ${isBeginning ? styles.arrowButtonDisabled : ""}`}
-            onClick={handlePrev}
-            aria-label="Previous"
-            type="button"
-            disabled={isBeginning}
-          >
-            <svg
-              width="35"
-              height="30"
-              viewBox="0 0 20 20"
-              fill="none"
-              stroke="currentColor"
-              className={
-                activeArrow === "prev"
-                  ? styles.arrowSvgActive
-                  : styles.arrowSvgInactive
-              }
-            >
-              <path d="M12 15l-5-5 5-5" />
-            </svg>
-          </button>
-          <button
-            className={`${styles.arrowButton} ${
-              activeArrow === "next"
-                ? styles.arrowButtonActive
-                : styles.arrowButtonInactive
-            } ${isEnd ? styles.arrowButtonDisabled : ""}`}
-            onClick={handleNext}
-            aria-label="Next"
-            type="button"
-            disabled={isEnd}
-          >
-            <svg
-              width="35"
-              height="30"
-              viewBox="0 0 20 20"
-              fill="none"
-              stroke="currentColor"
-              className={
-                activeArrow === "next"
-                  ? styles.arrowSvgActive
-                  : styles.arrowSvgInactive
-              }
-            >
-              <path d="M8 15l5-5-5-5" />
-            </svg>
-          </button>
-        </div>
+      {products.length > 0 && (
+        <>
+          <div className={styles.progress} aria-hidden>
+            <span className={styles.progressFill} style={{ width: `${progress}%` }} />
+          </div>
+          <div className={styles.bullets} role="tablist" aria-label="Слайды">
+            {products.map((product, index) => (
+              <button
+                key={product.id}
+                type="button"
+                className={`${styles.bullet} ${
+                  index === activeIndex ? styles.bulletActive : ""
+                }`}
+                aria-label={`Слайд ${index + 1}`}
+                onClick={() => goToSlide(index)}
+              />
+            ))}
+          </div>
+        </>
       )}
     </section>
   );

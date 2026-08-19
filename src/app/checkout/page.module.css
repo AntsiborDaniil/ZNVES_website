@@ -1,6 +1,6 @@
 .checkoutPage {
   min-height: 100vh;
-  margin-top: 46px;
+  margin-top: 0;
   background-color: #f2f0ec;
   display: flex;
   flex-direction: column;

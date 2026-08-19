@@ -11,10 +11,11 @@ import CookieBanner from "../components/CookieBanner/CookieBanner";
 import MockProvider from "../components/MockProvider/MockProvider";
 
 const inter = Inter({
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic", "cyrillic-ext"],
+  weight: ["300", "400", "500", "700"],
   variable: "--font-inter",
   display: "swap",
-  preload: false,
+  preload: true,
 });
 
 const montserrat = Montserrat({
@@ -36,7 +37,7 @@ const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
   variable: "--font-roboto",
   display: "swap",
-  preload: true,
+  preload: false,
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://znves.ru";
@@ -80,10 +81,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ru">
-      <body
-        className={`${roboto.variable} ${inter.variable} ${montserrat.variable} ${plusJakarta.variable}`}
-      >
+    <html
+      lang="ru"
+      className={`${inter.variable} ${roboto.variable} ${montserrat.variable} ${plusJakarta.variable}`}
+    >
+      <body className={inter.className}>
         <MockProvider>
           <ToastProvider>
             <AuthProvider>

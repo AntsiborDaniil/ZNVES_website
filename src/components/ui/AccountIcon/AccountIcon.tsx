@@ -21,12 +21,13 @@ const AccountIcon = () => {
       onClick={handleClick}
     >
       <Image
-        src="/images/account.png"
+        src="/images/icons/user.svg"
         alt="Личный кабинет"
-        width={12}
-        height={12}
+        width={16}
+        height={20}
         className={styles.accountImage}
         loading="lazy"
+        unoptimized
       />
     </button>
   );
