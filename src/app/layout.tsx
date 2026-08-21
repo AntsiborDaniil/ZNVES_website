@@ -7,6 +7,9 @@ import PreloadCatalogFilters from "../components/PreloadCatalogFilters/PreloadCa
 import { CartProvider } from "../contexts/CartContext";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ToastProvider } from "../components/ui/ToastProvider/ToastProvider";
+import CartModalHost from "../components/CartModal/CartModalHost";
+import AuthModalHost from "../components/AuthModal/AuthModalHost";
+import LogoutConfirmModalHost from "../components/LogoutConfirmModal/LogoutConfirmModalHost";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import MockProvider from "../components/MockProvider/MockProvider";
 
@@ -93,6 +96,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <NavigationTracker />
                 <PreloadCatalogFilters />
                 {children}
+                <CartModalHost />
+                <AuthModalHost />
+                <LogoutConfirmModalHost />
                 <CookieBanner />
               </CartProvider>
             </AuthProvider>

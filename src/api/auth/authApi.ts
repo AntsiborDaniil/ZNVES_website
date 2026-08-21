@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../../lib/apiConfig";
+import { getCsrfToken } from "../../lib/csrf";
 import { AuthApiError, parseAuthApiErrorResponse } from "./authApiErrors";
 
 export { AuthApiError, humanizeAuthErrorMessage, parseAuthApiErrorBody } from "./authApiErrors";
@@ -34,12 +35,14 @@ const AUTH_BASE_URL = `${API_BASE_URL}/api/auth`;
 
 const AUTH_USER_URL = `${AUTH_BASE_URL}/user/`;
 const AUTH_USER_DELIVERY_URL = `${AUTH_BASE_URL}/user/delivery-data/`;
+const AUTH_CHANGE_PASSWORD_URL = `${AUTH_BASE_URL}/user/change-password/`;
 
 const REGISTER_URL = `${AUTH_BASE_URL}/register/`;
 const REGISTER_VERIFY_URL = `${AUTH_BASE_URL}/register/verify/`;
 const LOGIN_URL = `${AUTH_BASE_URL}/login/`;
 const LOGIN_VERIFY_URL = `${AUTH_BASE_URL}/login/verify/`;
 const RESEND_CODE_URL = `${AUTH_BASE_URL}/register/resend-code/`;
+const LOGOUT_URL = `${AUTH_BASE_URL}/logout/`;
 
 export type RegisterPayload = {
   email: string;
@@ -78,6 +81,18 @@ export const parseAuthUser = (data: unknown): AuthUser | null => {
   };
 };
 
+const authJsonHeaders = (): Record<string, string> => {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+  const csrf = getCsrfToken();
+  if (csrf) {
+    headers["X-CSRFToken"] = csrf;
+  }
+  return headers;
+};
+
 const authPost = async (url: string, payload: object): Promise<void> => {
   if (typeof window === "undefined") {
     throw new Error("Вызов только на клиенте");
@@ -86,10 +101,7 @@ const authPost = async (url: string, payload: object): Promise<void> => {
   const response = await fetch(url, {
     method: "POST",
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+    headers: authJsonHeaders(),
     body: JSON.stringify(payload),
   });
 
@@ -106,10 +118,7 @@ const authPostVerify = async (url: string, payload: object): Promise<AuthUser> =
   const response = await fetch(url, {
     method: "POST",
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+    headers: authJsonHeaders(),
     body: JSON.stringify(payload),
   });
 
@@ -150,6 +159,24 @@ export const verifyLogin = async (payload: VerifyPayload): Promise<AuthUser> => 
 
 export const resendAuthCode = async (email: string): Promise<void> => {
   await authPost(RESEND_CODE_URL, { email });
+};
+
+export const logoutUser = async (): Promise<void> => {
+  if (typeof window === "undefined") {
+    throw new Error("Вызов только на клиенте");
+  }
+  try {
+    const headers: Record<string, string> = { Accept: "application/json" };
+    const csrf = getCsrfToken();
+    if (csrf) headers["X-CSRFToken"] = csrf;
+    await fetch(LOGOUT_URL, {
+      method: "POST",
+      credentials: "include",
+      headers,
+    });
+  } catch {
+    // Даже если сеть упала — чистим клиентскую сессию ниже по цепочке
+  }
 };
 
 export const getCurrentUser = async (): Promise<AuthUser | null> => {
@@ -218,10 +245,7 @@ export const updateCurrentUser = async (
   const response = await fetch(AUTH_USER_URL, {
     method: "PATCH",
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+    headers: authJsonHeaders(),
     body: JSON.stringify(payload),
   });
   if (!response.ok) {
@@ -253,10 +277,7 @@ export const updateUserDeliveryData = async (
   const response = await fetch(AUTH_USER_DELIVERY_URL, {
     method: "PATCH",
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+    headers: authJsonHeaders(),
     body: JSON.stringify(payload),
   });
   if (!response.ok) {
@@ -273,4 +294,26 @@ export const updateUserDeliveryData = async (
   }
   const data = (await response.json()) as AuthUserDeliveryData;
   return data;
+};
+
+export type ChangePasswordPayload = {
+  current_password: string;
+  new_password: string;
+};
+
+export const changePassword = async (
+  payload: ChangePasswordPayload
+): Promise<void> => {
+  if (typeof window === "undefined") {
+    throw new Error("Вызов только на клиенте");
+  }
+  const response = await fetch(AUTH_CHANGE_PASSWORD_URL, {
+    method: "POST",
+    credentials: "include",
+    headers: authJsonHeaders(),
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    throw await parseAuthApiErrorResponse(response, "Не удалось изменить пароль");
+  }
 };

@@ -42,4 +42,7 @@ export type CartContextType = {
     /** Применённый промокод (скидка в рублях, строка из API) */
     appliedPromo: AppliedPromo | null;
     setAppliedPromo: (promo: AppliedPromo | null) => void;
+    isCartOpen: boolean;
+    openCart: () => void;
+    closeCart: () => void;
 };

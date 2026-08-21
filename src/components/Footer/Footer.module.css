@@ -61,6 +61,15 @@
   transition: opacity 0.2s ease;
 }
 
+button.columnItem {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
 .columnInst {
   text-decoration: underline;
   text-underline-offset: 3px;

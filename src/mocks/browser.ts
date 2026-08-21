@@ -44,4 +44,13 @@ export const unregisterMockServiceWorker = async (): Promise<void> => {
       )
       .map((registration) => registration.unregister())
   );
+
+  if ("caches" in window) {
+    const keys = await caches.keys();
+    await Promise.all(
+      keys
+        .filter((key) => key.toLowerCase().includes("msw") || key.toLowerCase().includes("mock"))
+        .map((key) => caches.delete(key))
+    );
+  }
 };

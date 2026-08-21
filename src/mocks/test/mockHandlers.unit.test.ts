@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  changePassword,
   getCurrentUser,
   loginUser,
   registerUser,
@@ -116,5 +117,32 @@ describe("mock API handlers", () => {
 
     const activeOrders = await getMyOrders(true);
     expect(activeOrders[0]?.total_amount).toBe("4990");
+  });
+
+  it("changes password through mock account endpoint", async () => {
+    await loginUser({
+      email: MOCK_DEV_USER.email,
+      password: MOCK_DEV_USER.password,
+    });
+
+    const verifyResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.znves.ru"}/api/auth/login/verify/`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ email: MOCK_DEV_USER.email, code: MOCK_AUTH_CODE }),
+      }
+    );
+    applySetCookieHeader(verifyResponse.headers.get("set-cookie"));
+    await verifyLogin({ email: MOCK_DEV_USER.email, code: MOCK_AUTH_CODE });
+
+    await changePassword({
+      current_password: MOCK_DEV_USER.password,
+      new_password: "password456",
+    });
+
+    const user = await getCurrentUser();
+    expect(user?.email).toBe(MOCK_DEV_USER.email);
   });
 });

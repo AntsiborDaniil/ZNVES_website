@@ -12,7 +12,7 @@ type CatalogPageProps = {
 const CatalogPage = ({ title }: CatalogPageProps) => {
   return (
     <div className={styles.page}>
-      <Header variant="green" />
+      <Header />
       <main className={styles.main}>
         <Suspense fallback={<LoadingStub label="Загрузка каталога…" />}>
           <CatalogPageContent title={title} />

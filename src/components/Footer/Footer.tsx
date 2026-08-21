@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
 import NewsletterForm from "../NewsletterForm/NewsletterForm";
+import { useCart } from "../../contexts/CartContext";
+import { useAuth } from "../../contexts/AuthContext";
 import styles from "./Footer.module.css";
 
 const SERVICE_LINKS = [
@@ -18,6 +20,8 @@ const NAV_LINKS = [
 ] as const;
 
 const Footer = () => {
+  const { openCart } = useCart();
+  const { isAuthenticated, openAuth } = useAuth();
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [isModalClosing, setIsModalClosing] = useState(false);
   const autoCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -94,9 +98,27 @@ const Footer = () => {
           <ul className={styles.column} data-testid="footer-catalog">
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
-                <Link className={styles.columnItem} href={link.href} prefetch={false}>
-                  {link.label}
-                </Link>
+                {link.href === "/cart" ? (
+                  <button
+                    type="button"
+                    className={styles.columnItem}
+                    onClick={openCart}
+                  >
+                    {link.label}
+                  </button>
+                ) : link.href === "/account" && !isAuthenticated ? (
+                  <button
+                    type="button"
+                    className={styles.columnItem}
+                    onClick={() => openAuth("login")}
+                  >
+                    {link.label}
+                  </button>
+                ) : (
+                  <Link className={styles.columnItem} href={link.href} prefetch={false}>
+                    {link.label}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

@@ -1,7 +1,10 @@
 import { http, HttpResponse } from "msw";
 import { getMockApiBase } from "../config";
 import {
+  buildClearedSessionCookies,
   buildSessionCookies,
+  changePasswordByToken,
+  clearSession,
   getUserByToken,
   parseAccessToken,
   resendCode,
@@ -97,6 +100,34 @@ export const createAuthHandlers = () => {
       const data = updateDeliveryByToken(token, patch);
       if (!data) return HttpResponse.json({ detail: "Unauthorized" }, { status: 401 });
       return HttpResponse.json(data);
+    }),
+
+    http.post(`${base}/api/auth/user/change-password/`, async ({ request }) => {
+      const token = parseAccessToken(request.headers.get("cookie"));
+      const body = await readJson<{
+        current_password: string;
+        new_password: string;
+      }>(request);
+      const result = changePasswordByToken(token, body);
+      if (!result.ok) {
+        const status = result.error === "Unauthorized" ? 401 : 400;
+        return jsonError(result.error, status);
+      }
+      return HttpResponse.json({}, { status: 200 });
+    }),
+
+    http.post(`${base}/api/auth/logout/`, ({ request }) => {
+      const token = parseAccessToken(request.headers.get("cookie"));
+      clearSession(token);
+      return HttpResponse.json(
+        {},
+        {
+          status: 200,
+          headers: {
+            "Set-Cookie": buildClearedSessionCookies().join(", "),
+          },
+        }
+      );
     }),
   ];
 };

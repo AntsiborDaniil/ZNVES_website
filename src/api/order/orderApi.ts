@@ -9,6 +9,8 @@ function buildProductImageUrl(value: string | undefined): string {
   const trimmed = value.trim();
   if (!trimmed) return "";
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  // Локальные ассеты из public/ (мок-каталог) оставляем как есть
+  if (trimmed.startsWith("/images/")) return trimmed;
   const base = API_BASE_URL.replace(/\/$/, "");
   return trimmed.startsWith("/") ? `${base}${trimmed}` : `${base}/${trimmed}`;
 }
@@ -93,6 +95,7 @@ export const invalidateMyOrdersCache = () => {
 export interface AccountOrderView {
   id: string;
   date: string;
+  updatedDate?: string;
   status: string;
   totalAmount: string;
   paymentType: string;
@@ -159,6 +162,7 @@ export const apiOrderToAccountView = (api: ApiMyOrderItem): AccountOrderView => 
   return {
     id: String(api.id),
     date: formatOrderDate(api.created_at),
+    updatedDate: formatOrderDate(api.updated_at),
     status: api.status,
     totalAmount: api.total_amount ?? "",
     paymentType: api.payment_type ?? "",
@@ -257,7 +261,7 @@ function toRequestId(orderId: number): string {
 /** Формирует return_url/cancel_url относительно текущей страницы (origin + path) — работает на проде и деве */
 function getRelativePaymentUrls(): { return_url: string; cancel_url: string } {
   if (typeof window === "undefined") {
-    return { return_url: "/checkout?payment=success", cancel_url: "/checkout?payment=error" };
+    return { return_url: "/catalog?payment=success", cancel_url: "/catalog?payment=error" };
   }
   const { origin, pathname } = window.location;
   const sep = pathname.includes("?") ? "&" : "?";

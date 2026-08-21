@@ -18,6 +18,13 @@
 
 .image {
   object-fit: cover;
+  transition: transform 0.55s ease;
+}
+
+@media (hover: hover) {
+  .banner:hover .image {
+    transform: scale(1.08);
+  }
 }
 
 .gradient {

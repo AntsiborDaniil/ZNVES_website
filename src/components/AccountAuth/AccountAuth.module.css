@@ -8,6 +8,211 @@
   margin: 0 auto;
 }
 
+.authBlockModal {
+  flex: none;
+  justify-content: flex-start;
+  max-width: none;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Modal auth — Figma 2001:2645 */
+.authBlockModal .tabs {
+  margin-top: 0;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.authBlockModal .tabIndicator {
+  background-color: #000000;
+}
+
+.authBlockModal .tab {
+  font-size: 14px;
+  color: #8e8e8e;
+  padding: 12px 0;
+}
+
+.authBlockModal .tab:hover {
+  color: #525252;
+}
+
+.authBlockModal .tabActive {
+  color: #000000;
+  font-weight: 600;
+}
+
+.authBlockModal .title {
+  text-align: center;
+  color: #000000;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.3;
+  margin: 0 0 28px;
+}
+
+.authBlockModal .description {
+  display: none;
+}
+
+.authBlockModal .form {
+  gap: 20px;
+}
+
+.authBlockModal .row {
+  gap: 16px;
+}
+
+.authBlockModal .field {
+  gap: 8px;
+}
+
+.authBlockModal .label {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #000000;
+}
+
+.authBlockModal .input {
+  height: 48px;
+  border: none;
+  border-radius: 3px;
+  background: #f7f7f7;
+  padding: 0 16px;
+  font-size: 14px;
+  color: #000000;
+}
+
+.authBlockModal .input:focus {
+  outline: none;
+  background: #f0f0f0;
+}
+
+.authBlockModal .input::placeholder {
+  color: #8e8e8e;
+}
+
+.authBlockModal .inputError {
+  box-shadow: inset 0 0 0 1px #c93c3c;
+}
+
+.authBlockModal .passwordWrap .input {
+  background: #f7f7f7;
+  border: none;
+}
+
+.authBlockModal .passwordWrap .input:focus {
+  background: #f0f0f0;
+}
+
+.authBlockModal .passwordToggle {
+  color: #8e8e8e;
+}
+
+.authBlockModal .field > div:not(.passwordWrap) {
+  height: 48px;
+  border: none;
+  border-radius: 3px;
+  background: #f7f7f7;
+}
+
+.authBlockModal .field > div:not(.passwordWrap):focus-within {
+  background: #f0f0f0;
+}
+
+.authBlockModal .field > div:not(.passwordWrap) button {
+  background: transparent;
+  border-right: 1px solid #e5e5e5;
+}
+
+.authBlockModal .field > div:not(.passwordWrap) input {
+  background: transparent;
+  font-size: 14px;
+}
+
+.authBlockModal .field > div:not(.passwordWrap) input::placeholder {
+  color: #8e8e8e;
+}
+
+.authBlockModal .submitButton {
+  margin-top: 12px;
+  height: 48px;
+  border: 1px solid #000000;
+  border-radius: 0;
+  background-color: #000000;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.authBlockModal .submitButton:hover:not(:disabled) {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #000000;
+}
+
+.authBlockModal .submitButton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.authBlockModal .privacyNote {
+  margin-top: 20px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #8e8e8e;
+  text-align: center;
+}
+
+.authBlockModal .privacyLink {
+  color: #8e8e8e;
+}
+
+.authBlockModal .fieldError,
+.authBlockModal .errorMessage {
+  font-size: 12px;
+}
+
+.authBlockModal .fieldHint {
+  font-size: 11px;
+  color: #8e8e8e;
+}
+
+.authBlockModal .infoMessage {
+  color: #000000;
+  text-align: center;
+}
+
+.authBlockModal .textButton {
+  color: #8e8e8e;
+}
+
+.authBlockModal .verifyActions {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .authBlockModal .title {
+    font-size: 20px;
+    margin-bottom: 24px;
+  }
+
+  .authBlockModal .row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .tabs {
   position: relative;
   display: flex;

@@ -19,6 +19,8 @@ type PhoneInputProps = {
   error?: boolean;
   disabled?: boolean;
   className?: string;
+  /** `account` — стили как у инпутов личного кабинета */
+  variant?: "default" | "account";
   "aria-invalid"?: boolean;
 };
 
@@ -30,6 +32,7 @@ const PhoneInput = ({
   error = false,
   disabled = false,
   className = "",
+  variant = "default",
   "aria-invalid": ariaInvalid,
 }: PhoneInputProps) => {
   const listId = useId();
@@ -88,7 +91,9 @@ const PhoneInput = ({
   return (
     <div
       ref={wrapRef}
-      className={`${styles.wrap} ${error ? styles.wrapError : ""} ${className}`.trim()}
+      className={`${styles.wrap} ${
+        variant === "account" ? styles.wrapAccount : ""
+      } ${error ? styles.wrapError : ""} ${className}`.trim()}
     >
       <button
         type="button"

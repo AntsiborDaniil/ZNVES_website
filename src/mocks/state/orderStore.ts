@@ -33,7 +33,7 @@ export const createMockOrder = (payload: OrderRequest): ApiMyOrderItem => {
     customer_data: payload.customer_data,
     positions: payload.positions.map((pos) => ({
       id: pos.id,
-      product_name: `Товар ${pos.id}`,
+      product_name: `Товар ${pos.id.slice(0, 8)}`,
       color: "",
       size: "",
       quantity: pos.quantity,

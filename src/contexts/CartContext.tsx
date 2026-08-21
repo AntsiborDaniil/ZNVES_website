@@ -47,7 +47,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const skipPromoResetRef = useRef(true);
+
+  const openCart = useCallback(() => {
+    setIsCartOpen(true);
+  }, []);
+
+  const closeCart = useCallback(() => {
+    setIsCartOpen(false);
+  }, []);
 
   // Загружаем данные из localStorage только после монтирования на клиенте
   useEffect(() => {
@@ -190,6 +199,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         getTotalItems,
         appliedPromo,
         setAppliedPromo,
+        isCartOpen,
+        openCart,
+        closeCart,
       }}
     >
       {children}

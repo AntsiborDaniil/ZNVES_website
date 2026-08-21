@@ -642,15 +642,21 @@
   padding: 12px 24px;
   background-color: var(--color-black);
   color: var(--color-white);
-  border: none;
+  border: 1px solid var(--color-black);
   border-radius: 0;
   cursor: pointer;
   text-transform: uppercase;
-  transition: opacity 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .emptyStateButton:hover {
-  opacity: 0.86;
+  background-color: var(--color-white);
+  color: var(--color-black);
+  border-color: var(--color-black);
 }
 
 .emptyStateButton:active {

@@ -41,7 +41,8 @@ const CatalogCollage = ({
   }, []);
 
   const desktopProducts = products.slice(0, 4);
-  const mobileProducts = products.slice(0, 2);
+  const collageProducts = products.slice(0, 2);
+  const formatPrice = (price: string) => `${price} ₽`;
 
   return (
     <section id={id} className={styles.section}>
@@ -77,6 +78,7 @@ const CatalogCollage = ({
                     price={product.price}
                     images={product.images}
                     isNew={false}
+                    variant="grid"
                     zoomOnHover
                   />
                 </Link>
@@ -84,59 +86,64 @@ const CatalogCollage = ({
             </div>
           </div>
 
-          <div className={styles.mobileGrid}>
-            <div className={styles.mobileCol}>
-              <Link href={moreHref} className={`${styles.lookbook} ${styles.lookbookTall}`} prefetch={false}>
-                <Image
-                  src={HOME_FEATURED_IMAGES[0]}
-                  alt="Catalog lookbook"
-                  fill
-                  sizes="50vw"
-                  className={styles.lookbookImage}
-                />
-              </Link>
-              {mobileProducts[0] && (
+          <div className={styles.collageGrid}>
+            {collageProducts.map((product, index) => {
+              const primaryImage = product.images[0];
+              const secondaryImage = product.images[1] ?? product.images[0];
+              const infoBlock = (
+                <div className={styles.collageInfo}>
+                  <span className={styles.collageTitle}>{product.title}</span>
+                  <span className={styles.collagePrice}>{formatPrice(product.price)}</span>
+                </div>
+              );
+
+              const isRight = index % 2 === 1;
+
+              return (
                 <Link
-                  href={`/catalog/${mobileProducts[0].slug || mobileProducts[0].id}`}
-                  className={styles.productLink}
+                  key={product.id}
+                  href={`/catalog/${product.slug || product.id}`}
+                  className={styles.collageCol}
                   prefetch={false}
                 >
-                  <ProductCard
-                    title={mobileProducts[0].title}
-                    price={mobileProducts[0].price}
-                    images={mobileProducts[0].images}
-                    isNew={false}
-                    zoomOnHover
-                  />
+                  <div
+                    className={
+                      isRight
+                        ? `${styles.collageImageWrap} ${styles.collageImageWrapSmall}`
+                        : styles.collageImageWrap
+                    }
+                  >
+                    <Image
+                      src={primaryImage}
+                      alt={product.title}
+                      fill
+                      sizes="50vw"
+                      className={styles.collageImage}
+                    />
+                  </div>
+
+                  {isRight ? infoBlock : null}
+
+                  <div
+                    className={
+                      !isRight
+                        ? `${styles.collageImageWrap} ${styles.collageImageWrapSmallLeft}`
+                        : styles.collageImageWrap
+                    }
+                  >
+                    <Image
+                      src={secondaryImage}
+                      alt={`${product.title} detail`}
+                      fill
+                      sizes="50vw"
+                      className={styles.collageImage}
+                    />
+                  </div>
+
+                  {!isRight ? infoBlock : null}
                 </Link>
-              )}
-            </div>
-            <div className={styles.mobileCol}>
-              {mobileProducts[1] && (
-                <Link
-                  href={`/catalog/${mobileProducts[1].slug || mobileProducts[1].id}`}
-                  className={styles.productLink}
-                  prefetch={false}
-                >
-                  <ProductCard
-                    title={mobileProducts[1].title}
-                    price={mobileProducts[1].price}
-                    images={mobileProducts[1].images}
-                    isNew={false}
-                    zoomOnHover
-                  />
-                </Link>
-              )}
-              <Link href={moreHref} className={`${styles.lookbook} ${styles.lookbookTall}`} prefetch={false}>
-                <Image
-                  src={HOME_FEATURED_IMAGES[1]}
-                  alt="Catalog lookbook"
-                  fill
-                  sizes="50vw"
-                  className={styles.lookbookImage}
-                />
-              </Link>
-            </div>
+              );
+            })}
           </div>
 
           <Button href={moreHref} variant="outline" className={styles.mobileMore}>

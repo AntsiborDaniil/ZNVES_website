@@ -5,6 +5,7 @@
   padding: var(--space-section) var(--space-page) 0;
 }
 
+/* Desktop: lookbook + 2×2 product grid */
 .desktopGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -19,6 +20,7 @@
   height: 100%;
   min-height: 520px;
   background: var(--color-grey-5);
+  text-decoration: none;
 }
 
 .lookbookImage {
@@ -60,14 +62,79 @@
   min-width: 0;
 }
 
-.mobileGrid,
+/* Mobile: asymmetric collage */
+.collageGrid {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap-cards);
+  align-items: start;
+}
+
+.collageCol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.collageImageWrap {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+  background: var(--color-grey-5);
+}
+
+.collageImageWrapSmall {
+  aspect-ratio: unset !important;
+  height: 148px;
+}
+
+.collageImageWrapSmallLeft {
+  aspect-ratio: unset !important;
+  height: 224px;
+}
+
+.collageImage {
+  object-fit: cover;
+  transition: transform 0.55s ease;
+}
+
+@media (hover: hover) {
+  .collageCol:hover .collageImage {
+    transform: scale(1.08);
+  }
+}
+
+.collageInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.collageTitle {
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-18);
+  letter-spacing: var(--letter-spacing-tight);
+  text-transform: uppercase;
+}
+
+.collagePrice {
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-18);
+  color: var(--color-black);
+}
+
 .mobileMore {
   display: none;
 }
 
 .skeleton {
   width: 100%;
-  min-height: 480px;
+  min-height: 520px;
   background: var(--color-grey-5);
 }
 
@@ -96,32 +163,33 @@
     display: none;
   }
 
-  .mobileGrid {
+  .collageGrid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    align-items: start;
-  }
-
-  .mobileCol {
-    display: flex;
-    flex-direction: column;
     gap: 8px;
   }
 
-  .lookbook {
-    min-height: 0;
-    height: 240px;
+  .collageCol {
+    gap: 8px;
   }
 
-  .lookbookTall {
-    height: 240px;
+  .collageTitle {
+    font-size: var(--font-size-12);
+    line-height: var(--line-height-12);
+  }
+
+  .collagePrice {
+    font-size: var(--font-size-12);
+    line-height: var(--line-height-12);
   }
 
   .mobileMore {
     display: inline-flex;
     align-self: center;
-    width: calc(100% - 0px);
+    width: 100%;
     margin-top: 14px;
+  }
+
+  .skeleton {
+    min-height: 480px;
   }
 }

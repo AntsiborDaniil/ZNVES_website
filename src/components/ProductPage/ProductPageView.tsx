@@ -301,7 +301,7 @@ const ProductPageView = ({
 
   return (
     <div className={styles.page}>
-      <Header variant="green" />
+      <Header />
       <main className={styles.main}>
         <nav className={styles.breadcrumbs} aria-label="Хлебные крошки">
           <Link href="/" className={styles.breadcrumbLink}>

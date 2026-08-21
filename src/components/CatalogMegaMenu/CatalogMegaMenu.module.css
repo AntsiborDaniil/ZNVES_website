@@ -1,0 +1,106 @@
+.panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  display: flex;
+  align-items: stretch;
+  height: 376px;
+  background: transparent;
+  overflow: hidden;
+  animation: megaIn 0.22s ease;
+}
+
+@keyframes megaIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.linksPane {
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+  height: 100%;
+  min-height: 100%;
+  padding: 40px 48px 40px 39px;
+  box-sizing: border-box;
+  background: var(--color-black);
+}
+
+.columns {
+  display: flex;
+  gap: 100px;
+  align-items: flex-start;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 67px;
+}
+
+.link {
+  display: block;
+  color: var(--color-white);
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-16);
+  line-height: normal;
+  letter-spacing: var(--letter-spacing-tight);
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.link:hover,
+.link:focus-visible {
+  opacity: 0.7;
+}
+
+.mediaPane {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+}
+
+.mediaSvg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+@media (max-width: 1200px) {
+  .columns {
+    gap: 60px;
+  }
+
+  .linksPane {
+    padding: 32px 24px;
+  }
+
+  .panel {
+    height: 320px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .panel {
+    display: none;
+  }
+}

@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
-import { updateCurrentUser, updateUserDeliveryData } from "../../../api/auth/authApi";
+import { updateCurrentUser, updateUserDeliveryData, changePassword } from "../../../api/auth/authApi";
 import PhoneInput from "../../PhoneInput/PhoneInput";
 import styles from "./PersonalData.module.css";
 
 const emptyProfileData = {
-  username: "",
   firstName: "",
   lastName: "",
   email: "",
@@ -21,12 +20,24 @@ const profileFields: Array<{
   label: string;
   placeholder: string;
 }> = [
-  { key: "username", label: "Никнейм", placeholder: "Введите никнейм" },
-  { key: "firstName", label: "Имя", placeholder: "Введите ваше имя*" },
-  { key: "lastName", label: "Фамилия", placeholder: "Введите вашу фамилию*" },
-  { key: "email", label: "Email", placeholder: "Введите ваш email*" },
-  { key: "phone", label: "Номер", placeholder: "Введите ваш номер телефона*" },
+  { key: "firstName", label: "Имя", placeholder: "Екатерина" },
+  { key: "lastName", label: "Фамилия", placeholder: "Смирнова" },
+  { key: "phone", label: "Номер", placeholder: "+7" },
+  { key: "email", label: "Email", placeholder: "email@example.com" },
 ];
+
+const emptyDeliveryData = {
+  cdekPvz: "",
+  yandexPvz: "",
+  city: "",
+  street: "",
+  house: "",
+  apartment: "",
+  floor: "",
+  intercom: "",
+  comment: "",
+};
+type DeliveryFieldKey = keyof typeof emptyDeliveryData;
 
 const pvzFieldsList = [
   { key: "cdekPvz" as const, label: "СДЭК (ПВЗ)", placeholder: "Введите адрес ПВЗ СДЭК" },
@@ -43,19 +54,6 @@ const courierFieldsList = [
   { key: "comment" as const, label: "Комментарий курьеру", placeholder: "Позвонить за 10 минут" },
 ];
 
-const emptyDeliveryData = {
-  cdekPvz: "",
-  yandexPvz: "",
-  city: "",
-  street: "",
-  house: "",
-  apartment: "",
-  floor: "",
-  intercom: "",
-  comment: "",
-};
-type DeliveryFieldKey = keyof typeof emptyDeliveryData;
-
 const PersonalData = () => {
   const { user, updateUser } = useAuth();
   const [profileData, setProfileData] = useState({ ...emptyProfileData });
@@ -68,14 +66,19 @@ const PersonalData = () => {
     message: string;
   } | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  /** Какой блок подсветить зелёным после сохранения: profile | delivery */
   const [highlightSection, setHighlightSection] = useState<"profile" | "delivery" | null>(null);
+  const [isPasswordEditing, setIsPasswordEditing] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    current: "",
+    next: "",
+    confirm: "",
+  });
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
 
-  // Подставляем данные из ручки GET /api/auth/user/ в поля личной информации
   useEffect(() => {
     if (!user) return;
     setProfileData({
-      username: user.username ?? "",
       firstName: user.first_name ?? "",
       lastName: user.last_name ?? "",
       email: user.email ?? "",
@@ -102,10 +105,7 @@ const PersonalData = () => {
   const handleProfileChange =
     (field: ProfileFieldKey) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setProfileData((prev) => ({
-        ...prev,
-        [field]: event.target.value,
-      }));
+      setProfileData((prev) => ({ ...prev, [field]: event.target.value }));
       setHasUnsavedChanges(true);
       setSaveStatus(null);
       if (highlightSection === "profile") setHighlightSection(null);
@@ -120,13 +120,10 @@ const PersonalData = () => {
 
   const handleSaveChanges = async () => {
     if (!hasUnsavedChanges) return;
-
     setIsSaving(true);
     setSaveStatus(null);
-
     try {
       const updated = await updateCurrentUser({
-        username: profileData.username || undefined,
         first_name: profileData.firstName || undefined,
         last_name: profileData.lastName || undefined,
         email: profileData.email || undefined,
@@ -141,29 +138,11 @@ const PersonalData = () => {
       setSaveStatus({
         type: "error",
         message:
-          error instanceof Error
-            ? error.message
-            : "Не удалось сохранить изменения",
+          error instanceof Error ? error.message : "Не удалось сохранить изменения",
       });
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleResetProfile = () => {
-    if (user) {
-      setProfileData({
-        username: user.username ?? "",
-        firstName: user.first_name ?? "",
-        lastName: user.last_name ?? "",
-        email: user.email ?? "",
-        phone: user.phone_number ?? "",
-      });
-    } else {
-      setProfileData({ ...emptyProfileData });
-    }
-    setHasUnsavedChanges(false);
-    setSaveStatus(null);
   };
 
   const handleDeliveryChange =
@@ -208,55 +187,69 @@ const PersonalData = () => {
     }
   };
 
-  const handleResetDelivery = () => {
-    if (user?.delivery_data) {
-      const dd = user.delivery_data;
-      setDeliveryData({
-        cdekPvz: dd.cdek_full_pvz_address ?? "",
-        yandexPvz: dd.yandex_full_pvz_address ?? "",
-        city: dd.city ?? "",
-        street: dd.street ?? "",
-        house: dd.house ?? "",
-        apartment: dd.apartment ?? "",
-        floor: dd.floor ?? "",
-        intercom: dd.intercom ?? "",
-        comment: dd.comment ?? "",
-      });
-    } else {
-      setDeliveryData({ ...emptyDeliveryData });
+  const handlePasswordFieldChange =
+    (field: keyof typeof passwordForm) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setPasswordForm((prev) => ({ ...prev, [field]: event.target.value }));
+      setPasswordError(null);
+    };
+
+  const handleCancelPassword = () => {
+    setIsPasswordEditing(false);
+    setPasswordForm({ current: "", next: "", confirm: "" });
+    setPasswordError(null);
+  };
+
+  const handleSavePassword = async () => {
+    if (!passwordForm.current.trim() || !passwordForm.next.trim()) {
+      setPasswordError("Заполните все поля");
+      return;
     }
-    setHasDeliveryChanges(false);
+    if (passwordForm.next.length < 8) {
+      setPasswordError("Новый пароль должен быть не короче 8 символов");
+      return;
+    }
+    if (passwordForm.next !== passwordForm.confirm) {
+      setPasswordError("Пароли не совпадают");
+      return;
+    }
+    setIsSavingPassword(true);
+    setPasswordError(null);
+    try {
+      await changePassword({
+        current_password: passwordForm.current,
+        new_password: passwordForm.next,
+      });
+      handleCancelPassword();
+      setShowSuccessModal(true);
+    } catch (error) {
+      setPasswordError(
+        error instanceof Error ? error.message : "Не удалось изменить пароль"
+      );
+    } finally {
+      setIsSavingPassword(false);
+    }
   };
 
   return (
     <>
-      <div className={styles.container}>
-        <section className={styles.panel}>
-          <h1 className={styles.sectionHeading}>Настройки</h1>
-          <p className={styles.sectionDescription}>
-            В данном разделе можно изменить имя, контакты и адреса доставки.
-          </p>
-        </section>
-
-        <section className={styles.panel}>
-          <h2 className={styles.subsectionHeading}>Личные данные</h2>
-          <div className={styles.infoPanel}>
-            <div className={styles.fieldsGrid}>
+      <div className={styles.profileShell}>
+        <div className={styles.profileRow}>
+          <section className={styles.profileMain}>
+            <h2 className={styles.sectionHeading}>Профиль</h2>
+            <div className={styles.fieldsStack}>
               {profileFields.map((field) => (
                 <div className={styles.fieldRow} key={field.key}>
-                  <label
-                    className={styles.fieldLabel}
-                    htmlFor={`profile-${field.key}`}
-                  >
+                  <label className={styles.fieldLabel} htmlFor={`profile-${field.key}`}>
                     {field.label}
                   </label>
-
                   <div className={styles.inputWrapper}>
                     {field.key === "phone" ? (
                       <PhoneInput
                         id={`profile-${field.key}`}
                         value={profileData.phone}
                         onChange={handlePhoneChange}
+                        variant="account"
                         className={
                           highlightSection === "profile" ? styles.inputSuccess : ""
                         }
@@ -264,7 +257,9 @@ const PersonalData = () => {
                     ) : (
                       <input
                         id={`profile-${field.key}`}
-                        className={`${styles.input} ${highlightSection === "profile" ? styles.inputSuccess : ""}`}
+                        className={`${styles.input} ${
+                          highlightSection === "profile" ? styles.inputSuccess : ""
+                        }`}
                         type="text"
                         value={profileData[field.key]}
                         onChange={handleProfileChange(field.key)}
@@ -275,35 +270,102 @@ const PersonalData = () => {
                 </div>
               ))}
             </div>
-          </div>
-          <div className={styles.actions}>
             <button
               type="button"
-              className={styles.primaryButton}
+              className={styles.saveButton}
               onClick={handleSaveChanges}
               disabled={isSaving || !hasUnsavedChanges}
             >
-              {isSaving ? "Сохранение..." : "Сохранить изменения"}
+              {isSaving ? "Сохранение..." : "Сохранить"}
             </button>
-            <button
-              type="button"
-              className={styles.secondaryButton}
-              onClick={handleResetProfile}
-            >
-              Отмена
-            </button>
-          </div>
-        </section>
+          </section>
+
+          <aside className={styles.passwordAside}>
+            <p className={styles.fieldLabel}>Пароль</p>
+            {!isPasswordEditing ? (
+              <button
+                type="button"
+                className={styles.passwordButton}
+                onClick={() => setIsPasswordEditing(true)}
+              >
+                Изменить пароль
+              </button>
+            ) : (
+              <div className={styles.passwordForm}>
+                <div className={styles.fieldRow}>
+                  <label className={styles.fieldLabel} htmlFor="password-current">
+                    Текущий пароль
+                  </label>
+                  <input
+                    id="password-current"
+                    className={styles.input}
+                    type="password"
+                    autoComplete="current-password"
+                    value={passwordForm.current}
+                    onChange={handlePasswordFieldChange("current")}
+                    placeholder="••••••••"
+                  />
+                </div>
+                <div className={styles.fieldRow}>
+                  <label className={styles.fieldLabel} htmlFor="password-next">
+                    Новый пароль
+                  </label>
+                  <input
+                    id="password-next"
+                    className={styles.input}
+                    type="password"
+                    autoComplete="new-password"
+                    value={passwordForm.next}
+                    onChange={handlePasswordFieldChange("next")}
+                    placeholder="Не менее 8 символов"
+                  />
+                </div>
+                <div className={styles.fieldRow}>
+                  <label className={styles.fieldLabel} htmlFor="password-confirm">
+                    Повторите пароль
+                  </label>
+                  <input
+                    id="password-confirm"
+                    className={styles.input}
+                    type="password"
+                    autoComplete="new-password"
+                    value={passwordForm.confirm}
+                    onChange={handlePasswordFieldChange("confirm")}
+                    placeholder="••••••••"
+                  />
+                </div>
+                {passwordError && (
+                  <p className={styles.saveStatusError}>{passwordError}</p>
+                )}
+                <div className={styles.passwordActions}>
+                  <button
+                    type="button"
+                    className={styles.saveButton}
+                    onClick={() => void handleSavePassword()}
+                    disabled={isSavingPassword}
+                  >
+                    {isSavingPassword ? "Сохранение…" : "Сохранить"}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.passwordCancel}
+                    onClick={handleCancelPassword}
+                    disabled={isSavingPassword}
+                  >
+                    Отмена
+                  </button>
+                </div>
+              </div>
+            )}
+          </aside>
+        </div>
       </div>
 
       <section className={styles.deliveryPanel}>
-        <h2 className={styles.subsectionHeading}>Адреса доставки</h2>
+        <h2 className={styles.deliveryHeading}>Адреса доставки</h2>
 
         <div className={styles.deliveryBlock}>
-          <h3 className={styles.deliveryBlockTitle}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-            Пункты выдачи (ПВЗ)
-          </h3>
+          <h3 className={styles.deliveryBlockTitle}>Пункты выдачи (ПВЗ)</h3>
           <div className={styles.fieldsGrid}>
             {pvzFieldsList.map(({ key, label, placeholder }) => (
               <div className={styles.fieldRow} key={key}>
@@ -313,7 +375,9 @@ const PersonalData = () => {
                 <div className={styles.inputWrapper}>
                   <input
                     id={`delivery-${key}`}
-                    className={`${styles.input} ${highlightSection === "delivery" ? styles.inputSuccess : ""}`}
+                    className={`${styles.input} ${
+                      highlightSection === "delivery" ? styles.inputSuccess : ""
+                    }`}
                     type="text"
                     value={deliveryData[key]}
                     onChange={handleDeliveryChange(key)}
@@ -328,14 +392,13 @@ const PersonalData = () => {
         <div className={styles.deliverySeparator} />
 
         <div className={styles.deliveryBlock}>
-          <h3 className={styles.deliveryBlockTitle}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            Курьерская доставка
-          </h3>
+          <h3 className={styles.deliveryBlockTitle}>Курьерская доставка</h3>
           <div className={styles.fieldsGrid}>
             {courierFieldsList.map(({ key, label, placeholder }) => (
               <div
-                className={`${styles.fieldRow} ${key === "comment" ? styles.fieldRowFull : ""}`}
+                className={`${styles.fieldRow} ${
+                  key === "comment" ? styles.fieldRowFull : ""
+                }`}
                 key={key}
               >
                 <label className={styles.fieldLabel} htmlFor={`courier-${key}`}>
@@ -344,7 +407,9 @@ const PersonalData = () => {
                 <div className={styles.inputWrapper}>
                   <input
                     id={`courier-${key}`}
-                    className={`${styles.input} ${highlightSection === "delivery" ? styles.inputSuccess : ""}`}
+                    className={`${styles.input} ${
+                      highlightSection === "delivery" ? styles.inputSuccess : ""
+                    }`}
                     type="text"
                     value={deliveryData[key]}
                     onChange={handleDeliveryChange(key)}
@@ -359,18 +424,11 @@ const PersonalData = () => {
         <div className={styles.actions}>
           <button
             type="button"
-            className={styles.primaryButton}
+            className={styles.saveButton}
             disabled={isSaving || !hasDeliveryChanges}
             onClick={handleSaveDelivery}
           >
-            {isSaving ? "Сохранение..." : "Сохранить изменения"}
-          </button>
-          <button
-            type="button"
-            className={styles.secondaryButton}
-            onClick={handleResetDelivery}
-          >
-            Отмена
+            {isSaving ? "Сохранение..." : "Сохранить"}
           </button>
         </div>
         {saveStatus && saveStatus.type === "error" && (
@@ -390,26 +448,10 @@ const PersonalData = () => {
             className={styles.modalContent}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className={styles.modalIconWrap}>
-              <svg
-                className={styles.modalIcon}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <path d="M20 6L9 17l-5-5" />
-              </svg>
-            </div>
             <h2 id="success-modal-title" className={styles.modalTitle}>
               Данные сохранены
             </h2>
-            <p className={styles.modalText}>
-              Изменения успешно применены.
-            </p>
+            <p className={styles.modalText}>Изменения успешно применены.</p>
             <button
               type="button"
               className={styles.modalButton}

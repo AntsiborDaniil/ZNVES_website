@@ -45,7 +45,6 @@ type LoginFormValues = {
 type RegisterFormValues = {
   email: string;
   password: string;
-  confirmPassword: string;
   first_name: string;
   last_name: string;
   phone_number: string;
@@ -57,6 +56,9 @@ type VerifyFormValues = {
 
 type AccountAuthProps = {
   onAuthenticated?: () => void;
+  variant?: "page" | "modal";
+  initialMode?: AuthMode;
+  redirectOnSuccess?: boolean;
 };
 
 const getInitialAuthState = () => {
@@ -170,11 +172,23 @@ const PasswordToggleButton = ({
   </button>
 );
 
-const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
+const AccountAuth = ({
+  onAuthenticated,
+  variant = "page",
+  initialMode = "login",
+  redirectOnSuccess,
+}: AccountAuthProps) => {
   const router = useRouter();
   const { checkAuth, updateUser } = useAuth();
+  const isModal = variant === "modal";
+  const shouldRedirectOnSuccess = redirectOnSuccess ?? !isModal;
+  const blockClassName = isModal
+    ? `${styles.authBlock} ${styles.authBlockModal}`
+    : styles.authBlock;
   const [initialAuth] = useState(getInitialAuthState);
-  const [mode, setMode] = useState<AuthMode>(initialAuth.mode);
+  const [mode, setMode] = useState<AuthMode>(
+    initialAuth.step === "verify" ? initialAuth.mode : initialMode
+  );
   const [step, setStep] = useState<"credentials" | "verify">(initialAuth.step);
   const [pendingEmail, setPendingEmail] = useState(initialAuth.pendingEmail);
   const [loginPassword, setLoginPassword] = useState(initialAuth.loginPassword);
@@ -182,7 +196,6 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(initialAuth.resendCooldown);
 
   const formOptions = {
@@ -200,7 +213,6 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
     defaultValues: {
       email: "",
       password: "",
-      confirmPassword: "",
       first_name: "",
       last_name: "",
       phone_number: "",
@@ -213,13 +225,6 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
   });
 
   const registerPassword = registerForm.watch("password");
-  const confirmPasswordTouched = registerForm.formState.touchedFields.confirmPassword;
-
-  useEffect(() => {
-    if (confirmPasswordTouched) {
-      void registerForm.trigger("confirmPassword");
-    }
-  }, [registerPassword, confirmPasswordTouched, registerForm]);
 
   useEffect(() => {
     if (step !== "verify" || !pendingEmail) {
@@ -264,7 +269,9 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
     updateUser(verifiedUser);
     await checkAuth(true);
     onAuthenticated?.();
-    router.replace("/account");
+    if (shouldRedirectOnSuccess) {
+      router.replace("/account");
+    }
   };
 
   const handleLoginSubmit = loginForm.handleSubmit(async (values) => {
@@ -393,7 +400,7 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
 
   if (step === "verify") {
     return (
-      <div className={styles.authBlock}>
+      <div className={blockClassName}>
         <h1 className={styles.title}>
           {mode === "login" ? "Подтверждение входа" : "Подтверждение регистрации"}
         </h1>
@@ -470,7 +477,7 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
   }
 
   return (
-    <div className={styles.authBlock}>
+    <div className={blockClassName}>
       <div className={styles.tabs}>
         <div
           className={styles.tabIndicator}
@@ -711,41 +718,6 @@ const AccountAuth = ({ onAuthenticated }: AccountAuthProps) => {
               {!registerForm.formState.errors.password && registerPassword && (
                 <span className={styles.fieldHint}>
                   Минимум 8 символов, заглавная и строчная буква, цифра
-                </span>
-              )}
-            </div>
-
-            <div className={styles.field}>
-              <label htmlFor="register-confirm-password" className={styles.label}>
-                Подтвердите пароль
-              </label>
-              <div className={styles.passwordWrap}>
-                <input
-                  id="register-confirm-password"
-                  type={showConfirmPassword ? "text" : "password"}
-                  autoComplete="new-password"
-                  placeholder="Повторите пароль"
-                  className={`${styles.input} ${
-                    registerForm.formState.errors.confirmPassword ? styles.inputError : ""
-                  }`}
-                  {...registerForm.register("confirmPassword", {
-                    validate: (value) => {
-                      const password = registerForm.getValues("password");
-                      if (!value) return "Подтвердите пароль";
-                      if (value !== password) return "Пароли не совпадают";
-                      return true;
-                    },
-                  })}
-                />
-                <PasswordToggleButton
-                  visible={showConfirmPassword}
-                  onToggle={() => setShowConfirmPassword((v) => !v)}
-                  label={showConfirmPassword ? "Скрыть пароль" : "Показать пароль"}
-                />
-              </div>
-              {registerForm.formState.errors.confirmPassword && (
-                <span className={styles.fieldError}>
-                  {registerForm.formState.errors.confirmPassword.message}
                 </span>
               )}
             </div>

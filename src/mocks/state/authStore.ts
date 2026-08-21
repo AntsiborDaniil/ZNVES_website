@@ -30,14 +30,19 @@ const buildUsername = (email: string): string => email.split("@")[0] ?? "user";
 
 const createAuthUser = (
   email: string,
-  profile: { first_name: string; last_name: string; phone_number: string }
+  profile: {
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    delivery_data?: AuthUser["delivery_data"];
+  }
 ): AuthUser => ({
   username: buildUsername(email),
   first_name: profile.first_name,
   last_name: profile.last_name,
   email: email.trim().toLowerCase(),
   phone_number: profile.phone_number,
-  delivery_data: {},
+  delivery_data: profile.delivery_data ? { ...profile.delivery_data } : {},
 });
 
 const seedDevUser = (): void => {
@@ -50,6 +55,7 @@ const seedDevUser = (): void => {
       first_name: MOCK_DEV_USER.first_name,
       last_name: MOCK_DEV_USER.last_name,
       phone_number: MOCK_DEV_USER.phone_number,
+      delivery_data: { ...MOCK_DEV_USER.delivery_data },
     }),
   });
 };
@@ -212,13 +218,51 @@ export const updateDeliveryByToken = (
   return stored.user.delivery_data ?? null;
 };
 
+export const changePasswordByToken = (
+  token: string | null,
+  payload: { current_password: string; new_password: string }
+): { ok: true } | { ok: false; error: string } => {
+  const current = getUserByToken(token);
+  if (!current) return { ok: false, error: "Unauthorized" };
+
+  const email = emailKey(current.email);
+  const stored = users.get(email);
+  if (!stored) return { ok: false, error: "Unauthorized" };
+
+  if (stored.password !== payload.current_password) {
+    return { ok: false, error: "Неверный текущий пароль" };
+  }
+  if (!payload.new_password || payload.new_password.length < 8) {
+    return { ok: false, error: "Новый пароль должен быть не короче 8 символов" };
+  }
+
+  stored.password = payload.new_password;
+  users.set(email, stored);
+  return { ok: true };
+};
+
 export const parseAccessToken = (cookieHeader: string | null): string | null => {
   if (!cookieHeader) return null;
   const match = cookieHeader.match(/(?:^|;\s*)access-token=([^;]+)/);
   return match?.[1] ? decodeURIComponent(match[1]) : null;
 };
 
+export const clearSession = (token: string | null): void => {
+  if (token) {
+    sessions.delete(token);
+  }
+  if (lastSessionToken && (!token || lastSessionToken === token)) {
+    sessions.delete(lastSessionToken);
+    lastSessionToken = null;
+  }
+};
+
 export const buildSessionCookies = (token: string): string[] => [
   `access-token=${encodeURIComponent(token)}; Path=/; SameSite=Lax`,
   `csrftoken=mock-csrf-token; Path=/; SameSite=Lax`,
+];
+
+export const buildClearedSessionCookies = (): string[] => [
+  `access-token=; Path=/; Max-Age=0; SameSite=Lax`,
+  `csrftoken=; Path=/; Max-Age=0; SameSite=Lax`,
 ];

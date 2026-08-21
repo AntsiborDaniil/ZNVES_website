@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { MOCK_AUTH_CODE, MOCK_DEV_USER } from "../config";
 import {
+  changePasswordByToken,
   getUserByToken,
   parseAccessToken,
   resetAuthStore,
@@ -20,6 +21,40 @@ describe("authStore", () => {
       password: MOCK_DEV_USER.password,
     });
     expect(login.ok).toBe(true);
+  });
+
+  it("changes password for authenticated mock user", () => {
+    startLogin({
+      email: MOCK_DEV_USER.email,
+      password: MOCK_DEV_USER.password,
+    });
+    const session = verifyCode(MOCK_DEV_USER.email, MOCK_AUTH_CODE);
+    expect(session.ok).toBe(true);
+    if (!session.ok) return;
+
+    const wrong = changePasswordByToken(session.token, {
+      current_password: "wrong",
+      new_password: "newpass123",
+    });
+    expect(wrong.ok).toBe(false);
+
+    const ok = changePasswordByToken(session.token, {
+      current_password: MOCK_DEV_USER.password,
+      new_password: "newpass123",
+    });
+    expect(ok.ok).toBe(true);
+
+    const loginWithOld = startLogin({
+      email: MOCK_DEV_USER.email,
+      password: MOCK_DEV_USER.password,
+    });
+    expect(loginWithOld.ok).toBe(false);
+
+    const loginWithNew = startLogin({
+      email: MOCK_DEV_USER.email,
+      password: "newpass123",
+    });
+    expect(loginWithNew.ok).toBe(true);
   });
 
   it("rejects duplicate registration", () => {

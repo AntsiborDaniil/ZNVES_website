@@ -17,7 +17,8 @@ import { getAddressSuggestions, type AddressSuggestion } from "../../api/deliver
 import { useWindowSize } from "../../hooks/useWindowSize";
 import PhoneInput from "../PhoneInput/PhoneInput";
 import { validatePhone } from "../../lib/authValidation";
-import styles from "../../app/checkout/page.module.css";
+import pageStyles from "../../app/checkout/page.module.css";
+import modalStyles from "./CheckoutFormModal.module.css";
 
 const MapLazy = dynamic(
   () => import("../Map/Map").then((m) => ({ default: m.default })),
@@ -35,7 +36,16 @@ interface CheckoutFormProps {
   className?: string;
   /** Цвета с каталога (с cart), чтобы не дублировать запрос при открытии формы на cart */
   initialColorSlugToLabel?: Record<string, string>;
+  variant?: "page" | "modal";
+  modalPromo?: {
+    value: string;
+    onChange: (value: string) => void;
+    onApply: () => void;
+    isLoading: boolean;
+  };
 }
+
+type ModalDeliveryOption = "cdek_pickup" | "yandex_pickup" | "yandex_courier";
 
 const ORDER_ERROR_STORAGE_KEY = "znves:orderError";
 
@@ -79,9 +89,13 @@ const CheckoutForm = ({
   showRightColumn = true,
   className = "",
   initialColorSlugToLabel: initialColors = {},
+  variant = "page",
+  modalPromo,
 }: CheckoutFormProps) => {
+  const styles = variant === "modal" ? modalStyles : pageStyles;
+  const isModal = variant === "modal";
   const router = useRouter();
-  const { items, getTotalPrice, clearCart, appliedPromo, setAppliedPromo } = useCart();
+  const { items, getTotalPrice, clearCart, appliedPromo, setAppliedPromo, openCart } = useCart();
   const { user, updateUser } = useAuth();
   const { width } = useWindowSize();
   const isCartMobilePvz = width > 0 && width < 480 && !showRightColumn;
@@ -96,7 +110,7 @@ const CheckoutForm = ({
         sessionStorage.setItem(ORDER_ERROR_STORAGE_KEY, message);
       } catch {}
     }
-    router.push("/cart");
+    openCart();
   };
   const [formData, setFormData] = useState({
     firstName: "",
@@ -123,7 +137,16 @@ const CheckoutForm = ({
     agreeToOffer: false,
     agreeToPrivacy: false,
     differentRecipient: false,
+    deliveryComment: "",
   });
+  const isModalCourier = isModal && formData.deliveryMethod === "yandex";
+  const isModalPickup = isModal && formData.deliveryMethod === "pickup";
+  const modalDeliveryOption: ModalDeliveryOption =
+    formData.deliveryType === "cdek"
+      ? "cdek_pickup"
+      : formData.deliveryMethod === "yandex"
+        ? "yandex_courier"
+        : "yandex_pickup";
   const [showContinueButtonAgain, setShowContinueButtonAgain] = useState(false);
   const hideContinueButton =
     isCartMobilePvz &&
@@ -457,6 +480,29 @@ const CheckoutForm = ({
     return itemsTotal + deliveryPrice;
   }, [getTotalPrice, appliedPromo, deliveryPrice]);
 
+  const itemsSubtotal = useMemo(() => {
+    let total = getTotalPrice();
+    if (appliedPromo) {
+      total = Math.max(0, total - parseFloat(appliedPromo.discount));
+    }
+    return total;
+  }, [getTotalPrice, appliedPromo]);
+
+  const modalDeliverySummaryLabel = useMemo(() => {
+    if (!isModal) return "Доставка";
+    if (isModalCourier) return "Доставка Яндекс курьером";
+    if (formData.deliveryType === "cdek") return "Доставка СДЭК до ПВЗ";
+    return "Доставка Яндекс до ПВЗ";
+  }, [isModal, isModalCourier, formData.deliveryType]);
+
+  const modalSummaryCity = useMemo(() => {
+    if (!isModal) return "";
+    const city = isModalPickup
+      ? formData.pickupCity || "Москва"
+      : formData.city || "Москва";
+    return `Россия, г ${city}`;
+  }, [isModal, isModalPickup, formData.pickupCity, formData.city]);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ru-RU", {
       style: "currency",
@@ -495,7 +541,7 @@ const CheckoutForm = ({
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
@@ -613,6 +659,45 @@ const CheckoutForm = ({
         }
       }
     }
+  };
+
+  const handleModalDeliveryOption = (option: ModalDeliveryOption) => {
+    if (option === "cdek_pickup") {
+      setFormData((prev) => ({
+        ...prev,
+        deliveryType: "cdek",
+        deliveryMethod: "pickup",
+        ...(!prev.pickupCity?.trim() ? { pickupCity: "Москва" } : {}),
+      }));
+    } else if (option === "yandex_pickup") {
+      setFormData((prev) => ({
+        ...prev,
+        deliveryType: "yandex",
+        deliveryMethod: "pickup",
+        ...(!prev.pickupCity?.trim() ? { pickupCity: "Москва" } : {}),
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        deliveryType: "yandex",
+        deliveryMethod: "yandex",
+        city: "Москва",
+        deliveryFirstName: prev.deliveryFirstName || prev.firstName,
+        deliveryLastName: prev.deliveryLastName || prev.lastName,
+      }));
+    }
+    setSelectedPvzCoords(null);
+    setYandexCourierEstimate(null);
+    setYandexCourierOffers(null);
+    setSelectedCourierOfferId(null);
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.pvzAddress;
+      delete newErrors.city;
+      delete newErrors.street;
+      delete newErrors.house;
+      return newErrors;
+    });
   };
 
   const handleAddressSelectImpl = useCallback((addressData: {
@@ -1173,7 +1258,7 @@ const CheckoutForm = ({
   };
 
   const handleSubmitOrder = async () => {
-    if (!formData.agreeToOffer || !formData.agreeToPrivacy) {
+    if (!isModal && (!formData.agreeToOffer || !formData.agreeToPrivacy)) {
       return;
     }
 
@@ -1217,6 +1302,7 @@ const CheckoutForm = ({
             formData.floor && `${formData.floor} этаж`,
             formData.entrance && `подъезд ${formData.entrance}`,
             formData.intercom && `домофон ${formData.intercom}`,
+            formData.deliveryComment && `комментарий: ${formData.deliveryComment}`,
           ]
             .filter(Boolean)
             .join(", ");
@@ -1477,12 +1563,76 @@ const CheckoutForm = ({
     <div className={className}>
       <div ref={formContainerRef} className={styles.content}>
         <div className={styles.leftColumn}>
-          <div className={styles.checkoutHeader}>
-            <h1 className={styles.title}>Оформление заказа</h1>
-          </div>
+          {!isModal && (
+            <div className={styles.checkoutHeader}>
+              <h1 className={styles.title}>Оформление заказа</h1>
+            </div>
+          )}
 
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Личные данные</h2>
+          <div className={`${styles.section} ${isModal ? styles.modalPersonalSection : ""}`}>
+            {!isModal && <h2 className={styles.sectionTitle}>Личные данные</h2>}
+            {isModal ? (
+              <>
+                <div className={styles.inputWrapper}>
+                  <label htmlFor="firstName" className={styles.label}>
+                    Имя
+                  </label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    placeholder="Екатерина"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    className={`${styles.input} ${errors.firstName ? styles.inputError : ""}`}
+                    ref={firstNameRef}
+                  />
+                </div>
+                <div className={styles.inputWrapper}>
+                  <label htmlFor="lastName" className={styles.label}>
+                    Фамилия
+                  </label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    placeholder="Смирнов"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    className={`${styles.input} ${errors.lastName ? styles.inputError : ""}`}
+                    ref={lastNameRef}
+                  />
+                </div>
+                <div className={styles.inputWrapper}>
+                  <label htmlFor="email" className={styles.label}>
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="email@example.com"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
+                    ref={emailRef}
+                  />
+                </div>
+                <div className={`${styles.inputWrapper} ${styles.modalVisuallyHidden}`} ref={phoneRef}>
+                  <label htmlFor="phone" className={styles.label}>
+                    Телефон
+                  </label>
+                  <PhoneInput
+                    id="phone"
+                    value={formData.phone}
+                    onChange={handlePhoneChange("phone")}
+                    error={!!errors.phone}
+                    className={styles.phoneWrap}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
             <div className={styles.firstInputs}>
               <div className={styles.inputWrapper}>
                 <label htmlFor="firstName" className={styles.label}>
@@ -1525,6 +1675,7 @@ const CheckoutForm = ({
                   value={formData.phone}
                   onChange={handlePhoneChange("phone")}
                   error={!!errors.phone}
+                  className={isModal ? styles.phoneWrap : ""}
                 />
               </div>
               <div className={styles.inputWrapper}>
@@ -1543,8 +1694,11 @@ const CheckoutForm = ({
                 />
               </div>
             </div>
+              </>
+            )}
           </div>
 
+          {!isModal && (
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>Вариант доставки</h2>
             <div className={styles.deliveryTypeRow}>
@@ -1606,9 +1760,62 @@ const CheckoutForm = ({
               </label>
             </div>
           </div>
+          )}
 
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>Доставка</h2>
+            {isModal && (
+              <div className={styles.modalCityBlock}>
+                <div className={styles.inputWrapper}>
+                  <label htmlFor={isModalCourier ? "city" : "pickupCity"} className={styles.modalCityLabel}>
+                    Город
+                  </label>
+                  <input
+                    type="text"
+                    id={isModalCourier ? "city" : "pickupCity"}
+                    name={isModalCourier ? "city" : "pickupCity"}
+                    placeholder="Город"
+                    value={isModalCourier ? "Москва" : formData.pickupCity}
+                    onChange={handleInputChange}
+                    readOnly={isModalCourier}
+                    className={styles.input}
+                    autoComplete="address-level2"
+                  />
+                </div>
+                <p className={styles.modalCityHint}>
+                  Россия, г {isModalCourier ? "Москва" : formData.pickupCity || "Москва"}
+                </p>
+              </div>
+            )}
+            {isModal ? (
+              <div className={styles.modalDeliveryOptions}>
+                {(
+                  [
+                    { option: "cdek_pickup" as const, label: "СДЭК до пункта выдачи" },
+                    { option: "yandex_pickup" as const, label: "ЯНДЕКС до пункта выдачи" },
+                    { option: "yandex_courier" as const, label: "ЯНДЕКС курьером" },
+                  ] as const
+                ).map(({ option, label }) => (
+                  <label key={option} className={styles.modalDeliveryOption}>
+                    <input
+                      type="radio"
+                      name="modalDeliveryOption"
+                      value={option}
+                      checked={modalDeliveryOption === option}
+                      onChange={() => handleModalDeliveryOption(option)}
+                      className={styles.radioInput}
+                    />
+                    <span
+                      className={`${styles.modalRadioMark} ${
+                        modalDeliveryOption === option ? styles.modalRadioMarkActive : ""
+                      }`}
+                      aria-hidden
+                    />
+                    <span className={styles.modalDeliveryOptionLabel}>{label}</span>
+                  </label>
+                ))}
+              </div>
+            ) : (
             <div className={styles.deliveryButtonsRow}>
               {formData.deliveryType === "cdek" && (
                 <label className={styles.deliveryButton}>
@@ -1623,7 +1830,7 @@ const CheckoutForm = ({
                   <div className={styles.deliveryButtonContent}>
                     <div className={styles.deliveryButtonInfo}>
                       <span className={styles.deliveryButtonName}>
-                        Пункт выдачи
+                        {isModal ? "СДЭК до пункта выдачи" : "Пункт выдачи"}
                       </span>
                     </div>
                     <div className={styles.deliveryButtonInfo}>
@@ -1668,7 +1875,7 @@ const CheckoutForm = ({
                     <div className={styles.deliveryButtonContent}>
                       <div className={styles.deliveryButtonInfo}>
                         <span className={styles.deliveryButtonName}>
-                          Пункт выдачи
+                          {isModal ? "ЯНДЕКС до пункта выдачи" : "Пункт выдачи"}
                         </span>
                       </div>
                       <div className={styles.deliveryButtonInfo}>
@@ -1708,7 +1915,7 @@ const CheckoutForm = ({
                     <div className={styles.deliveryButtonContent}>
                       <div className={styles.deliveryButtonInfo}>
                         <span className={styles.deliveryButtonName}>
-                          Курьером
+                          {isModal ? "ЯНДЕКС курьером" : "Курьером"}
                         </span>
                       </div>
                       <div className={styles.deliveryButtonInfo}>
@@ -1751,6 +1958,112 @@ const CheckoutForm = ({
                 </>
               )}
             </div>
+            )}
+
+            {isModal && isModalCourier && (
+              <div className={styles.modalCourierFields}>
+                <div className={styles.inputWrapper}>
+                  <label htmlFor="street" className={styles.label}>
+                    Улица
+                  </label>
+                  <div className={styles.modalStreetInputWrap}>
+                    <input
+                      type="text"
+                      id="street"
+                      name="street"
+                      placeholder="Введите улицу"
+                      value={formData.street}
+                      onChange={handleInputChange}
+                      className={`${styles.input} ${errors.street ? styles.inputError : ""}`}
+                      ref={streetRef}
+                      autoComplete="address-line1"
+                    />
+                    <span className={styles.modalStreetSearchIcon} aria-hidden>
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.5" />
+                        <path d="M14 14L18 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.modalSplitRow}>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="house" className={styles.label}>
+                      Дом
+                    </label>
+                    <input
+                      type="text"
+                      id="house"
+                      name="house"
+                      placeholder="Введите дом"
+                      value={formData.house}
+                      onChange={handleInputChange}
+                      className={`${styles.input} ${errors.house ? styles.inputError : ""}`}
+                      ref={houseRef}
+                      autoComplete="address-line2"
+                    />
+                  </div>
+                  <div className={styles.inputWrapper}>
+                    <label htmlFor="floor" className={styles.label}>
+                      Этаж
+                    </label>
+                    <input
+                      type="text"
+                      id="floor"
+                      name="floor"
+                      placeholder="Введите этаж"
+                      value={formData.floor}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                </div>
+                <div className={styles.inputWrapper}>
+                  <label htmlFor="deliveryComment" className={styles.label}>
+                    Комментарий
+                  </label>
+                  <textarea
+                    id="deliveryComment"
+                    name="deliveryComment"
+                    placeholder="Комментарий к доставке"
+                    value={formData.deliveryComment}
+                    onChange={handleInputChange}
+                    className={styles.modalTextarea}
+                    rows={3}
+                  />
+                </div>
+                <div className={styles.inputWrapper}>
+                  <label htmlFor="deliveryFirstName" className={styles.label}>
+                    Имя получателя
+                  </label>
+                  <input
+                    type="text"
+                    id="deliveryFirstName"
+                    name="deliveryFirstName"
+                    placeholder="Екатерина"
+                    value={formData.deliveryFirstName}
+                    onChange={handleInputChange}
+                    className={`${styles.input} ${errors.deliveryFirstName ? styles.inputError : ""}`}
+                    ref={deliveryFirstNameRef}
+                  />
+                </div>
+                <div className={styles.inputWrapper}>
+                  <label htmlFor="deliveryLastName" className={styles.label}>
+                    Фамилия получателя
+                  </label>
+                  <input
+                    type="text"
+                    id="deliveryLastName"
+                    name="deliveryLastName"
+                    placeholder="Смирнов"
+                    value={formData.deliveryLastName}
+                    onChange={handleInputChange}
+                    className={`${styles.input} ${errors.deliveryLastName ? styles.inputError : ""}`}
+                    ref={deliveryLastNameRef}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {formData.deliveryMethod === "yandex" &&
@@ -1813,7 +2126,7 @@ const CheckoutForm = ({
             </div>
           )}
 
-          {formData.deliveryMethod !== "pickup" && (
+          {!isModal && formData.deliveryMethod !== "pickup" && (
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>Данные о доставке</h2>
               <label
@@ -2009,6 +2322,7 @@ const CheckoutForm = ({
             </div>
           )}
 
+          {(!isModal || isModalPickup) && (
           <div
             className={`${styles.section} ${hideContinueButton ? styles.hideContinueButton : ""}`}
             ref={mapSectionRef}
@@ -2018,12 +2332,14 @@ const CheckoutForm = ({
                 : undefined
             }
           >
+            {!isModal && (
             <h2 className={styles.sectionTitle}>
               {formData.deliveryMethod === "pickup"
                 ? "Пункт получения"
                 : "Адрес доставки"}
             </h2>
-            {formData.deliveryMethod === "pickup" && formData.deliveryType === "cdek" && (
+            )}
+            {formData.deliveryMethod === "pickup" && formData.deliveryType === "cdek" && !isModal && (
               <div className={styles.firstInputs} style={{ marginBottom: 12 }}>
                 <div className={styles.inputWrapper}>
                   <label htmlFor="pickupCity" className={styles.label}>
@@ -2042,7 +2358,12 @@ const CheckoutForm = ({
                 </div>
               </div>
             )}
-            <div className={styles.checkoutMapSearchContainer}>
+            <div className={isModal && isModalPickup ? styles.inputWrapper : styles.checkoutMapSearchContainer}>
+              {isModal && isModalPickup && (
+                <label htmlFor="mapSearchInput" className={styles.label}>
+                  Пункт получения
+                </label>
+              )}
               <input
                 type="text"
                 id="mapSearchInput"
@@ -2050,14 +2371,16 @@ const CheckoutForm = ({
                 className={styles.checkoutMapSearchInput}
                 placeholder={
                   formData.deliveryMethod === "pickup"
-                    ? "Выберите пункт получения"
+                    ? isModal
+                      ? ""
+                      : "Выберите пункт получения"
                     : "Выберите адрес доставки"
                 }
-                readOnly={formData.deliveryMethod === "pickup"}
+                readOnly={formData.deliveryMethod === "pickup" && !isModal}
                 value={
                   formData.deliveryMethod === "pickup"
                     ? (pvzAddressInputValue || formData.pvzAddress || "").trim() ||
-                      "Выберите пункт выдачи на карте"
+                      (isModal ? "" : "Выберите пункт выдачи на карте")
                     : mapSearchValue ||
                       [formData.city, formData.street, formData.house]
                         .filter(Boolean)
@@ -2106,9 +2429,83 @@ const CheckoutForm = ({
               )}
             </div>
           </div>
+          )}
 
-          <div className={styles.section}>
+          {isModal && modalPromo && (
+            <div className={styles.modalPromoBlock}>
+              <span className={styles.modalPromoLabel}>Промокод</span>
+              <div className={styles.modalPromoRow}>
+                <input
+                  id="checkout-modal-promo"
+                  type="text"
+                  className={styles.modalPromoInput}
+                  placeholder=""
+                  value={modalPromo.value}
+                  onChange={(event) => modalPromo.onChange(event.target.value)}
+                  disabled={modalPromo.isLoading}
+                />
+                <button
+                  type="button"
+                  className={styles.modalPromoBtn}
+                  onClick={() => modalPromo.onApply()}
+                  disabled={modalPromo.isLoading || !modalPromo.value.trim()}
+                >
+                  {modalPromo.isLoading ? "…" : "Активировать"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className={`${styles.section} ${styles.modalPaymentSection}`}>
             <h2 className={styles.paymentTitle}>Способ оплаты</h2>
+            {isModal ? (
+              <div className={styles.modalPaymentOptions}>
+                <label className={styles.modalPaymentOption}>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="card"
+                    checked={formData.paymentMethod === "card"}
+                    onChange={handleInputChange}
+                    className={styles.radioInput}
+                  />
+                  <span
+                    className={`${styles.modalRadioMark} ${
+                      formData.paymentMethod === "card" ? styles.modalRadioMarkActive : ""
+                    }`}
+                    aria-hidden
+                  />
+                  <span className={styles.modalPaymentOptionLabel}>Оплата банковской картой</span>
+                </label>
+                <label className={styles.modalPaymentOption}>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="sberbank"
+                    checked={formData.paymentMethod === "sberbank"}
+                    onChange={handleInputChange}
+                    className={styles.radioInput}
+                  />
+                  <span
+                    className={`${styles.modalRadioMark} ${
+                      formData.paymentMethod === "sberbank" ? styles.modalRadioMarkActive : ""
+                    }`}
+                    aria-hidden
+                  />
+                  <span className={styles.modalPaymentOptionLabel}>
+                    <span>СБП</span>
+                    <Image
+                      src="/images/checkout/sbp-icon.svg"
+                      alt=""
+                      width={20}
+                      height={20}
+                      className={styles.modalPaymentOptionIcon}
+                      unoptimized
+                    />
+                  </span>
+                </label>
+              </div>
+            ) : (
             <div className={styles.paymentButtonsRow}>
               <label className={styles.paymentButton}>
                 <input
@@ -2199,11 +2596,33 @@ const CheckoutForm = ({
                 </div>
               </label>
             </div>
+            )}
           </div>
 
           {!showRightColumn && (
             <>
               <div className={styles.orderSummaryBlock}>
+                {isModal ? (
+                  <div className={styles.modalOrderSummary}>
+                    <p className={styles.modalSummaryLine}>
+                      Сумма: {formatPrice(itemsSubtotal)}
+                    </p>
+                    <p className={styles.modalSummaryLine}>
+                      {modalDeliverySummaryLabel}:{" "}
+                      {isCourierPriceLoading
+                        ? "рассчитывается…"
+                        : deliveryPrice === 0
+                        ? "бесплатно"
+                        : formatPrice(deliveryPrice)}
+                    </p>
+                    {modalSummaryCity && (
+                      <p className={styles.modalSummaryLocation}>{modalSummaryCity}</p>
+                    )}
+                    <p className={styles.modalSummaryLineTotal}>
+                      Итоговая сумма: {formatPrice(totalAmount)}
+                    </p>
+                  </div>
+                ) : (
                 <div className={styles.orderSummary}>
                   <div className={styles.summaryRowTotal}>
                     <span className={styles.summaryLabelTotal}>Итого</span>
@@ -2212,11 +2631,16 @@ const CheckoutForm = ({
                     </span>
                   </div>
                 </div>
+                )}
                 <button
                   ref={submitButtonRef}
                   type="button"
                   className={`${styles.submitButton} ${styles.submitButtonRight}`}
-                  disabled={!formData.agreeToOffer || !formData.agreeToPrivacy || isSubmitting || (formData.deliveryMethod === "yandex" && !courierAvailable)}
+                  disabled={
+                    (!isModal && (!formData.agreeToOffer || !formData.agreeToPrivacy)) ||
+                    isSubmitting ||
+                    (formData.deliveryMethod === "yandex" && !courierAvailable)
+                  }
                   onClick={handleSubmitOrder}
                   onPointerDown={(e) => {
                     if (e.pointerType === "touch") {
@@ -2227,6 +2651,18 @@ const CheckoutForm = ({
                 >
                   {isSubmitting ? "Оформление..." : "Оформить заказ"}
                 </button>
+                {isModal ? (
+                  <p className={styles.modalAgreement}>
+                    Нажимая на кнопку, вы соглашаетесь с{" "}
+                    <Link href="/public-offer" className={styles.modalAgreementLink}>
+                      публичной офертой
+                    </Link>{" "}
+                    и{" "}
+                    <Link href="/privacy" className={styles.modalAgreementLink}>
+                      политикой конфиденциальности
+                    </Link>
+                  </p>
+                ) : (
                 <div className={styles.checkboxes}>
                   <label className={styles.checkboxLabel}>
                     <input
@@ -2262,6 +2698,7 @@ const CheckoutForm = ({
                     </span>
                   </label>
                 </div>
+                )}
               </div>
             </>
           )}

@@ -1,27 +1,26 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useCart } from "../../../contexts/CartContext";
 import styles from "./CartIcon.module.css";
 
 const CartIcon = () => {
-  const { getTotalItems } = useCart();
+  const { getTotalItems, openCart } = useCart();
   const totalItems = getTotalItems();
 
   return (
-    <Link
-      href="/cart"
+    <button
+      type="button"
       className={styles.cartIcon}
       aria-label="Корзина"
-      prefetch={false}
+      onClick={openCart}
     >
       <div className={styles.cartIconWrapper}>
         <Image
-        src="/images/icons/cart.svg"
-        alt="Корзина"
-        width={24}
-        height={24}
+          src="/images/icons/cart.svg"
+          alt=""
+          width={24}
+          height={24}
           className={styles.cartImage}
           loading="lazy"
           unoptimized
@@ -30,7 +29,7 @@ const CartIcon = () => {
           <span className={styles.cartBadge}>{totalItems}</span>
         )}
       </div>
-    </Link>
+    </button>
   );
 };
 

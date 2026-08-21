@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { useAuth } from "../../contexts/AuthContext";
 import styles from "./AccountAuthPromptModal.module.css";
 
 type AccountAuthPromptModalProps = {
@@ -11,6 +11,8 @@ type AccountAuthPromptModalProps = {
 };
 
 const AccountAuthPromptModal = ({ onClose, onSkip }: AccountAuthPromptModalProps) => {
+  const { openAuth } = useAuth();
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
 
@@ -57,9 +59,16 @@ const AccountAuthPromptModal = ({ onClose, onSkip }: AccountAuthPromptModalProps
           Авторизуйтесь, чтобы отслеживать заказы и упростить оформление покупок.
         </p>
 
-        <Link href="/account" className={styles.primaryBtn} onClick={onClose}>
+        <button
+          type="button"
+          className={styles.primaryBtn}
+          onClick={() => {
+            onClose();
+            openAuth("login");
+          }}
+        >
           Перейти ко входу
-        </Link>
+        </button>
 
         <button
           type="button"

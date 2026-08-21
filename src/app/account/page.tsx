@@ -1,25 +1,30 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../contexts/AuthContext";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import PersonalData from "../../components/AccountPage/PersonalData/PersonalData";
-import MyAccount from "../../components/AccountPage/MyAccount/MyAccount";
 import Orders from "../../components/AccountPage/Orders/Orders";
-import AccountAuth from "../../components/AccountAuth/AccountAuth";
 import AccountAuthCheckFallback from "../../components/AccountPage/AccountAuthCheckFallback/AccountAuthCheckFallback";
 import styles from "./page.module.css";
 
-const AccountPage = () => {
-  const { isAuthenticated, isLoading, isAuthReady, checkAuth } = useAuth();
-  const [activeTab, setActiveTab] = useState<"account" | "profile" | "orders">(
-    "account"
+type AccountTab = "profile" | "orders";
+
+const parseTab = (value: string | null): AccountTab =>
+  value === "orders" ? "orders" : "profile";
+
+const AccountPageContent = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { isAuthenticated, isLoading, isAuthReady, checkAuth, requestLogout } =
+    useAuth();
+  const [activeTab, setActiveTab] = useState<AccountTab>(() =>
+    parseTab(searchParams.get("tab"))
   );
-  const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>(
-    undefined
-  );
+  const [ordersHeading, setOrdersHeading] = useState("Заказы");
 
   const authCheckedRef = useRef(false);
 
@@ -29,10 +34,22 @@ const AccountPage = () => {
     void checkAuth(true);
   }, [isAuthReady, checkAuth]);
 
+  useEffect(() => {
+    const nextTab = parseTab(searchParams.get("tab"));
+    setActiveTab(nextTab);
+    if (nextTab !== "orders") setOrdersHeading("Заказы");
+  }, [searchParams]);
+
+  const goToTab = (tab: AccountTab) => {
+    setActiveTab(tab);
+    if (tab !== "orders") setOrdersHeading("Заказы");
+    router.replace(`/account?tab=${tab}`, { scroll: false });
+  };
+
   if (!isAuthReady || (isLoading && !isAuthenticated)) {
     return (
       <div className={styles.accountPage}>
-        <Header variant="green" />
+        <Header />
         <AccountAuthCheckFallback />
         <div className={styles.footerWrapper}>
           <Footer />
@@ -44,10 +61,8 @@ const AccountPage = () => {
   if (!isAuthenticated) {
     return (
       <div className={styles.accountPage}>
-        <Header variant="green" />
-        <main className={styles.main}>
-          <AccountAuth />
-        </main>
+        <Header />
+        <AccountAuthCheckFallback />
         <div className={styles.footerWrapper}>
           <Footer />
         </div>
@@ -57,86 +72,96 @@ const AccountPage = () => {
 
   return (
     <div className={styles.accountPage}>
-      <Header variant="green" />
+      <Header />
       <nav className={styles.mobileNav}>
-        <button
-          type="button"
-          className={`${styles.mobileNavItem} ${
-            activeTab === "account" ? styles.mobileNavItemActive : ""
-          }`}
-          onClick={() => setActiveTab("account")}
-        >
-          Мой кабинет
-        </button>
-        <span className={styles.mobileNavSeparator}></span>
         <button
           type="button"
           className={`${styles.mobileNavItem} ${
             activeTab === "profile" ? styles.mobileNavItemActive : ""
           }`}
-          onClick={() => setActiveTab("profile")}
+          onClick={() => goToTab("profile")}
         >
-          Личные данные
+          Личный кабинет
         </button>
-        <span className={styles.mobileNavSeparator}></span>
+        <span className={styles.mobileNavSeparator} />
         <button
           type="button"
           className={`${styles.mobileNavItem} ${
             activeTab === "orders" ? styles.mobileNavItemActive : ""
           }`}
-          onClick={() => setActiveTab("orders")}
+          onClick={() => goToTab("orders")}
         >
-          Заказы
+          Мои заказы
+        </button>
+        <span className={styles.mobileNavSeparator} />
+        <button
+          type="button"
+          className={styles.mobileNavItem}
+          onClick={requestLogout}
+        >
+          Выйти
         </button>
       </nav>
       <main className={styles.main}>
-        <div className={styles.aside}>
-          <Link href="/catalog" className={styles.backLink} prefetch={false}>
-            Вернуться в каталог
-          </Link>
-          <h2 className={styles.asideTitle}>Личный кабинет</h2>
-          <ul className={styles.navList}>
-            <li
-              className={`${styles.navListItem} ${
-                activeTab === "account" ? styles.navListItemActive : ""
+        <aside className={styles.aside}>
+          <p className={styles.breadcrumbs}>
+            <Link href="/" prefetch={false}>
+              Главная
+            </Link>
+            <span> / </span>
+            <Link href="/account?tab=profile" prefetch={false}>
+              Личный кабинет
+            </Link>
+            <span> / </span>
+            <span className={styles.breadcrumbCurrent}>
+              {activeTab === "orders" ? "Заказы" : "Профиль"}
+            </span>
+          </p>
+
+          <h1 className={styles.asideTitle}>
+            {activeTab === "orders" ? ordersHeading : "Профиль"}
+          </h1>
+
+          <nav className={styles.sideNav} aria-label="Разделы кабинета">
+            <button
+              type="button"
+              className={`${styles.sideNavItem} ${
+                activeTab === "profile" ? styles.sideNavItemActive : ""
               }`}
-              onClick={() => setActiveTab("account")}
+              onClick={() => goToTab("profile")}
             >
-              Мой кабинет
-            </li>
-            <li
-              className={`${styles.navListItem} ${
-                activeTab === "profile" ? styles.navListItemActive : ""
+              Личный кабинет
+            </button>
+            <button
+              type="button"
+              className={`${styles.sideNavItem} ${
+                activeTab === "orders" ? styles.sideNavItemActive : ""
               }`}
-              onClick={() => setActiveTab("profile")}
+              onClick={() => goToTab("orders")}
             >
-              Личные данные
-            </li>
-            <li
-              className={`${styles.navListItem} ${
-                activeTab === "orders" ? styles.navListItemActive : ""
-              }`}
-              onClick={() => setActiveTab("orders")}
+              Мои заказы
+            </button>
+            <button
+              type="button"
+              className={styles.sideNavItem}
+              onClick={requestLogout}
             >
-              Заказы
-            </li>
-          </ul>
-        </div>
+              Выйти
+            </button>
+          </nav>
+        </aside>
 
         <article className={styles.card}>
-          {activeTab === "account" && (
-            <MyAccount
-              onNavigate={(tab: "profile" | "orders", orderId?: string) => {
-                setActiveTab(tab);
-                if (orderId) {
-                  setSelectedOrderId(orderId);
-                }
-              }}
-            />
-          )}
+          <h1 className={styles.mobilePageTitle}>
+            {activeTab === "orders" ? ordersHeading : "Профиль"}
+          </h1>
           {activeTab === "profile" && <PersonalData />}
           {activeTab === "orders" && (
-            <Orders initialOrderId={selectedOrderId} />
+            <Orders
+              onOrderSelect={(order) =>
+                setOrdersHeading(order?.title ?? "Заказы")
+              }
+            />
           )}
         </article>
       </main>
@@ -146,5 +171,21 @@ const AccountPage = () => {
     </div>
   );
 };
+
+const AccountPage = () => (
+  <Suspense
+    fallback={
+      <div className={styles.accountPage}>
+        <Header />
+        <AccountAuthCheckFallback />
+        <div className={styles.footerWrapper}>
+          <Footer />
+        </div>
+      </div>
+    }
+  >
+    <AccountPageContent />
+  </Suspense>
+);
 
 export default AccountPage;
