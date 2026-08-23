@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -149,7 +149,7 @@ const CartModal = ({
     });
   }, []);
 
-  const handleResizeKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
+  const handleResizeKeyDown = useCallback((event: ReactKeyboardEvent<HTMLDivElement>) => {
     const step = event.shiftKey ? 40 : 20;
     let next: number | null = null;
     if (event.key === "ArrowLeft") {
