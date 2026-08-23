@@ -5,11 +5,30 @@ import Image from "next/image";
 import Button from "../ui/Button/Button";
 import styles from "./CollectionBanner.module.css";
 import { fetchHomePage } from "../../api/home/homeApi";
+import { buildCatalogCategoryHref } from "../../api/catalog/catalogApi";
 import type { HomeCollection } from "../../types/home";
 
 export type CollectionBannerItem = HomeCollection;
 
 type CollectionBannerProps = CollectionBannerItem;
+
+/** Категория каталога по названию баннера коллекции */
+const resolveCollectionCategorySlug = (title: string): string | null => {
+  const t = title.toLowerCase();
+  if (t.includes("bag") || t.includes("сумк")) return "bags";
+  if (t.includes("ski") || t.includes("suit") || t.includes("куртк")) {
+    return "jackets";
+  }
+  return null;
+};
+
+const resolveCollectionHref = (item: HomeCollection): string => {
+  const categorySlug = resolveCollectionCategorySlug(item.title);
+  if (categorySlug) {
+    return buildCatalogCategoryHref(categorySlug);
+  }
+  return item.href || "/catalog";
+};
 
 export const CollectionBanner = ({
   title,
@@ -17,6 +36,8 @@ export const CollectionBanner = ({
   href,
   cta = "Shop now",
 }: CollectionBannerProps) => {
+  const resolvedHref = resolveCollectionHref({ title, image, href, cta });
+
   return (
     <article className={styles.banner}>
       <Image
@@ -29,7 +50,7 @@ export const CollectionBanner = ({
       <div className={styles.gradient} />
       <div className={styles.content}>
         <h3 className={styles.title}>{title}</h3>
-        <Button href={href} variant="primary" className={styles.cta}>
+        <Button href={resolvedHref} variant="primary" className={styles.cta}>
           {cta}
         </Button>
       </div>

@@ -155,7 +155,9 @@ describe("mock API handlers", () => {
     expect(home.collections).toHaveLength(2);
     expect(home.collections[0]?.title).toBe("Ski suit");
     expect(home.collections[0]?.image).toBe("/images/home/collection-bag.png");
+    expect(home.collections[0]?.href).toBe("/catalog?category=jackets");
     expect(home.collections[1]?.title).toBe("Bag square");
     expect(home.collections[1]?.image).toBe("/images/home/collection-ski.png");
+    expect(home.collections[1]?.href).toBe("/catalog?category=bags");
   });
 });

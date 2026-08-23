@@ -418,7 +418,11 @@ export const filterMockCatalogProducts = (params: {
         product.slug.startsWith(cat) ||
         (cat === "hoodies" && product.slug.includes("hoodie")) ||
         (cat === "zip-hoodie" && product.slug.includes("zip-hoodie")) ||
-        (cat === "bags" && product.slug.includes("bag"))
+        (cat === "bags" && product.slug.includes("bag")) ||
+        (cat === "jackets" &&
+          (product.slug.includes("jacket") ||
+            product.slug.includes("ski") ||
+            product.slug.includes("suit")))
     );
   }
 

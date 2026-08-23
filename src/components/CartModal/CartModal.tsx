@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -42,6 +42,26 @@ type CartModalProps = {
   onPaymentReturnHandled?: () => void;
 };
 
+const CART_PANEL_WIDTH_KEY = "znves:cart-panel-width";
+const DEFAULT_PANEL_WIDTH = 600;
+const MIN_PANEL_WIDTH = 420;
+const MAX_PANEL_WIDTH = 960;
+
+const clampPanelWidth = (value: number) => {
+  const viewportMax =
+    typeof window !== "undefined" ? window.innerWidth : MAX_PANEL_WIDTH;
+  const max = Math.min(MAX_PANEL_WIDTH, viewportMax);
+  return Math.min(max, Math.max(MIN_PANEL_WIDTH, Math.round(value)));
+};
+
+const persistPanelWidth = (width: number) => {
+  try {
+    window.localStorage.setItem(CART_PANEL_WIDTH_KEY, String(width));
+  } catch {
+    /* ignore storage errors */
+  }
+};
+
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("ru-RU", {
     style: "currency",
@@ -77,7 +97,87 @@ const CartModal = ({
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [orderError, setOrderError] = useState<string | null>(null);
+  const [panelWidth, setPanelWidth] = useState(DEFAULT_PANEL_WIDTH);
+  const [isResizing, setIsResizing] = useState(false);
   const lastFailedPromoRef = useRef<string | null>(null);
+  const isResizingRef = useRef(false);
+  const resizeStartXRef = useRef(0);
+  const resizeStartWidthRef = useRef(DEFAULT_PANEL_WIDTH);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(CART_PANEL_WIDTH_KEY);
+      if (!raw) return;
+      const parsed = Number(raw);
+      if (Number.isFinite(parsed)) {
+        setPanelWidth(clampPanelWidth(parsed));
+      }
+    } catch {
+      /* ignore storage errors */
+    }
+  }, []);
+
+  const handleResizePointerDown = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    isResizingRef.current = true;
+    resizeStartXRef.current = event.clientX;
+    resizeStartWidthRef.current = panelWidth;
+    setIsResizing(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }, [panelWidth]);
+
+  const handleResizePointerMove = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!isResizingRef.current) return;
+    // Панель справа: тянем левый край влево — ширина растёт
+    const delta = resizeStartXRef.current - event.clientX;
+    setPanelWidth(clampPanelWidth(resizeStartWidthRef.current + delta));
+  }, []);
+
+  const endResize = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!isResizingRef.current) return;
+    isResizingRef.current = false;
+    setIsResizing(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    setPanelWidth((current) => {
+      const next = clampPanelWidth(current);
+      persistPanelWidth(next);
+      return next;
+    });
+  }, []);
+
+  const handleResizeKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
+    const step = event.shiftKey ? 40 : 20;
+    let next: number | null = null;
+    if (event.key === "ArrowLeft") {
+      next = clampPanelWidth(panelWidth + step);
+    } else if (event.key === "ArrowRight") {
+      next = clampPanelWidth(panelWidth - step);
+    } else if (event.key === "Home") {
+      next = MIN_PANEL_WIDTH;
+    } else if (event.key === "End") {
+      next = clampPanelWidth(MAX_PANEL_WIDTH);
+    }
+    if (next == null) return;
+    event.preventDefault();
+    setPanelWidth(next);
+    persistPanelWidth(next);
+  }, [panelWidth]);
+
+  useEffect(() => {
+    if (!isResizing) return;
+    const previousCursor = document.body.style.cursor;
+    const previousUserSelect = document.body.style.userSelect;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    return () => {
+      document.body.style.cursor = previousCursor;
+      document.body.style.userSelect = previousUserSelect;
+    };
+  }, [isResizing]);
 
   useEffect(() => {
     if (isCartOpen) {
@@ -245,12 +345,41 @@ const CartModal = ({
             aria-hidden={!isActive}
           />
           <aside
-            className={`${styles.panel} ${isActive ? styles.panelVisible : ""}`}
+            className={`${styles.panel} ${isActive ? styles.panelVisible : ""} ${
+              isResizing ? styles.panelResizing : ""
+            }`}
+            style={
+              {
+                "--cart-panel-width": `${panelWidth}px`,
+              } as CSSProperties
+            }
             role="dialog"
             aria-modal="true"
             aria-labelledby="cart-modal-title"
             aria-hidden={!isActive}
           >
+            <div
+              className={styles.resizeHandle}
+              onPointerDown={handleResizePointerDown}
+              onPointerMove={handleResizePointerMove}
+              onPointerUp={endResize}
+              onPointerCancel={endResize}
+              onKeyDown={handleResizeKeyDown}
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Изменить ширину панели"
+              aria-valuemin={MIN_PANEL_WIDTH}
+              aria-valuemax={MAX_PANEL_WIDTH}
+              aria-valuenow={panelWidth}
+              tabIndex={0}
+            >
+              <span className={styles.resizeHandleGrip} aria-hidden>
+                <span />
+                <span />
+                <span />
+              </span>
+            </div>
+
             <div className={styles.header}>
               <h2 className={styles.title} id="cart-modal-title">
                 Ваш заказ:
