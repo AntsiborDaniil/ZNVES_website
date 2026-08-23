@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
 import styles from "./Orders.module.css";
 import Image from "next/image";
 import {
@@ -389,14 +388,24 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
     return (
       <section className={styles.panel}>
         <div className={styles.emptyOrdersWrap}>
-          <h2 className={styles.emptyOrdersTitle}>У вас пока нет заказов</h2>
-          <p className={styles.emptyOrdersText}>
-            После оформления заказа он появится здесь. Пока можно выбрать что-нибудь в
-            каталоге.
-          </p>
-          <Link href="/catalog" className={styles.emptyOrdersLink}>
-            Перейти в каталог
-          </Link>
+          <div className={styles.emptyOrdersIcon} aria-hidden>
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3 3H5.2L6.2 7M6.2 7L8 14H18L21 7H6.2ZM9 20.5C9 21.3284 8.32843 22 7.5 22C6.67157 22 6 21.3284 6 20.5C6 19.6716 6.67157 19 7.5 19C8.32843 19 9 19.6716 9 20.5ZM19 20.5C19 21.3284 18.3284 22 17.5 22C16.6716 22 16 21.3284 16 20.5C16 19.6716 16.6716 19 17.5 19C18.3284 19 19 19.6716 19 20.5Z"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <p className={styles.emptyOrdersTitle}>У вас пока нет заказов</p>
         </div>
       </section>
     );

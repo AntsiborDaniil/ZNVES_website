@@ -27,6 +27,7 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+  const [isMobileHeader, setIsMobileHeader] = useState(false);
   const [catalogCategories, setCatalogCategories] = useState<ApiCatalogCategory[]>(
     FALLBACK_CATALOG_CATEGORIES
   );
@@ -40,6 +41,14 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
     void fetchCatalogCategories().then((data) => {
       if (data.length > 0) setCatalogCategories(data);
     });
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1024px)");
+    const sync = () => setIsMobileHeader(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
   }, []);
 
   useEffect(() => {
@@ -69,11 +78,16 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
   }, [isCatalogOpen]);
 
   const closeCatalog = () => setIsCatalogOpen(false);
+  const closeAccount = () => setIsAccountOpen(false);
 
   const toggleCatalog = () => {
     setIsAccountOpen(false);
     setIsCatalogOpen((open) => !open);
   };
+
+  const accountPopover = isAuthenticated ? (
+    <AccountPopover isOpen={isAccountOpen} onClose={closeAccount} />
+  ) : null;
 
   return (
     <div className={`${styles.shell} ${isCatalogOpen ? styles.catalogOpen : ""}`}>
@@ -142,10 +156,7 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
               >
                 Личный кабинет
               </button>
-              <AccountPopover
-                isOpen={isAccountOpen}
-                onClose={() => setIsAccountOpen(false)}
-              />
+              {!isMobileHeader && accountPopover}
             </div>
           ) : (
             <button
@@ -172,19 +183,27 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
         </nav>
 
         <div className={styles.mobileRight}>
-          <AccountIcon />
+          <div className={styles.mobileAccountWrap}>
+            <AccountIcon
+              isMenuOpen={isAccountOpen}
+              onAuthenticatedClick={() => {
+                closeCatalog();
+                setIsAccountOpen((open) => !open);
+              }}
+            />
+            {isMobileHeader && accountPopover}
+          </div>
           <CartIcon />
         </div>
       </header>
 
-      {isCatalogOpen && (
-        <div ref={catalogMenuRef}>
-          <CatalogMegaMenu
-            categories={catalogCategories}
-            onNavigate={closeCatalog}
-          />
-        </div>
-      )}
+      <div ref={catalogMenuRef} className={styles.catalogMenuHost}>
+        <CatalogMegaMenu
+          isOpen={isCatalogOpen}
+          categories={catalogCategories}
+          onNavigate={closeCatalog}
+        />
+      </div>
     </div>
   );
 };

@@ -699,12 +699,12 @@
 
 @media (max-width: 768px) {
   .main {
-    padding: 0 10px 20px;
+    padding: 0 var(--space-page-mobile) 20px;
   }
 
   .categoriesRow {
     gap: 16px;
-    padding: 15px 0;
+    padding: 40px 0 20px;
     margin: 0;
     width: 100%;
   }
@@ -721,6 +721,10 @@
 
   .filtersButton {
     display: flex;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    padding: 0;
   }
 
   .filtersButtonMobile {
@@ -801,9 +805,18 @@
     text-overflow: ellipsis;
   }
 
+  .productsSection {
+    gap: 0;
+  }
+
   .productsGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
+    row-gap: 20px;
+    column-gap: 8px;
+  }
+
+  .catalogCardLink {
+    min-width: 0;
   }
 
   .emptyStateWrap {
@@ -822,29 +835,6 @@
   .emptyStateText {
     font-size: 15px;
     margin-bottom: 20px;
-  }
-
-  .catalogCard {
-    gap: 18px;
-  }
-
-  .catalogCardImageWrapper {
-    padding: 28px 18px 22px;
-  }
-
-  .catalogCardImage {
-    max-width: 300px;
-    max-height: 320px;
-    margin: 0 auto;
-  }
-
-  .catalogCardInfo {
-    gap: 12px;
-  }
-
-  .catalogCardTitle,
-  .catalogCardPrice {
-    font-size: 16px;
   }
 }
 

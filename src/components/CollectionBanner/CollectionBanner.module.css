@@ -6,6 +6,28 @@
   scroll-margin-top: var(--header-height);
 }
 
+.skeleton {
+  grid-column: 1 / -1;
+  min-height: 520px;
+  background: linear-gradient(
+    110deg,
+    var(--color-grey-5) 25%,
+    var(--color-grey-3) 50%,
+    var(--color-grey-5) 75%
+  );
+  background-size: 200% 100%;
+  animation: collectionSkeleton 1.4s ease-in-out infinite;
+}
+
+@keyframes collectionSkeleton {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 .banner {
   position: relative;
   display: flex;

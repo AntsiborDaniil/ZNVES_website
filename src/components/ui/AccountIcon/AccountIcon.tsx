@@ -1,17 +1,23 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useAuth } from "../../../contexts/AuthContext";
 import styles from "./AccountIcon.module.css";
 
-const AccountIcon = () => {
-  const router = useRouter();
+type AccountIconProps = {
+  isMenuOpen?: boolean;
+  onAuthenticatedClick?: () => void;
+};
+
+const AccountIcon = ({
+  isMenuOpen = false,
+  onAuthenticatedClick,
+}: AccountIconProps) => {
   const { isAuthenticated, openAuth } = useAuth();
 
   const handleClick = () => {
     if (isAuthenticated) {
-      router.push("/account");
+      onAuthenticatedClick?.();
       return;
     }
     openAuth("login");
@@ -21,6 +27,8 @@ const AccountIcon = () => {
     <button
       className={styles.accountIcon}
       aria-label="Личный кабинет"
+      aria-expanded={isAuthenticated ? isMenuOpen : undefined}
+      aria-haspopup={isAuthenticated ? "menu" : undefined}
       type="button"
       onClick={handleClick}
     >

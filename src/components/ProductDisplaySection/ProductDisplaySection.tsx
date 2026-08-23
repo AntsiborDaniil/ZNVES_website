@@ -23,6 +23,12 @@ import "swiper/css/free-mode";
 import "swiper/css/mousewheel";
 import type { Swiper as SwiperInstance } from "swiper";
 import { useWindowSize } from "../../hooks/useWindowSize";
+import {
+  buildProductHref,
+  type ProductNavFrom,
+} from "../../lib/productNavigation";
+
+export const BESTSELLERS_MAX_PRODUCTS = 8;
 
 type ProductDisplaySectionProps = {
   title: string;
@@ -30,10 +36,15 @@ type ProductDisplaySectionProps = {
   id?: string;
   isBestseller?: boolean;
   headerAlign?: "split" | "center";
+  maxProducts?: number;
+  navFrom?: ProductNavFrom;
+  navCategory?: string | null;
 };
 
 const isNewInTitle = (title: string) =>
   title === "NEW IN" || title === "Bestsellers";
+
+const MIN_SLIDES_FOR_LOOP = 16;
 
 const ProductDisplaySection = ({
   title,
@@ -41,6 +52,9 @@ const ProductDisplaySection = ({
   id,
   isBestseller = false,
   headerAlign = "split",
+  maxProducts,
+  navFrom = "home",
+  navCategory = null,
 }: ProductDisplaySectionProps) => {
   const swiperRef = useRef<SwiperInstance | null>(null);
   const [maxVisible, setMaxVisible] = useState<number | "auto">(4);
@@ -50,6 +64,8 @@ const ProductDisplaySection = ({
   const [progress, setProgress] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const { width } = useWindowSize();
+
+  const isLimitedSlider = maxProducts != null;
 
   useEffect(() => {
     if (width === 0) return;
@@ -87,28 +103,56 @@ const ProductDisplaySection = ({
     loadProducts();
   }, [title]);
 
-  const MIN_SLIDES_FOR_LOOP = 16;
+  const displayProducts = useMemo(() => {
+    if (!isLimitedSlider) return products;
+    return products.slice(0, maxProducts);
+  }, [products, maxProducts, isLimitedSlider]);
 
   const slidesForSwiper = useMemo(() => {
-    if (products.length === 0) return [];
-    if (products.length >= MIN_SLIDES_FOR_LOOP) return products;
+    if (displayProducts.length === 0) return [];
+    if (isLimitedSlider) return displayProducts;
+
+    if (displayProducts.length >= MIN_SLIDES_FOR_LOOP) return displayProducts;
+
     const repeated: CatalogProduct[] = [];
     while (repeated.length < MIN_SLIDES_FOR_LOOP) {
-      repeated.push(...products);
+      repeated.push(...displayProducts);
     }
     return repeated;
-  }, [products]);
+  }, [displayProducts, isLimitedSlider]);
+
+  const visibleCount = typeof maxVisible === "number" ? maxVisible : 4;
+  const canScroll = displayProducts.length > visibleCount;
+  const pageCount = canScroll
+    ? displayProducts.length - visibleCount + 1
+    : 0;
+  const enableLoop =
+    !isLimitedSlider && displayProducts.length >= MIN_SLIDES_FOR_LOOP;
 
   const shopNowHref = isNewInTitle(title) ? "/new-in" : "/catalog";
-  const uniqueCount = Math.max(products.length, 1);
+  const slideCount = Math.max(displayProducts.length, 1);
+  const maxPageIndex = Math.max(pageCount - 1, 0);
 
   const syncSwiperState = useCallback(
     (swiper: SwiperInstance) => {
-      const real = swiper.realIndex ?? 0;
-      setActiveIndex(real % uniqueCount);
+      const index = enableLoop
+        ? swiper.realIndex ?? 0
+        : swiper.activeIndex ?? 0;
+
+      const pageIndex = enableLoop
+        ? index % slideCount
+        : Math.min(Math.max(index, 0), maxPageIndex);
+
+      setActiveIndex(pageIndex);
+
+      if (!canScroll) {
+        setProgress(100);
+        return;
+      }
+
       setProgress(Math.min(100, Math.max(8, (swiper.progress || 0) * 100)));
     },
-    [uniqueCount]
+    [canScroll, enableLoop, maxPageIndex, slideCount]
   );
 
   const handleSwiper = useCallback(
@@ -128,6 +172,8 @@ const ProductDisplaySection = ({
 
   const handleBeforeInit = useCallback(
     (swiper: SwiperInstance) => {
+      if (!enableLoop) return;
+
       const params = swiper.params as unknown as Record<string, unknown>;
       params.preloadImages = true;
       params.loopedSlides = Math.max(slidesForSwiper.length, 8);
@@ -139,11 +185,16 @@ const ProductDisplaySection = ({
         loadPrevNextAmount: 3,
       };
     },
-    [slidesForSwiper.length]
+    [enableLoop, slidesForSwiper.length]
   );
 
   const goToSlide = (index: number) => {
-    swiperRef.current?.slideToLoop(index);
+    if (enableLoop) {
+      swiperRef.current?.slideToLoop(index);
+      return;
+    }
+
+    swiperRef.current?.slideTo(index);
   };
 
   return (
@@ -151,22 +202,26 @@ const ProductDisplaySection = ({
       id={id}
       className={`${styles.section} ${isBestseller ? styles.isBestseller : ""}`}
     >
-      <SectionHeader
-        title={title}
-        href={showShopNow ? shopNowHref : undefined}
-        actionLabel="Смотреть больше"
-        align={headerAlign}
-      />
+      <div className={isBestseller ? styles.bestsellerHeader : undefined}>
+        <SectionHeader
+          title={title}
+          href={showShopNow ? shopNowHref : undefined}
+          actionLabel="Смотреть больше"
+          align={headerAlign}
+        />
+      </div>
       <div className={styles.sliderContainer}>
         {isLoading ? (
-          <SliderSkeleton />
-        ) : products.length > 0 ? (
+          <SliderSkeleton
+            cardCount={typeof maxVisible === "number" ? maxVisible : 4}
+          />
+        ) : displayProducts.length > 0 ? (
           createElement(
             Swiper as ComponentType<Record<string, unknown>>,
             {
               className: styles.slider,
               modules: [FreeMode, Mousewheel],
-              loop: true,
+              loop: enableLoop,
               spaceBetween,
               slidesPerView: maxVisible,
               slidesPerGroup: 1,
@@ -175,6 +230,8 @@ const ProductDisplaySection = ({
               touchRatio: 1,
               resistance: true,
               resistanceRatio: 0.65,
+              allowTouchMove: true,
+              watchOverflow: true,
               freeMode: {
                 enabled: true,
                 momentum: true,
@@ -182,59 +239,64 @@ const ProductDisplaySection = ({
                 momentumVelocityRatio: 0.7,
                 momentumBounce: false,
                 minimumVelocity: 0.02,
-                sticky: false,
+                sticky: true,
               },
-              mousewheel: {
-                enabled: true,
-                forceToAxis: true,
-                sensitivity: 0.8,
-                releaseOnEdges: true,
-              },
+              mousewheel: canScroll
+                ? {
+                    enabled: true,
+                    forceToAxis: true,
+                    sensitivity: 0.8,
+                    releaseOnEdges: true,
+                  }
+                : false,
               grabCursor: true,
               watchSlidesProgress: true,
-              watchOverflow: false,
               onSwiper: handleSwiper,
               onSlideChange: handleSlideChange,
               onProgress: syncSwiperState,
               onBeforeInit: handleBeforeInit,
             },
-            [
-              ...slidesForSwiper.map((product, index) => (
-                <SwiperSlide
-                  key={`${product.id}-${index}`}
-                  className={styles.slideItem}
+            slidesForSwiper.map((product, index) => (
+              <SwiperSlide
+                key={isLimitedSlider ? product.id : `${product.id}-${index}`}
+                className={styles.slideItem}
+              >
+                <Link
+                  href={buildProductHref(product.slug || product.id, {
+                    from: navFrom,
+                    category: navCategory,
+                  })}
+                  className={styles.slideLink}
+                  aria-label={`Перейти к товару ${product.title}`}
+                  prefetch={false}
                 >
-                  <Link
-                    href={`/catalog/${product.slug || product.id}`}
-                    className={styles.slideLink}
-                    aria-label={`Перейти к товару ${product.title}`}
-                    prefetch={false}
-                  >
-                    <ProductCard
-                      title={product.title}
-                      price={product.price}
-                      images={product.images}
-                      isNew={product.isNew}
-                      isSliderCard={true}
-                    />
-                  </Link>
-                </SwiperSlide>
-              )),
-            ]
+                  <ProductCard
+                    title={product.title}
+                    price={product.price}
+                    images={product.images}
+                    isNew={product.isNew}
+                    isSliderCard={true}
+                  />
+                </Link>
+              </SwiperSlide>
+            ))
           )
         ) : (
           <div className={styles.emptyState}>Товары не найдены</div>
         )}
       </div>
-      {products.length > 0 && (
+      {pageCount > 1 && displayProducts.length > 0 && (
         <>
           <div className={styles.progress} aria-hidden>
-            <span className={styles.progressFill} style={{ width: `${progress}%` }} />
+            <span
+              className={styles.progressFill}
+              style={{ width: `${progress}%` }}
+            />
           </div>
           <div className={styles.bullets} role="tablist" aria-label="Слайды">
-            {products.map((product, index) => (
+            {Array.from({ length: pageCount }, (_, index) => (
               <button
-                key={product.id}
+                key={index}
                 type="button"
                 className={`${styles.bullet} ${
                   index === activeIndex ? styles.bulletActive : ""

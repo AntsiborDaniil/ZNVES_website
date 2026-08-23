@@ -8,6 +8,7 @@ import {
   verifyRegistration,
 } from "../../api/auth/authApi";
 import { fetchCatalogProducts } from "../../api/catalog/catalogApi";
+import { fetchHomePage } from "../../api/home/homeApi";
 import { createOrder, getMyOrders } from "../../api/order/orderApi";
 import { fetchProductBySlug } from "../../api/product/productApi";
 import { MOCK_AUTH_CODE, MOCK_DEV_USER } from "../config";
@@ -144,5 +145,17 @@ describe("mock API handlers", () => {
 
     const user = await getCurrentUser();
     expect(user?.email).toBe(MOCK_DEV_USER.email);
+  });
+
+  it("returns mock home page content with matched collection images", async () => {
+    const home = await fetchHomePage();
+
+    expect(home.hero.title).toBe("NEW COLLECTION");
+    expect(home.catalog_featured_image).toContain("/images/home/");
+    expect(home.collections).toHaveLength(2);
+    expect(home.collections[0]?.title).toBe("Ski suit");
+    expect(home.collections[0]?.image).toBe("/images/home/collection-bag.png");
+    expect(home.collections[1]?.title).toBe("Bag square");
+    expect(home.collections[1]?.image).toBe("/images/home/collection-ski.png");
   });
 });

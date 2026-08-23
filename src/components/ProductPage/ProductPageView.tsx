@@ -11,6 +11,7 @@ import {
 } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 import Button from "../ui/Button/Button";
@@ -28,7 +29,16 @@ import {
   fetchProductImagesByColor,
   type ApiWarehouseItem,
 } from "../../api/product/productApi";
-import { fetchCatalogColors } from "../../api/catalog/catalogApi";
+import {
+  fetchCatalogCategories,
+  fetchCatalogColors,
+  getCategoryDisplayName,
+  resolveCategorySlug,
+  type ApiCatalogCategory,
+} from "../../api/catalog/catalogApi";
+import {
+  getBreadcrumbOrigin,
+} from "../../lib/productNavigation";
 
 type ProductPageViewProps = {
   product: ProductDetail;
@@ -62,6 +72,7 @@ const ProductPageView = ({
 }: ProductPageViewProps) => {
   const { addItem } = useCart();
   const { showToast } = useToast();
+  const searchParams = useSearchParams();
   const [selectedSize, setSelectedSize] = useState<string>(product.defaultSize);
   const [selectedColor, setSelectedColor] = useState<string>(
     product.availableColors[0]?.value ?? ""
@@ -72,6 +83,7 @@ const ProductPageView = ({
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>({});
+  const [catalogCategories, setCatalogCategories] = useState<ApiCatalogCategory[]>([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const gallerySwiperRef = useRef<SwiperInstance | null>(null);
   const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -122,6 +134,7 @@ const ProductPageView = ({
       });
       setColorSlugToLabel(map);
     });
+    fetchCatalogCategories().then(setCatalogCategories);
   }, []);
 
   useEffect(() => {
@@ -294,29 +307,43 @@ const ProductPageView = ({
     gallerySwiperRef.current?.slideTo(index);
   };
 
-  const skuLabel = product.sku ? `Арт.${product.sku}` : null;
-  const categoryHref = product.category
-    ? `/catalog?category=${encodeURIComponent(product.category)}`
-    : "/catalog";
+  const fromParam = searchParams?.get("from");
+  const categoryParam = searchParams?.get("category");
+  const origin = getBreadcrumbOrigin(fromParam);
+  const categorySlug = categoryParam ? resolveCategorySlug(categoryParam) : null;
+  const categoryLabel = categorySlug
+    ? getCategoryDisplayName(categorySlug, catalogCategories)
+    : null;
+  const categoryHref =
+    categorySlug == null
+      ? null
+      : fromParam === "new-in"
+        ? `/new-in?category=${encodeURIComponent(categorySlug)}`
+        : `/catalog?category=${encodeURIComponent(categorySlug)}`;
+  const productLabel = product.title;
 
   return (
     <div className={styles.page}>
       <Header />
       <main className={styles.main}>
         <nav className={styles.breadcrumbs} aria-label="Хлебные крошки">
-          <Link href="/" className={styles.breadcrumbLink}>
-            Главная
+          <Link href={origin.href} className={styles.breadcrumbLink}>
+            {origin.label}
           </Link>
+          {categoryLabel && categoryHref && (
+            <>
+              <span className={styles.breadcrumbSep} aria-hidden>
+                /
+              </span>
+              <Link href={categoryHref} className={styles.breadcrumbLink}>
+                {categoryLabel}
+              </Link>
+            </>
+          )}
           <span className={styles.breadcrumbSep} aria-hidden>
             /
           </span>
-          <Link href={categoryHref} className={styles.breadcrumbLink}>
-            {product.category || "Каталог"}
-          </Link>
-          <span className={styles.breadcrumbSep} aria-hidden>
-            /
-          </span>
-          <span className={styles.breadcrumbCurrent}>{product.title}</span>
+          <span className={styles.breadcrumbCurrent}>{productLabel}</span>
         </nav>
 
         <section className={styles.content}>
@@ -434,7 +461,6 @@ const ProductPageView = ({
 
           <div className={styles.info}>
             <div className={styles.heading}>
-              {skuLabel && <p className={styles.sku}>{skuLabel}</p>}
               <h1 className={styles.title}>{product.title}</h1>
               <span className={styles.price}>{product.price}</span>
             </div>
@@ -583,6 +609,7 @@ const ProductPageView = ({
           title="Вам также может понравиться"
           showShopNow={false}
           headerAlign="center"
+          navFrom="catalog"
         />
       </div>
       <Footer />

@@ -4,7 +4,6 @@ import ProductDisplaySection from "../components/ProductDisplaySection/ProductDi
 import CatalogCollage from "../components/CatalogCollage/CatalogCollage";
 import CollectionBanners from "../components/CollectionBanner/CollectionBanner";
 import Footer from "../components/Footer/Footer";
-import { HOME_COLLECTIONS } from "../data/homeContent";
 import styles from "./page.module.css";
 
 export default function HomePage() {
@@ -13,9 +12,15 @@ export default function HomePage() {
             <Header />
             <HeroSection />
             <div className={styles.productDisplaySections}>
-                <ProductDisplaySection title="Bestsellers" showShopNow />
+                <ProductDisplaySection
+                    title="Bestsellers"
+                    showShopNow
+                    isBestseller
+                    maxProducts={8}
+                    navFrom="home"
+                />
                 <CatalogCollage />
-                <CollectionBanners items={HOME_COLLECTIONS} />
+                <CollectionBanners />
             </div>
             <Footer />
         </div>

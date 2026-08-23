@@ -13,12 +13,22 @@ import {
 } from "react";
 import styles from "./CatalogPage.module.css";
 import type { CatalogProduct } from "../../types/products";
+import {
+  buildProductHref,
+  type ProductNavFrom,
+} from "../../lib/productNavigation";
 
 type CatalogGridCardProps = {
   product: CatalogProduct;
+  navFrom?: ProductNavFrom;
+  navCategory?: string | null;
 };
 
-const CatalogGridCard = ({ product }: CatalogGridCardProps) => {
+const CatalogGridCard = ({
+  product,
+  navFrom = "catalog",
+  navCategory = null,
+}: CatalogGridCardProps) => {
   const imageList = useMemo(() => {
     if (!product.images || product.images.length === 0) {
       return ["/images/catalogs/placeholder.png"];
@@ -98,6 +108,11 @@ const CatalogGridCard = ({ product }: CatalogGridCardProps) => {
     setCurrentIndex(0);
   };
 
+  const productHref = buildProductHref(product.slug || product.id, {
+    from: navFrom,
+    category: navCategory,
+  });
+
   const prefetchProduct = useCallback(() => {
     if (hasPrefetchedRef.current) return;
     if (prefetchTimeoutRef.current) return;
@@ -105,11 +120,10 @@ const CatalogGridCard = ({ product }: CatalogGridCardProps) => {
     prefetchTimeoutRef.current = setTimeout(() => {
       prefetchTimeoutRef.current = null;
       if (hasPrefetchedRef.current) return;
-      const productSlug = product.slug || product.id;
-      void router.prefetch(`/catalog/${productSlug}`);
+      void router.prefetch(productHref);
       hasPrefetchedRef.current = true;
     }, PREFETCH_DELAY_MS);
-  }, [router, product.id, product.slug]);
+  }, [router, productHref]);
 
   const cancelPrefetch = useCallback(() => {
     if (prefetchTimeoutRef.current) {
@@ -120,7 +134,7 @@ const CatalogGridCard = ({ product }: CatalogGridCardProps) => {
 
   return (
     <Link
-      href={`/catalog/${product.slug || product.id}`}
+      href={productHref}
       className={styles.catalogCardLink}
       aria-label={`Открыть товар ${product.title}`}
       onPointerEnter={prefetchProduct}

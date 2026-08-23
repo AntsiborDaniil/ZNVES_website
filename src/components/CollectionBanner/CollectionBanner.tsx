@@ -1,13 +1,13 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Button from "../ui/Button/Button";
 import styles from "./CollectionBanner.module.css";
+import { fetchHomePage } from "../../api/home/homeApi";
+import type { HomeCollection } from "../../types/home";
 
-export type CollectionBannerItem = {
-  title: string;
-  image: string;
-  href: string;
-  cta?: string;
-};
+export type CollectionBannerItem = HomeCollection;
 
 type CollectionBannerProps = CollectionBannerItem;
 
@@ -39,10 +39,31 @@ export const CollectionBanner = ({
 
 type CollectionBannersProps = {
   id?: string;
-  items: readonly CollectionBannerItem[];
 };
 
-const CollectionBanners = ({ id = "collections", items }: CollectionBannersProps) => {
+const CollectionBanners = ({ id = "collections" }: CollectionBannersProps) => {
+  const [items, setItems] = useState<HomeCollection[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchHomePage()
+      .then((data) => setItems(data.collections))
+      .catch(() => setItems([]))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  if (isLoading) {
+    return (
+      <section id={id} className={styles.section} aria-busy aria-label="Загрузка коллекций">
+        <div className={styles.skeleton} />
+      </section>
+    );
+  }
+
+  if (items.length === 0) {
+    return null;
+  }
+
   return (
     <section id={id} className={styles.section}>
       {items.map((item) => (

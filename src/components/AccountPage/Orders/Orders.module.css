@@ -315,80 +315,38 @@
 }
 
 .emptyOrdersWrap {
+  width: 100%;
   margin-top: 0;
-  padding: 40px 30px;
+  padding: 120px 40px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: 12px;
-  min-height: 280px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 20px;
+  min-height: 420px;
   box-sizing: border-box;
-  background: #f5f5f5;
+  background: var(--color-white);
   border: none;
   border-radius: 0;
-  animation: emptyOrdersAppear 0.35s ease-out;
 }
 
-@keyframes emptyOrdersAppear {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.emptyOrdersIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-black);
+  line-height: 0;
 }
 
 .emptyOrdersTitle {
   margin: 0;
   font-family: inherit;
-  font-weight: var(--font-weight-bold);
-  font-size: var(--font-size-20);
-  line-height: 25px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-16);
+  line-height: var(--line-height-20);
   letter-spacing: 0;
   color: var(--color-black);
-}
-
-.emptyOrdersText {
-  margin: 0;
-  max-width: 420px;
-  font-family: inherit;
-  font-size: var(--font-size-14);
-  line-height: var(--line-height-20);
-  color: var(--color-grey-4);
-}
-
-.emptyOrdersLink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 8px;
-  min-height: 44px;
-  padding: 0 20px;
-  border: 1px solid var(--color-black);
-  border-radius: 0;
-  background: var(--color-black);
-  color: var(--color-white);
-  font-family: inherit;
-  font-size: var(--font-size-14);
-  font-weight: var(--font-weight-regular);
-  letter-spacing: var(--letter-spacing-tight);
-  text-transform: uppercase;
-  text-decoration: none;
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
-}
-
-.emptyOrdersLink:hover {
-  background: var(--color-white);
-  color: var(--color-black);
-}
-
-.emptyOrdersLink:active {
-  opacity: 0.85;
 }
 
 .statusActionRow {
@@ -1344,30 +1302,25 @@
 
   .emptyOrdersWrap {
     margin-top: 0;
-    padding: 28px 16px 32px;
-    min-height: 220px;
+    padding: 80px 20px;
+    min-height: 280px;
+    gap: 16px;
+  }
+
+  .emptyOrdersIcon svg {
+    width: 40px;
+    height: 40px;
   }
 
   .emptyOrdersTitle {
-    font-size: 18px;
-    line-height: 22px;
-  }
-
-  .emptyOrdersText {
-    font-size: 14px;
-    margin-bottom: 0;
-  }
-
-  .emptyOrdersLink {
-    width: 100%;
-    padding: 0 18px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-20);
   }
 }
 
 @media (max-width: 480px) {
   .emptyOrdersWrap {
-    padding: 24px 16px 28px;
+    padding: 64px 16px;
   }
 
   .filterBtn {

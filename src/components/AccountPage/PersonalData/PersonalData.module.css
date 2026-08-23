@@ -5,20 +5,43 @@
   box-sizing: border-box;
 }
 
+.profileShellStandalone {
+  width: 100%;
+}
+
 .profileRow {
-  display: flex;
-  gap: 100px;
-  align-items: flex-start;
+  width: 100%;
 }
 
 .profileMain {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: min(532px, 100%);
+  display: grid;
+  grid-template-columns: min(532px, 1fr) min(320px, 1fr);
+  column-gap: 100px;
+  row-gap: 20px;
+  align-items: start;
+  width: 100%;
+}
+
+.profileMainStandalone {
+  grid-template-columns: 1fr min(320px, 30%);
+  column-gap: clamp(40px, 8vw, 100px);
+}
+
+.profileMainStandalone .fieldsStack,
+.profileMainStandalone .saveButton {
+  max-width: none;
+  width: 100%;
+}
+
+.profileMainStandalone .passwordAside {
+  max-width: none;
+  width: 100%;
+  justify-self: stretch;
 }
 
 .sectionHeading {
+  grid-column: 1;
+  grid-row: 1;
   margin: 0;
   font-size: var(--font-size-20);
   font-weight: var(--font-weight-bold);
@@ -27,10 +50,60 @@
 }
 
 .fieldsStack {
+  grid-column: 1;
+  grid-row: 2;
   display: flex;
   flex-direction: column;
   gap: 12px;
   width: 100%;
+}
+
+.passwordAside {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  justify-self: start;
+  padding-top: 45px;
+}
+
+.saveButton {
+  grid-column: 1;
+  grid-row: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 532px;
+  height: 44px;
+  margin-top: 0;
+  padding: 0 10px;
+  border: 1px solid var(--color-black);
+  background: var(--color-black);
+  font-family: inherit;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-20);
+  letter-spacing: var(--letter-spacing-tight);
+  text-transform: uppercase;
+  color: var(--color-white);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.saveButton:hover:not(:disabled) {
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .fieldRow {
@@ -83,47 +156,6 @@
   box-shadow: 0 0 0 2px rgba(10, 88, 64, 0.15);
 }
 
-.saveButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 44px;
-  margin-top: 20px;
-  padding: 0 10px;
-  border: 1px solid var(--color-black);
-  background: var(--color-black);
-  font-family: inherit;
-  font-size: var(--font-size-14);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-20);
-  letter-spacing: var(--letter-spacing-tight);
-  text-transform: uppercase;
-  color: var(--color-white);
-  cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
-}
-
-.saveButton:hover:not(:disabled) {
-  background: var(--color-white);
-  color: var(--color-black);
-}
-
-.saveButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.passwordAside {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: min(320px, 100%);
-  flex-shrink: 0;
-}
-
 .passwordButton {
   display: inline-flex;
   align-items: center;
@@ -146,42 +178,29 @@
   background: var(--color-grey-5);
 }
 
-.passwordForm {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-}
-
-.passwordActions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.passwordActions .saveButton {
-  margin-top: 0;
-}
-
 .passwordCancel {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+  min-height: 44px;
   height: 44px;
+  margin-top: 12px;
+  padding: 10px;
   border: 1px solid var(--color-grey-5);
-  background: transparent;
+  background: #fafafa;
   font-family: inherit;
   font-size: var(--font-size-14);
+  line-height: var(--line-height-20);
   letter-spacing: var(--letter-spacing-tight);
-  text-transform: uppercase;
-  color: var(--color-black);
+  text-transform: none;
+  color: var(--color-black-solid);
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .passwordCancel:hover:not(:disabled) {
-  background: #fafafa;
+  background: var(--color-grey-5);
 }
 
 .passwordCancel:disabled {
@@ -241,7 +260,10 @@
 
 .actions .saveButton {
   width: min(532px, 100%);
+  max-width: none;
   margin-top: 0;
+  grid-column: auto;
+  grid-row: auto;
 }
 
 .saveStatusError {
@@ -296,19 +318,93 @@
   cursor: pointer;
 }
 
+.passwordShell .profileMain {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: min(532px, 100%);
+}
+
+.passwordShell .sectionHeading,
+.passwordShell .fieldsStack,
+.passwordShell .saveButton {
+  grid-column: auto;
+  grid-row: auto;
+  max-width: none;
+}
+
+.passwordShell .saveButton {
+  margin-top: 0;
+}
+
+.passwordShell .passwordCancel {
+  margin-top: 12px;
+}
+
 @media (max-width: 900px) {
-  .profileRow {
-    flex-direction: column;
-    gap: 24px;
+  .fieldsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .profileShell,
+  .deliveryPanel {
+    padding: 20px;
   }
 
-  .profileMain,
-  .passwordAside {
+  .profileMain {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     width: 100%;
   }
 
-  .fieldsGrid {
-    grid-template-columns: 1fr;
+  .fieldsStack,
+  .passwordAside,
+  .saveButton {
+    grid-column: auto;
+    grid-row: auto;
+    max-width: none;
+    width: 100%;
+  }
+
+  .passwordAside {
+    padding-top: 0;
+  }
+
+  .fieldsStack {
+    gap: 12px;
+  }
+
+  .fieldRow {
+    gap: 8px;
+  }
+
+  .fieldLabel {
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-20);
+  }
+
+  .deliveryBlockTitlePvz {
+    display: none;
+  }
+
+  .deliveryPanel {
+    margin-top: 20px;
+  }
+
+  .deliveryHeading {
+    font-size: var(--font-size-20);
+    line-height: 25px;
+  }
+
+  .actions .saveButton {
+    width: 100%;
+  }
+
+  .passwordShell .profileMain {
+    width: 100%;
   }
 }
 
@@ -316,23 +412,5 @@
   .profileShell,
   .deliveryPanel {
     padding: 20px 16px;
-  }
-
-  .sectionHeading,
-  .deliveryHeading {
-    font-size: 18px;
-    line-height: 22px;
-  }
-
-  .profileRow {
-    gap: 20px;
-  }
-
-  .saveButton {
-    margin-top: 12px;
-  }
-
-  .actions .saveButton {
-    width: 100%;
   }
 }

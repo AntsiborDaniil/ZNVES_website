@@ -55,10 +55,3 @@
   }
 }
 
-@media (min-width: 769px) {
-  .center .title {
-    font-size: var(--font-size-30);
-    line-height: var(--line-height-30);
-    letter-spacing: var(--letter-spacing-tighter);
-  }
-}

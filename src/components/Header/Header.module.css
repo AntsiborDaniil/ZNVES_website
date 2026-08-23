@@ -6,6 +6,10 @@
   z-index: 1000;
 }
 
+.catalogMenuHost {
+  position: relative;
+}
+
 .header {
   position: relative;
   display: grid;
@@ -107,6 +111,12 @@
   align-items: center;
   gap: 20px;
   justify-self: end;
+}
+
+.mobileAccountWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 @media (max-width: 1200px) {

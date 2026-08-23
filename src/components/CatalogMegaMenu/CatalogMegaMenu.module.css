@@ -1,37 +1,43 @@
 .panel {
   position: absolute;
   top: 100%;
-  left: 0;
-  right: 0;
+  left: 50%;
   z-index: 999;
   display: flex;
   align-items: stretch;
+  width: 100vw;
   height: 376px;
+  margin-left: -50vw;
   background: transparent;
   overflow: hidden;
-  animation: megaIn 0.22s ease;
+  pointer-events: none;
 }
 
-@keyframes megaIn {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.panelOpen {
+  pointer-events: auto;
 }
 
 .linksPane {
   display: flex;
   align-items: flex-start;
-  flex-shrink: 0;
+  flex: 0 0 50%;
+  width: 50%;
   height: 100%;
   min-height: 100%;
   padding: 40px 48px 40px 39px;
   box-sizing: border-box;
   background: var(--color-black);
+  transform: translateX(-100%);
+  opacity: 0;
+  transition:
+    transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.32s ease;
+  will-change: transform, opacity;
+}
+
+.panelOpen .linksPane {
+  transform: translateX(0);
+  opacity: 1;
 }
 
 .columns {
@@ -71,18 +77,36 @@
 
 .mediaPane {
   position: relative;
-  flex: 1 1 auto;
-  min-width: 0;
+  flex: 0 0 50%;
+  width: 50%;
   height: 100%;
   overflow: hidden;
-  background: transparent;
+  background: #1a2e1a;
+  transform: translateX(100%);
+  opacity: 0;
+  transition:
+    transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.32s ease;
+  will-change: transform, opacity;
+}
+
+.panelOpen .mediaPane {
+  transform: translateX(0);
+  opacity: 1;
 }
 
 .mediaSvg {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: fill;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.08);
+  transition: transform 0.48s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.panelOpen .mediaSvg {
+  transform: scale(1);
 }
 
 @media (max-width: 1200px) {

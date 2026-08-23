@@ -4,6 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import {
+  ACCOUNT_ORDERS_HREF,
+  ACCOUNT_PROFILE_EDIT_HREF,
+  ACCOUNT_PROFILE_HREF,
+} from "../../lib/accountNavigation";
 import styles from "./AccountPopover.module.css";
 
 type AccountPopoverProps = {
@@ -19,19 +24,29 @@ const AccountPopover = ({ isOpen, onClose }: AccountPopoverProps) => {
     if (!isOpen) return;
 
     const handlePointer = (event: MouseEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        onClose();
+      const target = event.target as Node | null;
+      if (!target) return;
+      if (rootRef.current?.contains(target)) return;
+      // Триггер (кнопка/иконка) сам переключает меню
+      if (
+        target instanceof Element &&
+        target.closest('[aria-haspopup="menu"]')
+      ) {
+        return;
       }
+      onClose();
     };
 
     const handleKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
 
-    document.addEventListener("mousedown", handlePointer);
+    // click, не mousedown: иначе скрытый второй инстанс поповера
+    // закрывает меню до срабатывания click по ссылке
+    document.addEventListener("click", handlePointer);
     document.addEventListener("keydown", handleKey);
     return () => {
-      document.removeEventListener("mousedown", handlePointer);
+      document.removeEventListener("click", handlePointer);
       document.removeEventListener("keydown", handleKey);
     };
   }, [isOpen, onClose]);
@@ -60,7 +75,7 @@ const AccountPopover = ({ isOpen, onClose }: AccountPopoverProps) => {
         <div className={styles.userBlock}>
           <p className={styles.userName}>{displayName}</p>
           <Link
-            href="/account?tab=profile"
+            href={ACCOUNT_PROFILE_EDIT_HREF}
             className={styles.editLink}
             onClick={onClose}
             prefetch={false}
@@ -89,7 +104,7 @@ const AccountPopover = ({ isOpen, onClose }: AccountPopoverProps) => {
 
       <div className={styles.links}>
         <Link
-          href="/account?tab=profile"
+          href={ACCOUNT_PROFILE_HREF}
           className={styles.link}
           onClick={onClose}
           prefetch={false}
@@ -98,7 +113,7 @@ const AccountPopover = ({ isOpen, onClose }: AccountPopoverProps) => {
           Личный кабинет
         </Link>
         <Link
-          href="/account?tab=orders"
+          href={ACCOUNT_ORDERS_HREF}
           className={styles.link}
           onClick={onClose}
           prefetch={false}

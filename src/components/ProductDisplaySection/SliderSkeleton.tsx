@@ -2,7 +2,9 @@
 
 import styles from "./SliderSkeleton.module.css";
 
-const SKELETON_CARD_COUNT = 8;
+type SliderSkeletonProps = {
+  cardCount?: number;
+};
 
 function SkeletonCard() {
   return (
@@ -19,14 +21,14 @@ function SkeletonCard() {
   );
 }
 
-export default function SliderSkeleton() {
+export default function SliderSkeleton({ cardCount = 4 }: SliderSkeletonProps) {
   return (
     <div
       className={styles.track}
       role="status"
       aria-label="Загрузка товаров"
     >
-      {Array.from({ length: SKELETON_CARD_COUNT }, (_, i) => (
+      {Array.from({ length: cardCount }, (_, i) => (
         <SkeletonCard key={i} />
       ))}
     </div>

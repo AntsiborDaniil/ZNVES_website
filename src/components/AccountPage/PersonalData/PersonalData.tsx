@@ -54,7 +54,12 @@ const courierFieldsList = [
   { key: "comment" as const, label: "Комментарий курьеру", placeholder: "Позвонить за 10 минут" },
 ];
 
-const PersonalData = () => {
+type PersonalDataProps = {
+  standalone?: boolean;
+  onPasswordModeChange?: (isEditing: boolean) => void;
+};
+
+const PersonalData = ({ standalone = false, onPasswordModeChange }: PersonalDataProps) => {
   const { user, updateUser } = useAuth();
   const [profileData, setProfileData] = useState({ ...emptyProfileData });
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -75,6 +80,11 @@ const PersonalData = () => {
   });
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
+
+  const setPasswordEditing = (value: boolean) => {
+    setIsPasswordEditing(value);
+    onPasswordModeChange?.(value);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -195,7 +205,7 @@ const PersonalData = () => {
     };
 
   const handleCancelPassword = () => {
-    setIsPasswordEditing(false);
+    setPasswordEditing(false);
     setPasswordForm({ current: "", next: "", confirm: "" });
     setPasswordError(null);
   };
@@ -231,11 +241,135 @@ const PersonalData = () => {
     }
   };
 
+  if (isPasswordEditing) {
+    return (
+      <>
+        <div
+          className={`${styles.profileShell} ${styles.passwordShell} ${
+            standalone ? styles.profileShellStandalone : ""
+          }`}
+        >
+          <section
+            className={`${styles.profileMain} ${
+              standalone ? styles.profileMainStandalone : ""
+            }`}
+          >
+            <h2 className={styles.sectionHeading}>Пароль</h2>
+            <div className={styles.fieldsStack}>
+              <div className={styles.fieldRow}>
+                <label className={styles.fieldLabel} htmlFor="password-current">
+                  Текущий пароль
+                </label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    id="password-current"
+                    className={styles.input}
+                    type="password"
+                    autoComplete="current-password"
+                    value={passwordForm.current}
+                    onChange={handlePasswordFieldChange("current")}
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+              <div className={styles.fieldRow}>
+                <label className={styles.fieldLabel} htmlFor="password-next">
+                  Новый пароль
+                </label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    id="password-next"
+                    className={styles.input}
+                    type="password"
+                    autoComplete="new-password"
+                    value={passwordForm.next}
+                    onChange={handlePasswordFieldChange("next")}
+                    placeholder="Не менее 8 символов"
+                  />
+                </div>
+              </div>
+              <div className={styles.fieldRow}>
+                <label className={styles.fieldLabel} htmlFor="password-confirm">
+                  Повторите пароль
+                </label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    id="password-confirm"
+                    className={styles.input}
+                    type="password"
+                    autoComplete="new-password"
+                    value={passwordForm.confirm}
+                    onChange={handlePasswordFieldChange("confirm")}
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+            </div>
+            {passwordError && (
+              <p className={styles.saveStatusError}>{passwordError}</p>
+            )}
+            <button
+              type="button"
+              className={styles.saveButton}
+              onClick={() => void handleSavePassword()}
+              disabled={isSavingPassword}
+            >
+              {isSavingPassword ? "Сохранение..." : "Сохранить"}
+            </button>
+            <button
+              type="button"
+              className={styles.passwordCancel}
+              onClick={handleCancelPassword}
+              disabled={isSavingPassword}
+            >
+              Отмена
+            </button>
+          </section>
+        </div>
+
+        {showSuccessModal && (
+          <div
+            className={styles.modalOverlay}
+            onClick={() => setShowSuccessModal(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="success-modal-title"
+          >
+            <div
+              className={styles.modalContent}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 id="success-modal-title" className={styles.modalTitle}>
+                Данные сохранены
+              </h2>
+              <p className={styles.modalText}>Изменения успешно применены.</p>
+              <button
+                type="button"
+                className={styles.modalButton}
+                onClick={() => setShowSuccessModal(false)}
+              >
+                Отлично
+              </button>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  }
+
   return (
     <>
-      <div className={styles.profileShell}>
+      <div
+        className={`${styles.profileShell} ${
+          standalone ? styles.profileShellStandalone : ""
+        }`}
+      >
         <div className={styles.profileRow}>
-          <section className={styles.profileMain}>
+          <section
+            className={`${styles.profileMain} ${
+              standalone ? styles.profileMainStandalone : ""
+            }`}
+          >
             <h2 className={styles.sectionHeading}>Профиль</h2>
             <div className={styles.fieldsStack}>
               {profileFields.map((field) => (
@@ -270,6 +404,16 @@ const PersonalData = () => {
                 </div>
               ))}
             </div>
+            <aside className={styles.passwordAside}>
+              <p className={styles.fieldLabel}>Пароль</p>
+              <button
+                type="button"
+                className={styles.passwordButton}
+                onClick={() => setPasswordEditing(true)}
+              >
+                Изменить пароль
+              </button>
+            </aside>
             <button
               type="button"
               className={styles.saveButton}
@@ -279,93 +423,17 @@ const PersonalData = () => {
               {isSaving ? "Сохранение..." : "Сохранить"}
             </button>
           </section>
-
-          <aside className={styles.passwordAside}>
-            <p className={styles.fieldLabel}>Пароль</p>
-            {!isPasswordEditing ? (
-              <button
-                type="button"
-                className={styles.passwordButton}
-                onClick={() => setIsPasswordEditing(true)}
-              >
-                Изменить пароль
-              </button>
-            ) : (
-              <div className={styles.passwordForm}>
-                <div className={styles.fieldRow}>
-                  <label className={styles.fieldLabel} htmlFor="password-current">
-                    Текущий пароль
-                  </label>
-                  <input
-                    id="password-current"
-                    className={styles.input}
-                    type="password"
-                    autoComplete="current-password"
-                    value={passwordForm.current}
-                    onChange={handlePasswordFieldChange("current")}
-                    placeholder="••••••••"
-                  />
-                </div>
-                <div className={styles.fieldRow}>
-                  <label className={styles.fieldLabel} htmlFor="password-next">
-                    Новый пароль
-                  </label>
-                  <input
-                    id="password-next"
-                    className={styles.input}
-                    type="password"
-                    autoComplete="new-password"
-                    value={passwordForm.next}
-                    onChange={handlePasswordFieldChange("next")}
-                    placeholder="Не менее 8 символов"
-                  />
-                </div>
-                <div className={styles.fieldRow}>
-                  <label className={styles.fieldLabel} htmlFor="password-confirm">
-                    Повторите пароль
-                  </label>
-                  <input
-                    id="password-confirm"
-                    className={styles.input}
-                    type="password"
-                    autoComplete="new-password"
-                    value={passwordForm.confirm}
-                    onChange={handlePasswordFieldChange("confirm")}
-                    placeholder="••••••••"
-                  />
-                </div>
-                {passwordError && (
-                  <p className={styles.saveStatusError}>{passwordError}</p>
-                )}
-                <div className={styles.passwordActions}>
-                  <button
-                    type="button"
-                    className={styles.saveButton}
-                    onClick={() => void handleSavePassword()}
-                    disabled={isSavingPassword}
-                  >
-                    {isSavingPassword ? "Сохранение…" : "Сохранить"}
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.passwordCancel}
-                    onClick={handleCancelPassword}
-                    disabled={isSavingPassword}
-                  >
-                    Отмена
-                  </button>
-                </div>
-              </div>
-            )}
-          </aside>
         </div>
       </div>
 
+      {!standalone && (
       <section className={styles.deliveryPanel}>
         <h2 className={styles.deliveryHeading}>Адреса доставки</h2>
 
         <div className={styles.deliveryBlock}>
-          <h3 className={styles.deliveryBlockTitle}>Пункты выдачи (ПВЗ)</h3>
+          <h3 className={`${styles.deliveryBlockTitle} ${styles.deliveryBlockTitlePvz}`}>
+            Пункты выдачи (ПВЗ)
+          </h3>
           <div className={styles.fieldsGrid}>
             {pvzFieldsList.map(({ key, label, placeholder }) => (
               <div className={styles.fieldRow} key={key}>
@@ -435,6 +503,7 @@ const PersonalData = () => {
           <p className={styles.saveStatusError}>{saveStatus.message}</p>
         )}
       </section>
+      )}
 
       {showSuccessModal && (
         <div

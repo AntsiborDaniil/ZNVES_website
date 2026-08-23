@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import ProductPageView from "../../../components/ProductPage/ProductPageView";
 import LoadingStub from "../../../components/LoadingStub/LoadingStub";
@@ -12,7 +12,7 @@ type ProductPageClientProps = {
   slug: string;
 };
 
-const ProductPageClient = ({ slug }: ProductPageClientProps) => {
+const ProductPageBody = ({ slug }: ProductPageClientProps) => {
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [warehouseItems, setWarehouseItems] = useState<ApiWarehouseItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,7 +27,7 @@ const ProductPageClient = ({ slug }: ProductPageClientProps) => {
         }
         setProduct(data.product);
         setWarehouseItems(data.warehouseItems);
-      } catch (error) {
+      } catch {
         notFound();
       } finally {
         setIsLoading(false);
@@ -50,5 +50,12 @@ const ProductPageClient = ({ slug }: ProductPageClientProps) => {
   );
 };
 
-export default ProductPageClient;
+const ProductPageClient = ({ slug }: ProductPageClientProps) => {
+  return (
+    <Suspense fallback={<LoadingStub label="Загрузка товара…" />}>
+      <ProductPageBody slug={slug} />
+    </Suspense>
+  );
+};
 
+export default ProductPageClient;

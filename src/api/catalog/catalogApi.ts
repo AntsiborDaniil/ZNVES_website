@@ -48,6 +48,83 @@ export function getCatalogCategoryLabel(category: ApiCatalogCategory): string {
   return CATEGORY_SLUG_TO_ENGLISH[category.slug] ?? category.name;
 }
 
+/** Отображаемое название → slug для API и URL */
+export const CATEGORY_DISPLAY_TO_SLUG: Record<string, string> = {
+  Pants: "pants",
+  Jeans: "jeans",
+  "T-shirts": "t-shirt",
+  "Zip hoodies": "zip-hoodie",
+  Jackets: "jackets",
+  Hoodies: "hoodies",
+  Shorts: "shorts",
+  Bags: "bags",
+};
+
+/** Slug или отображаемое название → slug для query-параметров */
+export function resolveCategorySlug(value: string): string | null {
+  const trimmed = decodeURIComponent(value).trim();
+  if (!trimmed || trimmed.toLowerCase() === "all") {
+    return null;
+  }
+
+  const lower = trimmed.toLowerCase();
+  if (CATEGORY_SLUG_TO_ENGLISH[lower]) {
+    return lower;
+  }
+
+  if (CATEGORY_DISPLAY_TO_SLUG[trimmed]) {
+    return CATEGORY_DISPLAY_TO_SLUG[trimmed];
+  }
+
+  const byLabel = Object.entries(CATEGORY_SLUG_TO_ENGLISH).find(
+    ([, label]) => label.toLowerCase() === lower
+  );
+  if (byLabel) {
+    return byLabel[0];
+  }
+
+  return trimmed.toLowerCase();
+}
+
+const normalizeCategoryKey = (value: string): string =>
+  decodeURIComponent(value).trim().toLowerCase().replace(/_/g, "-");
+
+/** Найти категорию по slug или name из API */
+export function findCatalogCategory(
+  value: string,
+  categories: ApiCatalogCategory[]
+): ApiCatalogCategory | undefined {
+  const key = normalizeCategoryKey(value);
+  return categories.find(
+    (category) =>
+      normalizeCategoryKey(category.slug) === key ||
+      normalizeCategoryKey(category.name) === key
+  );
+}
+
+/** Подпись категории для UI: приоритет — name с бэка */
+export function getCategoryDisplayName(
+  value: string,
+  categories: ApiCatalogCategory[] = []
+): string {
+  const fromApi = findCatalogCategory(value, categories);
+  if (fromApi?.name) {
+    return fromApi.name;
+  }
+
+  const slug = resolveCategorySlug(value);
+  if (!slug) {
+    return "";
+  }
+
+  return CATEGORY_SLUG_TO_ENGLISH[slug] ?? slug.replace(/[-_]/g, " ");
+}
+
+/** @deprecated используйте getCategoryDisplayName с categories из API */
+export function getCategoryLabelFromParam(value: string): string {
+  return getCategoryDisplayName(value);
+}
+
 export function buildCatalogCategoryHref(slug: string): string {
   return `/catalog?category=${encodeURIComponent(slug)}`;
 }
@@ -134,18 +211,8 @@ const extractCategoryFromSlug = (slug: string): string | null => {
 // Нормализация категории для API
 const normalizeCategoryForApi = (category: string): string | undefined => {
   if (category === "All") return undefined;
-  
-  const categoryMap: Record<string, string> = {
-    Pants: "pants",
-    Jeans: "jeans",
-    "T-shirts": "t-shirt",
-    "Zip hoodies": "zip-hoodie",
-    Jackets: "jackets",
-    Hoodies: "hoodies",
-    Shorts: "shorts",
-  };
-  
-  return categoryMap[category] || category.toLowerCase();
+
+  return CATEGORY_DISPLAY_TO_SLUG[category] || category.toLowerCase();
 };
 
 // Функция для получения товаров каталога с фильтрами

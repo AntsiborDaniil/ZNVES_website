@@ -24,6 +24,7 @@ import {
   fetchCatalogCategories,
   FALLBACK_CATALOG_CATEGORIES,
   getCatalogCategoryLabel,
+  resolveCategorySlug,
   type ApiCatalogCategory,
 } from "../../api/catalog/catalogApi";
 import {
@@ -35,6 +36,7 @@ import {
   dismissCatalogAuthModal,
   isCatalogAuthModalDismissed,
 } from "../AccountAuthPromptModal/catalogAuthPromptStorage";
+import { buildProductHref } from "../../lib/productNavigation";
 
 const AccountAuthPromptModal = dynamic(
   () => import("../AccountAuthPromptModal/AccountAuthPromptModal"),
@@ -67,6 +69,11 @@ const orderOptions: FilterOption[] = [
   { value: "price-desc", label: "Сначала дороже" },
   { value: "newest", label: "Новинки" },
 ];
+
+const categoryFromUrl = (param: string | null): string => {
+  if (!param) return "all";
+  return resolveCategorySlug(param) ?? decodeURIComponent(param);
+};
 
 type FilterDropdownProps = {
   label: string;
@@ -178,6 +185,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const colorParam = searchParams?.get("color");
   const sizeParam = searchParams?.get("size");
   const orderParam = searchParams?.get("order");
+  const navFrom = title === "NEW IN" ? "new-in" : "catalog";
 
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [categories, setCategories] = useState<ApiCatalogCategory[]>([]);
@@ -188,7 +196,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const [activeCategory, setActiveCategory] = useState<string>(
-    categoryParam ? decodeURIComponent(categoryParam) : "all"
+    categoryFromUrl(categoryParam)
   );
   const [colorFilter, setColorFilter] = useState<string>(colorParam || "all");
   const [sizeFilter, setSizeFilter] = useState<string>(sizeParam || "all");
@@ -330,9 +338,11 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
         setIsLoading(true);
       }
       try {
-        const categorySlug = categoryParam
-          ? decodeURIComponent(categoryParam)
-          : undefined;
+        const categorySlug =
+          categoryParam == null
+            ? undefined
+            : resolveCategorySlug(categoryParam) ??
+              decodeURIComponent(categoryParam);
 
         if (title === "NEW IN") {
           // Для страницы NEW IN загружаем только новые товары
@@ -371,11 +381,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
 
   // Обновляем состояние из URL при изменении параметров
   useEffect(() => {
-    if (categoryParam) {
-      setActiveCategory(decodeURIComponent(categoryParam));
-    } else {
-      setActiveCategory("all");
-    }
+    setActiveCategory(categoryFromUrl(categoryParam));
   }, [categoryParam]);
 
   useEffect(() => {
@@ -623,7 +629,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
             </button>
             {categories.map((category) => {
               const isActive = category.slug === activeCategory;
-              const label = getCatalogCategoryLabel(category);
+              const label = category.name || getCatalogCategoryLabel(category);
               return (
                 <button
                   key={category.slug}
@@ -704,7 +710,13 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
               {filteredProducts.map((product, index) => (
                 <Link
                   key={`${String(product.slug ?? product.id)}-${index}`}
-                  href={`/catalog/${product.slug || product.id}`}
+                  href={buildProductHref(product.slug || product.id, {
+                    from: navFrom,
+                    category:
+                      activeCategory !== "all"
+                        ? activeCategory
+                        : product.category,
+                  })}
                   className={styles.catalogCardLink}
                   aria-label={`Открыть товар ${product.title}`}
                 >
