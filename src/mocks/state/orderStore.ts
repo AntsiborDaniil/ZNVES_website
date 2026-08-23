@@ -4,16 +4,45 @@ import { MOCK_INITIAL_ORDERS } from "../data/orders";
 let orders: ApiMyOrderItem[] = [...MOCK_INITIAL_ORDERS];
 let orderCounter = orders.length;
 
+const isActiveOrder = (order: ApiMyOrderItem): boolean => {
+  const status = (order.status || "").toLowerCase();
+  return (
+    status.includes("ожидает") ||
+    status === "создан" ||
+    status === "оплачен" ||
+    status.includes("доставляется") ||
+    status.includes("в пути")
+  );
+};
+
 export const resetOrderStore = (): void => {
   orders = [...MOCK_INITIAL_ORDERS];
   orderCounter = orders.length;
 };
 
+/** Всегда стартуем с полным набором моков ЛК. */
+resetOrderStore();
+
 export const getMockOrders = (active: boolean): ApiMyOrderItem[] => {
-  if (active) {
-    return orders.length > 0 ? [orders[0]] : [];
+  if (orders.length === 0) {
+    resetOrderStore();
   }
-  return orders.slice(1);
+
+  const activeOrders = orders.filter(isActiveOrder);
+  const primaryActive = activeOrders[0] ?? orders[0] ?? null;
+
+  if (active) {
+    return primaryActive ? [primaryActive] : [];
+  }
+
+  return orders.filter((order) => order.id !== primaryActive?.id);
+};
+
+export const getAllMockOrders = (): ApiMyOrderItem[] => {
+  if (orders.length === 0) {
+    resetOrderStore();
+  }
+  return [...orders];
 };
 
 export const createMockOrder = (payload: OrderRequest): ApiMyOrderItem => {
@@ -24,7 +53,7 @@ export const createMockOrder = (payload: OrderRequest): ApiMyOrderItem => {
   const order: ApiMyOrderItem = {
     id,
     total_amount: payload.total_amount,
-    status: "Создан",
+    status: "Ожидает оплаты",
     payment_type: payload.payment_type,
     delivery_service: payload.delivery_service,
     promocode: payload.promocode_value ?? null,

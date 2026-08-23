@@ -26,6 +26,7 @@ const AccountPageContent = () => {
   const activeTab = parseAccountTab(searchParams.get("tab"));
   const [ordersHeading, setOrdersHeading] = useState("Заказы");
   const [isPasswordMode, setIsPasswordMode] = useState(false);
+  const [ordersListKey, setOrdersListKey] = useState(0);
 
   const authCheckedRef = useRef(false);
 
@@ -47,6 +48,10 @@ const AccountPageContent = () => {
   const goToTab = (tab: AccountTab) => {
     setIsPasswordMode(false);
     if (tab !== "orders") setOrdersHeading("Заказы");
+    if (tab === "orders") {
+      setOrdersHeading("Заказы");
+      setOrdersListKey((key) => key + 1);
+    }
     navigateToAccount(router, pathname, tab);
   };
 
@@ -170,6 +175,7 @@ const AccountPageContent = () => {
           {activeTab === "orders" && (
             <div id="account-orders">
               <Orders
+                key={ordersListKey}
                 onOrderSelect={(order) =>
                   setOrdersHeading(order?.title ?? "Заказы")
                 }

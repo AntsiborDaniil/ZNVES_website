@@ -1,23 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AccountAuthPromptModal from "../AccountAuthPromptModal";
 
-vi.mock("next/link", () => ({
-  default: ({
-    children,
-    href,
-    onClick,
-  }: {
-    children: React.ReactNode;
-    href: string;
-    onClick?: () => void;
-  }) => (
-    <a href={href} onClick={onClick}>
-      {children}
-    </a>
-  ),
+const openAuth = vi.fn();
+
+vi.mock("../../../contexts/AuthContext", () => ({
+  useAuth: () => ({ openAuth }),
 }));
 
 vi.mock("next/image", () => ({
@@ -30,15 +20,29 @@ describe("AccountAuthPromptModal", () => {
     document.body.style.overflow = "unset";
   });
 
+  beforeEach(() => {
+    openAuth.mockReset();
+  });
+
   it("renders auth prompt content", () => {
     render(<AccountAuthPromptModal onClose={vi.fn()} />);
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByText("Войдите в личный кабинет")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Перейти ко входу" })).toHaveAttribute(
-      "href",
-      "/account"
-    );
+    expect(
+      screen.getByRole("button", { name: "Перейти ко входу" })
+    ).toBeInTheDocument();
+  });
+
+  it("opens auth modal when primary action is clicked", async () => {
+    const onClose = vi.fn();
+    const user = userEvent.setup();
+
+    render(<AccountAuthPromptModal onClose={onClose} />);
+    await user.click(screen.getByRole("button", { name: "Перейти ко входу" }));
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(openAuth).toHaveBeenCalledWith("login");
   });
 
   it("calls onSkip when skip is clicked", async () => {

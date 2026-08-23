@@ -18,9 +18,11 @@ const SectionHeader = ({
     <div className={`${styles.header} ${align === "center" ? styles.center : ""}`}>
       <h2 className={styles.title}>{title}</h2>
       {href && (
-        <Button href={href} variant="underline" className={styles.action}>
-          {actionLabel}
-        </Button>
+        <div className={styles.action}>
+          <Button href={href} variant="underline">
+            {actionLabel}
+          </Button>
+        </div>
       )}
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { API_BASE_URL } from "../../lib/apiConfig";
 import { getCsrfToken } from "../../lib/csrf";
+import { shouldUseMocks } from "../../mocks/config";
 
 /** Собирает URL изображения товара: если передан путь без протокола — дополняем базовым URL API. */
 function buildProductImageUrl(value: string | undefined): string {
@@ -63,6 +64,12 @@ const myOrdersCache: { active: { data: ApiMyOrderItem[]; at: number } | null; al
  */
 export const getMyOrders = async (active: boolean): Promise<ApiMyOrderItem[]> => {
   if (typeof window === "undefined") return [];
+
+  if (shouldUseMocks()) {
+    const { getMockOrders } = await import("../../mocks/state/orderStore");
+    return getMockOrders(active);
+  }
+
   const key = active ? "active" : "all";
   const cached = myOrdersCache[key];
   if (cached && Date.now() - cached.at < MY_ORDERS_CACHE_TTL_MS) {
@@ -78,11 +85,35 @@ export const getMyOrders = async (active: boolean): Promise<ApiMyOrderItem[]> =>
     if (!response.ok) return [];
     const data = (await response.json()) as ApiMyOrderItem[];
     const list = Array.isArray(data) ? data : [];
-    myOrdersCache[key] = { data: list, at: Date.now() };
+    if (list.length > 0) {
+      myOrdersCache[key] = { data: list, at: Date.now() };
+    }
     return list;
   } catch {
     return [];
   }
+};
+
+/** Все заказы пользователя для ЛК (active + остальные, без дублей). */
+export const fetchAccountOrders = async (): Promise<ApiMyOrderItem[]> => {
+  if (typeof window === "undefined") return [];
+
+  if (shouldUseMocks()) {
+    const { getAllMockOrders } = await import("../../mocks/state/orderStore");
+    return getAllMockOrders();
+  }
+
+  const [activeList, restList] = await Promise.all([
+    getMyOrders(true),
+    getMyOrders(false),
+  ]);
+
+  const byId = new Map<string, ApiMyOrderItem>();
+  [...activeList, ...restList].forEach((order) => {
+    byId.set(order.id, order);
+  });
+
+  return Array.from(byId.values());
 };
 
 /** Сброс кеша заказов (вызвать после создания заказа и т.п.) */

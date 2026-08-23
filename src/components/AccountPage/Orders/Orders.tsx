@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import styles from "./Orders.module.css";
 import Image from "next/image";
 import {
-  getMyOrders,
+  fetchAccountOrders,
   apiOrderToAccountView,
   getPaymentUrl,
   getYandexPaymentUrl,
@@ -103,31 +103,38 @@ function accountViewToOrderData(view: AccountOrderView): OrderData {
 
 const getPaymentSystemName = (method: string) => {
   const paymentNames: Record<string, string> = {
-    sberbank: "Оплата по СПБ",
+    sberbank: "СБП",
     yandexpay: "Яндекс Pay",
     installment: "Долями",
-    card: "Картой онлайн",
+    card: "Банковской картой",
     prepayment: "Предоплата",
   };
-  return paymentNames[method] || method || "Оплата по СПБ";
+  return paymentNames[method] || method || "СБП";
 };
 
 const getDeliveryServiceName = (type: string, method: string) => {
-  if (type === "cdek") {
+  const t = (type || "").toLowerCase();
+  if (t.includes("yandex")) {
+    return "Яндекс курьером";
+  }
+  if (t.includes("cdek") || t === "cdek") {
     return method === "pickup"
       ? "СДЭК: доставка в пункт выдачи"
       : "СДЭК: курьером";
-  } else if (type === "yandex") {
-    return method === "pickup"
-      ? "Яндекс.Курьер: пункт выдачи"
-      : "Яндекс.Курьер: курьером";
   }
-  return "СДЭК: доставка в пункт выдачи";
+  return type || "—";
 };
 
 const getStatusDisplayName = (status: string): string => {
   const s = (status || "").toLowerCase();
-  if (s === "pending_payment" || s.includes("ожидает")) return "Ожидает оплаты";
+  if (
+    s === "pending_payment" ||
+    s === "created" ||
+    s === "новый" ||
+    s.includes("ожидает")
+  ) {
+    return "Новый (не оплачен)";
+  }
   if (s === "paid" || s === "оплачен") return "Оплачен";
   if (s === "shipped" || s.includes("доставляется") || s.includes("в пути")) {
     return "Доставляется";
@@ -138,9 +145,8 @@ const getStatusDisplayName = (status: string): string => {
     s === "завершён" ||
     s.includes("доставлен")
   ) {
-    return "Доставлен";
+    return "Завершен";
   }
-  if (s === "created" || s === "новый") return "Ожидает оплаты";
   return status || "—";
 };
 
@@ -155,17 +161,6 @@ const isUnpaidStatus = (status: string) => {
   );
 };
 
-const isPaidTrackableStatus = (status: string) => {
-  const s = (status || "").toLowerCase();
-  return (
-    s === "paid" ||
-    s === "оплачен" ||
-    s.includes("доставляется") ||
-    s.includes("в пути") ||
-    s === "shipped"
-  );
-};
-
 const isDeliveredStatus = (status: string) => {
   const s = (status || "").toLowerCase();
   return (
@@ -174,6 +169,10 @@ const isDeliveredStatus = (status: string) => {
     s === "завершён" ||
     s.includes("доставлен")
   );
+};
+
+const getDetailStatusLabel = (status: string): string => {
+  return getStatusDisplayName(status);
 };
 
 const formatShortMonthDate = (date: string): string => {
@@ -201,6 +200,38 @@ const formatShortMonthDate = (date: string): string => {
 const getDeliveredBadgeText = (order: OrderData): string => {
   const source = order.updatedDate || order.date;
   return `Доставлен ${formatShortMonthDate(source)}`;
+};
+
+const formatColorLabel = (color: string): string => {
+  const map: Record<string, string> = {
+    black: "Черный",
+    white: "Белый",
+    green: "Зеленый",
+    blue: "Синий",
+    navy: "Темно-синий",
+    red: "Красный",
+    grey: "Серый",
+    gray: "Серый",
+  };
+  const key = (color || "").toLowerCase().trim();
+  return map[key] || color || "—";
+};
+
+const formatSizeLabel = (size: string): string => {
+  const s = (size || "").trim();
+  if (!s) return "—";
+  return s.toUpperCase();
+};
+
+const isPaidTrackableStatus = (status: string) => {
+  const s = (status || "").toLowerCase();
+  return (
+    s === "paid" ||
+    s === "оплачен" ||
+    s.includes("доставляется") ||
+    s.includes("в пути") ||
+    s === "shipped"
+  );
 };
 
 const getTrackingUrl = (order: OrderData): string => {
@@ -246,18 +277,17 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isPaying, setIsPaying] = useState(false);
   const [orderPayError, setOrderPayError] = useState<string | null>(null);
+  const [isBuyerExpanded, setIsBuyerExpanded] = useState(false);
   const selectedOrderSectionRef = useRef<HTMLDivElement>(null);
 
   const ORDER_ERROR_MESSAGE =
     "К сожалению, оплатить заказ не удалось: один или несколько товаров отсутствуют в наличии или их количество ограничено. Пожалуйста, обновите состав заказа и попробуйте снова либо свяжитесь со службой поддержки.";
 
   useEffect(() => {
-    Promise.all([getMyOrders(true), getMyOrders(false)])
-      .then(([activeList, restList]) => {
-        const activeViews = activeList.map(apiOrderToAccountView);
-        const restViews = restList.map(apiOrderToAccountView);
-        const combined: AccountOrderView[] = [...activeViews, ...restViews];
-        const sorted = combined
+    fetchAccountOrders()
+      .then((apiOrders) => {
+        const sorted = apiOrders
+          .map(apiOrderToAccountView)
           .slice()
           .sort((a, b) => {
             const parse = (d: string) => {
@@ -269,20 +299,22 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
         const orderDataList = sorted.map(accountViewToOrderData);
         setOrders(orderDataList);
 
-        if (orderDataList.length > 0) {
-          const toSelect =
-            initialOrderId
-              ? orderDataList.find((o) => o.id === initialOrderId)
-              : orderDataList[0];
-          const selected = toSelect ?? orderDataList[0];
+        if (initialOrderId && orderDataList.length > 0) {
+          const selected =
+            orderDataList.find((o) => o.id === initialOrderId) ?? null;
           setSelectedOrder(selected);
-          setIsDetailsOpen(true);
-          onOrderSelect?.({
-            id: selected.id,
-            title: formatOrderDateTitle(selected.date),
-          });
+          setIsDetailsOpen(Boolean(selected));
+          if (selected) {
+            onOrderSelect?.({
+              id: selected.id,
+              title: formatOrderDateTitle(selected.date),
+            });
+          } else {
+            onOrderSelect?.(null);
+          }
         } else {
           setSelectedOrder(null);
+          setIsDetailsOpen(false);
           onOrderSelect?.(null);
         }
       })
@@ -290,19 +322,29 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
       .finally(() => setIsLoading(false));
   }, [initialOrderId]);
 
-  // Автоматически открываем детали при смене выбранного заказа
-  useEffect(() => {
-    if (selectedOrder) {
-      setIsDetailsOpen(true);
-    }
-  }, [selectedOrder?.id]);
+  const openOrder = (order: OrderData) => {
+    setSelectedOrder(order);
+    setIsDetailsOpen(true);
+    setIsBuyerExpanded(false);
+    onOrderSelect?.({
+      id: order.id,
+      title: formatOrderDateTitle(order.date),
+    });
+  };
 
-  // Прокрутка к выбранному заказу при смене выбора (медленная плавная анимация)
+  const closeOrderDetails = () => {
+    setSelectedOrder(null);
+    setIsDetailsOpen(false);
+    setIsBuyerExpanded(false);
+    onOrderSelect?.(null);
+  };
+
+  // Прокрутка к открытому заказу
   useEffect(() => {
     const el = selectedOrderSectionRef.current;
-    if (!selectedOrder || !el) return;
+    if (!selectedOrder || !isDetailsOpen || !el) return;
 
-    const duration = 900;
+    const duration = 500;
     const easeInOutCubic = (t: number) =>
       t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
@@ -310,8 +352,7 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
       document.scrollingElement ||
       (document.documentElement as Element);
     const startTop = scrollable.scrollTop;
-    const targetTop =
-      startTop + el.getBoundingClientRect().top;
+    const targetTop = startTop + el.getBoundingClientRect().top - 24;
 
     let rafId: number;
     const startTime = { current: 0 };
@@ -327,7 +368,7 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
 
     rafId = requestAnimationFrame(step);
     return () => cancelAnimationFrame(rafId);
-  }, [selectedOrder?.id]);
+  }, [selectedOrder?.id, isDetailsOpen]);
 
   const handlePayOrder = async () => {
     if (!selectedOrder || isPaying) return;
@@ -413,52 +454,26 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
 
   return (
     <section className={styles.panel}>
-      <div className={styles.filtersRow}>
-        <button type="button" className={styles.filterBtn}>
-          <span>Любой статус заказа</span>
-          <Image src="/images/account/polygon-down.svg" alt="" width={8} height={7} unoptimized />
-        </button>
-        <button type="button" className={styles.filterBtn}>
-          <span>Любой статус оплаты</span>
-          <Image src="/images/account/polygon-down.svg" alt="" width={8} height={7} unoptimized />
-        </button>
-        <button type="button" className={styles.filterBtn}>
-          <span>За все время</span>
-          <Image src="/images/account/polygon-down.svg" alt="" width={8} height={7} unoptimized />
-        </button>
-      </div>
-
-      <div className={styles.ordersList}>
-        {orders.map((order) => {
-          const isActive = selectedOrder?.id === order.id;
-          return (
+      {!(selectedOrder && isDetailsOpen) && (
+        <div className={styles.ordersList}>
+          {orders.map((order) => (
             <div
               key={order.id}
-              className={`${styles.orderCard} ${isActive ? styles.orderCardActive : ""}`}
-              onClick={() => {
-                setSelectedOrder(order);
-                setIsDetailsOpen(true);
-                onOrderSelect?.({
-                  id: order.id,
-                  title: formatOrderDateTitle(order.date),
-                });
-              }}
+              className={styles.orderCard}
+              onClick={() => openOrder(order)}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  setSelectedOrder(order);
-                  setIsDetailsOpen(true);
-                  onOrderSelect?.({
-                    id: order.id,
-                    title: formatOrderDateTitle(order.date),
-                  });
+                  openOrder(order);
                 }
               }}
             >
               <div className={styles.orderCardLeft}>
-                <p className={styles.orderCardTitle}>{formatOrderDateTitle(order.date)}</p>
+                <p className={styles.orderCardTitle}>
+                  {formatOrderDateTitle(order.date)}
+                </p>
                 <div className={styles.orderCardMeta}>
                   <span className={styles.orderCardNumber}>№{order.id}</span>
                   {isUnpaidStatus(order.status) && (
@@ -467,22 +482,19 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
                 </div>
               </div>
               <div className={styles.orderCardCenter}>
-                {isDeliveredStatus(order.status) ? (
-                  <div className={styles.deliveredBadge}>{getDeliveredBadgeText(order)}</div>
-                ) : (
-                  <div className={styles.orderCardState}>
-                    <Image
-                      src="/images/account/info-circle.svg"
-                      alt=""
-                      width={24}
-                      height={24}
-                      unoptimized
-                    />
-                    <span className={styles.orderCardStateText}>
-                      {getStatusDisplayName(order.status)}
-                    </span>
-                  </div>
-                )}
+                <div className={styles.orderCardState}>
+                  <Image
+                    src="/images/account/info-circle.svg"
+                    alt=""
+                    width={24}
+                    height={24}
+                    className={styles.orderCardStateIcon}
+                    unoptimized
+                  />
+                  <span className={styles.orderCardStateText}>
+                    {getStatusDisplayName(order.status)}
+                  </span>
+                </div>
                 <p className={styles.orderCardPrice}>
                   {order.payment.amount || order.total.totalAmount || "—"}
                 </p>
@@ -500,7 +512,10 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
                         loading="lazy"
                       />
                     ) : (
-                      <div className={styles.orderCardThumbnailPlaceholder} aria-hidden />
+                      <div
+                        className={styles.orderCardThumbnailPlaceholder}
+                        aria-hidden
+                      />
                     )}
                   </div>
                 ))}
@@ -508,314 +523,343 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
               <Image
                 src="/images/account/chevron-right.svg"
                 alt=""
-                width={24}
-                height={24}
+                width={9}
+                height={16}
                 className={styles.orderCardChevron}
                 unoptimized
               />
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
 
       {selectedOrder && isDetailsOpen && (
         <div ref={selectedOrderSectionRef} className={styles.selectedOrderSection}>
-          <div
-            className={`${styles.orderDetailsWrapper} ${
-              isDetailsOpen
-                ? styles.orderDetailsOpen
-                : styles.orderDetailsClosed
-            }`}
-          >
-            <div className={styles.orderDetailsContent}>
-              <div className={styles.ordersContainer}>
-                <div className={styles.statusActionRow}>
-                  {isDeliveredStatus(selectedOrder.status) ? (
-                    <div className={styles.deliveredBadge}>
-                      {getDeliveredBadgeText(selectedOrder)}
+          <div className={styles.orderDetailsContent}>
+            <div className={styles.ordersContainer}>
+              <div className={styles.detailStatusBar}>
+                <Image
+                  src="/images/account/info-circle.svg"
+                  alt=""
+                  width={24}
+                  height={24}
+                  unoptimized
+                />
+                <span className={styles.detailStatusBarText}>
+                  {getDetailStatusLabel(selectedOrder.status)}
+                </span>
+              </div>
+
+              <div className={styles.productsList}>
+                {selectedOrder.products.map((product, index) => (
+                  <div
+                    key={`${product.id}-${index}`}
+                    className={styles.productItem}
+                  >
+                    <div className={styles.productMain}>
+                      {product.image ? (
+                        <Image
+                          src={product.image}
+                          className={styles.productImage}
+                          alt={
+                            product.name
+                              ? `${product.name}${product.color ? `, ${product.color}` : ""}${product.size ? `, ${product.size}` : ""}`.trim()
+                              : "Фото товара"
+                          }
+                          width={70}
+                          height={70}
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div
+                          className={styles.productImagePlaceholder}
+                          aria-hidden
+                        />
+                      )}
+                      <div className={styles.productText}>
+                        <h3 className={styles.productName}>{product.name}</h3>
+                        <div className={styles.productMetaInline}>
+                          <span>Цвет: {formatColorLabel(product.color)}</span>
+                          <span>Размер: {formatSizeLabel(product.size)}</span>
+                        </div>
+                      </div>
                     </div>
-                  ) : (
-                    <div
-                      className={`${styles.statusBanner} ${
-                        isUnpaidStatus(selectedOrder.status)
-                          ? styles.statusBannerUnpaid
-                          : ""
-                      }`}
-                    >
+                    <div className={styles.productMeta}>
+                      <span>Цвет: {formatColorLabel(product.color)}</span>
+                      <span>Размер: {formatSizeLabel(product.size)}</span>
+                    </div>
+                    <span className={styles.productPrice}>
+                      {product.price || "—"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className={styles.buyerSection}>
+                <div className={styles.sectionHeader}>
+                  <div className={styles.sectionHeaderLeft}>
+                    <div className={styles.sectionIcon}>
                       <Image
-                        src="/images/account/info-circle.svg"
+                        src="/images/account/accountImage.png"
                         alt=""
-                        width={20}
-                        height={20}
-                        unoptimized
-                      />
-                      <span className={styles.statusBannerText}>
-                        {getStatusDisplayName(selectedOrder.status)}
-                      </span>
-                    </div>
-                  )}
-
-                  {isUnpaidStatus(selectedOrder.status) && (
-                    <button
-                      type="button"
-                      className={styles.trackButton}
-                      onClick={() => void handlePayOrder()}
-                      disabled={isPaying}
-                    >
-                      {isPaying ? "Перенаправление…" : "Оплатить заказ"}
-                    </button>
-                  )}
-
-                  {isPaidTrackableStatus(selectedOrder.status) && (
-                    <a
-                      className={styles.trackButton}
-                      href={getTrackingUrl(selectedOrder)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Отследить заказ
-                    </a>
-                  )}
-                </div>
-
-                <div className={styles.buyerSection}>
-                  <div className={styles.sectionIcon}>
-                    <Image
-                      src="/images/account/accountImage.png"
-                      alt=""
-                      width={20}
-                      height={23}
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className={styles.buyerSectionText}>
-                    <h2 className={styles.sectionTitle}>Покупатель</h2>
-                    <div className={styles.buyerSectionInfo}>
-                      <div className={styles.buyerColumn}>
-                        <div className={styles.buyerSectionInfoItem}>
-                          <span className={styles.label}>Имя</span>
-                          <p className={styles.value}>
-                            {selectedOrder.buyer.firstName || "—"}
-                          </p>
-                        </div>
-                        <div className={styles.buyerSectionInfoItem}>
-                          <span className={styles.label}>Email</span>
-                          <p className={styles.value}>
-                            {selectedOrder.buyer.email || "—"}
-                          </p>
-                        </div>
-                        <div className={styles.buyerSectionInfoItem}>
-                          <span className={styles.label}>Адрес доставки</span>
-                          <p className={styles.value}>
-                            {selectedOrder.delivery.fullAddress || "—"}
-                          </p>
-                        </div>
-                      </div>
-                      <div className={styles.buyerColumn}>
-                        <div className={styles.buyerSectionInfoItem}>
-                          <span className={styles.label}>Фамилия</span>
-                          <p className={styles.value}>
-                            {selectedOrder.buyer.lastName || "—"}
-                          </p>
-                        </div>
-                        <div className={styles.buyerSectionInfoItem}>
-                          <span className={styles.label}>Номер</span>
-                          <p className={styles.value}>
-                            {selectedOrder.buyer.phone || "—"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.orderHeader}>
-                  <div className={styles.orderHeaderLeft}>
-                    <div className={styles.orderIcon}>
-                      <Image
-                        src="/images/account/info.png"
-                        alt="Заказ"
                         width={20}
                         height={20}
                         loading="lazy"
                       />
                     </div>
-                    <div className={styles.orderInfo}>
-                      <span className={styles.orderNumber}>
-                        Заказ: <strong>№{selectedOrder.id}</strong> от{" "}
-                        {selectedOrder.date}
-                      </span>
+                    <h2 className={styles.sectionTitle}>Покупатель</h2>
+                  </div>
+                </div>
+                <div
+                  className={`${styles.buyerSectionInfo} ${
+                    isBuyerExpanded ? styles.buyerSectionInfoExpanded : ""
+                  }`}
+                >
+                  <div className={styles.buyerColumn}>
+                    <div className={styles.buyerSectionInfoItem}>
+                      <span className={styles.label}>Имя</span>
+                      <p className={styles.value}>
+                        {selectedOrder.buyer.firstName || "—"}
+                      </p>
+                    </div>
+                    <div
+                      className={`${styles.buyerSectionInfoItem} ${styles.buyerFieldDesktop}`}
+                    >
+                      <span className={styles.label}>Номер</span>
+                      <p className={styles.value}>
+                        {selectedOrder.buyer.phone || "—"}
+                      </p>
+                    </div>
+                    <div
+                      className={`${styles.buyerSectionInfoItem} ${styles.buyerFieldMobile}`}
+                    >
+                      <span className={styles.label}>Фамилия</span>
+                      <p className={styles.value}>
+                        {selectedOrder.buyer.lastName || "—"}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className={`${styles.buyerColumn} ${styles.buyerColumnDesktop}`}
+                  >
+                    <div className={styles.buyerSectionInfoItem}>
+                      <span className={styles.label}>Фамилия</span>
+                      <p className={styles.value}>
+                        {selectedOrder.buyer.lastName || "—"}
+                      </p>
+                    </div>
+                    <div className={styles.buyerSectionInfoItem}>
+                      <span className={styles.label}>Email</span>
+                      <p className={styles.value}>
+                        {selectedOrder.buyer.email || "—"}
+                      </p>
+                    </div>
+                    <div className={styles.buyerSectionInfoItem}>
+                      <span className={styles.label}>Адрес доставки</span>
+                      <p className={styles.value}>
+                        {selectedOrder.delivery.fullAddress || "—"}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className={`${styles.buyerExtraMobile} ${
+                      isBuyerExpanded ? styles.buyerExtraMobileOpen : ""
+                    }`}
+                  >
+                    <div className={styles.buyerSectionInfoItem}>
+                      <span className={styles.label}>Номер</span>
+                      <p className={styles.value}>
+                        {selectedOrder.buyer.phone || "—"}
+                      </p>
+                    </div>
+                    <div className={styles.buyerSectionInfoItem}>
+                      <span className={styles.label}>Email</span>
+                      <p className={styles.value}>
+                        {selectedOrder.buyer.email || "—"}
+                      </p>
+                    </div>
+                    <div className={styles.buyerSectionInfoItem}>
+                      <span className={styles.label}>Адрес доставки</span>
+                      <p className={styles.value}>
+                        {selectedOrder.delivery.fullAddress || "—"}
+                      </p>
                     </div>
                   </div>
                 </div>
-
-                <div className={styles.paymentSection}>
-                  <div className={styles.sectionIcon}>
-                    <Image
-                      src="/images/account/buyImage.png"
-                      alt="Заказ"
-                      width={21.5}
-                      height={19.65}
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className={styles.paymentSectionText}>
-                    <h1 className={styles.sectionTitle}>Способ оплаты</h1>
-                    <div className={styles.paymentSectionInfo}>
-                      <div className={styles.paymentField}>
-                        <span className={styles.label}>Система оплаты</span>
-                        <div
-                          className={`${styles.value} ${styles.paymentValueContainer}`}
-                        >
-                          <span>
-                            {getPaymentSystemName(selectedOrder.payment.method)}
-                          </span>
-                          {selectedOrder.payment.method === "sberbank" && (
-                            <Image
-                              src="/images/account/sbpAcc.png"
-                              alt="СБП"
-                              width={18}
-                              height={18}
-                              loading="lazy"
-                            />
-                          )}
-                        </div>
-                      </div>
-                      <div className={styles.paymentField}>
-                        <span className={styles.label}>Сумма</span>
-                        <span className={styles.valuePay}>
-                          {selectedOrder.payment.amount}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.deliverySection}>
-                  <div className={styles.sectionIcon}>
-                    <Image
-                      src="/images/account/delivery.png"
-                      alt="Заказ"
-                      width={23}
-                      height={18.4}
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className={styles.deliverySectionText}>
-                    <h1 className={styles.sectionTitle}>Способ доставки</h1>
-                    <div className={styles.deliverySectionInfo}>
-                      <div className={styles.deliveryField}>
-                        <span className={styles.label}>Служба доставки</span>
-                        <span className={styles.value}>
-                          {getDeliveryServiceName(
-                            selectedOrder.delivery.type,
-                            selectedOrder.delivery.method
-                          )}
-                        </span>
-                      </div>
-                      <div className={styles.deliveryField}>
-                        <span className={styles.label}>Адрес</span>
-                        <span className={styles.value}>
-                          {selectedOrder.delivery.fullAddress ||
-                            (selectedOrder.delivery.city ||
-                            selectedOrder.delivery.street ||
-                            selectedOrder.delivery.house
-                              ? [
-                                  selectedOrder.delivery.city,
-                                  selectedOrder.delivery.street,
-                                  selectedOrder.delivery.house,
-                                  selectedOrder.delivery.apartment,
-                                ]
-                                  .filter(Boolean)
-                                  .join(", ")
-                              : "—")}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.productsSection}>
-                  <h1 className={styles.sectionTitle}>Товары</h1>
-                  <div className={styles.productsList}>
-                    {selectedOrder.products.map((product, index) => (
-                      <div
-                        key={`${product.id}-${index}`}
-                        className={styles.productItem}
-                      >
-                        {product.image ? (
-                          <Image
-                            src={product.image}
-                            className={styles.productImage}
-                            alt={product.name ? `${product.name}${product.color ? `, ${product.color}` : ""}${product.size ? `, ${product.size}` : ""}`.trim() || "Фото товара" : "Фото товара"}
-                            width={104}
-                            height={149}
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div
-                            className={styles.productImagePlaceholder}
-                            aria-hidden
-                          />
-                        )}
-                        <div className={styles.productDetails}>
-                          <div className={styles.upper}>
-                            <div className={styles.left}>
-                              <h3 className={styles.category}>
-                                {product.category}
-                              </h3>
-                              <h1 className={styles.title}>{product.name}</h1>
-                            </div>
-                            <div className={styles.right}>
-                              <h3 className={styles.amountWord}>Кол-во</h3>
-                              <h1 className={styles.amount}>{product.quantity} шт</h1>
-                              {product.price && (
-                                <>
-                                  <h3 className={styles.amountWord}>Сумма</h3>
-                                  <h1 className={styles.amount}>{product.price}</h1>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                          <div className={styles.bottom}>
-                            <div className={styles.leftBottom}>
-                              <h3 className={styles.labelBottom}>Цвет</h3>
-                              <h1 className={styles.wordColor}>
-                                {product.color}
-                              </h1>
-                            </div>
-                            <div className={styles.rightBottom}>
-                              <h3 className={styles.labelBottom}>Размер</h3>
-                              <h1 className={styles.word}>{product.size}</h1>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  className={styles.buyerMoreButton}
+                  onClick={() => setIsBuyerExpanded((open) => !open)}
+                  aria-expanded={isBuyerExpanded}
+                >
+                  {isBuyerExpanded ? "Скрыть" : "Подробнее"}
+                </button>
               </div>
 
-              {/* Блок Итого во всю ширину */}
-              <div className={styles.totalSection}>
-                <div className={styles.totalInfo}>
-                  <div className={styles.totalAmount}>
-                    <h1 className={styles.totalTitle}>Итого</h1>
-                    <span className={styles.totalAmountValue}>
-                      {selectedOrder.total.totalAmount}
+              <div className={styles.paymentSection}>
+                <div className={styles.sectionHeader}>
+                  <div className={styles.sectionHeaderLeft}>
+                    <div className={styles.sectionIcon}>
+                      <Image
+                        src="/images/account/buyImage.png"
+                        alt=""
+                        width={20}
+                        height={20}
+                        loading="lazy"
+                      />
+                    </div>
+                    <h2 className={styles.sectionTitle}>Способ оплаты</h2>
+                  </div>
+                  {isUnpaidStatus(selectedOrder.status) && (
+                    <span className={styles.paymentUnpaidLabel}>Не оплачено</span>
+                  )}
+                </div>
+                <div className={styles.paymentSectionInfo}>
+                  <div className={styles.paymentField}>
+                    <span className={styles.label}>Система оплаты</span>
+                    <div
+                      className={`${styles.value} ${styles.paymentValueContainer}`}
+                    >
+                      <span>
+                        {getPaymentSystemName(selectedOrder.payment.method)}
+                      </span>
+                      {selectedOrder.payment.method === "sberbank" && (
+                        <Image
+                          src="/images/account/sbpAcc.png"
+                          alt="СБП"
+                          width={18}
+                          height={18}
+                          loading="lazy"
+                        />
+                      )}
+                    </div>
+                  </div>
+                  <div className={styles.paymentField}>
+                    <span className={styles.label}>Сумма</span>
+                    <span className={styles.value}>
+                      {selectedOrder.payment.amount ||
+                        selectedOrder.total.totalAmount ||
+                        "—"}
                     </span>
                   </div>
-                  <h2 className={styles.totalItems}>
-                    Товары, {selectedOrder.total.itemsCount} шт
-                  </h2>
+                </div>
+                {isUnpaidStatus(selectedOrder.status) && (
+                  <button
+                    type="button"
+                    className={styles.detailPayButton}
+                    onClick={() => void handlePayOrder()}
+                    disabled={isPaying}
+                  >
+                    {isPaying ? "Перенаправление…" : "Оплатить"}
+                  </button>
+                )}
+              </div>
+
+              <div className={styles.deliverySection}>
+                <div className={styles.sectionHeader}>
+                  <div className={styles.sectionHeaderLeft}>
+                    <div className={styles.sectionIcon}>
+                      <Image
+                        src="/images/account/delivery.png"
+                        alt=""
+                        width={20}
+                        height={18}
+                        loading="lazy"
+                      />
+                    </div>
+                    <h2 className={styles.sectionTitle}>Способ доставки</h2>
+                  </div>
+                </div>
+                <div className={styles.deliverySectionInfo}>
+                  <div className={styles.deliveryField}>
+                    <span className={styles.label}>Служба доставки</span>
+                    <span className={styles.value}>
+                      {getDeliveryServiceName(
+                        selectedOrder.delivery.type,
+                        selectedOrder.delivery.method
+                      )}
+                    </span>
+                  </div>
+                  <div
+                    className={`${styles.deliveryField} ${styles.deliveryAmountDesktop}`}
+                  >
+                    <span className={styles.label}>Сумма</span>
+                    <span className={styles.value}>—</span>
+                  </div>
                 </div>
               </div>
             </div>
+
+            <aside className={styles.orderSidebar}>
+              {isUnpaidStatus(selectedOrder.status) && (
+                <>
+                  <div className={styles.awaitingPayBanner}>Ожидает оплаты</div>
+                  <div className={styles.totalSection}>
+                    <div className={styles.totalAmount}>
+                      <h2 className={styles.totalTitle}>Итого</h2>
+                      <span className={styles.totalAmountValue}>
+                        {selectedOrder.total.totalAmount || "—"}
+                      </span>
+                    </div>
+                    <div className={styles.totalBreakdown}>
+                      <div className={styles.totalBreakdownRow}>
+                        <span className={styles.totalBreakdownLabel}>
+                          Товары, {selectedOrder.total.itemsCount} шт
+                        </span>
+                        <span className={styles.totalBreakdownDots} aria-hidden />
+                        <span className={styles.totalBreakdownValue}>
+                          {selectedOrder.payment.amount ||
+                            selectedOrder.total.totalAmount ||
+                            "—"}
+                        </span>
+                      </div>
+                      <div className={styles.totalBreakdownRow}>
+                        <span className={styles.totalBreakdownLabel}>Доставка</span>
+                        <span className={styles.totalBreakdownDots} aria-hidden />
+                        <span className={styles.totalBreakdownValue}>—</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className={styles.sidebarPayButton}
+                      onClick={() => void handlePayOrder()}
+                      disabled={isPaying}
+                    >
+                      {isPaying ? "Перенаправление…" : "Оплатить"}
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {isPaidTrackableStatus(selectedOrder.status) && (
+                <a
+                  className={styles.sidebarTrackButton}
+                  href={getTrackingUrl(selectedOrder)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Отследить заказ
+                </a>
+              )}
+
+              {isDeliveredStatus(selectedOrder.status) && (
+                <div className={styles.deliveredDateBadge}>
+                  {getDeliveredBadgeText(selectedOrder)}
+                </div>
+              )}
+            </aside>
           </div>
+
+          <button
+            type="button"
+            className={styles.backToOrders}
+            onClick={closeOrderDetails}
+          >
+            Назад к списку
+          </button>
         </div>
       )}
 
-      
       {orderPayError && (
         <CartOrderErrorModal
           message={orderPayError}

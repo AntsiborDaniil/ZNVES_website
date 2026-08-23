@@ -114,7 +114,7 @@ export const MOCK_INITIAL_ORDERS: ApiMyOrderItem[] = [
     payment_type: "prepayment",
     delivery_service: "cdek",
     created_at: "2026-08-05T09:00:00.000Z",
-    updated_at: "2026-11-23T18:00:00.000Z",
+    updated_at: "2026-08-05T18:00:00.000Z",
     customer_data: { ...buyer },
     positions: [
       {

@@ -458,7 +458,7 @@
   }
 
   .main {
-    padding: 20px 20px 40px;
+    padding: 20px 10px 40px;
   }
 
   .loadingStubWrap {
@@ -468,6 +468,8 @@
   .card {
     padding-top: 0px;
     gap: 0;
+    width: 100%;
+    max-width: none;
   }
 
   .cardStandalone {
@@ -494,7 +496,7 @@
 
   .main {
     width: 100%;
-    padding: 16px 16px 32px;
+    padding: 16px 10px 32px;
   }
 
   .mobilePageTitle {
