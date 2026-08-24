@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "../ProductCard/ProductCard";
 import SectionHeader from "../SectionHeader/SectionHeader";
+import Button from "../ui/Button/Button";
 import styles from "./CatalogCollage.module.css";
 import type { CatalogProduct } from "../../types/products";
 import { fetchAllCatalogProducts } from "../../api/home/catalogApi";
@@ -158,6 +159,11 @@ const CatalogCollage = ({
             })}
           </div>
 
+          <div className={styles.mobileMore}>
+            <Button href={moreHref} variant="outline" fullWidth>
+              Смотреть больше
+            </Button>
+          </div>
         </>
       )}
     </section>

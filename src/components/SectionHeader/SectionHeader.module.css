@@ -22,12 +22,13 @@
 
 .center {
   justify-content: center;
+  padding: 0;
 }
 
 .center .title {
-  font-size: var(--font-size-14);
-  line-height: var(--line-height-20);
-  letter-spacing: var(--letter-spacing-tight);
+  font-size: var(--font-size-16);
+  line-height: var(--line-height-30);
+  letter-spacing: var(--letter-spacing-tighter);
   text-align: center;
 }
 
@@ -46,11 +47,20 @@
     line-height: var(--line-height-20);
   }
 
+  /* Центрированный заголовок слайдера («Вам также…») — всегда 16px */
   .center .title {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-30);
+    letter-spacing: var(--letter-spacing-tighter);
   }
 
   .action {
     display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .center {
+    padding: 0;
   }
 }

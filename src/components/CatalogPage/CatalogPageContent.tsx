@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import dynamic from "next/dynamic";
 import styles from "./CatalogPage.module.css";
 import ProductCard from "../ProductCard/ProductCard";
 import CatalogSkeleton from "./CatalogSkeleton";
@@ -26,17 +25,7 @@ import {
   fetchNewInProducts,
   normalizeCategoryForApi as normalizeCategoryForNewInApi,
 } from "../../api/new-in/newInApi";
-import { useAuth } from "../../contexts/AuthContext";
-import {
-  dismissCatalogAuthModal,
-  isCatalogAuthModalDismissed,
-} from "../AccountAuthPromptModal/catalogAuthPromptStorage";
 import { buildProductHref } from "../../lib/productNavigation";
-
-const AccountAuthPromptModal = dynamic(
-  () => import("../AccountAuthPromptModal/AccountAuthPromptModal"),
-  { ssr: false }
-);
 
 type CatalogPageContentProps = {
   title: string;
@@ -51,7 +40,6 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
   const categoryParam = searchParams?.get("category");
   const navFrom = title === "NEW IN" ? "new-in" : "catalog";
@@ -60,7 +48,6 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const [categories, setCategories] = useState<ApiCatalogCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
-  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const [activeCategory, setActiveCategory] = useState<string>(
     categoryFromUrl(categoryParam)
@@ -71,29 +58,6 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
-
-  // Модалка входа — только для неавторизованных, пока пользователь не отказался навсегда
-  useEffect(() => {
-    if (isAuthLoading || isAuthenticated) {
-      setShowAuthModal(false);
-      return;
-    }
-    if (isCatalogAuthModalDismissed()) return;
-
-    const timer = window.setTimeout(() => {
-      setShowAuthModal(true);
-    }, 900);
-
-    return () => window.clearTimeout(timer);
-  }, [isAuthenticated, isAuthLoading]);
-
-  const handleCloseAuthModal = useCallback(() => setShowAuthModal(false), []);
-
-  const handleSkipAuthModal = useCallback(() => {
-    dismissCatalogAuthModal();
-    setShowAuthModal(false);
-  }, []);
-
   // Обработчики для drag-скролла категорий
   const handleMouseDown = (e: React.MouseEvent<HTMLElement>) => {
     if (!categoriesRef.current) return;
@@ -293,10 +257,10 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
                   key={`${String(product.slug ?? product.id)}-${index}`}
                   href={buildProductHref(product.slug || product.id, {
                     from: navFrom,
+                    // Не подставляем product.category при "all" — иначе в крошках
+                    // появляется фейковый/дефолтный "t-shirt"
                     category:
-                      activeCategory !== "all"
-                        ? activeCategory
-                        : product.category,
+                      activeCategory !== "all" ? activeCategory : null,
                   })}
                   className={styles.catalogCardLink}
                   aria-label={`Открыть товар ${product.title}`}
@@ -340,13 +304,6 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
           </>
         )}
       </section>
-
-      {showAuthModal && !isAuthenticated && (
-        <AccountAuthPromptModal
-          onClose={handleCloseAuthModal}
-          onSkip={handleSkipAuthModal}
-        />
-      )}
     </>
   );
 };

@@ -153,7 +153,7 @@ const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProd
   const priceValue = parseFloat(apiProduct.price.replace(/\s/g, "").replace(",", ".")) || 0;
   const formattedPrice = `${Math.round(priceValue).toLocaleString("ru-RU")} ₽`;
 
-  const category = extractCategoryFromSlug(apiProduct.slug) || "T-shirts";
+  const category = extractCategoryFromSlug(apiProduct.slug) || "";
 
   // Генерируем стабильный ID на основе slug
   const id = hashString(apiProduct.slug) || index + 1;

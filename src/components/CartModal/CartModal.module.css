@@ -5,12 +5,14 @@
   background-color: rgba(28, 28, 28, 0.45);
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
   transition: opacity 0.32s ease, visibility 0.32s ease;
 }
 
 .overlayVisible {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 .panel {
@@ -433,31 +435,65 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  min-height: 240px;
-  padding: 40px;
+  gap: 0;
+  min-height: min(520px, calc(100vh - 120px));
+  padding: 48px 40px;
   text-align: center;
+  animation: emptyStateIn 0.45s ease-out;
+}
+
+@keyframes emptyStateIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.emptyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  margin-bottom: 28px;
+  border: 1px solid var(--color-grey-5);
+  color: var(--color-black);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.emptyState:hover .emptyIcon {
+  transform: scale(1.04);
+  border-color: var(--color-black);
 }
 
 .emptyTitle {
-  margin: 0;
+  margin: 0 0 12px;
+  font-family: var(--font-family);
   font-size: var(--font-size-20);
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-30);
+  letter-spacing: var(--letter-spacing-tight);
+  text-transform: uppercase;
   color: var(--color-black);
 }
 
 .emptyText {
-  margin: 0;
+  margin: 0 0 32px;
+  max-width: 280px;
+  font-family: var(--font-family);
   font-size: var(--font-size-14);
-  font-weight: var(--font-weight-light);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-20);
+  letter-spacing: var(--letter-spacing-tight);
   color: var(--color-grey-4);
 }
 
-.emptyLink {
-  margin-top: 8px;
-  font-size: var(--font-size-14);
-  color: var(--color-black);
-  text-decoration: underline;
+.emptyCta {
+  min-width: 200px;
 }
 
 .paymentBlock {
@@ -609,7 +645,9 @@
   .summaryRow {
     justify-content: flex-start;
     margin-top: 0;
-    padding: 20px;
+    margin-bottom: 0;
+    /* низ без паддинга — 40px до «Имя» только у modalPersonalSection */
+    padding: 20px 20px 0;
   }
 
   .summaryTotal {
@@ -626,6 +664,7 @@
 
   .checkoutSection {
     margin-top: 0;
+    padding-top: 0;
   }
 
   .panel {
@@ -646,6 +685,32 @@
   }
 
   .emptyState {
+    min-height: min(420px, calc(100vh - 100px));
     padding: 40px 20px;
+  }
+
+  .emptyIcon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 22px;
+  }
+
+  .emptyIcon svg {
+    width: 44px;
+    height: 44px;
+  }
+
+  .emptyTitle {
+    font-size: var(--font-size-16);
+  }
+
+  .emptyText {
+    margin-bottom: 24px;
+    font-size: var(--font-size-12);
+  }
+
+  .emptyCta {
+    width: 100%;
+    max-width: 280px;
   }
 }

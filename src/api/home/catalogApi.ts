@@ -26,7 +26,7 @@ const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProd
   const formattedPrice = `${Math.round(priceValue).toLocaleString("ru-RU")} ₽`;
 
   // Извлекаем категорию из slug или name
-  const category = extractCategoryFromSlug(apiProduct.slug) || "T-shirts";
+  const category = extractCategoryFromSlug(apiProduct.slug) || "";
 
   // Генерируем стабильный ID на основе slug
   const id = hashString(apiProduct.slug) || index + 1;

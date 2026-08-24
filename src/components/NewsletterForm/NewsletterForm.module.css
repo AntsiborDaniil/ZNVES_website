@@ -23,8 +23,10 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 1;
+  gap: 12px;
+  flex: 0 1 217px;
+  width: 217px;
+  max-width: 100%;
   min-width: 0;
 }
 
@@ -59,6 +61,13 @@
   color: var(--color-red);
 }
 
+.submitBtn {
+  flex-shrink: 0;
+  width: 216px;
+  min-width: 216px;
+  height: 44px;
+}
+
 .legal {
   margin: 0;
   color: var(--color-white);
@@ -77,9 +86,16 @@
   gap: 10px;
 }
 
-.stack .row :global(a),
-.stack .row :global(button) {
+.stack .field {
+  flex: 1 1 auto;
   width: 100%;
+}
+
+.stack .row :global(a),
+.stack .row :global(button),
+.stack .submitBtn {
+  width: 100%;
+  min-width: 0;
 }
 
 @media (max-width: 768px) {
@@ -89,8 +105,15 @@
     gap: 10px;
   }
 
-  .row :global(a),
-  .row :global(button) {
+  .field {
+    flex: 1 1 auto;
     width: 100%;
+  }
+
+  .row :global(a),
+  .row :global(button),
+  .submitBtn {
+    width: 100%;
+    min-width: 0;
   }
 }

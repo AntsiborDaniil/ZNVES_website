@@ -6,6 +6,12 @@
   background: transparent;
 }
 
+/* Заголовок: ровно 40px сверху и 40px до карточек (gap), без наложений */
+.sectionCentered {
+  gap: 40px;
+  padding: 40px var(--space-page);
+}
+
 @media (min-width: 769px) {
   .isBestseller .bestsellerHeader {
     padding-left: var(--space-page);
@@ -98,6 +104,11 @@
     padding: 40px var(--space-page-mobile) 0;
   }
 
+  .sectionCentered {
+    gap: 40px;
+    padding: 40px var(--space-page-mobile);
+  }
+
   .progress {
     display: none;
   }
@@ -106,4 +117,15 @@
     display: flex;
     margin-top: 20px;
   }
+
+  .mobileMore {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 0;
+  }
+}
+
+.mobileMore {
+  display: none;
 }

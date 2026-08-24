@@ -14,27 +14,47 @@
   z-index: 0;
 }
 
-.heroBackgroundImage,
-.heroBackgroundImageMobile {
+.heroBackgroundImage {
   object-fit: cover;
   object-position: center;
 }
 
-.heroBackgroundImageMobile {
+.heroMobileStack {
   display: none;
+}
+
+.heroMobileMain,
+.heroMobileLighten,
+.heroMobileDarken {
+  object-fit: cover;
+  object-position: center;
+}
+
+.heroMobileMain {
+  z-index: 0;
+}
+
+.heroMobileLighten {
+  z-index: 1;
+  pointer-events: none;
+}
+
+.heroMobileDarken {
+  z-index: 2;
+  pointer-events: none;
 }
 
 .overlay {
   position: absolute;
   inset: 0;
   background: var(--color-hero-overlay);
-  z-index: 1;
+  z-index: 3;
 }
 
 .gradient {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 4;
   background: linear-gradient(to top, #000 0%, transparent 50%);
   opacity: 0;
   pointer-events: none;
@@ -42,7 +62,7 @@
 
 .heroContent {
   position: relative;
-  z-index: 3;
+  z-index: 5;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -90,9 +110,10 @@
     display: none;
   }
 
-  .heroBackgroundImageMobile {
+  .heroMobileStack {
     display: block;
-    filter: brightness(1.12) contrast(1.02);
+    position: absolute;
+    inset: 0;
   }
 
   .overlay {

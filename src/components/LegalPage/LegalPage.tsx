@@ -1,7 +1,9 @@
 "use client";
 
+import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, Fragment } from "react";
+import Header from "../Header/Header";
+import Footer from "../Footer/Footer";
 import styles from "./LegalPage.module.css";
 
 /** Фрагмент текста с опциональной ссылкой */
@@ -96,35 +98,39 @@ const LegalPage = ({ title, updatedAt, intro, sections }: LegalPageProps) => {
   };
 
   return (
-    <main className={styles.page}>
-      <div className={styles.container}>
-        <button type="button" onClick={handleBack} className={styles.backLink}>
-          ← Вернуться назад
-        </button>
+    <div className={styles.shell}>
+      <Header />
+      <main className={styles.page}>
+        <div className={styles.container}>
+          <button type="button" onClick={handleBack} className={styles.backLink}>
+            ← Вернуться назад
+          </button>
 
-        <header className={styles.header}>
-          <h1 className={styles.title}>{title}</h1>
-          {updatedAt && (
-            <p className={styles.meta}>Последнее обновление: {updatedAt}</p>
+          <header className={styles.header}>
+            <h1 className={styles.title}>{title}</h1>
+            {updatedAt && (
+              <p className={styles.meta}>Последнее обновление: {updatedAt}</p>
+            )}
+          </header>
+
+          {intro && intro.length > 0 && (
+            <div className={styles.intro}>
+              {intro.map((b, i) => renderBlock(b, `intro-${i}`))}
+            </div>
           )}
-        </header>
 
-        {intro && intro.length > 0 && (
-          <div className={styles.intro}>
-            {intro.map((b, i) => renderBlock(b, `intro-${i}`))}
+          <div className={styles.sections}>
+            {sections.map(({ id, title: sectionTitle, blocks }) => (
+              <section key={id} className={styles.section} id={id}>
+                <h2 className={styles.sectionTitle}>{sectionTitle}</h2>
+                {blocks.map((block, index) => renderBlock(block, `${id}-b-${index}`))}
+              </section>
+            ))}
           </div>
-        )}
-
-        <div className={styles.sections}>
-          {sections.map(({ id, title: sectionTitle, blocks }) => (
-            <section key={id} className={styles.section} id={id}>
-              <h2 className={styles.sectionTitle}>{sectionTitle}</h2>
-              {blocks.map((block, index) => renderBlock(block, `${id}-b-${index}`))}
-            </section>
-          ))}
         </div>
-      </div>
-    </main>
+      </main>
+      <Footer />
+    </div>
   );
 };
 

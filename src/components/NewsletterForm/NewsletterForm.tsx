@@ -78,7 +78,12 @@ const NewsletterForm = ({
             </span>
           )}
         </div>
-        <Button type="submit" variant="primary" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={isSubmitting}
+          className={styles.submitBtn}
+        >
           {isSubmitting ? "Отправка…" : "Подписаться"}
         </Button>
       </div>

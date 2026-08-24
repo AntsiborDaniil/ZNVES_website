@@ -98,7 +98,7 @@ const transformApiProduct = (
   }));
   const defaultColor = availableColors[0]?.value ?? "";
 
-  const category = extractCategoryFromSlug(slug) || "T-shirts";
+  const category = extractCategoryFromSlug(slug) || "";
   const id = hashString(slug || apiProduct.name);
 
   const sectionEntries: Array<{ id: string; title: string; content: string }> = [

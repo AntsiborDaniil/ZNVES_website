@@ -4,38 +4,60 @@ import { useEffect, useState } from "react";
 import styles from "./Toast.module.css";
 
 type ToastProps = {
-    message: string;
-    onClose: () => void;
-    duration?: number;
+  message: string;
+  onClose: () => void;
+  duration?: number;
 };
 
-const Toast = ({ message, onClose, duration = 3000 }: ToastProps) => {
-    const [isClosing, setIsClosing] = useState(false);
+const Toast = ({ message, onClose, duration = 3500 }: ToastProps) => {
+  const [isClosing, setIsClosing] = useState(false);
 
-    useEffect(() => {
-        let closeTimer: NodeJS.Timeout | null = null;
-        
-        const timer = setTimeout(() => {
-            setIsClosing(true);
-            // Ждем завершения анимации исчезновения перед вызовом onClose
-            closeTimer = setTimeout(() => {
-                onClose();
-            }, 300); // Длительность анимации slideOut
-        }, duration);
+  useEffect(() => {
+    let closeTimer: ReturnType<typeof setTimeout> | null = null;
 
-        return () => {
-            clearTimeout(timer);
-            if (closeTimer) {
-                clearTimeout(closeTimer);
-            }
-        };
-    }, [duration, onClose]);
+    const timer = setTimeout(() => {
+      setIsClosing(true);
+      closeTimer = setTimeout(() => {
+        onClose();
+      }, 280);
+    }, duration);
 
-    return (
-        <div className={`${styles.toast} ${isClosing ? styles.toastClosing : ""}`}>
-            <span className={styles.toastMessage}>{message}</span>
-        </div>
-    );
+    return () => {
+      clearTimeout(timer);
+      if (closeTimer) clearTimeout(closeTimer);
+    };
+  }, [duration, onClose]);
+
+  const handleClose = () => {
+    if (isClosing) return;
+    setIsClosing(true);
+    window.setTimeout(() => onClose(), 280);
+  };
+
+  return (
+    <div
+      className={`${styles.toast} ${isClosing ? styles.toastClosing : ""}`}
+      role="status"
+      aria-live="polite"
+    >
+      <p className={styles.toastMessage}>{message}</p>
+      <button
+        type="button"
+        className={styles.closeBtn}
+        onClick={handleClose}
+        aria-label="Закрыть уведомление"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+          <path
+            d="M1 1L13 13M13 1L1 13"
+            stroke="currentColor"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+          />
+        </svg>
+      </button>
+    </div>
+  );
 };
 
 export default Toast;

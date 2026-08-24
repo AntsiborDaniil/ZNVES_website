@@ -280,7 +280,7 @@ const ProductPageView = ({
         selectedColorOption.label ??
         selectedColor
     );
-    showToast("Добавлено в корзину");
+    showToast(`${product.title} добавлено в корзину`);
   }, [
     addItem,
     colorSlugToLabel,
@@ -310,7 +310,9 @@ const ProductPageView = ({
   const fromParam = searchParams?.get("from");
   const categoryParam = searchParams?.get("category");
   const origin = getBreadcrumbOrigin(fromParam);
-  const categorySlug = categoryParam ? resolveCategorySlug(categoryParam) : null;
+  // Категория из query, иначе — из данных товара (slug/category), без фейкового "t-shirt"
+  const rawCategory = categoryParam?.trim() || product.category?.trim() || "";
+  const categorySlug = rawCategory ? resolveCategorySlug(rawCategory) : null;
   const categoryLabel = categorySlug
     ? getCategoryDisplayName(categorySlug, catalogCategories)
     : null;

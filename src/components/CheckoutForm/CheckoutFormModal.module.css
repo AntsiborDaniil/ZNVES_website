@@ -2379,17 +2379,21 @@ textarea.input::placeholder {
   .content,
   .leftColumn {
     gap: 0;
+    /* сбрасывает margin-top: 40px из ≤1024 — иначе до «Имя» ~80px */
+    margin-top: 0;
   }
 
   .section {
     gap: 16px;
-    padding-top: 20px;
+    padding-top: 0;
   }
 
   .modalPersonalSection {
     gap: 20px;
-    padding-top: 20px;
+    /* ровно 40px от «Итоговая сумма» до «Имя» */
+    padding-top: 40px;
     padding-bottom: 40px;
+    margin-top: 0;
   }
 
   .sectionTitle {
@@ -2502,10 +2506,11 @@ textarea.input::placeholder {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: calc(100% + 40px);
-    max-width: none;
-    margin-left: -20px;
-    margin-right: -20px;
+    /* Figma mobile: 353×44, в рамках паддингов экрана, без bleed */
+    width: 100%;
+    max-width: 353px;
+    margin-left: auto;
+    margin-right: auto;
     margin-top: 0;
     height: 44px;
     padding: 0 20px;

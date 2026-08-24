@@ -13,6 +13,7 @@ import {
   applyPromoCode,
   buildCartItemsForPromo,
 } from "../../api/discounts/discountsApi";
+import Button from "../ui/Button/Button";
 import styles from "./CartModal.module.css";
 
 const CheckoutForm = dynamic(
@@ -185,8 +186,11 @@ const CartModal = ({
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setIsActive(true));
       });
+      const previousOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
-      return;
+      return () => {
+        document.body.style.overflow = previousOverflow;
+      };
     }
 
     setIsActive(false);
@@ -451,13 +455,38 @@ const CartModal = ({
 
               {!paymentReturnStatus && items.length === 0 && (
                 <div className={styles.emptyState}>
+                  <div className={styles.emptyIcon} aria-hidden>
+                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M3 3H5.2L6.2 7M6.2 7L8 14H18L21 7H6.2ZM9 20.5C9 21.3284 8.32843 22 7.5 22C6.67157 22 6 21.3284 6 20.5C6 19.6716 6.67157 19 7.5 19C8.32843 19 9 19.6716 9 20.5ZM19 20.5C19 21.3284 18.3284 22 17.5 22C16.6716 22 16 21.3284 16 20.5C16 19.6716 16.6716 19 17.5 19C18.3284 19 19 19.6716 19 20.5Z"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M10 10.5h6.5"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        strokeLinecap="round"
+                        opacity="0.35"
+                      />
+                    </svg>
+                  </div>
                   <p className={styles.emptyTitle}>Корзина пуста</p>
                   <p className={styles.emptyText}>
-                    Добавьте товары в корзину, чтобы продолжить покупки
+                    Здесь появятся вещи, которые вы выберете.
+                    <br />
+                    Загляните в каталог — там уже есть на что посмотреть.
                   </p>
-                  <Link href="/catalog" className={styles.emptyLink} onClick={handleClose}>
+                  <Button
+                    href="/catalog"
+                    variant="dark"
+                    className={styles.emptyCta}
+                    onClick={handleClose}
+                  >
                     Перейти в каталог
-                  </Link>
+                  </Button>
                 </div>
               )}
 

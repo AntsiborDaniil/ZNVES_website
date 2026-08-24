@@ -12,15 +12,15 @@ import {
 import Link from "next/link";
 import ProductCard from "../ProductCard/ProductCard";
 import SectionHeader from "../SectionHeader/SectionHeader";
+import Button from "../ui/Button/Button";
 import SliderSkeleton from "./SliderSkeleton";
 import styles from "./ProductDisplaySection.module.css";
 import type { CatalogProduct } from "../../types/products";
 import { fetchNewInProducts, fetchAllCatalogProducts } from "../../api/home/catalogApi";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode, Mousewheel } from "swiper/modules";
+import { FreeMode } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
-import "swiper/css/mousewheel";
 import type { Swiper as SwiperInstance } from "swiper";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import {
@@ -200,7 +200,9 @@ const ProductDisplaySection = ({
   return (
     <section
       id={id}
-      className={`${styles.section} ${isBestseller ? styles.isBestseller : ""}`}
+      className={`${styles.section} ${isBestseller ? styles.isBestseller : ""} ${
+        headerAlign === "center" ? styles.sectionCentered : ""
+      }`}
     >
       <div className={isBestseller ? styles.bestsellerHeader : undefined}>
         <SectionHeader
@@ -220,7 +222,7 @@ const ProductDisplaySection = ({
             Swiper as ComponentType<Record<string, unknown>>,
             {
               className: styles.slider,
-              modules: [FreeMode, Mousewheel],
+              modules: [FreeMode],
               loop: enableLoop,
               spaceBetween,
               slidesPerView: maxVisible,
@@ -241,14 +243,6 @@ const ProductDisplaySection = ({
                 minimumVelocity: 0.02,
                 sticky: true,
               },
-              mousewheel: canScroll
-                ? {
-                    enabled: true,
-                    forceToAxis: true,
-                    sensitivity: 0.8,
-                    releaseOnEdges: true,
-                  }
-                : false,
               grabCursor: true,
               watchSlidesProgress: true,
               onSwiper: handleSwiper,
@@ -307,6 +301,13 @@ const ProductDisplaySection = ({
             ))}
           </div>
         </>
+      )}
+      {showShopNow && (
+        <div className={styles.mobileMore}>
+          <Button href={shopNowHref} variant="outline" fullWidth>
+            Смотреть больше
+          </Button>
+        </div>
       )}
     </section>
   );

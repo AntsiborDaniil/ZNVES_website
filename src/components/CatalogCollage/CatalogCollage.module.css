@@ -139,6 +139,10 @@
   text-align: center;
 }
 
+.mobileMore {
+  display: none;
+}
+
 @media (max-width: 1024px) {
   .desktopGrid {
     grid-template-columns: 1fr;
@@ -176,6 +180,12 @@
   .collagePrice {
     font-size: var(--font-size-12);
     line-height: var(--line-height-12);
+  }
+
+  .mobileMore {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
   }
 
   .skeleton {
