@@ -21,8 +21,7 @@ const AccountPageContent = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { isAuthenticated, isLoading, isAuthReady, checkAuth, requestLogout } =
-    useAuth();
+  const { isAuthenticated, isLoading, isAuthReady, checkAuth } = useAuth();
   const activeTab = parseAccountTab(searchParams.get("tab"));
   const [ordersHeading, setOrdersHeading] = useState("Заказы");
   const [isPasswordMode, setIsPasswordMode] = useState(false);
@@ -146,13 +145,6 @@ const AccountPageContent = () => {
                 onClick={() => goToTab("orders")}
               >
                 Мои заказы
-              </button>
-              <button
-                type="button"
-                className={styles.sideNavItem}
-                onClick={requestLogout}
-              >
-                Выйти
               </button>
             </nav>
           </aside>

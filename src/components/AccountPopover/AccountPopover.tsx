@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
@@ -17,7 +16,7 @@ type AccountPopoverProps = {
 };
 
 const AccountPopover = ({ isOpen, onClose }: AccountPopoverProps) => {
-  const { user, requestLogout } = useAuth();
+  const { user } = useAuth();
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,11 +58,6 @@ const AccountPopover = ({ isOpen, onClose }: AccountPopoverProps) => {
     user?.email?.split("@")[0] ||
     "Профиль";
 
-  const handleLogoutClick = () => {
-    onClose();
-    requestLogout();
-  };
-
   return (
     <div
       ref={rootRef}
@@ -84,20 +78,6 @@ const AccountPopover = ({ isOpen, onClose }: AccountPopoverProps) => {
             Редактировать профиль
           </Link>
         </div>
-        <button
-          type="button"
-          className={styles.logoutBtn}
-          onClick={handleLogoutClick}
-          aria-label="Выйти"
-        >
-          <Image
-            src="/images/account/logout.svg"
-            alt=""
-            width={18}
-            height={18}
-            unoptimized
-          />
-        </button>
       </div>
 
       <div className={styles.divider} aria-hidden />
