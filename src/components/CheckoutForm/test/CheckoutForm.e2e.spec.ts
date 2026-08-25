@@ -1,28 +1,25 @@
 import { test, expect } from "@playwright/test";
 import {
-  acceptCheckoutAgreements,
   fillCheckoutPersonalData,
   mockCartItem,
+  openCartModal,
   preparePage,
 } from "../../../test-utils/e2e/fixtures";
 
-test.describe("Checkout flows", () => {
+test.describe("Checkout flows (cart modal)", () => {
   test.beforeEach(async ({ page }) => {
     await preparePage(page, { cartItems: [mockCartItem] });
     await page.route("https://example.com/**", (route) => route.abort());
+    await openCartModal(page);
   });
 
   test("completes CDEK PVZ order and requests payment", async ({ page }) => {
-    await page.goto("/checkout");
-
     await fillCheckoutPersonalData(page);
 
     await expect(page.getByText("СДЭК · Пункты выдачи ·")).toBeVisible({
       timeout: 15_000,
     });
     await page.getByRole("button", { name: /Тверская/ }).click();
-
-    await acceptCheckoutAgreements(page);
 
     const payResponse = page.waitForResponse(
       (res) =>
@@ -36,25 +33,19 @@ test.describe("Checkout flows", () => {
     expect(response.ok()).toBeTruthy();
   });
 
-  test("submit stays disabled without agreements", async ({ page }) => {
-    await page.goto("/checkout");
+  test("submit is enabled for modal checkout without agreement checkboxes", async ({
+    page,
+  }) => {
     await fillCheckoutPersonalData(page);
-
-    await expect(page.getByRole("button", { name: "Оформить заказ" })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Оформить заказ" })).toBeEnabled();
   });
 
-  test("switches to Yandex and shows courier option", async ({ page }) => {
-    await page.goto("/checkout");
-
-    await page.getByText("ЯНДЕКС", { exact: true }).click();
-    await expect(page.getByText("Курьером", { exact: true })).toBeVisible();
-    await page.getByText("Курьером", { exact: true }).click();
-    await expect(page.getByText("Курьером", { exact: true })).toBeVisible();
+  test("switches to Yandex courier option", async ({ page }) => {
+    await page.getByText("ЯНДЕКС курьером", { exact: true }).click();
+    await expect(page.getByText("ЯНДЕКС курьером", { exact: true })).toBeVisible();
   });
 
   test("filters CDEK PVZ by search", async ({ page }) => {
-    await page.goto("/checkout");
-
     const search = page.getByLabel("Поиск по адресу ПВЗ");
     await expect(search).toBeVisible({ timeout: 15_000 });
     await search.fill("арбат");
@@ -64,9 +55,10 @@ test.describe("Checkout flows", () => {
   });
 
   test("selects card payment method", async ({ page }) => {
-    await page.goto("/checkout");
-
-    await page.locator('label').filter({ has: page.locator('input[value="card"]') }).click();
+    await page
+      .locator("label")
+      .filter({ has: page.locator('input[value="card"]') })
+      .click();
     await expect(page.locator('input[name="paymentMethod"][value="card"]')).toBeChecked();
   });
 });

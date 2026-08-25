@@ -5,36 +5,42 @@ import {
 } from "../../../test-utils/e2e/fixtures";
 
 test.describe("Account page", () => {
-  test("shows personal data and active orders after login", async ({ page }) => {
+  test("shows profile and delivery sections after login", async ({ page }) => {
     await preparePage(page);
     await loginAsDevUser(page);
 
-    await expect(page.getByRole("heading", { name: "Личные данные" })).toBeVisible();
-    // Секция всегда есть; пустое состояние даёт второй heading — не матчим оба одним getByText
-    await expect(page.getByRole("heading", { name: "Активные заказы" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Профиль", level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Адреса доставки" })).toBeVisible();
+    await expect(
+      page.getByRole("navigation", { name: "Разделы кабинета" }).getByRole("button", {
+        name: "Личный кабинет",
+      })
+    ).toBeVisible();
   });
 
-  test("opens orders tab with seed order", async ({ page }) => {
+  test("opens orders tab", async ({ page }) => {
     await preparePage(page);
     await loginAsDevUser(page);
 
-    await page.getByRole("listitem").filter({ hasText: "Заказы" }).click();
-    await expect(page.getByText(/Оплачен|T-SHIRT VOYAGE|У вас пока нет заказов/i).first()).toBeVisible({
-      timeout: 15_000,
-    });
+    await page
+      .getByRole("navigation", { name: "Разделы кабинета" })
+      .getByRole("button", { name: "Мои заказы" })
+      .click();
+
+    await expect(
+      page.getByText(/Оплачен|T-SHIRT VOYAGE|У вас пока нет заказов/i).first()
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test("saves profile changes", async ({ page }) => {
     await preparePage(page);
     await loginAsDevUser(page);
 
-    await page.getByRole("listitem").filter({ hasText: "Личные данные" }).click();
-
     const firstName = page.locator("#profile-firstName");
     await expect(firstName).toBeVisible({ timeout: 10_000 });
     await firstName.fill("Даниил");
 
-    await page.getByRole("button", { name: "Сохранить изменения" }).first().click();
+    await page.getByRole("button", { name: "Сохранить" }).first().click();
     await expect(page.getByText("Данные сохранены")).toBeVisible({ timeout: 10_000 });
   });
 });

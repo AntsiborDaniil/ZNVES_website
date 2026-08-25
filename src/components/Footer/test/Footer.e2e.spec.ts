@@ -27,13 +27,10 @@ test.describe("Footer links", () => {
       "href",
       "/catalog"
     );
-    await expect(footer.getByRole("link", { name: "Корзина", exact: true })).toHaveAttribute(
-      "href",
-      "/cart"
-    );
+    await expect(footer.getByRole("button", { name: "Корзина", exact: true })).toBeVisible();
     await expect(
-      footer.getByRole("link", { name: "Личный кабинет", exact: true })
-    ).toHaveAttribute("href", "/account");
+      footer.getByRole("button", { name: "Личный кабинет", exact: true })
+    ).toBeVisible();
     await expect(
       footer.getByRole("link", { name: "Доставка и оплата", exact: true })
     ).toHaveAttribute("href", "/delivery-payment");

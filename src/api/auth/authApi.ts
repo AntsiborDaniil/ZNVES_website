@@ -42,7 +42,6 @@ const REGISTER_VERIFY_URL = `${AUTH_BASE_URL}/register/verify/`;
 const LOGIN_URL = `${AUTH_BASE_URL}/login/`;
 const LOGIN_VERIFY_URL = `${AUTH_BASE_URL}/login/verify/`;
 const RESEND_CODE_URL = `${AUTH_BASE_URL}/register/resend-code/`;
-const LOGOUT_URL = `${AUTH_BASE_URL}/logout/`;
 
 export type RegisterPayload = {
   email: string;
@@ -159,24 +158,6 @@ export const verifyLogin = async (payload: VerifyPayload): Promise<AuthUser> => 
 
 export const resendAuthCode = async (email: string): Promise<void> => {
   await authPost(RESEND_CODE_URL, { email });
-};
-
-export const logoutUser = async (): Promise<void> => {
-  if (typeof window === "undefined") {
-    throw new Error("Вызов только на клиенте");
-  }
-  try {
-    const headers: Record<string, string> = { Accept: "application/json" };
-    const csrf = getCsrfToken();
-    if (csrf) headers["X-CSRFToken"] = csrf;
-    await fetch(LOGOUT_URL, {
-      method: "POST",
-      credentials: "include",
-      headers,
-    });
-  } catch {
-    // Даже если сеть упала — чистим клиентскую сессию ниже по цепочке
-  }
 };
 
 export const getCurrentUser = async (): Promise<AuthUser | null> => {

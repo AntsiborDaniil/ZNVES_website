@@ -1,14 +1,13 @@
 import { test, expect } from "@playwright/test";
-import { mockCartItem, preparePage } from "../../../test-utils/e2e/fixtures";
+import { mockCartItem, openCartModal, preparePage } from "../../../test-utils/e2e/fixtures";
 
-test.describe("Checkout delivery widgets", () => {
+test.describe("Checkout delivery widgets (cart modal)", () => {
   test.beforeEach(async ({ page }) => {
     await preparePage(page, { cartItems: [mockCartItem] });
+    await openCartModal(page);
   });
 
-  test("shows CDEK PVZ list on checkout by default", async ({ page }) => {
-    await page.goto("/checkout");
-
+  test("shows CDEK PVZ list by default", async ({ page }) => {
     await expect(page.getByText("СДЭК · Пункты выдачи ·")).toBeVisible({
       timeout: 15_000,
     });
@@ -17,9 +16,7 @@ test.describe("Checkout delivery widgets", () => {
   });
 
   test("switches to Yandex PVZ widget", async ({ page }) => {
-    await page.goto("/checkout");
-
-    await page.getByText("ЯНДЕКС", { exact: true }).click();
+    await page.getByText("ЯНДЕКС до пункта выдачи", { exact: true }).click();
 
     await expect(page.locator("#delivery-widget")).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText("Загрузка пунктов выдачи…")).toBeHidden({
@@ -28,8 +25,6 @@ test.describe("Checkout delivery widgets", () => {
   });
 
   test("filters CDEK PVZ list by search query", async ({ page }) => {
-    await page.goto("/checkout");
-
     const search = page.getByLabel("Поиск по адресу ПВЗ");
     await expect(search).toBeVisible({ timeout: 15_000 });
 
@@ -39,8 +34,6 @@ test.describe("Checkout delivery widgets", () => {
   });
 
   test("selects PVZ point from list", async ({ page }) => {
-    await page.goto("/checkout");
-
     const pvz = page.getByRole("button", { name: /Тверская/ });
     await expect(pvz).toBeVisible({ timeout: 15_000 });
     await pvz.click();

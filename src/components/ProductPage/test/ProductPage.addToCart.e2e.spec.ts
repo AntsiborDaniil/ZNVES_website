@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { preparePage } from "../../../test-utils/e2e/fixtures";
+import { openCartModal, preparePage } from "../../../test-utils/e2e/fixtures";
 
 test.describe("Product page add to cart", () => {
   test.beforeEach(async ({ page }) => {
@@ -14,7 +14,7 @@ test.describe("Product page add to cart", () => {
     });
 
     await page.getByRole("button", { name: "Добавить в корзину" }).click();
-    await expect(page.getByText("Добавлено в корзину")).toBeVisible();
+    await expect(page.getByText(/добавлено в корзину/i)).toBeVisible();
 
     await page.waitForFunction(() => {
       try {
@@ -25,8 +25,8 @@ test.describe("Product page add to cart", () => {
       }
     });
 
-    await page.goto("/cart");
+    await openCartModal(page);
     await expect(page.getByText("T-SHIRT VOYAGE").first()).toBeVisible();
-    await expect(page.getByText("Итого").first()).toBeVisible();
+    await expect(page.getByText("Итоговая сумма").first()).toBeVisible();
   });
 });

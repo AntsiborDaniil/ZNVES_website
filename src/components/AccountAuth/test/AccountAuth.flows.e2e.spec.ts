@@ -24,7 +24,7 @@ test.describe("AccountAuth flows", () => {
     await page.getByRole("button", { name: "Подтвердить" }).click();
 
     await expectAccountHub(page);
-    await expect(page.getByText(MOCK_DEV_USER.email)).toBeVisible();
+    await expect(page.locator("#profile-email")).toHaveValue(MOCK_DEV_USER.email);
   });
 
   test("shows error on wrong password", async ({ page }) => {
@@ -61,7 +61,6 @@ test.describe("AccountAuth flows", () => {
     await page.getByLabel("Email", { exact: true }).fill(email);
     await page.locator('input[type="tel"]').fill("9991112233");
     await page.locator("#register-password").fill("Secret123");
-    await page.locator("#register-confirm-password").fill("Secret123");
 
     await page.getByRole("button", { name: "Зарегистрироваться" }).click();
     await expect(page.getByText("Подтверждение регистрации")).toBeVisible();
@@ -81,7 +80,6 @@ test.describe("AccountAuth flows", () => {
     await page.getByLabel("Email", { exact: true }).fill(MOCK_DEV_USER.email);
     await page.locator('input[type="tel"]').fill("9991234567");
     await page.locator("#register-password").fill("Password123");
-    await page.locator("#register-confirm-password").fill("Password123");
 
     await page.getByRole("button", { name: "Зарегистрироваться" }).click();
     await expect(page.getByText("Пользователь с таким email уже существует")).toBeVisible();

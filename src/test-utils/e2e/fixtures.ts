@@ -122,9 +122,19 @@ export async function loginAsDevUser(page: Page) {
 }
 
 export async function expectAccountHub(page: Page) {
-  await expect(page.getByRole("heading", { name: "Личный кабинет" })).toBeVisible({
+  await expect(
+    page.getByRole("navigation", { name: "Разделы кабинета" })
+  ).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole("heading", { name: "Профиль", level: 1 })).toBeVisible();
+}
+
+/** /cart и /checkout открывают CartModal и редиректят на /catalog */
+export async function openCartModal(page: Page) {
+  await page.goto("/cart");
+  await expect(page.getByRole("dialog", { name: /Ваш заказ/i })).toBeVisible({
     timeout: 15_000,
   });
+  await expect(page).toHaveURL(/\/catalog/);
 }
 
 export async function fillCheckoutPersonalData(page: Page) {
@@ -135,8 +145,10 @@ export async function fillCheckoutPersonalData(page: Page) {
 }
 
 export async function acceptCheckoutAgreements(page: Page) {
-  await page.locator('input[name="agreeToOffer"]').check();
-  await page.locator('input[name="agreeToPrivacy"]').check();
+  const offer = page.locator('input[name="agreeToOffer"]');
+  const privacy = page.locator('input[name="agreeToPrivacy"]');
+  if (await offer.count()) await offer.check();
+  if (await privacy.count()) await privacy.check();
 }
 
 export { MOCK_AUTH_CODE, MOCK_DEV_USER };

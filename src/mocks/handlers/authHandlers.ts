@@ -1,10 +1,8 @@
 import { http, HttpResponse } from "msw";
 import { getMockApiBase } from "../config";
 import {
-  buildClearedSessionCookies,
   buildSessionCookies,
   changePasswordByToken,
-  clearSession,
   getUserByToken,
   parseAccessToken,
   resendCode,
@@ -114,20 +112,6 @@ export const createAuthHandlers = () => {
         return jsonError(result.error, status);
       }
       return HttpResponse.json({}, { status: 200 });
-    }),
-
-    http.post(`${base}/api/auth/logout/`, ({ request }) => {
-      const token = parseAccessToken(request.headers.get("cookie"));
-      clearSession(token);
-      return HttpResponse.json(
-        {},
-        {
-          status: 200,
-          headers: {
-            "Set-Cookie": buildClearedSessionCookies().join(", "),
-          },
-        }
-      );
     }),
   ];
 };

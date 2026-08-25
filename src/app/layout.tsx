@@ -1,4 +1,4 @@
-import { Inter, Montserrat, Plus_Jakarta_Sans, Roboto } from "next/font/google";
+import { Inter } from "next/font/google";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
@@ -9,7 +9,6 @@ import { AuthProvider } from "../contexts/AuthContext";
 import { ToastProvider } from "../components/ui/ToastProvider/ToastProvider";
 import CartModalHost from "../components/CartModal/CartModalHost";
 import AuthModalHost from "../components/AuthModal/AuthModalHost";
-import LogoutConfirmModalHost from "../components/LogoutConfirmModal/LogoutConfirmModalHost";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import MockProvider from "../components/MockProvider/MockProvider";
 
@@ -19,28 +18,6 @@ const inter = Inter({
   variable: "--font-inter",
   display: "swap",
   preload: true,
-});
-
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  variable: "--font-montserrat",
-  display: "swap",
-  preload: false,
-});
-
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-plus-jakarta",
-  display: "swap",
-  preload: false,
-});
-
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
-  variable: "--font-roboto",
-  display: "swap",
-  preload: false,
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://znves.ru";
@@ -84,10 +61,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html
-      lang="ru"
-      className={`${inter.variable} ${roboto.variable} ${montserrat.variable} ${plusJakarta.variable}`}
-    >
+    <html lang="ru" className={inter.variable}>
       <body className={inter.className}>
         <MockProvider>
           <ToastProvider>
@@ -98,7 +72,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 {children}
                 <CartModalHost />
                 <AuthModalHost />
-                <LogoutConfirmModalHost />
                 <CookieBanner />
               </CartProvider>
             </AuthProvider>

@@ -1,13 +1,13 @@
 import { test, expect } from "@playwright/test";
 import {
-  acceptCheckoutAgreements,
   fillCheckoutPersonalData,
   mockCartItem,
+  openCartModal,
   preparePage,
 } from "../../test-utils/e2e/fixtures";
 
 test.describe("Guest purchase happy path", () => {
-  test("catalog → product → cart → checkout → payment request", async ({ page }) => {
+  test("catalog → product → cart modal → payment request", async ({ page }) => {
     await preparePage(page);
     await page.route("https://example.com/**", (route) => route.abort());
 
@@ -18,7 +18,7 @@ test.describe("Guest purchase happy path", () => {
       timeout: 15_000,
     });
     await page.getByRole("button", { name: "Добавить в корзину" }).click();
-    await expect(page.getByText("Добавлено в корзину")).toBeVisible();
+    await expect(page.getByText(/добавлено в корзину/i)).toBeVisible();
     await page.waitForFunction(() => {
       try {
         const raw = localStorage.getItem("znves:cart");
@@ -28,17 +28,14 @@ test.describe("Guest purchase happy path", () => {
       }
     });
 
-    await page.goto("/cart");
+    await openCartModal(page);
     await expect(page.getByText("T-SHIRT VOYAGE").first()).toBeVisible();
-    await page.getByRole("button", { name: "Перейти к оформлению" }).click();
-    await expect(page).toHaveURL(/\/checkout/);
 
     await fillCheckoutPersonalData(page);
     await expect(page.getByRole("button", { name: /Тверская/ })).toBeVisible({
       timeout: 15_000,
     });
     await page.getByRole("button", { name: /Тверская/ }).click();
-    await acceptCheckoutAgreements(page);
 
     const orderCreated = page.waitForResponse(
       (res) =>
@@ -55,17 +52,11 @@ test.describe("Guest purchase happy path", () => {
     await paymentStarted;
   });
 
-  test("seeded cart checkout validation requires PVZ selection path", async ({
-    page,
-  }) => {
+  test("seeded cart modal checkout submit is available", async ({ page }) => {
     await preparePage(page, { cartItems: [mockCartItem] });
-    await page.goto("/checkout");
+    await openCartModal(page);
 
     await fillCheckoutPersonalData(page);
-    await acceptCheckoutAgreements(page);
-
-    // Without selecting PVZ order may still submit with DEFAULT pvz_code —
-    // ensure button is enabled after agreements
     await expect(page.getByRole("button", { name: "Оформить заказ" })).toBeEnabled();
   });
 });

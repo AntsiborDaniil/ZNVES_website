@@ -8,7 +8,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import { getCurrentUser, logoutUser, type AuthUser } from "../api/auth/authApi";
+import { getCurrentUser, type AuthUser } from "../api/auth/authApi";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -17,15 +17,8 @@ interface AuthContextType {
   isAuthReady: boolean;
   isAuthOpen: boolean;
   authModalMode: "login" | "register";
-  isLogoutConfirmOpen: boolean;
-  isLoggingOut: boolean;
   checkAuth: (forceRefresh?: boolean) => Promise<void>;
   updateUser: (user: AuthUser | null) => void;
-  logout: () => Promise<void>;
-  /** Открыть модалку «Вы уверены?» перед выходом */
-  requestLogout: () => void;
-  confirmLogout: () => Promise<void>;
-  cancelLogout: () => void;
   openAuth: (mode?: "login" | "register") => void;
   closeAuth: () => void;
 }
@@ -71,8 +64,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [cacheFreshOnLoad, setCacheFreshOnLoad] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<"login" | "register">("login");
-  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const { user: storedUser, savedAt } = getAuthFromStorage();
@@ -130,37 +121,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const logout = useCallback(async () => {
-    try {
-      await logoutUser();
-    } finally {
-      setUser(null);
-      saveAuthToStorage(null);
-      setIsAuthOpen(false);
-      setIsLogoutConfirmOpen(false);
-      setIsLoggingOut(false);
-    }
-  }, []);
-
-  const requestLogout = useCallback(() => {
-    setIsLogoutConfirmOpen(true);
-  }, []);
-
-  const cancelLogout = useCallback(() => {
-    if (isLoggingOut) return;
-    setIsLogoutConfirmOpen(false);
-  }, [isLoggingOut]);
-
-  const confirmLogout = useCallback(async () => {
-    if (isLoggingOut) return;
-    setIsLoggingOut(true);
-    try {
-      await logout();
-    } finally {
-      setIsLoggingOut(false);
-    }
-  }, [isLoggingOut, logout]);
-
   const openAuth = useCallback((mode: "login" | "register" = "login") => {
     setAuthModalMode(mode);
     setIsAuthOpen(true);
@@ -205,14 +165,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthReady: isHydrated,
         isAuthOpen,
         authModalMode,
-        isLogoutConfirmOpen,
-        isLoggingOut,
         checkAuth,
         updateUser,
-        logout,
-        requestLogout,
-        confirmLogout,
-        cancelLogout,
         openAuth,
         closeAuth,
       }}

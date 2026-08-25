@@ -247,22 +247,7 @@ export const parseAccessToken = (cookieHeader: string | null): string | null => 
   return match?.[1] ? decodeURIComponent(match[1]) : null;
 };
 
-export const clearSession = (token: string | null): void => {
-  if (token) {
-    sessions.delete(token);
-  }
-  if (lastSessionToken && (!token || lastSessionToken === token)) {
-    sessions.delete(lastSessionToken);
-    lastSessionToken = null;
-  }
-};
-
 export const buildSessionCookies = (token: string): string[] => [
   `access-token=${encodeURIComponent(token)}; Path=/; SameSite=Lax`,
   `csrftoken=mock-csrf-token; Path=/; SameSite=Lax`,
-];
-
-export const buildClearedSessionCookies = (): string[] => [
-  `access-token=; Path=/; Max-Age=0; SameSite=Lax`,
-  `csrftoken=; Path=/; Max-Age=0; SameSite=Lax`,
 ];

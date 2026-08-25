@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { CartProvider, useCart } from "../CartContext";
 import { ToastProvider } from "../../components/ui/ToastProvider/ToastProvider";
-import type { CatalogProduct } from "../types/products";
+import type { CatalogProduct } from "../../types/products";
 
 const mockProduct: CatalogProduct = {
   id: 1,

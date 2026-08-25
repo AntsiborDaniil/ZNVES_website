@@ -64,20 +64,8 @@ body {
   background-color: var(--color-white);
 }
 
-.font-montserrat {
-  font-family: var(--font-montserrat), sans-serif;
-}
-
-.font-plus-jakarta {
-  font-family: var(--font-plus-jakarta), sans-serif;
-}
-
 .font-inter {
   font-family: var(--font-inter), sans-serif;
-}
-
-.font-roboto {
-  font-family: var(--font-roboto), sans-serif;
 }
 
 /* Скелетон загрузки ПВЗ СДЭК */
