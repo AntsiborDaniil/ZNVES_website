@@ -8,13 +8,15 @@ vi.mock("../../../mocks/config", () => ({
   shouldUseMocks: () => shouldUseMocksMock(),
 }));
 
-const stopMockWorker = vi.fn().mockResolvedValue(undefined);
 const unregisterMockServiceWorker = vi.fn().mockResolvedValue(undefined);
 const startMockWorker = vi.fn().mockResolvedValue(undefined);
 
+vi.mock("../../../mocks/unregister", () => ({
+  unregisterMockServiceWorker: (...args: unknown[]) =>
+    unregisterMockServiceWorker(...args),
+}));
+
 vi.mock("../../../mocks/browser", () => ({
-  stopMockWorker: (...args: unknown[]) => stopMockWorker(...args),
-  unregisterMockServiceWorker: (...args: unknown[]) => unregisterMockServiceWorker(...args),
   startMockWorker: (...args: unknown[]) => startMockWorker(...args),
 }));
 
@@ -26,7 +28,6 @@ describe("MockProvider", () => {
 
   beforeEach(() => {
     shouldUseMocksMock.mockReset();
-    stopMockWorker.mockClear();
     unregisterMockServiceWorker.mockClear();
     startMockWorker.mockClear();
   });
@@ -41,7 +42,6 @@ describe("MockProvider", () => {
     );
 
     await waitFor(() => {
-      expect(stopMockWorker).toHaveBeenCalledTimes(1);
       expect(unregisterMockServiceWorker).toHaveBeenCalledTimes(1);
     });
     expect(startMockWorker).not.toHaveBeenCalled();
@@ -59,7 +59,6 @@ describe("MockProvider", () => {
     await waitFor(() => {
       expect(startMockWorker).toHaveBeenCalledTimes(1);
     });
-    expect(stopMockWorker).not.toHaveBeenCalled();
     expect(unregisterMockServiceWorker).not.toHaveBeenCalled();
   });
 });

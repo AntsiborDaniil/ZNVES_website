@@ -10,21 +10,14 @@ type MockProviderProps = {
 export default function MockProvider({ children }: MockProviderProps) {
   useEffect(() => {
     if (!shouldUseMocks()) {
-      // Важно при переключении с mock → real: снять SW, иначе он продолжит
-      // перехватывать /api/auth/* и ломать вход на боевой бэкенд.
-      void import("../../mocks/browser").then(
-        ({ stopMockWorker, unregisterMockServiceWorker }) => {
-          void stopMockWorker().finally(() => {
-            void unregisterMockServiceWorker();
-          });
-        }
-      );
+      // Лёгкий unregister без импорта MSW handlers (бандл моков не тянем в prod).
+      void import("../../mocks/unregister").then(({ unregisterMockServiceWorker }) => {
+        void unregisterMockServiceWorker();
+      });
       return;
     }
 
-    void import("../../mocks/browser").then(({ startMockWorker }) =>
-      startMockWorker()
-    );
+    void import("../../mocks/browser").then(({ startMockWorker }) => startMockWorker());
   }, []);
 
   return <>{children}</>;

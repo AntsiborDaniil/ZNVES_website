@@ -5,16 +5,18 @@ import type { HomePageContent } from "../../types/home";
 
 const HOME_API_URL = `${API_BASE_URL}/api/home/`;
 
-let cache: { data: HomePageContent; timestamp: number } | null = null;
-const CACHE_DURATION = 15 * 60 * 1000;
+/** ISR cache for home content (seconds). */
+const REVALIDATE_SECONDS = 15 * 60;
+
+let memoryCache: { data: HomePageContent; timestamp: number } | null = null;
 
 export const fetchHomePage = async (): Promise<HomePageContent> => {
-  if (cache && Date.now() - cache.timestamp < CACHE_DURATION) {
-    return cache.data;
+  if (memoryCache && Date.now() - memoryCache.timestamp < REVALIDATE_SECONDS * 1000) {
+    return memoryCache.data;
   }
 
   if (shouldUseMocks()) {
-    cache = { data: MOCK_HOME_PAGE, timestamp: Date.now() };
+    memoryCache = { data: MOCK_HOME_PAGE, timestamp: Date.now() };
     return MOCK_HOME_PAGE;
   }
 
@@ -22,7 +24,7 @@ export const fetchHomePage = async (): Promise<HomePageContent> => {
     const response = await fetch(HOME_API_URL, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      cache: "no-store",
+      next: { revalidate: REVALIDATE_SECONDS },
     });
 
     if (!response.ok) {
@@ -30,7 +32,7 @@ export const fetchHomePage = async (): Promise<HomePageContent> => {
     }
 
     const data = (await response.json()) as HomePageContent;
-    cache = { data, timestamp: Date.now() };
+    memoryCache = { data, timestamp: Date.now() };
     return data;
   } catch {
     return MOCK_HOME_PAGE;

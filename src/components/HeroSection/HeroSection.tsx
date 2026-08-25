@@ -1,9 +1,5 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import styles from "./HeroSection.module.css";
-import { useScrollRestoration } from "../../hooks/useScrollRestoration";
 import Button from "../ui/Button/Button";
 import { fetchHomePage } from "../../api/home/homeApi";
 import type { HomeHero } from "../../types/home";
@@ -12,22 +8,21 @@ const HERO_MOBILE_LIGHTEN = "/images/home/hero-mobile-lighten.png";
 const HERO_MOBILE_DARKEN = "/images/home/hero-mobile-darken.png";
 
 const DEFAULT_HERO: HomeHero = {
-  desktop_image: "/images/home/hero-desktop.png",
-  mobile_image: "/images/home/hero-mobile.png",
+  desktop_image: "/images/home/hero-desktop.webp",
+  mobile_image: "/images/home/hero-mobile.webp",
   title: "NEW COLLECTION",
   cta_text: "Перейти в каталог",
   cta_href: "/catalog",
 };
 
-const HeroSection = () => {
-  useScrollRestoration();
-  const [hero, setHero] = useState<HomeHero>(DEFAULT_HERO);
-
-  useEffect(() => {
-    fetchHomePage()
-      .then((data) => setHero(data.hero))
-      .catch(() => setHero(DEFAULT_HERO));
-  }, []);
+const HeroSection = async () => {
+  let hero = DEFAULT_HERO;
+  try {
+    const data = await fetchHomePage();
+    if (data?.hero) hero = data.hero;
+  } catch {
+    hero = DEFAULT_HERO;
+  }
 
   return (
     <section className={styles.hero}>
@@ -39,8 +34,8 @@ const HeroSection = () => {
           priority
           fetchPriority="high"
           className={styles.heroBackgroundImage}
-          sizes="100vw"
-          quality={85}
+          sizes="(max-width: 768px) 1px, 100vw"
+          quality={80}
         />
         {/* Mobile: 3 слоя из Figma — фото, осветление, затемнение */}
         <div className={styles.heroMobileStack}>
@@ -49,16 +44,15 @@ const HeroSection = () => {
             alt=""
             fill
             priority
-            unoptimized
+            fetchPriority="high"
             className={styles.heroMobileMain}
             sizes="(max-width: 768px) 100vw, 0px"
+            quality={78}
           />
           <Image
             src={HERO_MOBILE_LIGHTEN}
             alt=""
             fill
-            priority
-            unoptimized
             className={styles.heroMobileLighten}
             sizes="(max-width: 768px) 100vw, 0px"
           />
@@ -66,8 +60,6 @@ const HeroSection = () => {
             src={HERO_MOBILE_DARKEN}
             alt=""
             fill
-            priority
-            unoptimized
             className={styles.heroMobileDarken}
             sizes="(max-width: 768px) 100vw, 0px"
           />

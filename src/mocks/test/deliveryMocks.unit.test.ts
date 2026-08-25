@@ -5,8 +5,8 @@ import { getMockApiBase } from "../config";
 
 describe("resolveApiImageUrl", () => {
   it("keeps local public images relative", () => {
-    expect(resolveApiImageUrl("/images/catalogs/voyage.png", "https://api.znves.ru")).toBe(
-      "/images/catalogs/voyage.png"
+    expect(resolveApiImageUrl("/images/catalogs/voyage.webp", "https://api.znves.ru")).toBe(
+      "/images/catalogs/voyage.webp"
     );
   });
 
