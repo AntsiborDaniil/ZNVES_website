@@ -271,7 +271,6 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
                     images={product.images}
                     isNew={product.isNew}
                     variant="grid"
-                    zoomOnHover
                   />
                 </Link>
               ))}

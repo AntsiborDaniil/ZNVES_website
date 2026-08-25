@@ -71,10 +71,11 @@ describe("Map", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/СДЭК · Пункты выдачи · Москва/)).toBeInTheDocument();
+      expect(screen.getByText(/СДЭК · Пункты выдачи/)).toBeInTheDocument();
     });
 
     expect(getRegionPvzCdek).toHaveBeenCalledWith("Москва", expect.any(AbortSignal));
+    expect(screen.queryByLabelText("Город для пунктов выдачи СДЭК")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Тверская/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Арбат/ })).toBeInTheDocument();
 

@@ -456,30 +456,33 @@ const CartModal = ({
               {!paymentReturnStatus && items.length === 0 && (
                 <div className={styles.emptyState}>
                   <div className={styles.emptyVisual} aria-hidden>
-                    <span className={styles.emptyRing} />
-                    <div className={styles.emptyIcon}>
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M4 7h16l-1.2 12.2A2 2 0 0 1 16.81 21H7.19a2 2 0 0 1-1.99-1.8L4 7Z"
-                          stroke="currentColor"
-                          strokeWidth="1.4"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M9 7V5.5A2.5 2.5 0 0 1 11.5 3h1A2.5 2.5 0 0 1 15 5.5V7"
-                          stroke="currentColor"
-                          strokeWidth="1.4"
-                          strokeLinecap="round"
-                        />
-                        <path
-                          d="M9.5 12.5h5"
-                          stroke="currentColor"
-                          strokeWidth="1.4"
-                          strokeLinecap="round"
-                          opacity="0.35"
-                        />
-                      </svg>
-                    </div>
+                    <svg
+                      className={styles.emptyIconSvg}
+                      width="56"
+                      height="56"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M4 7h16l-1.2 12.2A2 2 0 0 1 16.81 21H7.19a2 2 0 0 1-1.99-1.8L4 7Z"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9 7V5.5A2.5 2.5 0 0 1 11.5 3h1A2.5 2.5 0 0 1 15 5.5V7"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M9.5 12.5h5"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        strokeLinecap="round"
+                        opacity="0.35"
+                      />
+                    </svg>
                   </div>
                   <p className={styles.emptyTitle}>Корзина пуста</p>
                   <p className={styles.emptyText}>

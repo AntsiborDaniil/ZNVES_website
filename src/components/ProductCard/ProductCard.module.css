@@ -62,8 +62,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-red);
-  color: var(--color-white);
+  background-color: #b40000;
+  color: #ffffff;
   border-radius: var(--radius-badge);
   font-family: var(--font-family);
   font-weight: var(--font-weight-light);
@@ -71,6 +71,11 @@
   line-height: var(--line-height-12);
   letter-spacing: var(--letter-spacing-tight);
   text-transform: uppercase;
+  z-index: 2;
+  isolation: isolate;
+  filter: none !important;
+  mix-blend-mode: normal;
+  -webkit-font-smoothing: antialiased;
 }
 
 .productInfo {

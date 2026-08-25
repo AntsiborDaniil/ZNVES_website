@@ -450,15 +450,22 @@ const CheckoutForm = ({
     });
   }, [items, initialColors]);
 
-  // Устанавливаем город "Москва" при выборе курьерской доставки
+  // Яндекс ПВЗ и курьер — город всегда Москва
   useEffect(() => {
-    if (formData.deliveryMethod === "yandex") {
-      setFormData((prev) => ({
-        ...prev,
-        city: "Москва",
-      }));
-    }
-  }, [formData.deliveryMethod]);
+    const isYandexPickup =
+      formData.deliveryType === "yandex" && formData.deliveryMethod === "pickup";
+    const isYandexCourier = formData.deliveryMethod === "yandex";
+    if (!isYandexPickup && !isYandexCourier) return;
+
+    setFormData((prev) => {
+      if (isYandexCourier) {
+        if (prev.city === "Москва") return prev;
+        return { ...prev, city: "Москва" };
+      }
+      if (prev.pickupCity === "Москва") return prev;
+      return { ...prev, pickupCity: "Москва" };
+    });
+  }, [formData.deliveryType, formData.deliveryMethod]);
 
   // Стоимость доставки: ПВЗ — всегда бесплатно; курьер Яндекс — из расчёта B2B API
   const deliveryPrice = useMemo(() => {
@@ -513,11 +520,15 @@ const CheckoutForm = ({
   }, [isModalCourier, formData.deliveryType]);
 
   const modalSummaryCity = useMemo(() => {
-    const city = isModalPickup
-      ? formData.pickupCity || "Москва"
-      : formData.city || "Москва";
+    const isYandex =
+      formData.deliveryType === "yandex" || formData.deliveryMethod === "yandex";
+    const city = isYandex
+      ? "Москва"
+      : isModalPickup
+        ? formData.pickupCity || "Москва"
+        : formData.city || "Москва";
     return `Россия, г ${city}`;
-  }, [isModalPickup, formData.pickupCity, formData.city]);
+  }, [isModalPickup, formData.pickupCity, formData.city, formData.deliveryType, formData.deliveryMethod]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ru-RU", {
@@ -690,7 +701,8 @@ const CheckoutForm = ({
         ...prev,
         deliveryType: "yandex",
         deliveryMethod: "pickup",
-        ...(!prev.pickupCity?.trim() ? { pickupCity: "Москва" } : {}),
+        pickupCity: "Москва",
+        city: "Москва",
       }));
     } else {
       setFormData((prev) => ({
@@ -698,6 +710,7 @@ const CheckoutForm = ({
         deliveryType: "yandex",
         deliveryMethod: "yandex",
         city: "Москва",
+        pickupCity: "Москва",
         deliveryFirstName: prev.deliveryFirstName || prev.firstName,
         deliveryLastName: prev.deliveryLastName || prev.lastName,
       }));
@@ -758,11 +771,36 @@ const CheckoutForm = ({
     // Если выбран пункт выдачи, сохраняем адрес ПВЗ в форму (инпут «Адрес пункта выдачи»).
     // mapSearchValue не меняем — карта не должна центрироваться/телепортироваться при выборе ПВЗ.
     if (formData.deliveryMethod === "pickup") {
+      // Смена города из виджета СДЭК (без выбора ПВЗ)
+      if (
+        addressData.city &&
+        !addressData.pvzCode &&
+        !addressData.pvzId &&
+        !addressData.pvzAddress
+      ) {
+        const nextCity = addressData.city.trim();
+        setFormData((prev) => ({
+          ...prev,
+          pickupCity: nextCity || prev.pickupCity,
+          city: nextCity || prev.city,
+          pvzAddress: "",
+        }));
+        setPvzAddressInputValue("");
+        pvzAddressLatestRef.current = "";
+        setPvzCode("");
+        setPvzId("");
+        setSelectedPvzCoords(null);
+        setShowContinueButtonAgain(false);
+        return;
+      }
+
       const pvzAddr = addressData.pvzAddress || fullAddress || "";
+      const isYandexPickup = formData.deliveryType === "yandex";
       setFormData((prev) => ({
         ...prev,
         pvzAddress: pvzAddr,
-        city: addressData.city || prev.city,
+        city: isYandexPickup ? "Москва" : addressData.city || prev.city,
+        pickupCity: isYandexPickup ? "Москва" : addressData.city || prev.pickupCity,
       }));
       setPvzAddressInputValue(pvzAddr);
       pvzAddressLatestRef.current = pvzAddr;
@@ -785,7 +823,7 @@ const CheckoutForm = ({
     } else {
       // Для курьерской доставки сохраняем полный адрес только в форме заказа. delivery-data вызывается только в личном кабинете.
       const newAddress = {
-        city: addressData.city || "",
+        city: "Москва",
         street: addressData.street || "",
         house: addressData.house || "",
       };
@@ -1305,14 +1343,17 @@ const CheckoutForm = ({
         deliveryService = "yandex";
       }
 
-      // Формируем полный адрес (для ПВЗ учитываем ещё не применённый debounce)
+      // Формируем полный адрес (для ПВЗ учитываем ещё не применённый debounce).
+      // Яндекс ПВЗ и курьер — только Москва.
+      const isYandexService = deliveryService === "yandex" || deliveryService === "yandex_courier";
+      const orderCity = isYandexService ? "Москва" : (formData.city || formData.pickupCity || "Москва");
       const effectivePvzAddress = formData.deliveryMethod === "pickup"
         ? (pvzAddressLatestRef.current || formData.pvzAddress || "")
         : "";
       const fullAddress = formData.deliveryMethod === "pickup"
         ? effectivePvzAddress
         : [
-            formData.city,
+            orderCity,
             formData.street,
             formData.house,
             formData.apartment && `кв. ${formData.apartment}`,
@@ -1502,14 +1543,14 @@ const CheckoutForm = ({
           lastName: formData.deliveryLastName || formData.lastName,
           email: formData.deliveryEmail || formData.email,
           phone: formData.deliveryPhone || formData.phone || formData.email,
-          city: formData.city,
+          city: isYandexService ? "Москва" : formData.city,
           street: formData.street,
           house: formData.house,
           apartment: formData.apartment,
           floor: formData.floor,
           entrance: formData.entrance,
           intercom: formData.intercom,
-          pickupCity: formData.pickupCity,
+          pickupCity: isYandexService ? "Москва" : formData.pickupCity,
           postalCode: formData.postalCode,
           pvzAddress: formData.deliveryMethod === "pickup" ? (pvzAddressLatestRef.current || formData.pvzAddress) : formData.pvzAddress,
           type: formData.deliveryType,

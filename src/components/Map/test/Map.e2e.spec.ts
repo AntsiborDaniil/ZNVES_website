@@ -8,9 +8,11 @@ test.describe("Checkout delivery widgets (cart modal)", () => {
   });
 
   test("shows CDEK PVZ list by default", async ({ page }) => {
-    await expect(page.getByText("СДЭК · Пункты выдачи ·")).toBeVisible({
+    await expect(page.getByText("СДЭК · Пункты выдачи")).toBeVisible({
       timeout: 15_000,
     });
+    await expect(page.getByLabel("Город", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("Город для пунктов выдачи СДЭК")).toHaveCount(0);
     await expect(page.getByLabel("Поиск по адресу ПВЗ")).toBeVisible();
     await expect(page.getByRole("button", { name: /Тверская/ })).toBeVisible();
   });

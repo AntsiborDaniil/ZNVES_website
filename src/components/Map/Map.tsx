@@ -133,7 +133,22 @@ const Map = ({
   /** Показывать скелетон «Загрузка пунктов…» для виджета Яндекса ПВЗ */
   const [yandexWidgetLoading, setYandexWidgetLoading] = useState(false);
 
-  const city = (cityProp || "Москва").trim() || "Москва";
+  const cityFromProp = (cityProp || "Москва").trim() || "Москва";
+  /** Для СДЭК город берём из формы сверху; список ПВЗ обновляем через 2 сек после ввода */
+  const [city, setCity] = useState(cityFromProp);
+
+  useEffect(() => {
+    if (!isPickupCdek) {
+      setCity(cityFromProp);
+      return;
+    }
+    if (cityFromProp === city) return;
+    const timer = window.setTimeout(() => {
+      setCdekPvzSearch("");
+      setCity(cityFromProp);
+    }, 2000);
+    return () => window.clearTimeout(timer);
+  }, [cityFromProp, city, isPickupCdek]);
 
   // Конфиг Яндекса нужен только для ПВЗ Яндекса / курьера — не дергаем API на СДЭК.
   useEffect(() => {
@@ -700,14 +715,22 @@ const Map = ({
             background: "#fafafa",
           }}
         >
-          <div style={{ padding: "12px 14px", borderBottom: "1px solid #e5e5e5", display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
+          <div
+            style={{
+              padding: "12px 14px",
+              borderBottom: "1px solid #e5e5e5",
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+            }}
+          >
             <span style={{ fontWeight: 600, color: "#333" }}>
-              СДЭК · Пункты выдачи · {city}
+              СДЭК · Пункты выдачи
             </span>
           </div>
 
           {cdekPvzLoading && (
-            <div style={{ padding: "0 12px 12px" }}>
+            <div style={{ padding: "12px 12px 12px" }}>
               <div
                 className="cdekPvzSkeletonLine"
                 style={{ height: 42, marginBottom: 12 }}
@@ -780,14 +803,14 @@ const Map = ({
                   В этом городе пока нет пунктов выдачи СДЭК
                 </p>
                 <p style={{ margin: "8px 0 0", fontSize: 14, color: "#737373", lineHeight: 1.4, maxWidth: 320 }}>
-                  Попробуйте указать другой город или выберите доставку курьером
+                  Попробуйте указать другой город выше
                 </p>
               </div>
             </div>
           )}
 
           {!cdekPvzLoading && cdekPvzList.length > 0 && (
-            <div style={{ padding: "0 12px 12px" }}>
+            <div style={{ padding: "16px 12px 12px" }}>
               <input
                 type="text"
                 placeholder="Поиск по адресу ПВЗ"
@@ -796,11 +819,13 @@ const Map = ({
                 style={{
                   width: "100%",
                   padding: "10px 12px",
+                  marginTop: 0,
                   marginBottom: 10,
                   border: "1px solid #e5e5e5",
                   borderRadius: 8,
                   fontSize: 14,
                   boxSizing: "border-box",
+                  background: "#fff",
                 }}
                 aria-label="Поиск по адресу ПВЗ"
               />

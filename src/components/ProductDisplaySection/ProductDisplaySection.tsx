@@ -18,7 +18,7 @@ import styles from "./ProductDisplaySection.module.css";
 import type { CatalogProduct } from "../../types/products";
 import { fetchNewInProducts, fetchAllCatalogProducts } from "../../api/home/catalogApi";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode } from "swiper/modules";
+import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import type { Swiper as SwiperInstance } from "swiper";
@@ -228,7 +228,7 @@ const ProductDisplaySection = ({
             Swiper as ComponentType<Record<string, unknown>>,
             {
               className: styles.slider,
-              modules: [FreeMode],
+              modules: [FreeMode, Mousewheel],
               loop: enableLoop,
               spaceBetween,
               slidesPerView: maxVisible,
@@ -240,6 +240,11 @@ const ProductDisplaySection = ({
               resistanceRatio: 0.65,
               allowTouchMove: true,
               watchOverflow: true,
+              mousewheel: {
+                forceToAxis: true,
+                sensitivity: 0.85,
+                releaseOnEdges: true,
+              },
               freeMode: {
                 enabled: true,
                 momentum: true,

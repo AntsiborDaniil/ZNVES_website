@@ -16,7 +16,7 @@ test.describe("Checkout flows (cart modal)", () => {
   test("completes CDEK PVZ order and requests payment", async ({ page }) => {
     await fillCheckoutPersonalData(page);
 
-    await expect(page.getByText("СДЭК · Пункты выдачи ·")).toBeVisible({
+    await expect(page.getByText("СДЭК · Пункты выдачи")).toBeVisible({
       timeout: 15_000,
     });
     await page.getByRole("button", { name: /Тверская/ }).click();

@@ -19,6 +19,9 @@
   border: none;
   border-radius: 0;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .closeButton {
@@ -61,6 +64,7 @@
   line-height: var(--line-height-20);
   letter-spacing: var(--letter-spacing-tight);
   color: var(--color-grey-4);
+  text-align: center;
   white-space: pre-wrap;
   word-break: break-word;
 }
@@ -69,6 +73,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
 }
 
 .primaryButton {

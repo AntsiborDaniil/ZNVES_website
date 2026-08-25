@@ -191,8 +191,8 @@
   top: -47px;
   right: 26px;
   padding: 8px 14px;
-  background-color: #525252;
-  color: #f2f0ec;
+  background-color: #b40000;
+  color: #ffffff;
 
   font-weight: 400;
   font-size: 22.29px;
@@ -202,6 +202,8 @@
 
   text-transform: lowercase;
   border-radius: 4px;
+  filter: none !important;
+  mix-blend-mode: normal;
 }
 
 .catalogCardImage {

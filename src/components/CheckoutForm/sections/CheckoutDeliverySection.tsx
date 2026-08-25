@@ -142,6 +142,11 @@ export default function CheckoutDeliverySection({
     isModalPickup &&
     (deliveryType === "cdek" || deliveryType === "yandex");
 
+  /** Яндекс ПВЗ и курьер — только Москва */
+  const cityLockedToMoscow =
+    modalDeliveryOption === "yandex_pickup" || modalDeliveryOption === "yandex_courier";
+  const displayCity = cityLockedToMoscow ? "Москва" : pickupCity;
+
   const pvzPointerDown =
     isCartMobilePvz && deliveryMethod === "pickup" && pvzAddress.trim()
       ? onShowContinueButtonAgain
@@ -161,15 +166,16 @@ export default function CheckoutDeliverySection({
               id={isModalCourier ? "city" : "pickupCity"}
               name={isModalCourier ? "city" : "pickupCity"}
               placeholder="Город"
-              value={isModalCourier ? "Москва" : pickupCity}
+              value={displayCity}
               onChange={onInputChange}
-              readOnly={isModalCourier}
-              className={styles.input}
+              disabled={cityLockedToMoscow}
+              readOnly={cityLockedToMoscow}
+              className={`${styles.input} ${cityLockedToMoscow ? styles.inputDisabled : ""}`}
               autoComplete="address-level2"
             />
           </div>
           <p className={styles.modalCityHint}>
-            Россия, г {isModalCourier ? "Москва" : pickupCity || "Москва"}
+            Россия, г {displayCity || "Москва"}
           </p>
         </div>
         <div className={styles.modalDeliveryOptions}>
@@ -392,7 +398,7 @@ export default function CheckoutDeliverySection({
             {showMap && (
               <MapLazy
                 key={`${deliveryType}-${deliveryMethod}`}
-                city={pickupCity}
+                city={cityLockedToMoscow ? "Москва" : pickupCity}
                 onAddressSelect={onAddressSelect}
                 onPvzListLoaded={onPvzListLoaded}
                 onCdekDeliveryEstimate={onCdekDeliveryEstimate}

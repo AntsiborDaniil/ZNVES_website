@@ -1810,6 +1810,14 @@ textarea.input::placeholder {
   font-size: var(--font-size-14);
 }
 
+.inputDisabled,
+.input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  color: var(--color-grey-3);
+  background: var(--color-grey-6, #f0f0f0);
+}
+
 .deliveryTypeRow {
   gap: 14px;
 }

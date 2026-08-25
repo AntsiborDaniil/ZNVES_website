@@ -439,15 +439,13 @@
   min-height: min(520px, calc(100vh - 120px));
   padding: 56px 40px;
   text-align: center;
-  background:
-    radial-gradient(ellipse 70% 45% at 50% 28%, rgba(0, 0, 0, 0.025), transparent 70%);
-  animation: emptyStateIn 0.45s ease-out;
+  animation: emptyStateIn 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes emptyStateIn {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(18px);
   }
   to {
     opacity: 1;
@@ -457,56 +455,30 @@
 
 .emptyVisual {
   position: relative;
-  width: 112px;
-  height: 112px;
+  width: 56px;
+  height: 56px;
   margin-bottom: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--color-black);
+  animation: emptyIconFloat 3.2s ease-in-out infinite;
 }
 
-.emptyRing {
-  position: absolute;
-  inset: 0;
-  border: 1px solid var(--color-grey-5);
-  border-radius: 50%;
-  animation: emptyRingPulse 2.4s ease-in-out infinite;
-}
-
-@keyframes emptyRingPulse {
+@keyframes emptyIconFloat {
   0%,
   100% {
-    transform: scale(1);
-    opacity: 1;
+    transform: translateY(0);
+    opacity: 0.88;
   }
   50% {
-    transform: scale(1.06);
-    opacity: 0.55;
+    transform: translateY(-6px);
+    opacity: 1;
   }
 }
 
-.emptyIcon {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 72px;
-  height: 72px;
-  margin-bottom: 0;
-  border: 1px solid var(--color-grey-5);
-  background: #fff;
-  color: var(--color-black);
-  transition: transform 0.25s ease, border-color 0.25s ease;
-}
-
-.emptyState:hover .emptyIcon {
-  transform: scale(1.04);
-  border-color: var(--color-black);
-}
-
-.emptyState:hover .emptyRing {
-  border-color: var(--color-grey-4);
+.emptyIconSvg {
+  display: block;
 }
 
 .emptyTitle {
@@ -518,6 +490,7 @@
   letter-spacing: var(--letter-spacing-tight);
   text-transform: uppercase;
   color: var(--color-black);
+  animation: emptyFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both;
 }
 
 .emptyText {
@@ -529,10 +502,23 @@
   line-height: var(--line-height-20);
   letter-spacing: var(--letter-spacing-tight);
   color: var(--color-grey-4);
+  animation: emptyFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
 }
 
 .emptyCta {
   min-width: 200px;
+  animation: emptyFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
+}
+
+@keyframes emptyFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .paymentBlock {
@@ -729,19 +715,14 @@
   }
 
   .emptyVisual {
-    width: 96px;
-    height: 96px;
+    width: 48px;
+    height: 48px;
     margin-bottom: 22px;
   }
 
-  .emptyIcon {
-    width: 64px;
-    height: 64px;
-  }
-
-  .emptyIcon svg {
-    width: 34px;
-    height: 34px;
+  .emptyIconSvg {
+    width: 48px;
+    height: 48px;
   }
 
   .emptyTitle {
