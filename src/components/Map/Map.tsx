@@ -869,7 +869,10 @@ const Map = ({
           width: "100%",
           minHeight: yaWidgetHeightPx,
           height: yaWidgetHeightPx,
+          maxHeight: yaWidgetHeightPx,
           position: "relative",
+          overflow: "hidden",
+          isolation: "isolate",
         }}
       >
         {yandexWidgetLoading && (
@@ -893,11 +896,23 @@ const Map = ({
         )}
         <div
           ref={containerRef}
-          style={{ width: "100%", height: yaWidgetHeightPx, minHeight: yaWidgetHeightPx }}
+          style={{
+            width: "100%",
+            height: yaWidgetHeightPx,
+            minHeight: yaWidgetHeightPx,
+            maxHeight: yaWidgetHeightPx,
+            overflow: "hidden",
+          }}
         >
           <div
             id={CONTAINER_ID}
-            style={{ width: "100%", height: yaWidgetHeightPx, minHeight: yaWidgetHeightPx }}
+            style={{
+              width: "100%",
+              height: yaWidgetHeightPx,
+              minHeight: yaWidgetHeightPx,
+              maxHeight: yaWidgetHeightPx,
+              overflow: "hidden",
+            }}
           />
         </div>
       </div>

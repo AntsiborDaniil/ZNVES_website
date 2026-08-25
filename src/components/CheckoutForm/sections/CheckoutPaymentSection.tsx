@@ -11,8 +11,11 @@ export interface CheckoutPaymentSectionProps {
   courierAvailable: boolean;
   isSubmitting: boolean;
   itemsSubtotal: number;
+  itemsSubtotalOriginal: number;
   deliveryPrice: number;
   totalAmount: number;
+  totalAmountOriginal: number;
+  hasPromoDiscount: boolean;
   isCourierPriceLoading: boolean;
   modalDeliverySummaryLabel: string;
   modalSummaryCity: string | null;
@@ -36,8 +39,11 @@ export default function CheckoutPaymentSection({
   courierAvailable,
   isSubmitting,
   itemsSubtotal,
+  itemsSubtotalOriginal,
   deliveryPrice,
   totalAmount,
+  totalAmountOriginal,
+  hasPromoDiscount,
   isCourierPriceLoading,
   modalDeliverySummaryLabel,
   modalSummaryCity,
@@ -126,7 +132,19 @@ export default function CheckoutPaymentSection({
 
       <div className={styles.orderSummaryBlock}>
         <div className={styles.modalOrderSummary}>
-          <p className={styles.modalSummaryLine}>Сумма: {formatPrice(itemsSubtotal)}</p>
+          <p className={styles.modalSummaryLine}>
+            Сумма:{" "}
+            {hasPromoDiscount ? (
+              <>
+                <span className={styles.modalSummaryTotalOld}>
+                  {formatPrice(itemsSubtotalOriginal)}
+                </span>
+                {formatPrice(itemsSubtotal)}
+              </>
+            ) : (
+              formatPrice(itemsSubtotal)
+            )}
+          </p>
           <p className={styles.modalSummaryLine}>
             {modalDeliverySummaryLabel}:{" "}
             {isCourierPriceLoading
@@ -139,7 +157,17 @@ export default function CheckoutPaymentSection({
             <p className={styles.modalSummaryLocation}>{modalSummaryCity}</p>
           )}
           <p className={styles.modalSummaryLineTotal}>
-            Итоговая сумма: {formatPrice(totalAmount)}
+            Итоговая сумма:{" "}
+            {hasPromoDiscount ? (
+              <>
+                <span className={styles.modalSummaryTotalOld}>
+                  {formatPrice(totalAmountOriginal)}
+                </span>
+                {formatPrice(totalAmount)}
+              </>
+            ) : (
+              formatPrice(totalAmount)
+            )}
           </p>
         </div>
         <button

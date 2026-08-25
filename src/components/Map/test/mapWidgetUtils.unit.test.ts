@@ -135,7 +135,8 @@ describe("resolveYaWidgetSize", () => {
     const size = resolveYaWidgetSize(el);
     expect(size.width).toBe("360px");
     expect(size.widthPx).toBe(360);
-    expect(size.heightPx).toBeGreaterThanOrEqual(560);
+    expect(size.heightPx).toBeGreaterThanOrEqual(540);
+    expect(size.heightPx).toBeLessThanOrEqual(620);
     expect(size.height).toBe(`${size.heightPx}px`);
   });
 

@@ -705,9 +705,11 @@ textarea.input::placeholder {
 .checkoutMapContainer {
   width: 100%;
   border-radius: 3px;
-  overflow: visible;
+  /* Виджет Яндекса не должен наезжать на промокод/оплату */
+  overflow: hidden;
   position: relative;
-  z-index: 1;
+  z-index: 0;
+  isolation: isolate;
 }
 
 .checkoutMapContainerCourier {
@@ -726,13 +728,17 @@ textarea.input::placeholder {
 }
 
 @media (max-width: 768px) {
+  /* Высота задаётся Map (size YaDelivery) — не раздуваем height:auto наружу */
   .checkoutMapContainer :global(#delivery-widget) {
-    min-height: 560px;
-    height: auto;
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
   }
 
   .checkoutMapContainer :global(.ymaps-2-1-79-map) {
-    min-height: 320px;
+    min-height: 0;
     height: 100%;
   }
 }
@@ -744,10 +750,8 @@ textarea.input::placeholder {
     display: none !important;
   }
 
-  /* Не обрезаем кнопку «Выбрать» у виджета Яндекса */
   .checkoutMapContainer:not(.checkoutMapContainerCourier) {
-    overflow: visible;
-    min-height: 560px;
+    overflow: hidden;
   }
 
   .hideContinueButton .checkoutMapContainer :global(#delivery-widget button) {
@@ -1615,11 +1619,13 @@ textarea.input::placeholder {
   }
 
   .orderSummaryBlock {
+    /* Модалка: итог → кнопка → оферта всегда столбиком, не в ряд */
     display: flex;
-    justify-content: space-between;
-    gap: 60px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 0;
     width: 100%;
-    align-items: center;
   }
 
   .paymentButton {
@@ -1644,7 +1650,7 @@ textarea.input::placeholder {
 @media (max-width: 768px) {
   .orderSummaryBlock {
     flex-direction: column;
-    align-items: normal;
+    align-items: stretch;
     gap: 0;
   }
 
@@ -1920,6 +1926,15 @@ textarea.input::placeholder {
 .orderSummaryBlock {
   border-top: none;
   padding-top: 8px;
+  position: relative;
+  z-index: 2;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0;
+  width: 100%;
 }
 
 .summaryRowTotal {
@@ -1933,12 +1948,15 @@ textarea.input::placeholder {
 
 .submitButton,
 .submitButtonRight {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+  max-width: none;
   height: 44px;
   margin-top: 24px;
+  margin-left: 0;
+  margin-right: 0;
   padding: 0 20px;
   background: var(--color-black) !important;
   color: var(--color-white) !important;
@@ -1956,6 +1974,8 @@ textarea.input::placeholder {
     color 0.2s ease,
     border-color 0.2s ease,
     transform 0.15s ease;
+  flex-shrink: 0;
+  align-self: stretch;
 }
 
 .submitButton:hover:not(:disabled),
@@ -1994,7 +2014,8 @@ textarea.input::placeholder {
 
 @media (max-width: 768px) {
   .checkoutMapContainer:not(.checkoutMapContainerCourier) {
-    min-height: 560px;
+    /* Высоту задаёт Map под size YaDelivery — без лишнего min-height наружу */
+    min-height: 0;
   }
 }
 
@@ -2189,6 +2210,9 @@ textarea.input::placeholder {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  position: relative;
+  z-index: 2;
+  background: #fff;
 }
 
 .modalPromoLabel {
@@ -2295,7 +2319,18 @@ textarea.input::placeholder {
   align-items: flex-end;
   gap: 6px;
   width: 100%;
+  flex-shrink: 0;
   margin-bottom: 8px;
+}
+
+.modalAgreement {
+  margin: 12px 0 0;
+  width: 100%;
+  flex-shrink: 0;
+  text-align: center;
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-20);
+  color: var(--color-black);
 }
 
 .modalSummaryLine,
@@ -2314,6 +2349,14 @@ textarea.input::placeholder {
   font-weight: var(--font-weight-medium);
 }
 
+.modalSummaryTotalOld {
+  margin-right: 8px;
+  font-size: inherit;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-grey-4);
+  text-decoration: line-through;
+}
+
 .modalSummaryLocation {
   margin: 0;
   width: 100%;
@@ -2321,14 +2364,6 @@ textarea.input::placeholder {
   font-size: var(--font-size-14);
   line-height: var(--line-height-20);
   color: var(--color-grey-4);
-}
-
-.modalAgreement {
-  margin: 12px 0 0;
-  text-align: center;
-  font-size: var(--font-size-14);
-  line-height: var(--line-height-20);
-  color: var(--color-black);
 }
 
 .modalAgreementLink {
@@ -2485,8 +2520,9 @@ textarea.input::placeholder {
 
   .checkoutMapContainer,
   .checkoutMapContainerCourier {
-    min-height: 400px;
+    min-height: 0;
     height: auto;
+    overflow: hidden;
   }
 
   .modalOrderSummary {
@@ -2511,19 +2547,19 @@ textarea.input::placeholder {
 
   .submitButton,
   .submitButtonRight {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
-    /* Figma mobile: 353×44, в рамках паддингов экрана, без bleed */
     width: 100%;
-    max-width: 353px;
-    margin-left: auto;
-    margin-right: auto;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
     margin-top: 0;
     height: 44px;
     padding: 0 20px;
     line-height: var(--line-height-20);
     text-align: center;
+    align-self: stretch;
   }
 
   .modalAgreement {

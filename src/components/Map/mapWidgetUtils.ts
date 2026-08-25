@@ -149,15 +149,18 @@ export function resolveYaWidgetSize(container?: HTMLElement | null): {
   widthPx: number;
 } {
   const viewportH =
-    typeof window !== "undefined" ? window.innerHeight || 800 : 800;
+    typeof window !== "undefined"
+      ? window.visualViewport?.height || window.innerHeight || 800
+      : 800;
   const measuredWidth =
     container?.clientWidth ||
     (typeof window !== "undefined" ? window.innerWidth || 400 : 400);
   const widthPx = Math.max(280, Math.round(measuredWidth));
   const isCompact = widthPx < 768;
-  // На мобилке 450px обрезает панель ПВЗ с кнопкой «Выбрать».
+  // Компакт: высота = карта + нижняя панель «Я Доставка» с «Продолжить».
+  // Держим внутри контейнера (overflow:hidden), без наезда на промокод.
   const heightPx = isCompact
-    ? Math.round(Math.min(Math.max(viewportH * 0.62, 560), 720))
+    ? Math.round(Math.min(Math.max(viewportH * 0.56, 540), 620))
     : 450;
 
   return {

@@ -489,21 +489,22 @@ const CheckoutForm = ({
   );
 
   // Расчет итоговой суммы (с учётом промокода и доставки)
-  const totalAmount = useMemo(() => {
-    let itemsTotal = getTotalPrice();
-    if (appliedPromo) {
-      itemsTotal = Math.max(0, itemsTotal - parseFloat(appliedPromo.discount));
-    }
-    return itemsTotal + deliveryPrice;
-  }, [getTotalPrice, appliedPromo, deliveryPrice]);
+  const itemsSubtotalOriginal = useMemo(() => getTotalPrice(), [getTotalPrice]);
 
   const itemsSubtotal = useMemo(() => {
-    let total = getTotalPrice();
-    if (appliedPromo) {
-      total = Math.max(0, total - parseFloat(appliedPromo.discount));
-    }
-    return total;
-  }, [getTotalPrice, appliedPromo]);
+    if (!appliedPromo) return itemsSubtotalOriginal;
+    return Math.max(0, itemsSubtotalOriginal - parseFloat(appliedPromo.discount));
+  }, [itemsSubtotalOriginal, appliedPromo]);
+
+  const totalAmountOriginal = useMemo(
+    () => itemsSubtotalOriginal + deliveryPrice,
+    [itemsSubtotalOriginal, deliveryPrice]
+  );
+
+  const totalAmount = useMemo(
+    () => itemsSubtotal + deliveryPrice,
+    [itemsSubtotal, deliveryPrice]
+  );
 
   const modalDeliverySummaryLabel = useMemo(() => {
     if (isModalCourier) return "Доставка Яндекс курьером";
@@ -1646,8 +1647,11 @@ const CheckoutForm = ({
             courierAvailable={courierAvailable}
             isSubmitting={isSubmitting}
             itemsSubtotal={itemsSubtotal}
+            itemsSubtotalOriginal={itemsSubtotalOriginal}
             deliveryPrice={deliveryPrice}
             totalAmount={totalAmount}
+            totalAmountOriginal={totalAmountOriginal}
+            hasPromoDiscount={Boolean(appliedPromo)}
             isCourierPriceLoading={isCourierPriceLoading}
             modalDeliverySummaryLabel={modalDeliverySummaryLabel}
             modalSummaryCity={modalSummaryCity}
