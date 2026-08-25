@@ -134,8 +134,10 @@ const Map = ({
 
   const city = (cityProp || "Москва").trim() || "Москва";
 
-  // Загрузка конфига доставки с сервера — на проде env задаётся в настройках хоста
+  // Конфиг Яндекса нужен только для ПВЗ Яндекса / курьера — не дергаем API на СДЭК.
   useEffect(() => {
+    if (!isPickupYandex && !isCourier) return;
+
     let cancelled = false;
     const timeout = setTimeout(() => {
       if (cancelled) return;
@@ -159,7 +161,7 @@ const Map = ({
       cancelled = true;
       clearTimeout(timeout);
     };
-  }, []);
+  }, [isPickupYandex, isCourier]);
 
   const cdekPvzFiltered = filterCdekPvzPoints(cdekPvzList, cdekPvzSearch);
 

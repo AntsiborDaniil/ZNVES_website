@@ -28,7 +28,7 @@ export const MOCK_INITIAL_ORDERS: ApiMyOrderItem[] = [
         color: "black",
         size: "m",
         quantity: 1,
-        product_image: "/images/catalogs/mock/ski-suit-1.png",
+        product_image: "/images/catalogs/mock/ski-suit-1.webp",
       },
       {
         id: "a1b2c3d4-e5f6-4789-a012-3456789abc02",
@@ -68,7 +68,7 @@ export const MOCK_INITIAL_ORDERS: ApiMyOrderItem[] = [
         color: "black",
         size: "os",
         quantity: 1,
-        product_image: "/images/catalogs/mock/bag-1.png",
+        product_image: "/images/catalogs/mock/bag-1.webp",
       },
     ],
     delivery_data: {
@@ -91,7 +91,7 @@ export const MOCK_INITIAL_ORDERS: ApiMyOrderItem[] = [
         color: "navy",
         size: "l",
         quantity: 1,
-        product_image: "/images/catalogs/mock/ski-suit-2.png",
+        product_image: "/images/catalogs/mock/ski-suit-2.webp",
       },
       {
         id: "c1b2c3d4-e5f6-4789-a012-3456789abc06",
@@ -131,7 +131,7 @@ export const MOCK_INITIAL_ORDERS: ApiMyOrderItem[] = [
         color: "beige",
         size: "os",
         quantity: 1,
-        product_image: "/images/catalogs/mock/bag-low-1.png",
+        product_image: "/images/catalogs/mock/bag-low-1.webp",
       },
     ],
     delivery_data: {

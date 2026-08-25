@@ -60,18 +60,25 @@ export const CollectionBanner = ({
 
 type CollectionBannersProps = {
   id?: string;
+  items?: HomeCollection[];
 };
 
-const CollectionBanners = ({ id = "collections" }: CollectionBannersProps) => {
-  const [items, setItems] = useState<HomeCollection[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+const CollectionBanners = ({
+  id = "collections",
+  items: itemsProp,
+}: CollectionBannersProps) => {
+  const hasServerData = itemsProp != null;
+  const [items, setItems] = useState<HomeCollection[]>(itemsProp ?? []);
+  const [isLoading, setIsLoading] = useState(!hasServerData);
 
   useEffect(() => {
+    if (hasServerData) return;
+
     fetchHomePage()
       .then((data) => setItems(data.collections))
       .catch(() => setItems([]))
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [hasServerData]);
 
   if (isLoading) {
     return (

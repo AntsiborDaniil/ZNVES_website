@@ -603,8 +603,6 @@ const CartModal = ({
                     <CheckoutForm
                       onOrderSubmit={handleOrderSubmit}
                       onOrderError={(message) => setOrderError(message)}
-                      showRightColumn={false}
-                      variant="modal"
                       initialColorSlugToLabel={colorSlugToLabel}
                       modalPromo={{
                         value: promoInputValue,

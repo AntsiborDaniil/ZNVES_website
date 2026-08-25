@@ -3,17 +3,15 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import NavigationTracker from "../components/NavigationTracker/NavigationTracker";
-import PreloadCatalogFilters from "../components/PreloadCatalogFilters/PreloadCatalogFilters";
 import { CartProvider } from "../contexts/CartContext";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ToastProvider } from "../components/ui/ToastProvider/ToastProvider";
-import CartModalHost from "../components/CartModal/CartModalHost";
-import AuthModalHost from "../components/AuthModal/AuthModalHost";
+import ClientModalHosts from "../components/ClientModalHosts/ClientModalHosts";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import MockProvider from "../components/MockProvider/MockProvider";
 
 const inter = Inter({
-  subsets: ["latin", "cyrillic", "cyrillic-ext"],
+  subsets: ["latin", "cyrillic"],
   weight: ["300", "400", "500", "700"],
   variable: "--font-inter",
   display: "swap",
@@ -68,10 +66,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <AuthProvider>
               <CartProvider>
                 <NavigationTracker />
-                <PreloadCatalogFilters />
                 {children}
-                <CartModalHost />
-                <AuthModalHost />
+                <ClientModalHosts />
                 <CookieBanner />
               </CartProvider>
             </AuthProvider>

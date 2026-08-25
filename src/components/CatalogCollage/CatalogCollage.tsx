@@ -16,6 +16,8 @@ type CatalogCollageProps = {
   id?: string;
   title?: string;
   moreHref?: string;
+  products?: CatalogProduct[];
+  featuredImage?: string;
 };
 
 const DEFAULT_FEATURED_IMAGE = "/images/home/collage-featured.png";
@@ -24,12 +26,21 @@ const CatalogCollage = ({
   id = "catalog-section",
   title = "Catalog",
   moreHref = "/catalog",
+  products: productsProp,
+  featuredImage: featuredImageProp,
 }: CatalogCollageProps) => {
-  const [products, setProducts] = useState<CatalogProduct[]>([]);
-  const [featuredImage, setFeaturedImage] = useState(DEFAULT_FEATURED_IMAGE);
-  const [isLoading, setIsLoading] = useState(true);
+  const hasServerData = productsProp != null;
+  const [products, setProducts] = useState<CatalogProduct[]>(
+    productsProp ?? []
+  );
+  const [featuredImage, setFeaturedImage] = useState(
+    featuredImageProp ?? DEFAULT_FEATURED_IMAGE
+  );
+  const [isLoading, setIsLoading] = useState(!hasServerData);
 
   useEffect(() => {
+    if (hasServerData) return;
+
     const load = async () => {
       setIsLoading(true);
       try {
@@ -47,7 +58,7 @@ const CatalogCollage = ({
       }
     };
     void load();
-  }, []);
+  }, [hasServerData]);
 
   const desktopProducts = products.slice(0, 4);
   const collageProducts = products.slice(0, 2);

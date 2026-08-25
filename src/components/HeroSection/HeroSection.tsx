@@ -15,13 +15,20 @@ const DEFAULT_HERO: HomeHero = {
   cta_href: "/catalog",
 };
 
-const HeroSection = async () => {
-  let hero = DEFAULT_HERO;
-  try {
-    const data = await fetchHomePage();
-    if (data?.hero) hero = data.hero;
-  } catch {
-    hero = DEFAULT_HERO;
+type HeroSectionProps = {
+  hero?: HomeHero;
+};
+
+const HeroSection = async ({ hero: heroProp }: HeroSectionProps) => {
+  let hero = heroProp ?? DEFAULT_HERO;
+
+  if (!heroProp) {
+    try {
+      const data = await fetchHomePage();
+      if (data?.hero) hero = data.hero;
+    } catch {
+      hero = DEFAULT_HERO;
+    }
   }
 
   return (
@@ -47,7 +54,7 @@ const HeroSection = async () => {
             fetchPriority="high"
             className={styles.heroMobileMain}
             sizes="(max-width: 768px) 100vw, 0px"
-            quality={78}
+            quality={80}
           />
           <Image
             src={HERO_MOBILE_LIGHTEN}

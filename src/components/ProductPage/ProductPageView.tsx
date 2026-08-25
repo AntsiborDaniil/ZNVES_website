@@ -1,14 +1,13 @@
 "use client";
 
 import {
-  createElement,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  type ComponentType,
 } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -22,9 +21,6 @@ import { toCatalogProduct } from "../../data/products";
 import styles from "./ProductPageView.module.css";
 import ProductDisplaySection from "../ProductDisplaySection/ProductDisplaySection";
 import { useWindowSize } from "../../hooks/useWindowSize";
-import { Swiper, SwiperSlide } from "swiper/react";
-import type { Swiper as SwiperInstance } from "swiper";
-import "swiper/css";
 import {
   fetchProductImagesByColor,
   type ApiWarehouseItem,
@@ -40,12 +36,15 @@ import {
   getBreadcrumbOrigin,
 } from "../../lib/productNavigation";
 
+const ProductGallerySwiper = dynamic(
+  () => import("./ProductGallerySwiper"),
+  { ssr: false }
+);
+
 type ProductPageViewProps = {
   product: ProductDetail;
   warehouseItems?: ApiWarehouseItem[];
 };
-
-const MAX_VISIBLE_THUMBS = 7;
 
 const isLightHex = (hex?: string) => {
   const value = (hex ?? "").toLowerCase();
@@ -84,8 +83,6 @@ const ProductPageView = ({
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>({});
   const [catalogCategories, setCatalogCategories] = useState<ApiCatalogCategory[]>([]);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const gallerySwiperRef = useRef<SwiperInstance | null>(null);
   const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const colorToSizesFromWarehouse = useMemo(() => {
@@ -188,11 +185,6 @@ const ProductPageView = ({
     loadImagesByColor();
   }, [product.slug, selectedColor, product.images]);
 
-  useEffect(() => {
-    setActiveImageIndex(0);
-    gallerySwiperRef.current?.slideTo(0);
-  }, [currentImages]);
-
   const handleToggleSection = (id: string) => {
     setSelectedSection(id);
     setOpenSection((prev) => (prev === id ? null : id));
@@ -293,20 +285,6 @@ const ProductPageView = ({
     showToast,
   ]);
 
-  const hasOverflow = currentImages.length > MAX_VISIBLE_THUMBS;
-  const overflowCount = hasOverflow
-    ? currentImages.length - (MAX_VISIBLE_THUMBS - 1)
-    : 0;
-  const visibleThumbs =
-    overflowCount > 0
-      ? currentImages.slice(0, MAX_VISIBLE_THUMBS)
-      : currentImages;
-
-  const goToImage = (index: number) => {
-    setActiveImageIndex(index);
-    gallerySwiperRef.current?.slideTo(index);
-  };
-
   const fromParam = searchParams?.get("from");
   const categoryParam = searchParams?.get("category");
   const origin = getBreadcrumbOrigin(fromParam);
@@ -350,97 +328,10 @@ const ProductPageView = ({
 
         <section className={styles.content}>
           <div className={styles.gallery} aria-live="polite">
-            <div className={styles.imageSliderWrap}>
-              <div className={styles.heroWrap}>
-                {currentImages.length > 1 && (
-                  <button
-                    type="button"
-                    className={`${styles.galleryArrow} ${styles.galleryPrev}`}
-                    aria-label="Предыдущее фото"
-                    onClick={() => gallerySwiperRef.current?.slidePrev()}
-                  >
-                    <Image
-                      src="/images/product/gallery-arrow.svg"
-                      alt=""
-                      width={6}
-                      height={11}
-                      className={styles.galleryArrowIcon}
-                      unoptimized
-                    />
-                  </button>
-                )}
-                {createElement(
-                  Swiper as ComponentType<Record<string, unknown>>,
-                  {
-                    slidesPerView: 1,
-                    spaceBetween: 0,
-                    className: styles.imageSlider,
-                    onSwiper: (swiper: SwiperInstance) => {
-                      gallerySwiperRef.current = swiper;
-                    },
-                    onSlideChange: (swiper: SwiperInstance) => {
-                      setActiveImageIndex(swiper.activeIndex);
-                    },
-                  },
-                  currentImages.map((image, index) => (
-                    <SwiperSlide key={image + index}>
-                      <div className={styles.heroSlide}>
-                        <img
-                          src={image}
-                          alt={`${product.title} — фото ${index + 1}`}
-                          className={styles.heroImage}
-                          loading={index === 0 ? "eager" : "lazy"}
-                          decoding="async"
-                        />
-                      </div>
-                    </SwiperSlide>
-                  ))
-                )}
-                {currentImages.length > 1 && (
-                  <button
-                    type="button"
-                    className={`${styles.galleryArrow} ${styles.galleryNext}`}
-                    aria-label="Следующее фото"
-                    onClick={() => gallerySwiperRef.current?.slideNext()}
-                  >
-                    <Image
-                      src="/images/product/gallery-arrow.svg"
-                      alt=""
-                      width={6}
-                      height={11}
-                      className={styles.galleryArrowIcon}
-                      unoptimized
-                    />
-                  </button>
-                )}
-              </div>
-              <div className={styles.thumbs} role="tablist" aria-label="Фотографии товара">
-                {visibleThumbs.map((image, index) => {
-                  const isLastOverflow =
-                    overflowCount > 0 && index === visibleThumbs.length - 1;
-                  return (
-                    <button
-                      key={image + index}
-                      type="button"
-                      className={`${styles.thumb} ${
-                        activeImageIndex === index ? styles.thumbActive : ""
-                      }`}
-                      onClick={() => goToImage(index)}
-                      aria-label={
-                        isLastOverflow
-                          ? `Ещё ${overflowCount} фото`
-                          : `Фото ${index + 1}`
-                      }
-                    >
-                      <img src={image} alt="" className={styles.thumbImage} />
-                      {isLastOverflow && (
-                        <span className={styles.thumbMore}>+{overflowCount}</span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <ProductGallerySwiper
+              images={currentImages}
+              productTitle={product.title}
+            />
 
             <div
               className={`${styles.imageGrid} ${

@@ -4,6 +4,11 @@ import HeroSection from "../components/HeroSection/HeroSection";
 import HomeScrollReset from "../components/HomeScrollReset/HomeScrollReset";
 import Footer from "../components/Footer/Footer";
 import SliderSkeleton from "../components/ProductDisplaySection/SliderSkeleton";
+import { fetchHomePage } from "../api/home/homeApi";
+import {
+  fetchNewInProducts,
+  fetchAllCatalogProducts,
+} from "../api/home/catalogApi";
 import styles from "./page.module.css";
 
 const ProductDisplaySection = dynamic(
@@ -19,12 +24,18 @@ const CollectionBanners = dynamic(
   () => import("../components/CollectionBanner/CollectionBanner")
 );
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [homePage, newInProducts, catalogProducts] = await Promise.all([
+    fetchHomePage(),
+    fetchNewInProducts(),
+    fetchAllCatalogProducts(),
+  ]);
+
   return (
     <div className={styles.app}>
       <HomeScrollReset />
       <Header />
-      <HeroSection />
+      <HeroSection hero={homePage.hero} />
       <div className={styles.productDisplaySections}>
         <ProductDisplaySection
           title="Bestsellers"
@@ -32,9 +43,13 @@ export default function HomePage() {
           isBestseller
           maxProducts={8}
           navFrom="home"
+          initialProducts={newInProducts}
         />
-        <CatalogCollage />
-        <CollectionBanners />
+        <CatalogCollage
+          products={catalogProducts}
+          featuredImage={homePage.catalog_featured_image}
+        />
+        <CollectionBanners items={homePage.collections} />
       </div>
       <Footer />
     </div>

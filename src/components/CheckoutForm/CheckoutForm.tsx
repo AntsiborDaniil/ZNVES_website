@@ -1,12 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
 import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
-import Image from "next/image";
-import Link from "next/link";
 import { getProductById } from "../../data/products";
 import { createOrder, getPaymentUrl, getYandexPaymentUrl, invalidateMyOrdersCache, type OrderRequest } from "../../api/order/orderApi";
 import PromoErrorToast from "../PromoErrorToast/PromoErrorToast";
@@ -15,15 +11,14 @@ import { fetchCatalogColors } from "../../api/catalog/catalogApi";
 import type { PvzListOption } from "../Map/Map";
 import { getAddressSuggestions, type AddressSuggestion } from "../../api/delivery/addressSuggestApi";
 import { useWindowSize } from "../../hooks/useWindowSize";
-import PhoneInput from "../PhoneInput/PhoneInput";
 import { validatePhone } from "../../lib/authValidation";
-import pageStyles from "../../app/checkout/page.module.css";
-import modalStyles from "./CheckoutFormModal.module.css";
-
-const MapLazy = dynamic(
-  () => import("../Map/Map").then((m) => ({ default: m.default })),
-  { ssr: false }
-);
+import styles from "./CheckoutFormModal.module.css";
+import CheckoutPersonalSection from "./sections/CheckoutPersonalSection";
+import CheckoutDeliverySection, {
+  type ModalDeliveryOption,
+  type YandexCourierOffer,
+} from "./sections/CheckoutDeliverySection";
+import CheckoutPaymentSection from "./sections/CheckoutPaymentSection";
 
 /** Кеш по slug на время сессии — меньше повторных запросов при оформлении заказа */
 const productRawCache = new Map<string, ApiProductDetail | null>();
@@ -32,11 +27,9 @@ interface CheckoutFormProps {
   onOrderSubmit?: (orderNumber: string) => void;
   /** Вызывается при ошибке заказа, когда форма встроена в родительскую страницу (минует sessionStorage + router.push) */
   onOrderError?: (message: string) => void;
-  showRightColumn?: boolean;
   className?: string;
   /** Цвета с каталога (с cart), чтобы не дублировать запрос при открытии формы на cart */
   initialColorSlugToLabel?: Record<string, string>;
-  variant?: "page" | "modal";
   modalPromo?: {
     value: string;
     onChange: (value: string) => void;
@@ -44,8 +37,6 @@ interface CheckoutFormProps {
     isLoading: boolean;
   };
 }
-
-type ModalDeliveryOption = "cdek_pickup" | "yandex_pickup" | "yandex_courier";
 
 const ORDER_ERROR_STORAGE_KEY = "znves:orderError";
 
@@ -86,19 +77,14 @@ function filterPvzByCityAddressDetails(
 const CheckoutForm = ({
   onOrderSubmit,
   onOrderError,
-  showRightColumn = true,
   className = "",
   initialColorSlugToLabel: initialColors = {},
-  variant = "page",
   modalPromo,
 }: CheckoutFormProps) => {
-  const styles = variant === "modal" ? modalStyles : pageStyles;
-  const isModal = variant === "modal";
-  const router = useRouter();
   const { items, getTotalPrice, clearCart, appliedPromo, setAppliedPromo, openCart } = useCart();
   const { user, updateUser } = useAuth();
   const { width } = useWindowSize();
-  const isCartMobilePvz = width > 0 && width < 480 && !showRightColumn;
+  const isCartMobilePvz = width > 0 && width < 480;
 
   const redirectToCartWithError = (message: string) => {
     if (onOrderError) {
@@ -134,13 +120,11 @@ const CheckoutForm = ({
     deliveryType: "cdek",
     deliveryMethod: "pickup",
     paymentMethod: "sberbank",
-    agreeToOffer: false,
-    agreeToPrivacy: false,
     differentRecipient: false,
     deliveryComment: "",
   });
-  const isModalCourier = isModal && formData.deliveryMethod === "yandex";
-  const isModalPickup = isModal && formData.deliveryMethod === "pickup";
+  const isModalCourier = formData.deliveryMethod === "yandex";
+  const isModalPickup = formData.deliveryMethod === "pickup";
   const modalDeliveryOption: ModalDeliveryOption =
     formData.deliveryType === "cdek"
       ? "cdek_pickup"
@@ -183,15 +167,6 @@ const CheckoutForm = ({
     daysMax: number;
   } | null>(null);
 
-  type YandexCourierOffer = {
-    id: string;
-    taxiClass: string | null;
-    description: string | null;
-    price: number;
-    deliveryFrom: string | null;
-    deliveryTo: string | null;
-  };
-
   const [yandexCourierEstimate, setYandexCourierEstimate] = useState<{
     price: number;
     description: string;
@@ -201,6 +176,8 @@ const CheckoutForm = ({
   } | null>(null);
   const [yandexCourierOffers, setYandexCourierOffers] = useState<YandexCourierOffer[] | null>(null);
   const [selectedCourierOfferId, setSelectedCourierOfferId] = useState<string | null>(null);
+  const [mapEnabled, setMapEnabled] = useState(false);
+  const mapWasPickupRef = useRef(false);
 
   const isCourierAvailableByTime = useMemo(() => {
     const now = new Date();
@@ -243,6 +220,45 @@ const CheckoutForm = ({
   useEffect(() => {
     setShowContinueButtonAgain(false);
   }, [formData.deliveryType, formData.deliveryMethod]);
+
+  // Defer MapLazy mount so opening cart/checkout doesn't immediately load map scripts.
+  // First pickup show: requestIdleCallback / setTimeout(400). Delivery-type changes while
+  // already on pickup: enable immediately. Courier: disable so ymaps unloads.
+  useEffect(() => {
+    if (formData.deliveryMethod !== "pickup") {
+      setMapEnabled(false);
+      mapWasPickupRef.current = false;
+      return;
+    }
+
+    if (mapWasPickupRef.current) {
+      setMapEnabled(true);
+      return;
+    }
+
+    mapWasPickupRef.current = true;
+    let cancelled = false;
+    let idleId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    const enable = () => {
+      if (!cancelled) setMapEnabled(true);
+    };
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(enable, { timeout: 400 });
+    } else {
+      timeoutId = setTimeout(enable, 400);
+    }
+
+    return () => {
+      cancelled = true;
+      if (idleId !== undefined && typeof window !== "undefined" && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    };
+  }, [formData.deliveryMethod, formData.deliveryType]);
 
   // Суммарный вес корзины в граммах из warehouse_items (для виджета доставки)
   useEffect(() => {
@@ -489,19 +505,17 @@ const CheckoutForm = ({
   }, [getTotalPrice, appliedPromo]);
 
   const modalDeliverySummaryLabel = useMemo(() => {
-    if (!isModal) return "Доставка";
     if (isModalCourier) return "Доставка Яндекс курьером";
     if (formData.deliveryType === "cdek") return "Доставка СДЭК до ПВЗ";
     return "Доставка Яндекс до ПВЗ";
-  }, [isModal, isModalCourier, formData.deliveryType]);
+  }, [isModalCourier, formData.deliveryType]);
 
   const modalSummaryCity = useMemo(() => {
-    if (!isModal) return "";
     const city = isModalPickup
       ? formData.pickupCity || "Москва"
       : formData.city || "Москва";
     return `Россия, г ${city}`;
-  }, [isModal, isModalPickup, formData.pickupCity, formData.city]);
+  }, [isModalPickup, formData.pickupCity, formData.city]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ru-RU", {
@@ -1258,10 +1272,6 @@ const CheckoutForm = ({
   };
 
   const handleSubmitOrder = async () => {
-    if (!isModal && (!formData.agreeToOffer || !formData.agreeToPrivacy)) {
-      return;
-    }
-
     if (isSubmitting) {
       return;
     }
@@ -1563,1326 +1573,85 @@ const CheckoutForm = ({
     <div className={className}>
       <div ref={formContainerRef} className={styles.content}>
         <div className={styles.leftColumn}>
-          {!isModal && (
-            <div className={styles.checkoutHeader}>
-              <h1 className={styles.title}>Оформление заказа</h1>
-            </div>
-          )}
+          <CheckoutPersonalSection
+            firstName={formData.firstName}
+            lastName={formData.lastName}
+            email={formData.email}
+            phone={formData.phone}
+            errors={errors}
+            firstNameRef={firstNameRef}
+            lastNameRef={lastNameRef}
+            emailRef={emailRef}
+            phoneRef={phoneRef}
+            onInputChange={handleInputChange}
+            onPhoneChange={handlePhoneChange("phone")}
+          />
 
-          <div className={`${styles.section} ${isModal ? styles.modalPersonalSection : ""}`}>
-            {!isModal && <h2 className={styles.sectionTitle}>Личные данные</h2>}
-            {isModal ? (
-              <>
-                <div className={styles.inputWrapper}>
-                  <label htmlFor="firstName" className={styles.label}>
-                    Имя
-                  </label>
-                  <input
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    placeholder="Екатерина"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    className={`${styles.input} ${errors.firstName ? styles.inputError : ""}`}
-                    ref={firstNameRef}
-                  />
-                </div>
-                <div className={styles.inputWrapper}>
-                  <label htmlFor="lastName" className={styles.label}>
-                    Фамилия
-                  </label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    placeholder="Смирнов"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    className={`${styles.input} ${errors.lastName ? styles.inputError : ""}`}
-                    ref={lastNameRef}
-                  />
-                </div>
-                <div className={styles.inputWrapper}>
-                  <label htmlFor="email" className={styles.label}>
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="email@example.com"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
-                    ref={emailRef}
-                  />
-                </div>
-                <div className={`${styles.inputWrapper} ${styles.modalVisuallyHidden}`} ref={phoneRef}>
-                  <label htmlFor="phone" className={styles.label}>
-                    Телефон
-                  </label>
-                  <PhoneInput
-                    id="phone"
-                    value={formData.phone}
-                    onChange={handlePhoneChange("phone")}
-                    error={!!errors.phone}
-                    className={styles.phoneWrap}
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-            <div className={styles.firstInputs}>
-              <div className={styles.inputWrapper}>
-                <label htmlFor="firstName" className={styles.label}>
-                  Имя
-                </label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  placeholder="Введите имя"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  className={`${styles.input} ${errors.firstName ? styles.inputError : ""}`}
-                  ref={firstNameRef}
-                />
-              </div>
-              <div className={styles.inputWrapper}>
-                <label htmlFor="lastName" className={styles.label}>
-                  Фамилия
-                </label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  placeholder="Введите фамилию"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  className={`${styles.input} ${errors.lastName ? styles.inputError : ""}`}
-                  ref={lastNameRef}
-                />
-              </div>
-            </div>
-            <div className={styles.infoInputs}>
-              <div className={styles.inputWrapper} ref={phoneRef}>
-                <label htmlFor="phone" className={styles.label}>
-                  Телефон
-                </label>
-                <PhoneInput
-                  id="phone"
-                  value={formData.phone}
-                  onChange={handlePhoneChange("phone")}
-                  error={!!errors.phone}
-                  className={isModal ? styles.phoneWrap : ""}
-                />
-              </div>
-              <div className={styles.inputWrapper}>
-                <label htmlFor="email" className={styles.label}>
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  placeholder="Введите email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
-                  ref={emailRef}
-                />
-              </div>
-            </div>
-              </>
-            )}
-          </div>
+          <CheckoutDeliverySection
+            isModalCourier={isModalCourier}
+            isModalPickup={isModalPickup}
+            modalDeliveryOption={modalDeliveryOption}
+            deliveryMethod={formData.deliveryMethod}
+            deliveryType={formData.deliveryType}
+            pickupCity={formData.pickupCity}
+            street={formData.street}
+            house={formData.house}
+            floor={formData.floor}
+            deliveryComment={formData.deliveryComment}
+            deliveryFirstName={formData.deliveryFirstName}
+            deliveryLastName={formData.deliveryLastName}
+            pvzAddress={formData.pvzAddress}
+            pvzAddressInputValue={pvzAddressInputValue}
+            mapSearchValue={mapSearchValue}
+            selectedPvzCoords={selectedPvzCoords}
+            totalWeightGrams={totalWeightGrams}
+            mapEnabled={mapEnabled}
+            hideContinueButton={hideContinueButton}
+            isCartMobilePvz={isCartMobilePvz}
+            errors={errors}
+            yandexCourierOffers={yandexCourierOffers}
+            selectedCourierOfferId={selectedCourierOfferId}
+            courierAvailable={courierAvailable}
+            streetRef={streetRef}
+            houseRef={houseRef}
+            deliveryFirstNameRef={deliveryFirstNameRef}
+            deliveryLastNameRef={deliveryLastNameRef}
+            mapSectionRef={mapSectionRef}
+            onInputChange={handleInputChange}
+            onModalDeliveryOption={handleModalDeliveryOption}
+            onCourierTariffChange={handleCourierTariffChange}
+            onShowContinueButtonAgain={() => setShowContinueButtonAgain(true)}
+            onPvzSearchChange={(v) => {
+              setPvzAddressInputValue(v);
+              schedulePvzAddressSync(v);
+            }}
+            onMapSearchChange={handleMapSearchChange}
+            onAddressSelect={handleAddressSelect}
+            onPvzListLoaded={setPvzOptions}
+            onCdekDeliveryEstimate={setCdekDeliveryEstimate}
+            onYandexContinueClick={() => setShowContinueButtonAgain(false)}
+            onYandexWidgetInteraction={() => setShowContinueButtonAgain(true)}
+            formatPrice={formatPrice}
+          />
 
-          {!isModal && (
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Вариант доставки</h2>
-            <div className={styles.deliveryTypeRow}>
-              <label className={styles.deliveryTypeButton}>
-                <input
-                  type="radio"
-                  name="deliveryType"
-                  value="cdek"
-                  checked={formData.deliveryType === "cdek"}
-                  onChange={handleInputChange}
-                  className={styles.radioInput}
-                />
-                <div className={styles.deliveryTypeButtonContent}>
-                  <span className={styles.deliveryTypeText}>СДЕК</span>
-                  <div
-                    className={`${styles.deliveryCheckmark} ${
-                      formData.deliveryType === "cdek"
-                        ? styles.deliveryCheckmarkActive
-                        : ""
-                    }`}
-                  >
-                    {formData.deliveryType === "cdek" && (
-                      <span className={styles.checkmarkIcon} aria-hidden>
-                        <svg viewBox="0 0 12 10" width={12} height={10} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="butt" strokeLinejoin="miter">
-                          <path d="M1 5 L4 8 L11 1" />
-                        </svg>
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </label>
-              <label className={styles.deliveryTypeButton}>
-                <input
-                  type="radio"
-                  name="deliveryType"
-                  value="yandex"
-                  checked={formData.deliveryType === "yandex"}
-                  onChange={handleInputChange}
-                  className={styles.radioInput}
-                />
-                <div className={styles.deliveryTypeButtonContent}>
-                  <span className={styles.deliveryTypeText}>ЯНДЕКС</span>
-                  <div
-                    className={`${styles.deliveryCheckmark} ${
-                      formData.deliveryType === "yandex"
-                        ? styles.deliveryCheckmarkActive
-                        : ""
-                    }`}
-                  >
-                    {formData.deliveryType === "yandex" && (
-                      <span className={styles.checkmarkIcon} aria-hidden>
-                        <svg viewBox="0 0 12 10" width={12} height={10} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="butt" strokeLinejoin="miter">
-                          <path d="M1 5 L4 8 L11 1" />
-                        </svg>
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </label>
-            </div>
-          </div>
-          )}
-
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Доставка</h2>
-            {isModal && (
-              <div className={styles.modalCityBlock}>
-                <div className={styles.inputWrapper}>
-                  <label htmlFor={isModalCourier ? "city" : "pickupCity"} className={styles.modalCityLabel}>
-                    Город
-                  </label>
-                  <input
-                    type="text"
-                    id={isModalCourier ? "city" : "pickupCity"}
-                    name={isModalCourier ? "city" : "pickupCity"}
-                    placeholder="Город"
-                    value={isModalCourier ? "Москва" : formData.pickupCity}
-                    onChange={handleInputChange}
-                    readOnly={isModalCourier}
-                    className={styles.input}
-                    autoComplete="address-level2"
-                  />
-                </div>
-                <p className={styles.modalCityHint}>
-                  Россия, г {isModalCourier ? "Москва" : formData.pickupCity || "Москва"}
-                </p>
-              </div>
-            )}
-            {isModal ? (
-              <div className={styles.modalDeliveryOptions}>
-                {(
-                  [
-                    { option: "cdek_pickup" as const, label: "СДЭК до пункта выдачи" },
-                    { option: "yandex_pickup" as const, label: "ЯНДЕКС до пункта выдачи" },
-                    { option: "yandex_courier" as const, label: "ЯНДЕКС курьером" },
-                  ] as const
-                ).map(({ option, label }) => (
-                  <label key={option} className={styles.modalDeliveryOption}>
-                    <input
-                      type="radio"
-                      name="modalDeliveryOption"
-                      value={option}
-                      checked={modalDeliveryOption === option}
-                      onChange={() => handleModalDeliveryOption(option)}
-                      className={styles.radioInput}
-                    />
-                    <span
-                      className={`${styles.modalRadioMark} ${
-                        modalDeliveryOption === option ? styles.modalRadioMarkActive : ""
-                      }`}
-                      aria-hidden
-                    />
-                    <span className={styles.modalDeliveryOptionLabel}>{label}</span>
-                  </label>
-                ))}
-              </div>
-            ) : (
-            <div className={styles.deliveryButtonsRow}>
-              {formData.deliveryType === "cdek" && (
-                <label className={styles.deliveryButton}>
-                  <input
-                    type="radio"
-                    name="deliveryMethod"
-                    value="pickup"
-                    checked={formData.deliveryMethod === "pickup"}
-                    onChange={handleInputChange}
-                    className={styles.radioInput}
-                  />
-                  <div className={styles.deliveryButtonContent}>
-                    <div className={styles.deliveryButtonInfo}>
-                      <span className={styles.deliveryButtonName}>
-                        {isModal ? "СДЭК до пункта выдачи" : "Пункт выдачи"}
-                      </span>
-                    </div>
-                    <div className={styles.deliveryButtonInfo}>
-                      <span className={styles.deliveryButtonSubtext}>
-                        {cdekDeliveryEstimate
-                          ? cdekDeliveryEstimate.daysMin === cdekDeliveryEstimate.daysMax
-                            ? `${cdekDeliveryEstimate.daysMin} дн.`
-                            : `${cdekDeliveryEstimate.daysMin}–${cdekDeliveryEstimate.daysMax} дн.`
-                          : "Послезавтра"}
-                      </span>
-                      <span className={styles.deliveryButtonPrice}>бесплатно</span>
-                    </div>
-                    <div
-                      className={`${styles.deliveryCheckmark} ${
-                        formData.deliveryMethod === "pickup"
-                          ? styles.deliveryCheckmarkActive
-                          : ""
-                      }`}
-                    >
-                      {formData.deliveryMethod === "pickup" && (
-                        <span className={styles.checkmarkIcon} aria-hidden>
-                          <svg viewBox="0 0 12 10" width={12} height={10} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="butt" strokeLinejoin="miter">
-                            <path d="M1 5 L4 8 L11 1" />
-                          </svg>
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </label>
-              )}
-              {formData.deliveryType === "yandex" && (
-                <>
-                  <label className={styles.deliveryButton}>
-                    <input
-                      type="radio"
-                      name="deliveryMethod"
-                      value="pickup"
-                      checked={formData.deliveryMethod === "pickup"}
-                      onChange={handleInputChange}
-                      className={styles.radioInput}
-                    />
-                    <div className={styles.deliveryButtonContent}>
-                      <div className={styles.deliveryButtonInfo}>
-                        <span className={styles.deliveryButtonName}>
-                          {isModal ? "ЯНДЕКС до пункта выдачи" : "Пункт выдачи"}
-                        </span>
-                      </div>
-                      <div className={styles.deliveryButtonInfo}>
-                        <span className={styles.deliveryButtonSubtext}>
-                          Послезавтра
-                        </span>
-                        <span className={styles.deliveryButtonPrice}>
-                          бесплатно
-                        </span>
-                      </div>
-                      <div
-                        className={`${styles.deliveryCheckmark} ${
-                          formData.deliveryMethod === "pickup"
-                            ? styles.deliveryCheckmarkActive
-                            : ""
-                        }`}
-                      >
-                        {formData.deliveryMethod === "pickup" && (
-                          <span className={styles.checkmarkIcon} aria-hidden>
-                            <svg viewBox="0 0 12 10" width={12} height={10} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="butt" strokeLinejoin="miter">
-                              <path d="M1 5 L4 8 L11 1" />
-                            </svg>
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </label>
-                  <label className={styles.deliveryButton}>
-                    <input
-                      type="radio"
-                      name="deliveryMethod"
-                      value="yandex"
-                      checked={formData.deliveryMethod === "yandex"}
-                      onChange={handleInputChange}
-                      className={styles.radioInput}
-                    />
-                    <div className={styles.deliveryButtonContent}>
-                      <div className={styles.deliveryButtonInfo}>
-                        <span className={styles.deliveryButtonName}>
-                          {isModal ? "ЯНДЕКС курьером" : "Курьером"}
-                        </span>
-                      </div>
-                      <div className={styles.deliveryButtonInfo}>
-                        <span className={styles.deliveryButtonSubtext}>
-                          {!courierAvailable
-                            ? "Недоступно"
-                            : yandexCourierEstimate && !yandexCourierEstimate.loading && yandexCourierEstimate.deliveryTo
-                            ? `до ${new Date(yandexCourierEstimate.deliveryTo).toLocaleDateString("ru-RU", { day: "numeric", month: "short" })}`
-                            : "Сегодня/завтра"}
-                        </span>
-                        <span className={styles.deliveryButtonPrice}>
-                          {!courierAvailable
-                            ? ""
-                            : isCourierPriceLoading
-                            ? "рассчитывается…"
-                            : yandexCourierEstimate && !yandexCourierEstimate.loading
-                            ? yandexCourierEstimate.price === 0
-                              ? "бесплатно"
-                              : `${formatPrice(yandexCourierEstimate.price)}`
-                            : "от адреса"}
-                        </span>
-                      </div>
-                      <div
-                        className={`${styles.deliveryCheckmark} ${
-                          formData.deliveryMethod === "yandex"
-                            ? styles.deliveryCheckmarkActive
-                            : ""
-                        }`}
-                      >
-                        {formData.deliveryMethod === "yandex" && (
-                          <span className={styles.checkmarkIcon} aria-hidden>
-                            <svg viewBox="0 0 12 10" width={12} height={10} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="butt" strokeLinejoin="miter">
-                              <path d="M1 5 L4 8 L11 1" />
-                            </svg>
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </label>
-                </>
-              )}
-            </div>
-            )}
-
-            {isModal && isModalCourier && (
-              <div className={styles.modalCourierFields}>
-                <div className={styles.inputWrapper}>
-                  <label htmlFor="street" className={styles.label}>
-                    Улица
-                  </label>
-                  <div className={styles.modalStreetInputWrap}>
-                    <input
-                      type="text"
-                      id="street"
-                      name="street"
-                      placeholder="Введите улицу"
-                      value={formData.street}
-                      onChange={handleInputChange}
-                      className={`${styles.input} ${errors.street ? styles.inputError : ""}`}
-                      ref={streetRef}
-                      autoComplete="address-line1"
-                    />
-                    <span className={styles.modalStreetSearchIcon} aria-hidden>
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.5" />
-                        <path d="M14 14L18 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
-                <div className={styles.modalSplitRow}>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="house" className={styles.label}>
-                      Дом
-                    </label>
-                    <input
-                      type="text"
-                      id="house"
-                      name="house"
-                      placeholder="Введите дом"
-                      value={formData.house}
-                      onChange={handleInputChange}
-                      className={`${styles.input} ${errors.house ? styles.inputError : ""}`}
-                      ref={houseRef}
-                      autoComplete="address-line2"
-                    />
-                  </div>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="floor" className={styles.label}>
-                      Этаж
-                    </label>
-                    <input
-                      type="text"
-                      id="floor"
-                      name="floor"
-                      placeholder="Введите этаж"
-                      value={formData.floor}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  </div>
-                </div>
-                <div className={styles.inputWrapper}>
-                  <label htmlFor="deliveryComment" className={styles.label}>
-                    Комментарий
-                  </label>
-                  <textarea
-                    id="deliveryComment"
-                    name="deliveryComment"
-                    placeholder="Комментарий к доставке"
-                    value={formData.deliveryComment}
-                    onChange={handleInputChange}
-                    className={styles.modalTextarea}
-                    rows={3}
-                  />
-                </div>
-                <div className={styles.inputWrapper}>
-                  <label htmlFor="deliveryFirstName" className={styles.label}>
-                    Имя получателя
-                  </label>
-                  <input
-                    type="text"
-                    id="deliveryFirstName"
-                    name="deliveryFirstName"
-                    placeholder="Екатерина"
-                    value={formData.deliveryFirstName}
-                    onChange={handleInputChange}
-                    className={`${styles.input} ${errors.deliveryFirstName ? styles.inputError : ""}`}
-                    ref={deliveryFirstNameRef}
-                  />
-                </div>
-                <div className={styles.inputWrapper}>
-                  <label htmlFor="deliveryLastName" className={styles.label}>
-                    Фамилия получателя
-                  </label>
-                  <input
-                    type="text"
-                    id="deliveryLastName"
-                    name="deliveryLastName"
-                    placeholder="Смирнов"
-                    value={formData.deliveryLastName}
-                    onChange={handleInputChange}
-                    className={`${styles.input} ${errors.deliveryLastName ? styles.inputError : ""}`}
-                    ref={deliveryLastNameRef}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {formData.deliveryMethod === "yandex" &&
-            yandexCourierOffers &&
-            yandexCourierOffers.length > 1 && (
-              <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>Тариф доставки</h2>
-                <div className={styles.courierTariffs}>
-                  {yandexCourierOffers.map((offer) => {
-                    const isActive = selectedCourierOfferId === offer.id;
-                    const descriptionMap: Record<string, string> = {
-                      "2_hours_delivery": "Доставка за 2 часа",
-                      "4_hours_delivery": "Доставка за 4 часа",
-                      "express_30min_longer": "Экспресс ~30 мин",
-                      "express_60min_longer": "Экспресс ~60 мин",
-                      "same_day_delivery": "Доставка сегодня",
-                      "next_day_delivery": "Доставка завтра",
-                    };
-                    const label =
-                      (offer.description && descriptionMap[offer.description]) ||
-                      (offer.description && offer.description.replace(/_/g, " ")) ||
-                      (offer.taxiClass === "express" ? "Экспресс" : "Курьер");
-                    const deliveryDate = offer.deliveryTo
-                      ? new Date(offer.deliveryTo).toLocaleDateString("ru-RU", { day: "numeric", month: "short" })
-                      : null;
-                    return (
-                      <button
-                        key={offer.id}
-                        type="button"
-                        className={`${styles.courierTariffButton} ${isActive ? styles.courierTariffButtonActive : ""}`}
-                        onClick={() => handleCourierTariffChange(offer.id)}
-                      >
-                        <span className={styles.courierTariffName}>{label}</span>
-                        {deliveryDate && (
-                          <span className={styles.courierTariffDate}>до {deliveryDate}</span>
-                        )}
-                        <span className={styles.courierTariffPrice}>
-                          {offer.price === 0 ? "бесплатно" : formatPrice(offer.price)}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-          {formData.deliveryMethod === "yandex" && !courierAvailable && (
-            <div className={styles.courierUnavailable}>
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="10" cy="10" r="9" stroke="#c45e2c" strokeWidth="1.5"/>
-                <path d="M10 6v5" stroke="#c45e2c" strokeWidth="1.5" strokeLinecap="round"/>
-                <circle cx="10" cy="14" r="0.75" fill="#c45e2c"/>
-              </svg>
-              <div>
-                <span className={styles.courierUnavailableTitle}>Курьерская доставка сейчас недоступна</span>
-                <span className={styles.courierUnavailableHint}>
-                  Курьеры работают с 8:00 до 22:00. Попробуйте оформить заказ позже или выберите доставку в пункт выдачи.
-                </span>
-              </div>
-            </div>
-          )}
-
-          {!isModal && formData.deliveryMethod !== "pickup" && (
-            <div className={styles.section}>
-              <h2 className={styles.sectionTitle}>Данные о доставке</h2>
-              <label
-                className={styles.checkboxLabel}
-                style={{ marginBottom: "20px" }}
-              >
-                <input
-                  type="checkbox"
-                  name="differentRecipient"
-                  checked={formData.differentRecipient}
-                  onChange={handleInputChange}
-                  className={styles.checkbox}
-                />
-                <span>Получатель отличается от покупателя</span>
-              </label>
-              {formData.differentRecipient && (
-                <>
-                  <div className={styles.firstInputs}>
-                    <div className={styles.inputWrapper}>
-                      <label htmlFor="deliveryFirstName" className={styles.label}>
-                        Имя получателя
-                      </label>
-                      <input
-                        type="text"
-                        id="deliveryFirstName"
-                        name="deliveryFirstName"
-                        placeholder="Введите имя"
-                        value={formData.deliveryFirstName}
-                        onChange={handleInputChange}
-                        className={`${styles.input} ${errors.deliveryFirstName ? styles.inputError : ""}`}
-                        ref={deliveryFirstNameRef}
-                      />
-                    </div>
-                    <div className={styles.inputWrapper}>
-                      <label htmlFor="deliveryLastName" className={styles.label}>
-                        Фамилия получателя
-                      </label>
-                      <input
-                        type="text"
-                        id="deliveryLastName"
-                        name="deliveryLastName"
-                        placeholder="Введите фамилию"
-                        value={formData.deliveryLastName}
-                        onChange={handleInputChange}
-                        className={`${styles.input} ${errors.deliveryLastName ? styles.inputError : ""}`}
-                        ref={deliveryLastNameRef}
-                      />
-                    </div>
-                  </div>
-                  <div className={styles.infoInputs}>
-                    <div className={styles.inputWrapper} ref={deliveryPhoneRef}>
-                      <label htmlFor="deliveryPhone" className={styles.label}>
-                        Телефон получателя
-                      </label>
-                      <PhoneInput
-                        id="deliveryPhone"
-                        value={formData.deliveryPhone}
-                        onChange={handlePhoneChange("deliveryPhone")}
-                        error={!!errors.deliveryPhone}
-                      />
-                    </div>
-                    <div className={styles.inputWrapper}>
-                      <label htmlFor="deliveryEmail" className={styles.label}>
-                        Email получателя
-                      </label>
-                      <input
-                        type="email"
-                        id="deliveryEmail"
-                        name="deliveryEmail"
-                        placeholder="Введите email"
-                        value={formData.deliveryEmail}
-                        onChange={handleInputChange}
-                        className={`${styles.input} ${errors.deliveryEmail ? styles.inputError : ""}`}
-                        ref={deliveryEmailRef}
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-              {formData.deliveryMethod === "yandex" && (
-              <>
-                <div className={styles.firstInputs}>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="city" className={styles.label}>
-                      Город
-                    </label>
-                    <input
-                      type="text"
-                      id="city"
-                      name="city"
-                      placeholder="Москва"
-                      value="Москва"
-                      className={`${styles.input} ${errors.city ? styles.inputError : ""}`}
-                      readOnly
-                      ref={cityRef}
-                    />
-                  </div>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="street" className={styles.label}>
-                      Улица
-                    </label>
-                    <input
-                      type="text"
-                      id="street"
-                      name="street"
-                      placeholder="Введите улицу"
-                      value={formData.street}
-                      onChange={handleInputChange}
-                      className={`${styles.input} ${errors.street ? styles.inputError : ""}`}
-                      ref={streetRef}
-                    />
-                  </div>
-                </div>
-                <div className={styles.infoInputs}>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="house" className={styles.label}>
-                      Дом
-                    </label>
-                    <input
-                      type="text"
-                      id="house"
-                      name="house"
-                      placeholder="Введите дом"
-                      value={formData.house}
-                      onChange={handleInputChange}
-                      className={`${styles.input} ${errors.house ? styles.inputError : ""}`}
-                      ref={houseRef}
-                    />
-                  </div>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="apartment" className={styles.label}>
-                      Квартира
-                    </label>
-                    <input
-                      type="text"
-                      id="apartment"
-                      name="apartment"
-                      placeholder="Введите квартиру"
-                      value={formData.apartment}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  </div>
-                </div>
-                <div className={styles.firstInputs}>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="floor" className={styles.label}>
-                      Этаж
-                    </label>
-                    <input
-                      type="text"
-                      id="floor"
-                      name="floor"
-                      placeholder="Введите этаж"
-                      value={formData.floor}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  </div>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="entrance" className={styles.label}>
-                      Подъезд
-                    </label>
-                    <input
-                      type="text"
-                      id="entrance"
-                      name="entrance"
-                      placeholder="Введите подъезд"
-                      value={formData.entrance}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  </div>
-                </div>
-                <div className={styles.infoInputs}>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="intercom" className={styles.label}>
-                      Домофон
-                    </label>
-                    <input
-                      type="text"
-                      id="intercom"
-                      name="intercom"
-                      placeholder="Введите домофон"
-                      value={formData.intercom}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  </div>
-                </div>
-              </>
-              )}
-            </div>
-          )}
-
-          {(!isModal || isModalPickup) && (
-          <div
-            className={`${styles.section} ${hideContinueButton ? styles.hideContinueButton : ""}`}
-            ref={mapSectionRef}
-            onPointerDown={
-              isCartMobilePvz && formData.deliveryMethod === "pickup" && formData.pvzAddress.trim()
-                ? () => setShowContinueButtonAgain(true)
-                : undefined
-            }
-          >
-            {!isModal && (
-            <h2 className={styles.sectionTitle}>
-              {formData.deliveryMethod === "pickup"
-                ? "Пункт получения"
-                : "Адрес доставки"}
-            </h2>
-            )}
-            {formData.deliveryMethod === "pickup" && formData.deliveryType === "cdek" && !isModal && (
-              <div className={styles.firstInputs} style={{ marginBottom: 12 }}>
-                <div className={styles.inputWrapper}>
-                  <label htmlFor="pickupCity" className={styles.label}>
-                    Город
-                  </label>
-                  <input
-                    type="text"
-                    id="pickupCity"
-                    name="pickupCity"
-                    placeholder="Например: Москва, Санкт-Петербург"
-                    value={formData.pickupCity}
-                    onChange={handleInputChange}
-                    className={styles.input}
-                    autoComplete="address-level2"
-                  />
-                </div>
-              </div>
-            )}
-            <div className={isModal && isModalPickup ? styles.inputWrapper : styles.checkoutMapSearchContainer}>
-              {isModal && isModalPickup && (
-                <label htmlFor="mapSearchInput" className={styles.label}>
-                  Пункт получения
-                </label>
-              )}
-              <input
-                type="text"
-                id="mapSearchInput"
-                name="mapSearchInput"
-                className={styles.checkoutMapSearchInput}
-                placeholder={
-                  formData.deliveryMethod === "pickup"
-                    ? isModal
-                      ? ""
-                      : "Выберите пункт получения"
-                    : "Выберите адрес доставки"
-                }
-                readOnly={formData.deliveryMethod === "pickup" && !isModal}
-                value={
-                  formData.deliveryMethod === "pickup"
-                    ? (pvzAddressInputValue || formData.pvzAddress || "").trim() ||
-                      (isModal ? "" : "Выберите пункт выдачи на карте")
-                    : mapSearchValue ||
-                      [formData.city, formData.street, formData.house]
-                        .filter(Boolean)
-                        .join(", ") ||
-                      "Выберите адрес на карте"
-                }
-                onChange={(e) => {
-                  const v = e.target.value;
-                  if (formData.deliveryMethod === "pickup") {
-                    setPvzAddressInputValue(v);
-                    schedulePvzAddressSync(v);
-                  } else {
-                    handleMapSearchChange(v);
-                  }
-                }}
-              />
-            </div>
-            <div
-              className={`${styles.checkoutMapContainer} ${
-                formData.deliveryMethod === "yandex"
-                  ? styles.checkoutMapContainerCourier
-                  : ""
-              }`}
-              onPointerDown={
-                isCartMobilePvz && formData.deliveryMethod === "pickup" && formData.pvzAddress.trim()
-                  ? () => setShowContinueButtonAgain(true)
-                  : undefined
-              }
-            >
-              {(formData.deliveryType === "cdek" || formData.deliveryType === "yandex") && (
-                <MapLazy
-                  key={`${formData.deliveryType}-${formData.deliveryMethod}`}
-                  city={formData.pickupCity}
-                  onAddressSelect={handleAddressSelect}
-                  onPvzListLoaded={setPvzOptions}
-                  onCdekDeliveryEstimate={setCdekDeliveryEstimate}
-                  onYandexContinueClick={() => setShowContinueButtonAgain(false)}
-                  onYandexWidgetInteraction={() => setShowContinueButtonAgain(true)}
-                  searchValue={mapSearchValue}
-                  onSearchChange={handleMapSearchChange}
-                  deliveryMethod={formData.deliveryMethod}
-                  deliveryType={formData.deliveryType}
-                  selectedPvzCoords={selectedPvzCoords}
-                  totalWeightGrams={totalWeightGrams}
-                />
-              )}
-            </div>
-          </div>
-          )}
-
-          {isModal && modalPromo && (
-            <div className={styles.modalPromoBlock}>
-              <span className={styles.modalPromoLabel}>Промокод</span>
-              <div className={styles.modalPromoRow}>
-                <input
-                  id="checkout-modal-promo"
-                  type="text"
-                  className={styles.modalPromoInput}
-                  placeholder=""
-                  value={modalPromo.value}
-                  onChange={(event) => modalPromo.onChange(event.target.value)}
-                  disabled={modalPromo.isLoading}
-                />
-                <button
-                  type="button"
-                  className={styles.modalPromoBtn}
-                  onClick={() => modalPromo.onApply()}
-                  disabled={modalPromo.isLoading || !modalPromo.value.trim()}
-                >
-                  {modalPromo.isLoading ? "…" : "Активировать"}
-                </button>
-              </div>
-            </div>
-          )}
-
-          <div className={`${styles.section} ${styles.modalPaymentSection}`}>
-            <h2 className={styles.paymentTitle}>Способ оплаты</h2>
-            {isModal ? (
-              <div className={styles.modalPaymentOptions}>
-                <label className={styles.modalPaymentOption}>
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="card"
-                    checked={formData.paymentMethod === "card"}
-                    onChange={handleInputChange}
-                    className={styles.radioInput}
-                  />
-                  <span
-                    className={`${styles.modalRadioMark} ${
-                      formData.paymentMethod === "card" ? styles.modalRadioMarkActive : ""
-                    }`}
-                    aria-hidden
-                  />
-                  <span className={styles.modalPaymentOptionLabel}>Оплата банковской картой</span>
-                </label>
-                <label className={styles.modalPaymentOption}>
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="sberbank"
-                    checked={formData.paymentMethod === "sberbank"}
-                    onChange={handleInputChange}
-                    className={styles.radioInput}
-                  />
-                  <span
-                    className={`${styles.modalRadioMark} ${
-                      formData.paymentMethod === "sberbank" ? styles.modalRadioMarkActive : ""
-                    }`}
-                    aria-hidden
-                  />
-                  <span className={styles.modalPaymentOptionLabel}>
-                    <span>СБП</span>
-                    <Image
-                      src="/images/checkout/sbp-icon.svg"
-                      alt=""
-                      width={20}
-                      height={20}
-                      className={styles.modalPaymentOptionIcon}
-                      unoptimized
-                    />
-                  </span>
-                </label>
-              </div>
-            ) : (
-            <div className={styles.paymentButtonsRow}>
-              <label className={styles.paymentButton}>
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="sberbank"
-                  checked={formData.paymentMethod === "sberbank"}
-                  onChange={handleInputChange}
-                  className={styles.radioInput}
-                />
-                <div className={styles.paymentButtonContent}>
-                  <Image
-                    src="/images/checkout/sbp.png"
-                    alt="СБП"
-                    width={54}
-                    height={30}
-                    className={styles.paymentButtonIcon}
-                    loading="lazy"
-                  />
-                </div>
-              </label>
-              <label className={styles.paymentButton}>
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="card"
-                  checked={formData.paymentMethod === "card"}
-                  onChange={handleInputChange}
-                  className={styles.radioInput}
-                />
-                <div className={styles.paymentButtonContent}>
-                  <Image
-                    src="/images/checkout/card.png"
-                    alt="Картой онлайн"
-                    width={86}
-                    height={24}
-                    className={styles.paymentButtonIcon}
-                    loading="lazy"
-                  />
-                  <Image
-                    src="/images/checkout/cardText.png"
-                    alt="Онлайн"
-                    width={86}
-                    height={16}
-                    className={styles.paymentButtonIcon}
-                    loading="lazy"
-                  />
-                </div>
-              </label>
-              <label className={styles.paymentButton}>
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="yandexpay"
-                  checked={formData.paymentMethod === "yandexpay"}
-                  onChange={handleInputChange}
-                  className={styles.radioInput}
-                />
-                <div className={styles.paymentButtonContent}>
-                  <Image
-                    src="/images/checkout/y.png"
-                    alt="Яндекс Pay"
-                    width={60}
-                    height={20}
-                    className={styles.paymentButtonIcon}
-                    loading="lazy"
-                  />
-                </div>
-              </label>
-              <label className={styles.paymentButton}>
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="installment"
-                  checked={formData.paymentMethod === "installment"}
-                  onChange={handleInputChange}
-                  className={styles.radioInput}
-                />
-                <div className={styles.paymentButtonContent}>
-                  <Image
-                    src="/images/checkout/dolya.png"
-                    alt="Долями"
-                    width={73}
-                    height={14}
-                    className={styles.paymentButtonIcon}
-                    loading="lazy"
-                  />
-                </div>
-              </label>
-            </div>
-            )}
-          </div>
-
-          {!showRightColumn && (
-            <>
-              <div className={styles.orderSummaryBlock}>
-                {isModal ? (
-                  <div className={styles.modalOrderSummary}>
-                    <p className={styles.modalSummaryLine}>
-                      Сумма: {formatPrice(itemsSubtotal)}
-                    </p>
-                    <p className={styles.modalSummaryLine}>
-                      {modalDeliverySummaryLabel}:{" "}
-                      {isCourierPriceLoading
-                        ? "рассчитывается…"
-                        : deliveryPrice === 0
-                        ? "бесплатно"
-                        : formatPrice(deliveryPrice)}
-                    </p>
-                    {modalSummaryCity && (
-                      <p className={styles.modalSummaryLocation}>{modalSummaryCity}</p>
-                    )}
-                    <p className={styles.modalSummaryLineTotal}>
-                      Итоговая сумма: {formatPrice(totalAmount)}
-                    </p>
-                  </div>
-                ) : (
-                <div className={styles.orderSummary}>
-                  <div className={styles.summaryRowTotal}>
-                    <span className={styles.summaryLabelTotal}>Итого</span>
-                    <span className={styles.summaryTotal}>
-                      {formatPrice(totalAmount)}
-                    </span>
-                  </div>
-                </div>
-                )}
-                <button
-                  ref={submitButtonRef}
-                  type="button"
-                  className={`${styles.submitButton} ${styles.submitButtonRight}`}
-                  disabled={
-                    (!isModal && (!formData.agreeToOffer || !formData.agreeToPrivacy)) ||
-                    isSubmitting ||
-                    (formData.deliveryMethod === "yandex" && !courierAvailable)
-                  }
-                  onClick={handleSubmitOrder}
-                  onPointerDown={(e) => {
-                    if (e.pointerType === "touch") {
-                      e.preventDefault();
-                      handleSubmitOrder();
-                    }
-                  }}
-                >
-                  {isSubmitting ? "Оформление..." : "Оформить заказ"}
-                </button>
-                {isModal ? (
-                  <p className={styles.modalAgreement}>
-                    Нажимая на кнопку, вы соглашаетесь с{" "}
-                    <Link href="/public-offer" className={styles.modalAgreementLink}>
-                      публичной офертой
-                    </Link>{" "}
-                    и{" "}
-                    <Link href="/privacy" className={styles.modalAgreementLink}>
-                      политикой конфиденциальности
-                    </Link>
-                  </p>
-                ) : (
-                <div className={styles.checkboxes}>
-                  <label className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      name="agreeToOffer"
-                      checked={formData.agreeToOffer}
-                      onChange={handleInputChange}
-                      className={styles.checkbox}
-                    />
-                    <span>
-                      Я соглашаюсь с условиями{" "}
-                      <Link
-                        href="/public-offer"
-                        className={styles.checkboxLink}
-                      >
-                        публичной оферты
-                      </Link>
-                    </span>
-                  </label>
-                  <label className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      name="agreeToPrivacy"
-                      checked={formData.agreeToPrivacy}
-                      onChange={handleInputChange}
-                      className={styles.checkbox}
-                    />
-                    <span>
-                      Я принимаю{" "}
-                      <Link href="/privacy" className={styles.checkboxLink}>
-                        политику конфиденциальности
-                      </Link>
-                    </span>
-                  </label>
-                </div>
-                )}
-              </div>
-            </>
-          )}
+          <CheckoutPaymentSection
+            paymentMethod={formData.paymentMethod}
+            deliveryMethod={formData.deliveryMethod}
+            courierAvailable={courierAvailable}
+            isSubmitting={isSubmitting}
+            itemsSubtotal={itemsSubtotal}
+            deliveryPrice={deliveryPrice}
+            totalAmount={totalAmount}
+            isCourierPriceLoading={isCourierPriceLoading}
+            modalDeliverySummaryLabel={modalDeliverySummaryLabel}
+            modalSummaryCity={modalSummaryCity}
+            modalPromo={modalPromo}
+            submitButtonRef={submitButtonRef}
+            onInputChange={handleInputChange}
+            onSubmitOrder={handleSubmitOrder}
+            formatPrice={formatPrice}
+          />
         </div>
-        {showRightColumn && (
-          <div className={styles.rightPart}>
-            <div className={styles.orderHeader}>
-              <h2 className={styles.orderTitle}>Ваши товары</h2>
-              <Link href="/cart" className={styles.editLink}>
-                изменить
-              </Link>
-            </div>
-            <div className={styles.rightColumn}>
-              <div className={styles.orderItemsBlock}>
-                <div className={styles.orderItems}>
-                  {items.map((item, index) => {
-                    const fullProduct =
-                      typeof item.productId === "number"
-                        ? getProductById(item.productId)
-                        : undefined;
-                    const colorLabel =
-                      item.colorLabel ||
-                      colorSlugToLabel[item.color] ||
-                      fullProduct?.availableColors.find(
-                        (c) => c.value === item.color
-                      )?.label ||
-                      item.color;
-
-                    return (
-                      <div
-                        key={`${item.productId}-${item.size}-${item.color}-${index}`}
-                        className={styles.orderItem}
-                      >
-                        <div className={styles.orderItemImage}>
-                          <Image
-                            src={
-                              item.product.images[0] ||
-                              "/images/catalogs/placeholder.png"
-                            }
-                            alt={item.product.title}
-                            fill
-                            sizes="120px"
-                            className={styles.orderImage}
-                            loading="lazy"
-                          />
-                        </div>
-                        <div className={styles.orderItemInfo}>
-                          <div className={styles.orderItemCategory}>
-                            <div className={styles.column}>
-                              {fullProduct?.category ||
-                                item.product.category ||
-                                ""}
-
-                              <h2 className={styles.orderItemTitle}>
-                                {item.product.title}
-                              </h2>
-                            </div>
-                            <div className={styles.orderItemDetailsRow}>
-                              <div className={styles.orderItemDetailColumn}>
-                                <span className={styles.orderItemDetailLabel}>
-                                  Цвет
-                                </span>
-                                <span className={styles.orderItemDetailValue}>
-                                  {colorLabel}
-                                </span>
-                              </div>
-                              <div className={styles.orderItemDetailColumn}>
-                                <span className={styles.orderItemDetailLabel}>
-                                  Размер
-                                </span>
-                                <span
-                                  className={`${styles.orderItemDetailValue} ${styles.orderItemSizeValue}`}
-                                >
-                                  {item.size}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className={styles.orderItemPrice}>
-                            {formatPrice(
-                              item.product.priceValue * item.quantity
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className={styles.summaryRow}>
-                <span className={styles.summaryLabel}>Доставка:</span>
-                <span className={styles.summaryValue}>
-                  {isCourierPriceLoading
-                    ? "рассчитывается…"
-                    : deliveryPrice === 0
-                    ? "Бесплатно"
-                    : formatPrice(deliveryPrice)}
-                </span>
-              </div>
-              <div className={styles.summaryRow}>
-                <span className={styles.summaryLabel}>Товаров на:</span>
-                {appliedPromo ? (
-                  <span className={styles.summaryValueWithPromo}>
-                    <span className={styles.summaryValueOld}>
-                      {formatPrice(getTotalPrice())}
-                    </span>{" "}
-                    <span className={styles.summaryValue}>
-                      {formatPrice(
-                        Math.max(
-                          0,
-                          getTotalPrice() - parseFloat(appliedPromo.discount)
-                        )
-                      )}
-                    </span>
-                  </span>
-                ) : (
-                  <span className={styles.summaryValue}>
-                    {formatPrice(getTotalPrice())}
-                  </span>
-                )}
-              </div>
-              <div className={styles.orderSummaryBlock}>
-                <div className={styles.orderSummary}>
-                  <div className={styles.summaryRowTotal}>
-                    <span className={styles.summaryLabelTotal}>Итого</span>
-                    <span className={styles.summaryTotal}>
-                      {formatPrice(totalAmount)}
-                    </span>
-                  </div>
-                </div>
-                <button
-                  ref={submitButtonRef}
-                  type="button"
-                  className={`${styles.submitButton} ${styles.submitButtonRight}`}
-                  disabled={!formData.agreeToOffer || !formData.agreeToPrivacy || isSubmitting || (formData.deliveryMethod === "yandex" && !courierAvailable)}
-                  onClick={handleSubmitOrder}
-                  onPointerDown={(e) => {
-                    if (e.pointerType === "touch") {
-                      e.preventDefault();
-                      handleSubmitOrder();
-                    }
-                  }}
-                >
-                  {isSubmitting ? "Оформление..." : "Оформить заказ"}
-                </button>
-                <div className={styles.checkboxes}>
-                  <label className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      name="agreeToOffer"
-                      checked={formData.agreeToOffer}
-                      onChange={handleInputChange}
-                      className={styles.checkbox}
-                    />
-                    <span>
-                      Я соглашаюсь с условиями{" "}
-                      <Link
-                        href="/public-offer"
-                        className={styles.checkboxLink}
-                      >
-                        публичной оферты
-                      </Link>
-                    </span>
-                  </label>
-                  <label className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      name="agreeToPrivacy"
-                      checked={formData.agreeToPrivacy}
-                      onChange={handleInputChange}
-                      className={styles.checkbox}
-                    />
-                    <span>
-                      Я принимаю{" "}
-                      <Link href="/privacy" className={styles.checkboxLink}>
-                        политику конфиденциальности
-                      </Link>
-                    </span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
     {paymentErrorToast && (

@@ -39,6 +39,7 @@ type ProductDisplaySectionProps = {
   maxProducts?: number;
   navFrom?: ProductNavFrom;
   navCategory?: string | null;
+  initialProducts?: CatalogProduct[];
 };
 
 const isNewInTitle = (title: string) =>
@@ -55,12 +56,15 @@ const ProductDisplaySection = ({
   maxProducts,
   navFrom = "home",
   navCategory = null,
+  initialProducts,
 }: ProductDisplaySectionProps) => {
   const swiperRef = useRef<SwiperInstance | null>(null);
   const [maxVisible, setMaxVisible] = useState<number | "auto">(4);
   const [spaceBetween, setSpaceBetween] = useState(20);
-  const [products, setProducts] = useState<CatalogProduct[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [products, setProducts] = useState<CatalogProduct[]>(
+    initialProducts ?? []
+  );
+  const [isLoading, setIsLoading] = useState(initialProducts == null);
   const [progress, setProgress] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const { width } = useWindowSize();
@@ -83,6 +87,8 @@ const ProductDisplaySection = ({
   }, [width]);
 
   useEffect(() => {
+    if (initialProducts != null) return;
+
     const loadProducts = async () => {
       setIsLoading(true);
       try {
@@ -101,7 +107,7 @@ const ProductDisplaySection = ({
     };
 
     loadProducts();
-  }, [title]);
+  }, [title, initialProducts]);
 
   const displayProducts = useMemo(() => {
     if (!isLimitedSlider) return products;

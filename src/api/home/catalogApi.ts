@@ -123,7 +123,7 @@ export const fetchCatalogProducts = async (
       headers: {
         "Content-Type": "application/json",
       },
-      cache: "no-store", // Для динамических данных
+      next: { revalidate: 15 * 60 },
     });
 
     if (!response.ok) {
