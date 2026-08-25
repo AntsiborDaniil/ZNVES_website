@@ -437,8 +437,10 @@
   justify-content: center;
   gap: 0;
   min-height: min(520px, calc(100vh - 120px));
-  padding: 48px 40px;
+  padding: 56px 40px;
   text-align: center;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 28%, rgba(0, 0, 0, 0.025), transparent 70%);
   animation: emptyStateIn 0.45s ease-out;
 }
 
@@ -453,14 +455,47 @@
   }
 }
 
-.emptyIcon {
+.emptyVisual {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  margin-bottom: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 96px;
-  height: 96px;
-  margin-bottom: 28px;
+}
+
+.emptyRing {
+  position: absolute;
+  inset: 0;
   border: 1px solid var(--color-grey-5);
+  border-radius: 50%;
+  animation: emptyRingPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes emptyRingPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.55;
+  }
+}
+
+.emptyIcon {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 0;
+  border: 1px solid var(--color-grey-5);
+  background: #fff;
   color: var(--color-black);
   transition: transform 0.25s ease, border-color 0.25s ease;
 }
@@ -468,6 +503,10 @@
 .emptyState:hover .emptyIcon {
   transform: scale(1.04);
   border-color: var(--color-black);
+}
+
+.emptyState:hover .emptyRing {
+  border-color: var(--color-grey-4);
 }
 
 .emptyTitle {
@@ -689,15 +728,20 @@
     padding: 40px 20px;
   }
 
-  .emptyIcon {
-    width: 80px;
-    height: 80px;
+  .emptyVisual {
+    width: 96px;
+    height: 96px;
     margin-bottom: 22px;
   }
 
+  .emptyIcon {
+    width: 64px;
+    height: 64px;
+  }
+
   .emptyIcon svg {
-    width: 44px;
-    height: 44px;
+    width: 34px;
+    height: 34px;
   }
 
   .emptyTitle {

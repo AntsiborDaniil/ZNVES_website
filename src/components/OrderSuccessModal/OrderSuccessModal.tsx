@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import Image from "next/image";
 import styles from "./OrderSuccessModal.module.css";
 
 type OrderSuccessModalProps = {
@@ -15,35 +14,46 @@ const OrderSuccessModal = ({
   onClose,
   onGoToAccount,
 }: OrderSuccessModalProps) => {
-  // Блокируем скролл при открытой модалке
   useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "unset";
+
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
     };
-  }, []);
+    document.addEventListener("keydown", handleKey);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [onClose]);
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+    <div className={styles.modalOverlay} onClick={onClose} role="presentation">
+      <div
+        className={styles.modalContent}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="order-success-title"
+      >
         <button
           type="button"
           className={styles.closeButton}
           onClick={onClose}
           aria-label="Закрыть"
         >
-          <Image
-            src="/images/login/cancel-btn.png"
-            alt="Закрыть"
-            width={24}
-            height={24}
-            loading="lazy"
-          />
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+            <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="1.5" />
+          </svg>
         </button>
-        <h2 className={styles.modalTitle}>Спасибо за Ваш заказ!</h2>
+        <h2 id="order-success-title" className={styles.modalTitle}>
+          Спасибо за ваш заказ
+        </h2>
         <div className={styles.orderNumber}>№{orderNumber}</div>
         <p className={styles.modalText}>
-          Отследить ваш заказ Вы можете <br/>в личном кабинете
+          Отследить заказ можно в личном кабинете
         </p>
         <div className={styles.modalButtons}>
           <button
@@ -51,7 +61,7 @@ const OrderSuccessModal = ({
             className={styles.primaryButton}
             onClick={onGoToAccount}
           >
-            Перейти в личный кабинет
+            Личный кабинет
           </button>
         </div>
       </div>

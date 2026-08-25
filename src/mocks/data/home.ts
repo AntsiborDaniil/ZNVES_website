@@ -15,14 +15,14 @@ export const MOCK_HOME_PAGE: HomePageContent = {
       title: "Ski suit",
       // файл collection-bag.png содержит фото ski suit
       image: "/images/home/collection-bag.png",
-      href: "/catalog?category=jackets",
+      href: "/catalog",
       cta: "Shop now",
     },
     {
       title: "Bag square",
       // файл collection-ski.png содержит фото сумки
       image: "/images/home/collection-ski.png",
-      href: "/catalog?category=bags",
+      href: "/catalog",
       cta: "Shop now",
     },
   ],

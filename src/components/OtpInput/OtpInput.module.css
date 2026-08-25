@@ -16,27 +16,27 @@
   aspect-ratio: 1;
   max-width: 56px;
   height: 52px;
-  border-radius: 3px;
-  border: 1px solid #bcb4a5;
-  background: #ffffff;
+  border-radius: 0;
+  border: 1px solid var(--color-grey-5);
+  background: #fafafa;
   text-align: center;
-  font-family: inherit;
-  font-size: 22px;
-  font-weight: 600;
-  color: #2d2d2d;
-  caret-color: #0a5840;
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: var(--font-family);
+  font-size: var(--font-size-20);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black);
+  caret-color: var(--color-black);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .box:focus {
   outline: none;
-  border-color: #0a5840;
-  box-shadow: 0 0 0 2px rgba(10, 88, 64, 0.12);
+  border-color: var(--color-grey-2);
+  background: #fff;
 }
 
 .boxFilled {
-  border-color: #0a5840;
-  background: #f4faf7;
+  border-color: var(--color-grey-2);
+  background: #fff;
 }
 
 .boxError {
@@ -45,7 +45,6 @@
 
 .boxError:focus {
   border-color: #c93c3c;
-  box-shadow: 0 0 0 2px rgba(201, 60, 60, 0.12);
 }
 
 @media (max-width: 400px) {
@@ -55,6 +54,6 @@
 
   .box {
     height: 46px;
-    font-size: 18px;
+    font-size: var(--font-size-16);
   }
 }

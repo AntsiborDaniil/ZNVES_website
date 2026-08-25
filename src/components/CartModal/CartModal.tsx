@@ -455,23 +455,31 @@ const CartModal = ({
 
               {!paymentReturnStatus && items.length === 0 && (
                 <div className={styles.emptyState}>
-                  <div className={styles.emptyIcon} aria-hidden>
-                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M3 3H5.2L6.2 7M6.2 7L8 14H18L21 7H6.2ZM9 20.5C9 21.3284 8.32843 22 7.5 22C6.67157 22 6 21.3284 6 20.5C6 19.6716 6.67157 19 7.5 19C8.32843 19 9 19.6716 9 20.5ZM19 20.5C19 21.3284 18.3284 22 17.5 22C16.6716 22 16 21.3284 16 20.5C16 19.6716 16.6716 19 17.5 19C18.3284 19 19 19.6716 19 20.5Z"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M10 10.5h6.5"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                        opacity="0.35"
-                      />
-                    </svg>
+                  <div className={styles.emptyVisual} aria-hidden>
+                    <span className={styles.emptyRing} />
+                    <div className={styles.emptyIcon}>
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M4 7h16l-1.2 12.2A2 2 0 0 1 16.81 21H7.19a2 2 0 0 1-1.99-1.8L4 7Z"
+                          stroke="currentColor"
+                          strokeWidth="1.4"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M9 7V5.5A2.5 2.5 0 0 1 11.5 3h1A2.5 2.5 0 0 1 15 5.5V7"
+                          stroke="currentColor"
+                          strokeWidth="1.4"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M9.5 12.5h5"
+                          stroke="currentColor"
+                          strokeWidth="1.4"
+                          strokeLinecap="round"
+                          opacity="0.35"
+                        />
+                      </svg>
+                    </div>
                   </div>
                   <p className={styles.emptyTitle}>Корзина пуста</p>
                   <p className={styles.emptyText}>

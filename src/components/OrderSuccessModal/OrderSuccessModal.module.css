@@ -1,80 +1,76 @@
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
-  padding: 20px;
+  padding: 24px;
+  box-sizing: border-box;
+  background-color: rgba(28, 28, 28, 0.45);
 }
 
 .modalContent {
-  background-color: #f2f0ec;
-  border-radius: 3px;
-  padding: 70px 34px 26px 34px;
-  max-width: 650px;
-  width: 100%;
   position: relative;
-  border: 1px solid #bcb4a5;
+  box-sizing: border-box;
+  width: min(100%, 420px);
+  padding: 48px 32px 32px;
+  background-color: var(--color-white);
+  border: none;
+  border-radius: 0;
+  text-align: center;
 }
 
 .closeButton {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-black);
+  cursor: pointer;
   transition: opacity 0.2s ease;
 }
 
-.closeButton img {
-  width: 37px;
-  height: 37px;
-}
-
 .closeButton:hover {
-  opacity: 0.7;
+  opacity: 0.65;
 }
 
 .modalTitle {
-  font-weight: 400;
-  font-size: 24px;
-  line-height: 29.98px;
-  letter-spacing: 0px;
-  text-align: center;
-  margin-bottom: 47px;
-
-  color: #525252;
+  margin: 0 0 20px;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-20);
+  line-height: var(--line-height-30);
+  letter-spacing: var(--letter-spacing-tight);
+  text-transform: uppercase;
+  color: var(--color-black);
 }
 
 .orderNumber {
-  font-weight: 600;
-  font-size: 36px;
-  line-height: 28px;
-  letter-spacing: 0%;
-  margin-bottom: 18px;
-
-  color: #262626;
-  text-align: center;
+  margin: 0 0 12px;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-30);
+  line-height: var(--line-height-30);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-black);
 }
 
 .modalText {
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 28px;
-  letter-spacing: 0%;
-  text-align: center;
-
-  color: #525252;
-  margin: 0 0 36px 0;
+  margin: 0 0 28px;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-20);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-grey-4);
 }
 
 .modalButtons {
@@ -84,66 +80,47 @@
 }
 
 .primaryButton {
-  background-color: #0a5840;
-  color: #f2f0ec;
-  border: none;
-  width: 100%;
-  height: 58px;
-  border-radius: 3px;
-  padding: 18px 20px;
-  font-weight: 600;
-  font-size: 18px;
-  line-height: 100%;
-  letter-spacing: 0%;
-  text-align: center;
-  vertical-align: middle;
-
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-/* .primaryButton:hover {
-  background-color: transparent;
-  border: 1px solid #0a5840;
-  color: #0a5840;
-} */
-
-.secondaryButton {
-  background-color: transparent;
-  color: #0a5840;
-  border: 1px solid #0a5840;
-  width: 100%;
-  height: 58px;
-  border-radius: 3px;
-  padding: 18px 20px;
-  font-weight: 600;
-  font-size: 18px;
-  line-height: 100%;
-  letter-spacing: 0%;
-  text-align: center;
-  vertical-align: middle;
-
-  text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  width: 100%;
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--color-black);
+  border-radius: 0;
+  background-color: var(--color-black);
+  color: var(--color-white);
+  font-family: var(--font-family);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-20);
+  letter-spacing: var(--letter-spacing-tight);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
 }
 
-/* .secondaryButton:hover {
-  background-color: #1f4c38;
-  color: #f2f0ec;
-} */
+.primaryButton:hover {
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
 
-/* 480px и меньше */
+.primaryButton:active {
+  transform: scale(0.98);
+}
+
 @media (max-width: 480px) {
   .modalOverlay {
-    padding: 76px;
+    padding: 16px;
   }
 
   .modalContent {
-    padding: 50px 20px 20px;
-    min-width: 300px;
+    width: 100%;
+    padding: 40px 20px 24px;
   }
 
   .closeButton {
@@ -151,110 +128,18 @@
     right: 12px;
   }
 
-  .closeButton img {
-    width: 30px;
-    height: 30px;
-  }
-
   .modalTitle {
-    font-size: 18px;
-    line-height: 22px;
-    margin-bottom: 32px;
-  }
-
-  .orderNumber {
-    font-size: 24px;
-    line-height: 28px;
+    font-size: var(--font-size-16);
     margin-bottom: 16px;
   }
 
-  .modalText {
-    font-size: 14px;
-    line-height: 24px;
-    margin-bottom: 28px;
-  }
-
-  .primaryButton,
-  .secondaryButton {
-    height: 50px;
-    padding: 14px 18px;
-    font-size: 16px;
-  }
-}
-
-/* 481px - 768px */
-@media (min-width: 481px) and (max-width: 768px) {
-  .modalOverlay {
-    padding: 20px;
-  }
-
-  .modalContent {
-    padding: 40px 28px;
-    max-width: 600px;
-  }
-
-  .modalTitle {
-    font-size: 22px;
-    line-height: 26px;
-    margin-bottom: 40px;
-  }
-
   .orderNumber {
-    font-size: 32px;
-    line-height: 36px;
-    margin-bottom: 18px;
+    font-size: var(--font-size-22);
+    margin-bottom: 10px;
   }
 
   .modalText {
-    font-size: 15px;
-    line-height: 26px;
-    margin-bottom: 32px;
-  }
-
-  .primaryButton,
-  .secondaryButton {
-    height: 54px;
-    padding: 16px 20px;
-    font-size: 17px;
-  }
-}
-
-/* 769px - 1024px */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .modalContent {
-    padding: 60px 32px 24px 32px;
-    max-width: 620px;
-  }
-
-  .modalTitle {
-    font-size: 23px;
-    line-height: 28px;
-    margin-bottom: 44px;
-  }
-
-  .orderNumber {
-    font-size: 34px;
-    line-height: 38px;
-  }
-
-  .primaryButton,
-  .secondaryButton {
-    height: 56px;
-  }
-}
-
-/* 1025px - 1280px */
-@media (min-width: 1025px) and (max-width: 1280px) {
-  .modalContent {
-    padding: 65px 34px 26px 34px;
-    max-width: 640px;
-  }
-}
-
-/* Больше 1280px - модалка не растет, остается 650px */
-@media (min-width: 1281px) {
-  .modalContent {
-    padding: 70px 34px 26px 34px;
-    max-width: 650px;
+    font-size: var(--font-size-12);
+    margin-bottom: 24px;
   }
 }

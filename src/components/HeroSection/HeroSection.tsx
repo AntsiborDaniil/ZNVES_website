@@ -54,7 +54,7 @@ const HeroSection = async ({ hero: heroProp }: HeroSectionProps) => {
             fetchPriority="high"
             className={styles.heroMobileMain}
             sizes="(max-width: 768px) 100vw, 0px"
-            quality={80}
+            quality={90}
           />
           <Image
             src={HERO_MOBILE_LIGHTEN}

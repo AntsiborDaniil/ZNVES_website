@@ -2,31 +2,29 @@ import { describe, expect, it } from "vitest";
 import { resolveCollectionHref } from "../CollectionBanner";
 
 describe("resolveCollectionHref", () => {
-  it("uses category from title when href is bare /catalog", () => {
+  it("always returns /catalog without category params", () => {
     expect(
       resolveCollectionHref({
         title: "Ski suit",
         image: "/x.png",
-        href: "/catalog",
+        href: "/catalog?category=jackets",
       })
-    ).toBe("/catalog?category=jackets");
+    ).toBe("/catalog");
 
     expect(
       resolveCollectionHref({
         title: "BAG SQUARE",
         image: "/x.png",
-        href: "/catalog",
+        href: "/catalog?category=bags",
       })
-    ).toBe("/catalog?category=bags");
-  });
+    ).toBe("/catalog");
 
-  it("keeps href that already has category", () => {
     expect(
       resolveCollectionHref({
         title: "Anything",
         image: "/x.png",
-        href: "/catalog?category=hoodies",
+        href: "/catalog",
       })
-    ).toBe("/catalog?category=hoodies");
+    ).toBe("/catalog");
   });
 });

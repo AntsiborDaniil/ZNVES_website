@@ -279,26 +279,53 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
 
             {filteredProducts.length === 0 && (
               <div className={styles.emptyStateWrap}>
-                <div className={styles.emptyStateIcon} aria-hidden>
-                  <svg
-                    width="64"
-                    height="64"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-                    <line x1="3" y1="6" x2="21" y2="6" />
-                    <path d="M16 10a4 4 0 01-8 0" />
-                  </svg>
+                <div className={styles.emptyStateVisual} aria-hidden>
+                  <span className={styles.emptyStateRing} />
+                  <div className={styles.emptyStateIcon}>
+                    <svg
+                      width="40"
+                      height="40"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M4 7h16l-1.2 12.2A2 2 0 0 1 16.81 21H7.19a2 2 0 0 1-1.99-1.8L4 7Z"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9 7V5.5A2.5 2.5 0 0 1 11.5 3h1A2.5 2.5 0 0 1 15 5.5V7"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M9.5 12.5h5"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        strokeLinecap="round"
+                        opacity="0.4"
+                      />
+                    </svg>
+                  </div>
                 </div>
-                <h2 className={styles.emptyStateTitle}>Ничего не найдено</h2>
+                <h2 className={styles.emptyStateTitle}>Таких товаров нет</h2>
                 <p className={styles.emptyStateText}>
-                  В этой категории пока нет товаров.
+                  В этой выборке пока пусто.
+                  <br />
+                  Откройте весь каталог — там есть что посмотреть.
                 </p>
+                {activeCategory !== "all" && (
+                  <button
+                    type="button"
+                    className={styles.emptyStateButton}
+                    onClick={() => handleCategoryChange("all")}
+                  >
+                    Смотреть все
+                  </button>
+                )}
               </div>
             )}
           </>

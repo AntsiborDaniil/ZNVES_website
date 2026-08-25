@@ -6,60 +6,14 @@ import Link from "next/link";
 import styles from "./CollectionBanner.module.css";
 import buttonStyles from "../ui/Button/Button.module.css";
 import { fetchHomePage } from "../../api/home/homeApi";
-import { buildCatalogCategoryHref } from "../../api/catalog/catalogApi";
 import type { HomeCollection } from "../../types/home";
 
 export type CollectionBannerItem = HomeCollection;
 
 type CollectionBannerProps = CollectionBannerItem;
 
-/** Категория каталога по названию баннера коллекции */
-const resolveCollectionCategorySlug = (title: string): string | null => {
-  const t = title.toLowerCase().replace(/\s+/g, " ").trim();
-  if (t.includes("bag") || t.includes("сумк")) return "bags";
-  if (
-    t.includes("ski") ||
-    t.includes("suit") ||
-    t.includes("jacket") ||
-    t.includes("куртк")
-  ) {
-    return "jackets";
-  }
-  return null;
-};
-
-const catalogHrefHasCategory = (href: string): boolean => {
-  try {
-    const url = new URL(href, "https://znves.local");
-    return Boolean(url.searchParams.get("category")?.trim());
-  } catch {
-    return /[?&]category=/i.test(href);
-  }
-};
-
-/**
- * Приоритет: href с category= → slug из title → любой непустой href → /catalog.
- * Так Shop now не сваливается на общий каталог, если бэкенд отдал href="/catalog".
- */
-export const resolveCollectionHref = (item: HomeCollection): string => {
-  const rawHref = (item.href || "").trim();
-  if (rawHref && catalogHrefHasCategory(rawHref)) {
-    return rawHref.startsWith("http")
-      ? rawHref.replace(/^https?:\/\/[^/]+/i, "") || rawHref
-      : rawHref;
-  }
-
-  const categorySlug = resolveCollectionCategorySlug(item.title);
-  if (categorySlug) {
-    return buildCatalogCategoryHref(categorySlug);
-  }
-
-  if (rawHref && rawHref !== "/catalog" && rawHref !== "/catalog/") {
-    return rawHref;
-  }
-
-  return "/catalog";
-};
+/** Shop now всегда ведёт в общий каталог без category= */
+export const resolveCollectionHref = (_item?: HomeCollection): string => "/catalog";
 
 export const CollectionBanner = ({
   title,
