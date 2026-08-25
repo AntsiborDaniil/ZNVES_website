@@ -238,7 +238,61 @@ export interface PaymentResponse {
   payment_id?: string;
   confirmation_url?: string;
   payment_url?: string; // Для обратной совместимости
+  /** Вложенный объект как у ЮKassa confirmation */
+  confirmation?: {
+    confirmation_url?: string;
+    type?: string;
+  };
   [key: string]: unknown;
+}
+
+/** Достаёт URL оплаты из разных форм ответа бэка / ЮKassa */
+export function resolvePaymentRedirectUrl(
+  data: PaymentResponse | null | undefined
+): string | null {
+  if (!data || typeof data !== "object") return null;
+  const candidates = [
+    data.confirmation_url,
+    data.payment_url,
+    data.confirmation?.confirmation_url,
+  ];
+  for (const raw of candidates) {
+    if (typeof raw === "string") {
+      const url = raw.trim();
+      if (url && /^https?:\/\//i.test(url)) return url;
+    }
+  }
+  return null;
+}
+
+/**
+ * Редирект на оплату. После await Safari иногда игнорирует location.href —
+ * поэтому assign + fallback через <a click> и повторный href.
+ */
+export function redirectToPaymentUrl(url: string): void {
+  if (typeof window === "undefined" || !url) return;
+
+  try {
+    window.location.assign(url);
+  } catch {
+    window.location.href = url;
+  }
+
+  // Если навигация не стартовала (Safari после async), пробуем ещё раз
+  window.setTimeout(() => {
+    if (document.visibilityState !== "visible") return;
+    try {
+      const link = document.createElement("a");
+      link.href = url;
+      link.rel = "noopener noreferrer";
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch {
+      window.location.href = url;
+    }
+  }, 250);
 }
 
 /**

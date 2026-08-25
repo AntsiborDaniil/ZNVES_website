@@ -6,14 +6,20 @@
 
 .boxes {
   display: flex;
+  align-items: center;
   gap: 10px;
   justify-content: space-between;
 }
 
 .box {
-  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 0;
   min-width: 0;
-  aspect-ratio: 1;
+  width: 100%;
   max-width: 56px;
   height: 52px;
   border-radius: 0;
@@ -23,8 +29,11 @@
   font-family: var(--font-family);
   font-size: var(--font-size-20);
   font-weight: var(--font-weight-medium);
+  line-height: normal;
   color: var(--color-black);
   caret-color: var(--color-black);
+  vertical-align: middle;
+  align-self: center;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 

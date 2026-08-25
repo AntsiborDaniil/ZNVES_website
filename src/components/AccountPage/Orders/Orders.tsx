@@ -8,6 +8,8 @@ import {
   apiOrderToAccountView,
   getPaymentUrl,
   getYandexPaymentUrl,
+  redirectToPaymentUrl,
+  resolvePaymentRedirectUrl,
   type AccountOrderView,
 } from "../../../api/order/orderApi";
 import LoadingStub from "../../LoadingStub/LoadingStub";
@@ -394,10 +396,9 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
             return_url: returnUrl,
             cancel_url: cancelUrl,
           });
-      const paymentUrl =
-        paymentResponse.confirmation_url || paymentResponse.payment_url;
+      const paymentUrl = resolvePaymentRedirectUrl(paymentResponse);
       if (paymentUrl) {
-        window.location.href = paymentUrl;
+        redirectToPaymentUrl(paymentUrl);
         return;
       }
       setOrderPayError(ORDER_ERROR_MESSAGE);

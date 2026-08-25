@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { getProductById } from "../../data/products";
-import { createOrder, getPaymentUrl, getYandexPaymentUrl, invalidateMyOrdersCache, type OrderRequest } from "../../api/order/orderApi";
+import { createOrder, getPaymentUrl, getYandexPaymentUrl, invalidateMyOrdersCache, redirectToPaymentUrl, resolvePaymentRedirectUrl, type OrderRequest } from "../../api/order/orderApi";
 import PromoErrorToast from "../PromoErrorToast/PromoErrorToast";
 import { fetchCatalogProductRaw, type ApiProductDetail, type ApiWarehouseItem } from "../../api/product/productApi";
 import { fetchCatalogColors } from "../../api/catalog/catalogApi";
@@ -1489,38 +1489,40 @@ const CheckoutForm = ({
       // Сохраняем order_id для дальнейшего использования
       const orderId = orderResponse.id;
 
-      // Обработка оплаты в зависимости от выбранного способа
-      if (formData.paymentMethod === "card" || formData.paymentMethod === "sberbank") {
-        // Оплата картой или СБП — return_url/cancel_url формируются в API относительно текущей страницы
+      // Обработка оплаты в зависимости от выбранного способа.
+      // Онлайн-оплата: при успехе уходим на ЮKassa/Яндекс; при ошибке — только тост, без модалки «спасибо».
+      const isOnlinePayment =
+        formData.paymentMethod === "card" ||
+        formData.paymentMethod === "sberbank" ||
+        formData.paymentMethod === "yandexpay" ||
+        formData.paymentMethod === "installment";
+
+      if (isOnlinePayment) {
         try {
-          const paymentResponse = await getPaymentUrl(orderId);
-          
-          // Используем confirmation_url или payment_url для обратной совместимости
-          const paymentUrl = paymentResponse.confirmation_url || paymentResponse.payment_url;
-          
+          const paymentResponse =
+            formData.paymentMethod === "yandexpay" ||
+            formData.paymentMethod === "installment"
+              ? await getYandexPaymentUrl(orderId)
+              : await getPaymentUrl(orderId);
+
+          const paymentUrl = resolvePaymentRedirectUrl(paymentResponse);
           if (paymentUrl) {
-            // Перенаправляем на страницу оплаты
-            window.location.href = paymentUrl;
+            redirectToPaymentUrl(paymentUrl);
             return;
           }
-        } catch (error) {
-          setPaymentErrorToast("Не удалось перейти к оплате. Попробуйте ещё раз или свяжитесь с поддержкой.");
+
+          setPaymentErrorToast(
+            "Не удалось получить ссылку на оплату. Попробуйте ещё раз или свяжитесь с поддержкой."
+          );
+        } catch {
+          setPaymentErrorToast(
+            formData.paymentMethod === "yandexpay" ||
+              formData.paymentMethod === "installment"
+              ? "Не удалось перейти к оплате. Попробуйте оплатить картой или СБП, либо свяжитесь с поддержкой."
+              : "Не удалось перейти к оплате. Попробуйте ещё раз или свяжитесь с поддержкой."
+          );
         }
-      } else if (formData.paymentMethod === "yandexpay" || formData.paymentMethod === "installment") {
-        // Яндекс Pay и Долями — return_url/cancel_url формируются в API относительно текущей страницы
-        try {
-          const paymentResponse = await getYandexPaymentUrl(orderId);
-          
-          const paymentUrl = paymentResponse.confirmation_url || paymentResponse.payment_url;
-          
-          if (paymentUrl) {
-            window.location.href = paymentUrl;
-            return;
-          }
-        } catch (error) {
-          setPaymentErrorToast("Не удалось перейти к оплате. Попробуйте оплатить картой или СБП, либо свяжитесь с поддержкой.");
-          return;
-        }
+        return;
       }
 
       // Сохраняем заказ в sessionStorage для отображения в личном кабинете
