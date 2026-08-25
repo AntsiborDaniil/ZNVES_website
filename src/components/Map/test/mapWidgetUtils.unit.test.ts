@@ -9,6 +9,7 @@ import {
   normalizePvzSearch,
   parseAddressFromGeoObject,
   parseYaNddWidgetSelection,
+  resolveYaWidgetSize,
 } from "../mapWidgetUtils";
 
 const samplePvz: CdekPvzPoint = {
@@ -111,11 +112,38 @@ describe("buildYaDeliveryWidgetParams", () => {
     expect(params.physical_dims_weight_gross).toBe(100);
     expect(params.filter.type).toEqual(["pickup_point", "terminal"]);
     expect(params.show_select_button).toBe(true);
+    expect(params.size).toEqual({ height: "450px", width: "100%" });
   });
 
   it("keeps provided weight when above minimum", () => {
     const params = buildYaDeliveryWidgetParams("Москва", "addr", 2500);
     expect(params.physical_dims_weight_gross).toBe(2500);
+  });
+
+  it("accepts explicit widget size", () => {
+    const params = buildYaDeliveryWidgetParams("Москва", "addr", 1000, {
+      width: "100%",
+      height: "620px",
+    });
+    expect(params.size).toEqual({ width: "100%", height: "620px" });
+  });
+});
+
+describe("resolveYaWidgetSize", () => {
+  it("returns taller height and pixel width on compact containers", () => {
+    const el = { clientWidth: 360 } as HTMLElement;
+    const size = resolveYaWidgetSize(el);
+    expect(size.width).toBe("360px");
+    expect(size.widthPx).toBe(360);
+    expect(size.heightPx).toBeGreaterThanOrEqual(560);
+    expect(size.height).toBe(`${size.heightPx}px`);
+  });
+
+  it("returns 450px height on wide containers", () => {
+    const el = { clientWidth: 900 } as HTMLElement;
+    const size = resolveYaWidgetSize(el);
+    expect(size.heightPx).toBe(450);
+    expect(size.width).toBe("900px");
   });
 });
 

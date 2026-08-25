@@ -248,7 +248,6 @@ export const createOrder = async (
   orderData: OrderRequest
 ): Promise<OrderResponse> => {
   try {
-
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
@@ -279,6 +278,18 @@ export const createOrder = async (
     const data: OrderResponse = await response.json();
     return data;
   } catch (error) {
+    // Mock-режим: только при сетевом сбое (MSW ещё не готов) — локальный заказ.
+    // HTTP-ошибки бэка / MSW пробрасываем дальше, чтобы запросы на /api/order/ оставались видимыми.
+    if (shouldUseMocks() && error instanceof TypeError) {
+      const { createMockOrder } = await import("../../mocks/state/orderStore");
+      const order = createMockOrder(orderData);
+      const numericId = Number(String(order.id).replace(/\D/g, "")) || Date.now();
+      return {
+        id: numericId,
+        status: order.status,
+        message: "Заказ создан",
+      };
+    }
     throw error;
   }
 };
@@ -351,6 +362,12 @@ export const getPaymentUrl = async (
     const data: PaymentResponse = await response.json();
     return data;
   } catch (error) {
+    if (shouldUseMocks() && error instanceof TypeError) {
+      return {
+        payment_id: `mock-pay-${orderId}`,
+        confirmation_url: `https://example.com/pay/${orderId}`,
+      };
+    }
     throw error;
   }
 };
@@ -404,6 +421,12 @@ export const getYandexPaymentUrl = async (
     const data: PaymentResponse = await response.json();
     return data;
   } catch (error) {
+    if (shouldUseMocks() && error instanceof TypeError) {
+      return {
+        payment_id: `mock-yandex-pay-${orderId}`,
+        confirmation_url: `https://example.com/yandex-pay/${orderId}`,
+      };
+    }
     throw error;
   }
 };

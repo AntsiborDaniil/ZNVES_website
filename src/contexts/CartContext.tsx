@@ -114,9 +114,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             ...updated[existingIndex],
             quantity: updated[existingIndex].quantity + quantity,
             ...(colorLabel != null && { colorLabel }),
+            ...(warehouseProductId ? { warehouseProduct: warehouseProductId } : {}),
           };
-          if (warehouseProductId) {
-          }
           return updated;
         }
 
@@ -127,9 +126,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           ...(colorLabel != null && { colorLabel }),
           quantity,
           product,
+          ...(warehouseProductId ? { warehouseProduct: warehouseProductId } : {}),
         };
-        if (warehouseProductId) {
-        }
         return [...prevItems, newItem];
       });
     },

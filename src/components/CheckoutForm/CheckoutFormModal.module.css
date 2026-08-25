@@ -727,8 +727,8 @@ textarea.input::placeholder {
 
 @media (max-width: 768px) {
   .checkoutMapContainer :global(#delivery-widget) {
-    min-height: 320px;
-    height: 100%;
+    min-height: 560px;
+    height: auto;
   }
 
   .checkoutMapContainer :global(.ymaps-2-1-79-map) {
@@ -744,8 +744,10 @@ textarea.input::placeholder {
     display: none !important;
   }
 
+  /* Не обрезаем кнопку «Выбрать» у виджета Яндекса */
   .checkoutMapContainer:not(.checkoutMapContainerCourier) {
-    overflow: hidden;
+    overflow: visible;
+    min-height: 560px;
   }
 
   .hideContinueButton .checkoutMapContainer :global(#delivery-widget button) {
@@ -1990,6 +1992,12 @@ textarea.input::placeholder {
   border-radius: 0;
 }
 
+@media (max-width: 768px) {
+  .checkoutMapContainer:not(.checkoutMapContainerCourier) {
+    min-height: 560px;
+  }
+}
+
 .checkoutMapSearchInput {
   width: 100%;
   min-height: 50px;
@@ -2478,7 +2486,7 @@ textarea.input::placeholder {
   .checkoutMapContainer,
   .checkoutMapContainerCourier {
     min-height: 400px;
-    height: 400px;
+    height: auto;
   }
 
   .modalOrderSummary {

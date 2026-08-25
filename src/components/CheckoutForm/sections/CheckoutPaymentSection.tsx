@@ -147,11 +147,14 @@ export default function CheckoutPaymentSection({
           type="button"
           className={`${styles.submitButton} ${styles.submitButtonRight}`}
           disabled={isSubmitting || (deliveryMethod === "yandex" && !courierAvailable)}
-          onClick={onSubmitOrder}
+          onClick={() => {
+            void onSubmitOrder();
+          }}
           onPointerDown={(e) => {
+            // iOS/Safari: клик по кнопке иногда теряется после скролла виджета карты
             if (e.pointerType === "touch") {
               e.preventDefault();
-              onSubmitOrder();
+              void onSubmitOrder();
             }
           }}
         >

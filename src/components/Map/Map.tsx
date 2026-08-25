@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { CdekPvzPoint } from "../../api/delivery/cdekApi";
 import { getRegionPvzCdek } from "../../api/delivery/pvzRegionCache";
 import {
@@ -14,6 +14,7 @@ import {
   MOSCOW_CENTER,
   parseAddressFromGeoObject,
   parseYaNddWidgetSelection,
+  resolveYaWidgetSize,
   type PvzListOption,
   type YaNddWidgetPointDetail,
   YANDEX_PVZ_CONTAINER_ID,
@@ -290,6 +291,10 @@ const Map = ({
     return () => widgetRoot.removeEventListener("click", handleWidgetClick, true);
   }, [isPickupYandex, onYandexWidgetInteraction]);
 
+  /** Высота контейнера = size, переданный в YaDelivery.createWidget */
+  const [yaWidgetHeightPx, setYaWidgetHeightPx] = useState(450);
+  const yaWidgetWidthPxRef = useRef(0);
+
   // Загрузка скрипта и инициализация виджета ПВЗ (только для Яндекса).
   // Вес берём из ref — не пересоздаём виджет при каждом изменении totalWeightGrams.
   const totalWeightGramsRef = useRef(totalWeightGrams);
@@ -297,6 +302,34 @@ const Map = ({
   const yaSourceAddress =
     deliveryConfig?.yaDeliverySourceAddress?.trim() || DEFAULT_YA_SOURCE_ADDRESS;
   const deliveryConfigReady = Boolean(deliveryConfig);
+
+  const mountYaWidget = useCallback(
+    (force = false) => {
+      if (!window.YaDelivery) return false;
+      if (!document.getElementById(CONTAINER_ID)) return false;
+      if (!force && widgetInitedRef.current) return false;
+
+      const size = resolveYaWidgetSize(containerRef.current);
+      yaWidgetWidthPxRef.current = size.widthPx;
+      setYaWidgetHeightPx(size.heightPx);
+
+      const container = document.getElementById(CONTAINER_ID);
+      if (container) container.innerHTML = "";
+
+      widgetInitedRef.current = true;
+      window.YaDelivery.createWidget({
+        containerId: CONTAINER_ID,
+        params: buildYaDeliveryWidgetParams(
+          city,
+          yaSourceAddress,
+          totalWeightGramsRef.current,
+          { width: size.width, height: size.height }
+        ),
+      });
+      return true;
+    },
+    [city, yaSourceAddress]
+  );
 
   useEffect(() => {
     if (!isPickupYandex || !containerRef.current || !deliveryConfigReady) return;
@@ -310,32 +343,11 @@ const Map = ({
       }
     };
 
-    const sourceAddress = yaSourceAddress;
-
     function startWidget() {
-      if (widgetInitedRef.current) {
-        return;
+      if (mountYaWidget(false)) {
+        clearLoadingTimeout();
+        loadingTimeout = setTimeout(() => setYandexWidgetLoading(false), 4000);
       }
-      if (!window.YaDelivery) {
-        return;
-      }
-      if (!document.getElementById(CONTAINER_ID)) {
-        return;
-      }
-      widgetInitedRef.current = true;
-
-      const params = buildYaDeliveryWidgetParams(
-        city,
-        sourceAddress,
-        totalWeightGramsRef.current
-      );
-
-      window.YaDelivery.createWidget({
-        containerId: CONTAINER_ID,
-        params,
-      });
-      clearLoadingTimeout();
-      loadingTimeout = setTimeout(() => setYandexWidgetLoading(false), 4000);
     }
 
     if (window.YaDelivery) {
@@ -349,8 +361,6 @@ const Map = ({
     ) as (HTMLScriptElement & { readyState?: string }) | null;
     if (existing) {
       const readyState = existing.readyState ?? "";
-      // Не вызываем startWidget() синхронно: скрипт с async мог ещё не выполниться.
-      // Если скрипт уже загружен — событие YaNddWidgetLoad мы могли пропустить; тогда опрашиваем YaDelivery.
       if (readyState === "complete" || readyState === "loaded") {
         const poll = setInterval(() => {
           if (window.YaDelivery) {
@@ -398,7 +408,39 @@ const Map = ({
       const container = document.getElementById(CONTAINER_ID);
       if (container) container.innerHTML = "";
     };
-  }, [isPickupYandex, city, yaSourceAddress, deliveryConfigReady]);
+  }, [isPickupYandex, city, yaSourceAddress, deliveryConfigReady, mountYaWidget]);
+
+  // При ресайзе модалки корзины YaDelivery не обновляет size — пересоздаём виджет.
+  useEffect(() => {
+    if (!isPickupYandex || !deliveryConfigReady) return;
+    const el = containerRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const remountIfWidthChanged = () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        if (!widgetInitedRef.current || !window.YaDelivery) return;
+        const nextWidth = containerRef.current?.clientWidth ?? 0;
+        if (nextWidth < 200) return;
+        if (Math.abs(nextWidth - yaWidgetWidthPxRef.current) < 12) return;
+        setYandexWidgetLoading(true);
+        mountYaWidget(true);
+        window.setTimeout(() => setYandexWidgetLoading(false), 600);
+      }, 180);
+    };
+
+    const observer = new ResizeObserver(remountIfWidthChanged);
+    observer.observe(el);
+    // Родитель модалки тоже может менять ширину, пока YaDelivery зафиксировал ребёнка.
+    if (el.parentElement) observer.observe(el.parentElement);
+
+    return () => {
+      observer.disconnect();
+      if (debounceTimer) clearTimeout(debounceTimer);
+    };
+  }, [isPickupYandex, deliveryConfigReady, mountYaWidget]);
 
   useEffect(() => {
     if (!isCourier) return;
@@ -822,7 +864,14 @@ const Map = ({
 
   if (isPickupYandex) {
     return (
-      <div style={{ width: "100%", minHeight: 400, position: "relative" }}>
+      <div
+        style={{
+          width: "100%",
+          minHeight: yaWidgetHeightPx,
+          height: yaWidgetHeightPx,
+          position: "relative",
+        }}
+      >
         {yandexWidgetLoading && (
           <div
             style={{
@@ -842,8 +891,14 @@ const Map = ({
             <span style={{ color: "#555", fontSize: 14 }}>Загрузка пунктов выдачи…</span>
           </div>
         )}
-        <div ref={containerRef} style={{ width: "100%", minHeight: 450 }}>
-          <div id={CONTAINER_ID} style={{ width: "100%", height: "100%", minHeight: 450 }} />
+        <div
+          ref={containerRef}
+          style={{ width: "100%", height: yaWidgetHeightPx, minHeight: yaWidgetHeightPx }}
+        >
+          <div
+            id={CONTAINER_ID}
+            style={{ width: "100%", height: yaWidgetHeightPx, minHeight: yaWidgetHeightPx }}
+          />
         </div>
       </div>
     );

@@ -142,16 +142,46 @@ export function parseYaNddWidgetSelection(
   };
 }
 
+export function resolveYaWidgetSize(container?: HTMLElement | null): {
+  width: string;
+  height: string;
+  heightPx: number;
+  widthPx: number;
+} {
+  const viewportH =
+    typeof window !== "undefined" ? window.innerHeight || 800 : 800;
+  const measuredWidth =
+    container?.clientWidth ||
+    (typeof window !== "undefined" ? window.innerWidth || 400 : 400);
+  const widthPx = Math.max(280, Math.round(measuredWidth));
+  const isCompact = widthPx < 768;
+  // На мобилке 450px обрезает панель ПВЗ с кнопкой «Выбрать».
+  const heightPx = isCompact
+    ? Math.round(Math.min(Math.max(viewportH * 0.62, 560), 720))
+    : 450;
+
+  return {
+    // Пиксельная ширина: YaDelivery фиксирует size при createWidget — при ресайзе модалки
+    // виджет нужно пересоздать с новой шириной контейнера.
+    width: `${widthPx}px`,
+    height: `${heightPx}px`,
+    heightPx,
+    widthPx,
+  };
+}
+
 export function buildYaDeliveryWidgetParams(
   city: string,
   sourceAddress: string,
-  totalWeightGrams?: number
+  totalWeightGrams?: number,
+  size?: { width: string; height: string }
 ) {
   const weightGrams = Math.max(100, totalWeightGrams ?? 10000);
+  const resolvedSize = size ?? { height: "450px", width: "100%" };
 
   return {
     city,
-    size: { height: "450px", width: "100%" },
+    size: resolvedSize,
     source_address: sourceAddress,
     physical_dims_weight_gross: weightGrams,
     physical_dims_dx: 30,

@@ -80,7 +80,7 @@ export default function CheckoutPersonalSection({
           ref={emailRef}
         />
       </div>
-      <div className={`${styles.inputWrapper} ${styles.modalVisuallyHidden}`} ref={phoneRef}>
+      <div className={styles.inputWrapper} ref={phoneRef}>
         <label htmlFor="phone" className={styles.label}>
           Телефон
         </label>

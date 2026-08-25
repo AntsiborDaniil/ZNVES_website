@@ -134,6 +134,7 @@ const CheckoutForm = ({
   const [showContinueButtonAgain, setShowContinueButtonAgain] = useState(false);
   const hideContinueButton =
     isCartMobilePvz &&
+    formData.deliveryType === "cdek" &&
     !!formData.pvzAddress.trim() &&
     formData.deliveryMethod === "pickup" &&
     !showContinueButtonAgain;
@@ -1171,6 +1172,11 @@ const CheckoutForm = ({
 
     // Если есть ошибки, скроллим к первой
     if (Object.keys(newErrors).length > 0) {
+      if (newErrors.phone) {
+        setPaymentErrorToast("Укажите корректный номер телефона для оформления заказа.");
+      } else if (newErrors.pvzAddress) {
+        setPaymentErrorToast("Выберите пункт выдачи на карте или в списке.");
+      }
       const errorFields = Object.keys(newErrors);
       const firstError = errorFields[0];
       
