@@ -5,10 +5,13 @@ import { Controller, useForm } from "react-hook-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  changePasswordWithResetToken,
   loginUser,
   registerUser,
+  requestPasswordReset,
   resendAuthCode,
   verifyLogin,
+  verifyPasswordResetCode,
   verifyRegistration,
   type AuthUser,
 } from "../../api/auth/authApi";
@@ -37,6 +40,14 @@ import styles from "./AccountAuth.module.css";
 
 type AuthMode = "login" | "register";
 
+type AuthStep =
+  | "credentials"
+  | "verify"
+  | "reset-email"
+  | "reset-code"
+  | "reset-password"
+  | "reset-success";
+
 type LoginFormValues = {
   email: string;
   password: string;
@@ -52,6 +63,15 @@ type RegisterFormValues = {
 
 type VerifyFormValues = {
   code: string;
+};
+
+type ResetEmailFormValues = {
+  email: string;
+};
+
+type ResetPasswordFormValues = {
+  password: string;
+  confirmPassword: string;
 };
 
 type AccountAuthProps = {
@@ -189,13 +209,16 @@ const AccountAuth = ({
   const [mode, setMode] = useState<AuthMode>(
     initialAuth.step === "verify" ? initialAuth.mode : initialMode
   );
-  const [step, setStep] = useState<"credentials" | "verify">(initialAuth.step);
+  const [step, setStep] = useState<AuthStep>(initialAuth.step);
   const [pendingEmail, setPendingEmail] = useState(initialAuth.pendingEmail);
   const [loginPassword, setLoginPassword] = useState(initialAuth.loginPassword);
+  const [resetToken, setResetToken] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [showResetPasswordConfirm, setShowResetPasswordConfirm] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(initialAuth.resendCooldown);
 
   const formOptions = {
@@ -224,7 +247,22 @@ const AccountAuth = ({
     defaultValues: { code: "" },
   });
 
+  const resetEmailForm = useForm<ResetEmailFormValues>({
+    ...formOptions,
+    defaultValues: { email: "" },
+  });
+
+  const resetPasswordForm = useForm<ResetPasswordFormValues>({
+    ...formOptions,
+    defaultValues: { password: "", confirmPassword: "" },
+  });
+
   const registerPassword = registerForm.watch("password");
+  const isPasswordResetFlow =
+    step === "reset-email" ||
+    step === "reset-code" ||
+    step === "reset-password" ||
+    step === "reset-success";
 
   useEffect(() => {
     if (step !== "verify" || !pendingEmail) {
@@ -260,7 +298,24 @@ const AccountAuth = ({
     setFormError(null);
     setInfoMessage(null);
     setResendCooldown(0);
+    setResetToken("");
     clearPendingAccountAuthFlow();
+    verifyForm.reset();
+    resetEmailForm.reset();
+    resetPasswordForm.reset();
+  };
+
+  const openPasswordReset = () => {
+    const loginEmail = loginForm.getValues("email").trim();
+    setStep("reset-email");
+    setMode("login");
+    setFormError(null);
+    setInfoMessage(null);
+    setResendCooldown(0);
+    setResetToken("");
+    clearPendingAccountAuthFlow();
+    resetEmailForm.reset({ email: loginEmail });
+    resetPasswordForm.reset();
     verifyForm.reset();
   };
 
@@ -394,9 +449,371 @@ const AccountAuth = ({
     setFormError(null);
     setInfoMessage(null);
     setResendCooldown(0);
+    setResetToken("");
     clearPendingAccountAuthFlow();
     verifyForm.reset();
+    resetEmailForm.reset();
+    resetPasswordForm.reset();
   };
+
+  const handleResetEmailSubmit = resetEmailForm.handleSubmit(async (values) => {
+    resetEmailForm.clearErrors();
+    setFormError(null);
+    setInfoMessage(null);
+    try {
+      await requestPasswordReset(values.email.trim());
+      setPendingEmail(values.email.trim());
+      setStep("reset-code");
+      verifyForm.reset();
+      startResendCooldown();
+      setInfoMessage("Код для сброса пароля отправлен на вашу почту");
+    } catch (error) {
+      applyAuthApiError({
+        error,
+        form: resetEmailForm,
+        fieldMap: { email: "email" },
+        setFormError,
+        fallback: "Не удалось отправить код",
+      });
+    }
+  });
+
+  const handleResetCodeSubmit = verifyForm.handleSubmit(async (values) => {
+    verifyForm.clearErrors();
+    setFormError(null);
+    setInfoMessage(null);
+    try {
+      const token = await verifyPasswordResetCode(pendingEmail, values.code.trim());
+      setResetToken(token);
+      setStep("reset-password");
+      resetPasswordForm.reset();
+      setInfoMessage(null);
+    } catch (error) {
+      applyAuthApiError({
+        error,
+        form: verifyForm,
+        fieldMap: { code: "code" },
+        setFormError,
+        fallback: "Не удалось подтвердить код",
+      });
+    }
+  });
+
+  const handleResetPasswordSubmit = resetPasswordForm.handleSubmit(async (values) => {
+    resetPasswordForm.clearErrors();
+    setFormError(null);
+    setInfoMessage(null);
+
+    if (values.password !== values.confirmPassword) {
+      resetPasswordForm.setError("confirmPassword", {
+        type: "validate",
+        message: "Пароли не совпадают",
+      });
+      return;
+    }
+
+    try {
+      await changePasswordWithResetToken(resetToken, values.password);
+      setStep("reset-success");
+      setInfoMessage("Пароль успешно изменён. Теперь можно войти с новым паролем.");
+    } catch (error) {
+      applyAuthApiError({
+        error,
+        form: resetPasswordForm,
+        fieldMap: { password: "password" },
+        setFormError,
+        fallback: "Не удалось изменить пароль",
+      });
+    }
+  });
+
+  const handleResendResetCode = async () => {
+    if (resendCooldown > 0 || !pendingEmail) return;
+
+    verifyForm.clearErrors();
+    setFormError(null);
+    setInfoMessage(null);
+    try {
+      await requestPasswordReset(pendingEmail);
+      startResendCooldown();
+      setInfoMessage("Код отправлен повторно");
+    } catch (error) {
+      applyAuthApiError({
+        error,
+        form: verifyForm,
+        fieldMap: { code: "code" },
+        setFormError,
+        fallback: "Не удалось отправить код повторно",
+      });
+    }
+  };
+
+  const handleBackToLoginAfterReset = () => {
+    handleBackToCredentials();
+    setMode("login");
+    setInfoMessage("Войдите с новым паролем");
+  };
+
+  if (step === "reset-success") {
+    return (
+      <div className={blockClassName}>
+        <h1 className={styles.title}>Пароль изменён</h1>
+        <p className={`${styles.description} ${styles.descriptionVisible}`}>
+          {infoMessage || "Теперь вы можете войти в личный кабинет с новым паролем."}
+        </p>
+        <button
+          type="button"
+          className={styles.submitButton}
+          onClick={handleBackToLoginAfterReset}
+        >
+          Войти
+        </button>
+      </div>
+    );
+  }
+
+  if (step === "reset-password") {
+    return (
+      <div className={blockClassName}>
+        <h1 className={styles.title}>Новый пароль</h1>
+        <p className={`${styles.description} ${styles.descriptionVisible}`}>
+          Придумайте новый пароль для{" "}
+          <span className={styles.emailHighlight}>{pendingEmail}</span>
+        </p>
+
+        <form className={styles.form} onSubmit={handleResetPasswordSubmit} noValidate>
+          <div className={styles.field}>
+            <label htmlFor="reset-password" className={styles.label}>
+              Новый пароль
+            </label>
+            <div className={styles.passwordWrap}>
+              <input
+                id="reset-password"
+                type={showResetPassword ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder="Минимум 8 символов, Aa и цифра"
+                className={`${styles.input} ${
+                  resetPasswordForm.formState.errors.password ? styles.inputError : ""
+                }`}
+                {...resetPasswordForm.register("password", {
+                  validate: validateRegistrationPassword,
+                })}
+              />
+              <PasswordToggleButton
+                visible={showResetPassword}
+                onToggle={() => setShowResetPassword((v) => !v)}
+                label={showResetPassword ? "Скрыть пароль" : "Показать пароль"}
+              />
+            </div>
+            {resetPasswordForm.formState.errors.password && (
+              <span className={styles.fieldError}>
+                {resetPasswordForm.formState.errors.password.message}
+              </span>
+            )}
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="reset-password-confirm" className={styles.label}>
+              Повторите пароль
+            </label>
+            <div className={styles.passwordWrap}>
+              <input
+                id="reset-password-confirm"
+                type={showResetPasswordConfirm ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder="Повторите пароль"
+                className={`${styles.input} ${
+                  resetPasswordForm.formState.errors.confirmPassword ? styles.inputError : ""
+                }`}
+                {...resetPasswordForm.register("confirmPassword", {
+                  validate: (value) =>
+                    value.trim() ? true : "Повторите пароль",
+                })}
+              />
+              <PasswordToggleButton
+                visible={showResetPasswordConfirm}
+                onToggle={() => setShowResetPasswordConfirm((v) => !v)}
+                label={showResetPasswordConfirm ? "Скрыть пароль" : "Показать пароль"}
+              />
+            </div>
+            {resetPasswordForm.formState.errors.confirmPassword && (
+              <span className={styles.fieldError}>
+                {resetPasswordForm.formState.errors.confirmPassword.message}
+              </span>
+            )}
+          </div>
+
+          {formError && (
+            <p className={styles.errorMessage} role="alert">
+              {formError}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            className={styles.submitButton}
+            disabled={resetPasswordForm.formState.isSubmitting}
+          >
+            {resetPasswordForm.formState.isSubmitting ? "Сохраняем…" : "Сохранить пароль"}
+          </button>
+
+          <div className={styles.verifyActions}>
+            <button
+              type="button"
+              className={styles.textButton}
+              onClick={() => {
+                setStep("reset-code");
+                setFormError(null);
+              }}
+            >
+              Назад
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  if (step === "reset-code") {
+    return (
+      <div className={blockClassName}>
+        <h1 className={styles.title}>Подтверждение</h1>
+        <p className={`${styles.description} ${styles.descriptionVisible}`}>
+          Введите код из письма, отправленного на{" "}
+          <span className={styles.emailHighlight}>{pendingEmail}</span>
+        </p>
+
+        <form className={styles.form} onSubmit={handleResetCodeSubmit} noValidate>
+          <div className={styles.field}>
+            <span className={styles.label} id="reset-code-label">
+              Код подтверждения
+            </span>
+            <Controller
+              name="code"
+              control={verifyForm.control}
+              rules={{ validate: validateCode }}
+              render={({ field }) => (
+                <OtpInput
+                  id="reset-code"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  error={!!verifyForm.formState.errors.code}
+                  disabled={verifyForm.formState.isSubmitting}
+                  aria-label="Код подтверждения из письма"
+                />
+              )}
+            />
+            {verifyForm.formState.errors.code && (
+              <span className={styles.fieldError}>
+                {verifyForm.formState.errors.code.message}
+              </span>
+            )}
+          </div>
+
+          {infoMessage && <p className={styles.infoMessage}>{infoMessage}</p>}
+          {formError && (
+            <p className={styles.errorMessage} role="alert">
+              {formError}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            className={styles.submitButton}
+            disabled={verifyForm.formState.isSubmitting}
+          >
+            {verifyForm.formState.isSubmitting ? "Проверяем…" : "Подтвердить"}
+          </button>
+
+          <div className={styles.verifyActions}>
+            <button
+              type="button"
+              className={styles.textButton}
+              onClick={handleResendResetCode}
+              disabled={verifyForm.formState.isSubmitting || resendCooldown > 0}
+            >
+              {resendCooldown > 0
+                ? `Повторная отправка через ${formatResendCooldown(resendCooldown)}`
+                : "Отправить код повторно"}
+            </button>
+            <button
+              type="button"
+              className={styles.textButton}
+              onClick={() => {
+                setStep("reset-email");
+                setFormError(null);
+                setInfoMessage(null);
+              }}
+            >
+              Назад
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  if (step === "reset-email") {
+    return (
+      <div className={blockClassName}>
+        <h1 className={styles.title}>Восстановление пароля</h1>
+        <p className={`${styles.description} ${styles.descriptionVisible}`}>
+          Введите email — мы отправим код для сброса пароля.
+        </p>
+
+        <form className={styles.form} onSubmit={handleResetEmailSubmit} noValidate>
+          <div className={styles.field}>
+            <label htmlFor="reset-email" className={styles.label}>
+              Email
+            </label>
+            <input
+              id="reset-email"
+              type="email"
+              autoComplete="email"
+              placeholder="Введите email"
+              className={`${styles.input} ${
+                resetEmailForm.formState.errors.email ? styles.inputError : ""
+              }`}
+              {...resetEmailForm.register("email", {
+                validate: validateLoginEmail,
+              })}
+            />
+            {resetEmailForm.formState.errors.email && (
+              <span className={styles.fieldError}>
+                {resetEmailForm.formState.errors.email.message}
+              </span>
+            )}
+          </div>
+
+          {infoMessage && <p className={styles.infoMessage}>{infoMessage}</p>}
+          {formError && (
+            <p className={styles.errorMessage} role="alert">
+              {formError}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            className={styles.submitButton}
+            disabled={resetEmailForm.formState.isSubmitting}
+          >
+            {resetEmailForm.formState.isSubmitting ? "Отправляем…" : "Отправить код"}
+          </button>
+
+          <div className={styles.verifyActions}>
+            <button
+              type="button"
+              className={styles.textButton}
+              onClick={handleBackToCredentials}
+            >
+              Назад ко входу
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   if (step === "verify") {
     return (
@@ -404,7 +821,7 @@ const AccountAuth = ({
         <h1 className={styles.title}>
           {mode === "login" ? "Подтверждение входа" : "Подтверждение регистрации"}
         </h1>
-        <p className={styles.description}>
+        <p className={`${styles.description} ${styles.descriptionVisible}`}>
           Введите код из письма, отправленного на{" "}
           <span className={styles.emailHighlight}>{pendingEmail}</span>
         </p>
@@ -478,6 +895,7 @@ const AccountAuth = ({
 
   return (
     <div className={blockClassName}>
+      {!isPasswordResetFlow && (
       <div className={styles.tabs}>
         <div
           className={styles.tabIndicator}
@@ -499,6 +917,7 @@ const AccountAuth = ({
           Регистрация
         </button>
       </div>
+      )}
 
       <div
         className={`${styles.formPanel} ${
@@ -565,6 +984,13 @@ const AccountAuth = ({
                   {loginForm.formState.errors.password.message}
                 </span>
               )}
+              <button
+                type="button"
+                className={styles.forgotPasswordLink}
+                onClick={openPasswordReset}
+              >
+                Забыли пароль?
+              </button>
             </div>
 
             {formError && (

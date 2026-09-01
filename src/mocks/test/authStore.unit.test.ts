@@ -2,12 +2,15 @@ import { afterEach, describe, expect, it } from "vitest";
 import { MOCK_AUTH_CODE, MOCK_DEV_USER } from "../config";
 import {
   changePasswordByToken,
+  changePasswordWithResetToken,
   getUserByToken,
   parseAccessToken,
   resetAuthStore,
   startLogin,
+  startPasswordReset,
   startRegistration,
   verifyCode,
+  verifyPasswordReset,
 } from "../state/authStore";
 
 describe("authStore", () => {
@@ -104,5 +107,24 @@ describe("authStore", () => {
   it("parses access token from cookie header", () => {
     expect(parseAccessToken("access-token=abc123; other=1")).toBe("abc123");
     expect(parseAccessToken(null)).toBeNull();
+  });
+
+  it("resets password with temporary token", () => {
+    startPasswordReset(MOCK_DEV_USER.email);
+    const verified = verifyPasswordReset(MOCK_DEV_USER.email, MOCK_AUTH_CODE);
+    expect(verified.ok).toBe(true);
+    if (!verified.ok) return;
+
+    const changed = changePasswordWithResetToken(verified.token, "newpass123");
+    expect(changed.ok).toBe(true);
+
+    const loginWithNew = startLogin({
+      email: MOCK_DEV_USER.email,
+      password: "newpass123",
+    });
+    expect(loginWithNew.ok).toBe(true);
+
+    const reused = changePasswordWithResetToken(verified.token, "anotherpass");
+    expect(reused.ok).toBe(false);
   });
 });

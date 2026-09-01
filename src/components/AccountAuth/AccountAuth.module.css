@@ -58,6 +58,15 @@
   display: none;
 }
 
+.authBlockModal .descriptionVisible {
+  display: block;
+  margin: 0 0 20px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #525252;
+}
+
 .authBlockModal .form {
   gap: 20px;
 }
@@ -447,6 +456,30 @@
 .submitButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.forgotPasswordLink {
+  align-self: flex-end;
+  margin-top: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #525252;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.forgotPasswordLink:hover {
+  opacity: 0.7;
+}
+
+.authBlockModal .forgotPasswordLink {
+  font-size: 12px;
+  color: #8e8e8e;
 }
 
 .verifyActions {

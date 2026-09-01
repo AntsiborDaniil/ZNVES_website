@@ -3,14 +3,18 @@ import { getMockApiBase } from "../config";
 import {
   buildSessionCookies,
   changePasswordByToken,
+  changePasswordWithResetToken,
   getUserByToken,
   parseAccessToken,
+  parseBearerToken,
   resendCode,
   startLogin,
+  startPasswordReset,
   startRegistration,
   updateDeliveryByToken,
   updateUserByToken,
   verifyCode,
+  verifyPasswordReset,
 } from "../state/authStore";
 
 const jsonError = (message: string, status = 400) =>
@@ -107,6 +111,30 @@ export const createAuthHandlers = () => {
         new_password: string;
       }>(request);
       const result = changePasswordByToken(token, body);
+      if (!result.ok) {
+        const status = result.error === "Unauthorized" ? 401 : 400;
+        return jsonError(result.error, status);
+      }
+      return HttpResponse.json({}, { status: 200 });
+    }),
+
+    http.post(`${base}/password-reset/request/`, async ({ request }) => {
+      const body = await readJson<{ email: string }>(request);
+      startPasswordReset(body.email);
+      return HttpResponse.json({}, { status: 200 });
+    }),
+
+    http.post(`${base}/password-reset/verify/`, async ({ request }) => {
+      const body = await readJson<{ email: string; code: string }>(request);
+      const result = verifyPasswordReset(body.email, body.code);
+      if (!result.ok) return jsonError(result.error);
+      return HttpResponse.json({ token: result.token }, { status: 200 });
+    }),
+
+    http.post(`${base}/password-reset/change/`, async ({ request }) => {
+      const bearer = parseBearerToken(request.headers.get("authorization"));
+      const body = await readJson<{ new_password: string }>(request);
+      const result = changePasswordWithResetToken(bearer, body.new_password);
       if (!result.ok) {
         const status = result.error === "Unauthorized" ? 401 : 400;
         return jsonError(result.error, status);

@@ -42,6 +42,9 @@ const REGISTER_VERIFY_URL = `${AUTH_BASE_URL}/register/verify/`;
 const LOGIN_URL = `${AUTH_BASE_URL}/login/`;
 const LOGIN_VERIFY_URL = `${AUTH_BASE_URL}/login/verify/`;
 const RESEND_CODE_URL = `${AUTH_BASE_URL}/register/resend-code/`;
+const PASSWORD_RESET_REQUEST_URL = `${API_BASE_URL}/password-reset/request/`;
+const PASSWORD_RESET_VERIFY_URL = `${API_BASE_URL}/password-reset/verify/`;
+const PASSWORD_RESET_CHANGE_URL = `${API_BASE_URL}/password-reset/change/`;
 
 export type RegisterPayload = {
   email: string;
@@ -158,6 +161,83 @@ export const verifyLogin = async (payload: VerifyPayload): Promise<AuthUser> => 
 
 export const resendAuthCode = async (email: string): Promise<void> => {
   await authPost(RESEND_CODE_URL, { email });
+};
+
+export type PasswordResetVerifyResponse = {
+  token?: string;
+  access?: string;
+  access_token?: string;
+  temporary_token?: string;
+};
+
+export const parsePasswordResetToken = (data: unknown): string | null => {
+  if (!data || typeof data !== "object") return null;
+  const record = data as Record<string, unknown>;
+  for (const key of ["token", "access", "access_token", "temporary_token"] as const) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+  return null;
+};
+
+/** Шаг 1: запрос кода сброса пароля на email */
+export const requestPasswordReset = async (email: string): Promise<void> => {
+  await authPost(PASSWORD_RESET_REQUEST_URL, { email: email.trim() });
+};
+
+/** Шаг 2: проверка кода и получение временного JWT */
+export const verifyPasswordResetCode = async (
+  email: string,
+  code: string
+): Promise<string> => {
+  if (typeof window === "undefined") {
+    throw new Error("Вызов только на клиенте");
+  }
+
+  const response = await fetch(PASSWORD_RESET_VERIFY_URL, {
+    method: "POST",
+    credentials: "include",
+    headers: authJsonHeaders(),
+    body: JSON.stringify({ email: email.trim(), code: code.trim() }),
+  });
+
+  if (!response.ok) {
+    throw await parseAuthApiErrorResponse(response, "Неверный или просроченный код");
+  }
+
+  const data = (await response.json()) as PasswordResetVerifyResponse;
+  const token = parsePasswordResetToken(data);
+  if (!token) {
+    throw new Error("Сервер не вернул токен для смены пароля");
+  }
+  return token;
+};
+
+/** Шаг 3: смена пароля по временному JWT */
+export const changePasswordWithResetToken = async (
+  resetToken: string,
+  newPassword: string
+): Promise<void> => {
+  if (typeof window === "undefined") {
+    throw new Error("Вызов только на клиенте");
+  }
+
+  const response = await fetch(PASSWORD_RESET_CHANGE_URL, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${resetToken}`,
+    },
+    body: JSON.stringify({ new_password: newPassword }),
+  });
+
+  if (!response.ok) {
+    throw await parseAuthApiErrorResponse(response, "Не удалось изменить пароль");
+  }
 };
 
 export const getCurrentUser = async (): Promise<AuthUser | null> => {

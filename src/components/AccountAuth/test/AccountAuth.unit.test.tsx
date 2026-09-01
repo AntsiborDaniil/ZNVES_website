@@ -76,4 +76,16 @@ describe("AccountAuth", () => {
     expect(await screen.findByText("Введите email")).toBeInTheDocument();
     expect(screen.getByText("Введите пароль")).toBeInTheDocument();
   });
+
+  it("shows forgot password entry on login form", async () => {
+    const user = userEvent.setup();
+    render(<AccountAuth />);
+
+    expect(screen.getByRole("button", { name: "Забыли пароль?" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Забыли пароль?" }));
+
+    expect(screen.getByRole("heading", { name: "Восстановление пароля" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Отправить код" })).toBeInTheDocument();
+  });
 });

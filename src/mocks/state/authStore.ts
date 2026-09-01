@@ -18,6 +18,8 @@ type StoredUser = {
 
 const users = new Map<string, StoredUser>();
 const pendingVerifications = new Map<string, PendingVerification>();
+const pendingPasswordResets = new Set<string>();
+const passwordResetTokens = new Map<string, string>();
 const sessions = new Map<string, string>();
 
 let sessionCounter = 0;
@@ -65,6 +67,8 @@ seedDevUser();
 export const resetAuthStore = (): void => {
   users.clear();
   pendingVerifications.clear();
+  pendingPasswordResets.clear();
+  passwordResetTokens.clear();
   sessions.clear();
   sessionCounter = 0;
   lastSessionToken = null;
@@ -239,6 +243,72 @@ export const changePasswordByToken = (
   stored.password = payload.new_password;
   users.set(email, stored);
   return { ok: true };
+};
+
+export const startPasswordReset = (
+  email: string
+): { ok: true } | { ok: false; error: string } => {
+  const key = emailKey(email);
+  if (!users.has(key)) {
+    // Не раскрываем, существует ли email
+    return { ok: true };
+  }
+  pendingPasswordResets.add(key);
+  return { ok: true };
+};
+
+export const verifyPasswordReset = (
+  email: string,
+  code: string
+): { ok: true; token: string } | { ok: false; error: string } => {
+  const key = emailKey(email);
+
+  if (code !== MOCK_AUTH_CODE) {
+    return { ok: false, error: "Неверный код подтверждения" };
+  }
+
+  if (!users.has(key) || !pendingPasswordResets.has(key)) {
+    return { ok: false, error: "Сначала запросите код сброса пароля" };
+  }
+
+  const token = `mock-reset-${++sessionCounter}`;
+  passwordResetTokens.set(token, key);
+  return { ok: true, token };
+};
+
+export const changePasswordWithResetToken = (
+  bearerToken: string | null,
+  newPassword: string
+): { ok: true } | { ok: false; error: string } => {
+  if (!bearerToken) {
+    return { ok: false, error: "Unauthorized" };
+  }
+
+  const email = passwordResetTokens.get(bearerToken);
+  if (!email) {
+    return { ok: false, error: "Срок действия токена истёк" };
+  }
+
+  const stored = users.get(email);
+  if (!stored) {
+    return { ok: false, error: "Unauthorized" };
+  }
+
+  if (!newPassword || newPassword.length < 8) {
+    return { ok: false, error: "Новый пароль должен быть не короче 8 символов" };
+  }
+
+  stored.password = newPassword;
+  users.set(email, stored);
+  passwordResetTokens.delete(bearerToken);
+  pendingPasswordResets.delete(email);
+  return { ok: true };
+};
+
+export const parseBearerToken = (authorization: string | null): string | null => {
+  if (!authorization) return null;
+  const match = authorization.match(/^Bearer\s+(.+)$/i);
+  return match?.[1]?.trim() || null;
 };
 
 export const parseAccessToken = (cookieHeader: string | null): string | null => {
