@@ -42,9 +42,9 @@ const REGISTER_VERIFY_URL = `${AUTH_BASE_URL}/register/verify/`;
 const LOGIN_URL = `${AUTH_BASE_URL}/login/`;
 const LOGIN_VERIFY_URL = `${AUTH_BASE_URL}/login/verify/`;
 const RESEND_CODE_URL = `${AUTH_BASE_URL}/register/resend-code/`;
-const PASSWORD_RESET_REQUEST_URL = `${API_BASE_URL}/password-reset/request/`;
-const PASSWORD_RESET_VERIFY_URL = `${API_BASE_URL}/password-reset/verify/`;
-const PASSWORD_RESET_CHANGE_URL = `${API_BASE_URL}/password-reset/change/`;
+const PASSWORD_RESET_REQUEST_URL = `${AUTH_BASE_URL}/password-reset/request/`;
+const PASSWORD_RESET_VERIFY_URL = `${AUTH_BASE_URL}/password-reset/verify/`;
+const PASSWORD_RESET_CHANGE_URL = `${AUTH_BASE_URL}/password-reset/change/`;
 
 export type RegisterPayload = {
   email: string;
@@ -95,7 +95,11 @@ const authJsonHeaders = (): Record<string, string> => {
   return headers;
 };
 
-const authPost = async (url: string, payload: object): Promise<void> => {
+const authPost = async (
+  url: string,
+  payload: object,
+  fallback = "Не удалось выполнить запрос"
+): Promise<void> => {
   if (typeof window === "undefined") {
     throw new Error("Вызов только на клиенте");
   }
@@ -108,7 +112,7 @@ const authPost = async (url: string, payload: object): Promise<void> => {
   });
 
   if (!response.ok) {
-    throw await parseAuthApiErrorResponse(response, "Не удалось выполнить запрос");
+    throw await parseAuthApiErrorResponse(response, fallback);
   }
 };
 
@@ -184,7 +188,11 @@ export const parsePasswordResetToken = (data: unknown): string | null => {
 
 /** Шаг 1: запрос кода сброса пароля на email */
 export const requestPasswordReset = async (email: string): Promise<void> => {
-  await authPost(PASSWORD_RESET_REQUEST_URL, { email: email.trim() });
+  await authPost(
+    PASSWORD_RESET_REQUEST_URL,
+    { email: email.trim() },
+    "Не удалось отправить код"
+  );
 };
 
 /** Шаг 2: проверка кода и получение временного JWT */

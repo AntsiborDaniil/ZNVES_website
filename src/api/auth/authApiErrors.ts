@@ -43,6 +43,7 @@ const MESSAGE_ALIASES: Record<string, string> = {
   "verification code expired.": "Срок действия кода истёк — запросите новый",
   "code expired.": "Срок действия кода истёк — запросите новый",
   "too many requests.": "Слишком много попыток — попробуйте позже",
+  "not found.": "Сервис восстановления пароля недоступен",
 };
 
 export const humanizeAuthErrorMessage = (message: string): string => {
@@ -157,6 +158,12 @@ export const parseAuthApiErrorResponse = async (
     if (response.status === 429) {
       return new AuthApiError("Слишком много попыток — попробуйте позже");
     }
+    if (response.status === 404) {
+      return new AuthApiError("Сервис восстановления пароля недоступен");
+    }
+    if (response.status >= 500) {
+      return new AuthApiError("Сервер временно недоступен — попробуйте позже");
+    }
     return new AuthApiError(fallback);
   }
 
@@ -164,6 +171,16 @@ export const parseAuthApiErrorResponse = async (
     const json = JSON.parse(text) as unknown;
     return parseAuthApiErrorBody(json, fallback);
   } catch {
+    if (response.status === 404) {
+      return new AuthApiError("Сервис восстановления пароля недоступен");
+    }
+    if (response.status >= 500) {
+      return new AuthApiError("Сервер временно недоступен — попробуйте позже");
+    }
+    const trimmed = text.trim();
+    if (trimmed.startsWith("<")) {
+      return new AuthApiError(fallback);
+    }
     return new AuthApiError(humanizeAuthErrorMessage(text) || fallback);
   }
 };

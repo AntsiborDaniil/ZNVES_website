@@ -118,20 +118,20 @@ export const createAuthHandlers = () => {
       return HttpResponse.json({}, { status: 200 });
     }),
 
-    http.post(`${base}/password-reset/request/`, async ({ request }) => {
+    http.post(`${base}/api/auth/password-reset/request/`, async ({ request }) => {
       const body = await readJson<{ email: string }>(request);
       startPasswordReset(body.email);
       return HttpResponse.json({}, { status: 200 });
     }),
 
-    http.post(`${base}/password-reset/verify/`, async ({ request }) => {
+    http.post(`${base}/api/auth/password-reset/verify/`, async ({ request }) => {
       const body = await readJson<{ email: string; code: string }>(request);
       const result = verifyPasswordReset(body.email, body.code);
       if (!result.ok) return jsonError(result.error);
       return HttpResponse.json({ token: result.token }, { status: 200 });
     }),
 
-    http.post(`${base}/password-reset/change/`, async ({ request }) => {
+    http.post(`${base}/api/auth/password-reset/change/`, async ({ request }) => {
       const bearer = parseBearerToken(request.headers.get("authorization"));
       const body = await readJson<{ new_password: string }>(request);
       const result = changePasswordWithResetToken(bearer, body.new_password);

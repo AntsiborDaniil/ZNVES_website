@@ -74,4 +74,34 @@ describe("authApiErrors", () => {
     const error = await parseAuthApiErrorResponse(response, "fallback");
     expect(error.message).toBe("Слишком много попыток — попробуйте позже");
   });
+
+  it("returns status-specific fallback for empty 404 response", async () => {
+    const response = new Response("", { status: 404 });
+    const error = await parseAuthApiErrorResponse(response, "fallback");
+    expect(error.message).toBe("Сервис восстановления пароля недоступен");
+  });
+
+  it("returns status-specific fallback for empty 500 response", async () => {
+    const response = new Response("", { status: 500 });
+    const error = await parseAuthApiErrorResponse(response, "fallback");
+    expect(error.message).toBe("Сервер временно недоступен — попробуйте позже");
+  });
+
+  it("humanizes Not found detail from JSON 404", async () => {
+    const response = new Response(JSON.stringify({ detail: "Not found." }), {
+      status: 404,
+      headers: { "Content-Type": "application/json" },
+    });
+    const error = await parseAuthApiErrorResponse(response, "fallback");
+    expect(error.message).toBe("Сервис восстановления пароля недоступен");
+  });
+
+  it("uses fallback for HTML error pages", async () => {
+    const response = new Response("<html><body>404 Not Found</body></html>", {
+      status: 404,
+      headers: { "Content-Type": "text/html" },
+    });
+    const error = await parseAuthApiErrorResponse(response, "Не удалось отправить код");
+    expect(error.message).toBe("Сервис восстановления пароля недоступен");
+  });
 });
