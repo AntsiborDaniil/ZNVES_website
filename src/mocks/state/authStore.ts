@@ -317,7 +317,18 @@ export const parseAccessToken = (cookieHeader: string | null): string | null => 
   return match?.[1] ? decodeURIComponent(match[1]) : null;
 };
 
+export const parsePasswordResetToken = (cookieHeader: string | null): string | null => {
+  if (!cookieHeader) return null;
+  const match = cookieHeader.match(/(?:^|;\s*)password-reset-token=([^;]+)/);
+  return match?.[1] ? decodeURIComponent(match[1]) : null;
+};
+
 export const buildSessionCookies = (token: string): string[] => [
   `access-token=${encodeURIComponent(token)}; Path=/; SameSite=Lax`,
+  `csrftoken=mock-csrf-token; Path=/; SameSite=Lax`,
+];
+
+export const buildPasswordResetCookies = (token: string): string[] => [
+  `password-reset-token=${encodeURIComponent(token)}; Path=/; SameSite=Lax`,
   `csrftoken=mock-csrf-token; Path=/; SameSite=Lax`,
 ];

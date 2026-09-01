@@ -215,7 +215,6 @@ const AccountAuth = ({
   const [step, setStep] = useState<AuthStep>(initialAuth.step);
   const [pendingEmail, setPendingEmail] = useState(initialAuth.pendingEmail);
   const [loginPassword, setLoginPassword] = useState(initialAuth.loginPassword);
-  const [resetToken, setResetToken] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
@@ -314,7 +313,6 @@ const AccountAuth = ({
     setFormError(null);
     setInfoMessage(null);
     setResendCooldown(0);
-    setResetToken("");
     clearPendingAccountAuthFlow();
     verifyForm.reset();
     resetEmailForm.reset();
@@ -328,7 +326,6 @@ const AccountAuth = ({
     setFormError(null);
     setInfoMessage(null);
     setResendCooldown(0);
-    setResetToken("");
     clearPendingAccountAuthFlow();
     resetEmailForm.reset({ email: loginEmail });
     resetPasswordForm.reset();
@@ -465,7 +462,6 @@ const AccountAuth = ({
     setFormError(null);
     setInfoMessage(null);
     setResendCooldown(0);
-    setResetToken("");
     clearPendingAccountAuthFlow();
     verifyForm.reset();
     resetEmailForm.reset();
@@ -499,8 +495,7 @@ const AccountAuth = ({
     setFormError(null);
     setInfoMessage(null);
     try {
-      const token = await verifyPasswordResetCode(pendingEmail, values.code.trim());
-      setResetToken(token);
+      await verifyPasswordResetCode(pendingEmail, values.code.trim());
       setStep("reset-password");
       resetPasswordForm.reset();
       setInfoMessage(null);
@@ -529,8 +524,7 @@ const AccountAuth = ({
     }
 
     try {
-      await changePasswordWithResetToken(resetToken, values.password);
-      setResetToken("");
+      await changePasswordWithResetToken(values.password);
 
       const user = await getCurrentUserWithRetry();
       if (user) {

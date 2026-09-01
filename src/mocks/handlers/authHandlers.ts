@@ -1,12 +1,13 @@
 import { http, HttpResponse } from "msw";
 import { getMockApiBase } from "../config";
 import {
+  buildPasswordResetCookies,
   buildSessionCookies,
   changePasswordByToken,
   changePasswordWithResetToken,
   getUserByToken,
   parseAccessToken,
-  parseBearerToken,
+  parsePasswordResetToken,
   resendCode,
   startLogin,
   startPasswordReset,
@@ -128,13 +129,21 @@ export const createAuthHandlers = () => {
       const body = await readJson<{ email: string; code: string }>(request);
       const result = verifyPasswordReset(body.email, body.code);
       if (!result.ok) return jsonError(result.error);
-      return HttpResponse.json({ token: result.token }, { status: 200 });
+      return HttpResponse.json(
+        { detail: "Код подтверждён. Теперь вы можете сменить пароль." },
+        {
+          status: 200,
+          headers: {
+            "Set-Cookie": buildPasswordResetCookies(result.token).join(", "),
+          },
+        }
+      );
     }),
 
     http.post(`${base}/api/auth/password-reset/change/`, async ({ request }) => {
-      const bearer = parseBearerToken(request.headers.get("authorization"));
+      const resetToken = parsePasswordResetToken(request.headers.get("cookie"));
       const body = await readJson<{ new_password: string }>(request);
-      const result = changePasswordWithResetToken(bearer, body.new_password);
+      const result = changePasswordWithResetToken(resetToken, body.new_password);
       if (!result.ok) {
         const status = result.error === "Unauthorized" ? 401 : 400;
         return jsonError(result.error, status);
