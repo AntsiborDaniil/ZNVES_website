@@ -116,7 +116,7 @@ const OtpInput = ({
   };
 
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} data-otp-input>
       <div
         className={styles.boxes}
         role="group"

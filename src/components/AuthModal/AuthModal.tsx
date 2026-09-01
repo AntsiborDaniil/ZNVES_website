@@ -11,6 +11,7 @@ const AuthModal = () => {
   const { isAuthOpen, authModalMode, closeAuth, isAuthenticated } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   const [isActive, setIsActive] = useState(false);
+  const [isPasswordResetInProgress, setIsPasswordResetInProgress] = useState(false);
 
   useEffect(() => {
     if (isAuthOpen) {
@@ -44,10 +45,10 @@ const AuthModal = () => {
   }, [isAuthOpen, closeAuth]);
 
   useEffect(() => {
-    if (isAuthenticated && isAuthOpen) {
+    if (isAuthenticated && isAuthOpen && !isPasswordResetInProgress) {
       closeAuth();
     }
-  }, [isAuthenticated, isAuthOpen, closeAuth]);
+  }, [isAuthenticated, isAuthOpen, isPasswordResetInProgress, closeAuth]);
 
   const handleAuthenticated = useCallback(() => {
     closeAuth();
@@ -98,6 +99,7 @@ const AuthModal = () => {
           initialMode={authModalMode}
           redirectOnSuccess={false}
           onAuthenticated={handleAuthenticated}
+          onPasswordResetFlowChange={setIsPasswordResetInProgress}
         />
       </div>
     </div>

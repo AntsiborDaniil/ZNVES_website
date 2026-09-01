@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   changePasswordWithResetToken,
+  getCurrentUserWithRetry,
   loginUser,
   registerUser,
   requestPasswordReset,
@@ -76,6 +77,7 @@ type ResetPasswordFormValues = {
 
 type AccountAuthProps = {
   onAuthenticated?: () => void;
+  onPasswordResetFlowChange?: (active: boolean) => void;
   variant?: "page" | "modal";
   initialMode?: AuthMode;
   redirectOnSuccess?: boolean;
@@ -194,6 +196,7 @@ const PasswordToggleButton = ({
 
 const AccountAuth = ({
   onAuthenticated,
+  onPasswordResetFlowChange,
   variant = "page",
   initialMode = "login",
   redirectOnSuccess,
@@ -263,6 +266,19 @@ const AccountAuth = ({
     step === "reset-code" ||
     step === "reset-password" ||
     step === "reset-success";
+
+  const isPasswordResetInProgress =
+    step === "reset-email" || step === "reset-code" || step === "reset-password";
+
+  useEffect(() => {
+    onPasswordResetFlowChange?.(isPasswordResetInProgress);
+  }, [isPasswordResetInProgress, onPasswordResetFlowChange]);
+
+  useEffect(() => {
+    return () => {
+      onPasswordResetFlowChange?.(false);
+    };
+  }, [onPasswordResetFlowChange]);
 
   useEffect(() => {
     if (step !== "verify" || !pendingEmail) {
@@ -514,6 +530,14 @@ const AccountAuth = ({
 
     try {
       await changePasswordWithResetToken(resetToken, values.password);
+      setResetToken("");
+
+      const user = await getCurrentUserWithRetry();
+      if (user) {
+        await completeAuth(user);
+        return;
+      }
+
       setStep("reset-success");
       setInfoMessage("Пароль успешно изменён. Теперь можно войти с новым паролем.");
     } catch (error) {

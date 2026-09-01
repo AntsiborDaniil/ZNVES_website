@@ -122,28 +122,28 @@
   color: #8e8e8e;
 }
 
-.authBlockModal .field > div:not(.passwordWrap) {
+.authBlockModal .field > div:not(.passwordWrap):not([data-otp-input]) {
   height: 48px;
   border: none;
   border-radius: 3px;
   background: #f7f7f7;
 }
 
-.authBlockModal .field > div:not(.passwordWrap):focus-within {
+.authBlockModal .field > div:not(.passwordWrap):not([data-otp-input]):focus-within {
   background: #f0f0f0;
 }
 
-.authBlockModal .field > div:not(.passwordWrap) button {
+.authBlockModal .field > div:not(.passwordWrap):not([data-otp-input]) button {
   background: transparent;
   border-right: 1px solid #e5e5e5;
 }
 
-.authBlockModal .field > div:not(.passwordWrap) input {
+.authBlockModal .field > div:not(.passwordWrap):not([data-otp-input]) input {
   background: transparent;
   font-size: 14px;
 }
 
-.authBlockModal .field > div:not(.passwordWrap) input::placeholder {
+.authBlockModal .field > div:not(.passwordWrap):not([data-otp-input]) input::placeholder {
   color: #8e8e8e;
 }
 
