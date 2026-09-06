@@ -299,8 +299,7 @@ const ProductPageView = ({
   }, [product.sections, selectedSection]);
 
   const adjustSectionHeights = useCallback(() => {
-    const isDesktop = width >= 1025;
-    const desktopMaxPx =
+    const maxPx =
       typeof window !== "undefined"
         ? Math.max(200, Math.round(window.innerHeight * 0.4))
         : 320;
@@ -317,8 +316,8 @@ const ProductPageView = ({
         element.style.maxHeight = "none";
         const fullHeight = element.scrollHeight;
 
-        if (isDesktop && fullHeight > desktopMaxPx) {
-          element.style.maxHeight = `${desktopMaxPx}px`;
+        if (fullHeight > maxPx) {
+          element.style.maxHeight = `${maxPx}px`;
           element.style.overflowY = "auto";
         } else {
           element.style.maxHeight = `${fullHeight}px`;
@@ -329,11 +328,31 @@ const ProductPageView = ({
         element.style.overflowY = "hidden";
       }
     });
-  }, [openSection, product.sections, width]);
+  }, [openSection, product.sections]);
 
   useEffect(() => {
     adjustSectionHeights();
-  }, [adjustSectionHeights, width]);
+  }, [adjustSectionHeights]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || openSection == null) return;
+    const element = contentRefs.current[openSection];
+    if (!element) return;
+
+    const onResize = () => adjustSectionHeights();
+    window.addEventListener("resize", onResize);
+
+    const observer =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(onResize)
+        : null;
+    observer?.observe(element);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      observer?.disconnect();
+    };
+  }, [openSection, adjustSectionHeights]);
 
   const selectedColorOption = useMemo(() => {
     return (
