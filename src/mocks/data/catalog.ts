@@ -155,6 +155,11 @@ const PRODUCT_SEEDS: MockProductSeed[] = [
     price: "4490",
     is_new: true,
     image: "/images/catalogs/mock/bag-sport.webp",
+    gallery: [
+      "/images/catalogs/mock/bag-sport.webp",
+      "/images/catalogs/mock/bag-1.webp",
+      "/images/catalogs/mock/bag-square.webp",
+    ],
     colors: ["black", "olive"],
     sizes: ["s", "m", "l"],
     variants: [
@@ -170,6 +175,11 @@ const PRODUCT_SEEDS: MockProductSeed[] = [
     price: "5390",
     is_new: true,
     image: "/images/catalogs/mock/bag-square.webp",
+    gallery: [
+      "/images/catalogs/mock/bag-square.webp",
+      "/images/catalogs/mock/bag-sport.webp",
+      "/images/catalogs/mock/bag-2.webp",
+    ],
     colors: ["green", "black"],
     sizes: ["s", "m"],
     variants: [
@@ -218,6 +228,7 @@ const PRODUCT_SEEDS: MockProductSeed[] = [
     price: "4790",
     is_new: true,
     image: mockImg("tshirt-rust"),
+    gallery: [mockImg("tshirt-rust"), mockImg("tshirt-green"), mockImg("tshirt-navy")],
     colors: ["rust"],
     sizes: ["s", "m", "l", "xl"],
     variants: [{ color_slug: "rust", size_slugs: ["s", "m", "l", "xl"] }],
@@ -246,6 +257,7 @@ const PRODUCT_SEEDS: MockProductSeed[] = [
     price: "6790",
     is_new: true,
     image: mockImg("zip-hoodie-blue"),
+    gallery: [mockImg("zip-hoodie-blue"), mockImg("zip-hoodie-green"), mockImg("hoodie-gray")],
     colors: ["blue", "navy"],
     sizes: ["m", "l", "xl"],
     variants: [
@@ -261,6 +273,7 @@ const PRODUCT_SEEDS: MockProductSeed[] = [
     price: "5990",
     is_new: false,
     image: mockImg("hoodie-gray"),
+    gallery: [mockImg("hoodie-gray"), mockImg("zip-hoodie-green"), mockImg("zip-hoodie-blue")],
     colors: ["gray", "green"],
     sizes: ["s", "m", "l", "xl"],
     variants: [
@@ -292,6 +305,7 @@ const PRODUCT_SEEDS: MockProductSeed[] = [
     price: "8290",
     is_new: true,
     image: mockImg("jeans-light"),
+    gallery: [mockImg("jeans-light"), mockImg("jeans-navy"), mockImg("pants-black")],
     colors: ["blue", "gray"],
     sizes: ["m", "l", "xl"],
     variants: [
@@ -323,6 +337,7 @@ const PRODUCT_SEEDS: MockProductSeed[] = [
     price: "12490",
     is_new: true,
     image: mockImg("jacket-olive"),
+    gallery: [mockImg("jacket-olive"), mockImg("jacket-brown"), mockImg("hoodie-gray")],
     colors: ["olive", "brown"],
     sizes: ["m", "l", "xl"],
     variants: [
@@ -338,6 +353,7 @@ const PRODUCT_SEEDS: MockProductSeed[] = [
     price: "6990",
     is_new: false,
     image: mockImg("pants-black"),
+    gallery: [mockImg("pants-black"), mockImg("jeans-navy"), mockImg("shorts-sand")],
     colors: ["black", "gray"],
     sizes: ["s", "m", "l", "xl"],
     variants: [
@@ -353,6 +369,7 @@ const PRODUCT_SEEDS: MockProductSeed[] = [
     price: "3990",
     is_new: true,
     image: mockImg("shorts-sand"),
+    // одно фото — на мобилке точек карусели не будет
     colors: ["sand", "olive"],
     sizes: ["s", "m", "l"],
     variants: [

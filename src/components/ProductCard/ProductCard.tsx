@@ -2,13 +2,20 @@
 
 import Image from "next/image";
 import {
+  createElement,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
+  type ComponentType,
   type PointerEvent as ReactPointerEvent,
 } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import type { Swiper as SwiperInstance } from "swiper";
+import "swiper/css";
+import "swiper/css/pagination";
 import styles from "./ProductCard.module.css";
 import {
   isSvgImageSrc,
@@ -41,17 +48,19 @@ const ProductCard = ({
     return images;
   }, [images]);
 
+  const hasCarousel = imageList.length > 1;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hoverEnabled, setHoverEnabled] = useState(true);
+  // Карусель фото только в каталоге / new-in (не в слайдерах Bestsellers и т.п.)
+  const useImageSwiper = !hoverEnabled && hasCarousel && !isSliderCard;
+
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const cardSwiperRef = useRef<SwiperInstance | null>(null);
+  const swipeMovedRef = useRef(false);
   const { loadedStates, markImageLoaded } = useImageLoadedStates(
     imageList,
     containerRef
   );
-  const lastTapRef = useRef<{ time: number; x: number; y: number } | null>(null);
-  const touchUsedRef = useRef(false);
-  const DOUBLE_TAP_MS = 350;
-  const DOUBLE_TAP_PX = 40;
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 769px)");
@@ -62,15 +71,18 @@ const ProductCard = ({
   }, []);
 
   useEffect(() => {
-    if (!hoverEnabled) setCurrentIndex(0);
+    setCurrentIndex(0);
+    cardSwiperRef.current?.slideTo(0, 0);
+  }, [imageList]);
+
+  useEffect(() => {
+    if (hoverEnabled) setCurrentIndex(0);
   }, [hoverEnabled]);
 
   const updateIndexFromPointer = useCallback(
     (clientX: number) => {
       const container = containerRef.current;
-      if (!container || imageList.length <= 1) {
-        return;
-      }
+      if (!container || !hasCarousel) return;
 
       const rect = container.getBoundingClientRect();
       const relativeX = clientX - rect.left;
@@ -80,65 +92,29 @@ const ProductCard = ({
 
       setCurrentIndex((prev) => (prev === newIndex ? prev : newIndex));
     },
-    [imageList.length]
+    [hasCarousel, imageList.length]
   );
 
-  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!hoverEnabled || imageList.length <= 1) return;
+  const handlePointerMoveHover = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!hoverEnabled || !hasCarousel) return;
     updateIndexFromPointer(event.clientX);
   };
 
-  const handlePointerEnter = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!hoverEnabled || imageList.length <= 1) return;
+  const handlePointerEnterHover = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!hoverEnabled || !hasCarousel) return;
     updateIndexFromPointer(event.clientX);
   };
 
-  const handlePointerLeave = () => {
+  const handlePointerLeaveHover = () => {
     if (hoverEnabled) setCurrentIndex(0);
   };
 
-  const handleDoubleTapOrClick = useCallback(
-    (clientX: number, clientY: number) => {
-      if (hoverEnabled || imageList.length <= 1) return;
-      const now = Date.now();
-      const prev = lastTapRef.current;
-      const isDoubleTap =
-        prev &&
-        now - prev.time < DOUBLE_TAP_MS &&
-        Math.abs(clientX - prev.x) < DOUBLE_TAP_PX &&
-        Math.abs(clientY - prev.y) < DOUBLE_TAP_PX;
-      if (isDoubleTap) {
-        lastTapRef.current = null;
-        setCurrentIndex((i) => (i + 1) % imageList.length);
-        return;
-      }
-      lastTapRef.current = { time: now, x: clientX, y: clientY };
-    },
-    [hoverEnabled, imageList.length]
-  );
-
-  const handleContainerClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (touchUsedRef.current) return;
-      handleDoubleTapOrClick(e.clientX, e.clientY);
-    },
-    [handleDoubleTapOrClick]
-  );
-
-  const handleContainerTouchStart = useCallback(() => {
-    touchUsedRef.current = true;
-  }, []);
-
-  const handleContainerTouchEnd = useCallback(
-    (e: React.TouchEvent<HTMLDivElement>) => {
-      const touch = e.changedTouches?.[0];
-      if (touch) handleDoubleTapOrClick(touch.clientX, touch.clientY);
-      setTimeout(() => {
-        touchUsedRef.current = false;
-      }, 400);
-    },
-    [handleDoubleTapOrClick]
-  );
+  const handleClickCapture = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!swipeMovedRef.current) return;
+    event.preventDefault();
+    event.stopPropagation();
+    swipeMovedRef.current = false;
+  };
 
   return (
     <div
@@ -147,44 +123,126 @@ const ProductCard = ({
       } ${variant === "grid" ? styles.gridCard : ""} ${
         zoomOnHover ? styles.zoomOnHover : ""
       }`}
+      onClickCapture={handleClickCapture}
     >
       <div className={styles.imageWrapper}>
         <div
-          className={styles.imageContainer}
+          className={`${styles.imageContainer} ${
+            useImageSwiper ? styles.imageContainerCarousel : ""
+          }`}
           ref={containerRef}
-          onPointerEnter={handlePointerEnter}
-          onPointerMove={handlePointerMove}
-          onPointerLeave={handlePointerLeave}
-          onClick={handleContainerClick}
-          onTouchStart={handleContainerTouchStart}
-          onTouchEnd={handleContainerTouchEnd}
-          role={imageList.length > 1 ? "button" : undefined}
-          aria-label={imageList.length > 1 ? "Двойное нажатие — следующее фото" : undefined}
+          onPointerEnter={useImageSwiper ? undefined : handlePointerEnterHover}
+          onPointerMove={useImageSwiper ? undefined : handlePointerMoveHover}
+          onPointerLeave={useImageSwiper ? undefined : handlePointerLeaveHover}
+          role={hasCarousel ? "group" : undefined}
+          aria-label={
+            hasCarousel
+              ? `${title}, фото ${currentIndex + 1} из ${imageList.length}`
+              : undefined
+          }
         >
-          {imageList.map((image, index) => {
-            const isActive = index === currentIndex;
-            const isLoaded = loadedStates[index];
-            return (
-              <Image
-                key={image + index}
-                src={image}
-                alt={`${title} — фото ${index + 1}`}
-                fill
-                sizes="(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 22vw"
-                className={`${styles.productImage} ${
-                  isActive ? styles.productImageVisible : ""
-                } ${
-                  isLoaded
-                    ? styles.productImageLoaded
-                    : styles.productImageLoading
-                }`}
-                loading={isSliderCard && index === 0 ? "eager" : "lazy"}
-                onLoad={() => markImageLoaded(index)}
-                quality={80}
-                unoptimized={isSvgImageSrc(image)}
-              />
-            );
-          })}
+          {useImageSwiper ? (
+            createElement(
+              Swiper as ComponentType<Record<string, unknown>>,
+              {
+                modules: [Pagination],
+                className: styles.cardSwiper,
+                slidesPerView: 1,
+                spaceBetween: 0,
+                speed: 320,
+                threshold: 18,
+                longSwipesRatio: 0.35,
+                longSwipesMs: 280,
+                shortSwipes: true,
+                resistanceRatio: 0.65,
+                nested: true,
+                touchStartPreventDefault: false,
+                pagination: {
+                  clickable: true,
+                  bulletClass: styles.dot,
+                  bulletActiveClass: styles.dotActive,
+                },
+                onSwiper: (swiper: SwiperInstance) => {
+                  cardSwiperRef.current = swiper;
+                },
+                onSlideChange: (swiper: SwiperInstance) => {
+                  setCurrentIndex(swiper.activeIndex);
+                },
+                onSliderMove: () => {
+                  swipeMovedRef.current = true;
+                },
+                onTouchEnd: () => {
+                  window.setTimeout(() => {
+                    swipeMovedRef.current = false;
+                  }, 50);
+                },
+                onTouchStart: (_swiper: SwiperInstance, event: Event) => {
+                  swipeMovedRef.current = false;
+                  event.stopPropagation();
+                },
+                onTouchMove: (_swiper: SwiperInstance, event: Event) => {
+                  event.stopPropagation();
+                },
+              },
+              imageList.map((image, index) =>
+                createElement(
+                  SwiperSlide as ComponentType<Record<string, unknown>>,
+                  {
+                    key: image + index,
+                    className: styles.cardSwiperSlide,
+                  },
+                  <div className={styles.imageSlide}>
+                    <Image
+                      src={image}
+                      alt={`${title} — фото ${index + 1}`}
+                      fill
+                      sizes="(max-width: 768px) 70vw, 40vw"
+                      className={`${styles.productImage} ${styles.productImageCarousel} ${
+                        loadedStates[index]
+                          ? styles.productImageLoaded
+                          : styles.productImageLoading
+                      }`}
+                      loading={index === 0 ? "eager" : "lazy"}
+                      onLoad={() => markImageLoaded(index)}
+                      quality={80}
+                      unoptimized={isSvgImageSrc(image)}
+                      draggable={false}
+                    />
+                  </div>
+                )
+              )
+            )
+          ) : (
+            <div className={`${styles.imageTrack} ${styles.imageTrackStacked}`}>
+              {imageList.map((image, index) => {
+                const isActive = index === currentIndex;
+                const isLoaded = loadedStates[index];
+                return (
+                  <div key={image + index} className={styles.imageSlide}>
+                    <Image
+                      src={image}
+                      alt={`${title} — фото ${index + 1}`}
+                      fill
+                      sizes="(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 22vw"
+                      className={`${styles.productImage} ${
+                        isActive ? styles.productImageVisible : ""
+                      } ${
+                        isLoaded
+                          ? styles.productImageLoaded
+                          : styles.productImageLoading
+                      }`}
+                      loading={isSliderCard && index === 0 ? "eager" : "lazy"}
+                      onLoad={() => markImageLoaded(index)}
+                      quality={80}
+                      unoptimized={isSvgImageSrc(image)}
+                      draggable={false}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {isNew && <div className={styles.newBadge}>NEW</div>}
         </div>
       </div>
