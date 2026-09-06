@@ -561,18 +561,26 @@
     border-radius: 50%;
     background: var(--color-white);
     color: var(--color-black);
-    font-size: 32px;
-    line-height: 1;
     cursor: pointer;
     transform: translateY(-50%);
   }
 
+  .lightboxNavIcon {
+    width: 8px;
+    height: 14px;
+    display: block;
+  }
+
   .lightboxPrev {
-    left: 12px;
+    left: 24px;
+  }
+
+  .lightboxPrev .lightboxNavIcon {
+    transform: rotate(180deg);
   }
 
   .lightboxNext {
-    right: 12px;
+    right: 24px;
   }
 
   .info {

@@ -86,6 +86,7 @@ const ProductPageView = ({
   const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>({});
   const [catalogCategories, setCatalogCategories] = useState<ApiCatalogCategory[]>([]);
   const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const { width } = useWindowSize();
 
   const closeLightbox = useCallback(() => setLightboxIndex(null), []);
 
@@ -108,7 +109,12 @@ const ProductPageView = ({
   }, [currentImages]);
 
   useEffect(() => {
+    if (width < 1025) setLightboxIndex(null);
+  }, [width]);
+
+  useEffect(() => {
     if (lightboxIndex == null) return;
+    if (width < 1025) return;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -150,7 +156,7 @@ const ProductPageView = ({
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("wheel", onWheel);
     };
-  }, [lightboxIndex, closeLightbox, showLightboxPrev, showLightboxNext]);
+  }, [lightboxIndex, width, closeLightbox, showLightboxPrev, showLightboxNext]);
 
   const lightboxPointerStartX = useRef<number | null>(null);
 
@@ -291,8 +297,6 @@ const ProductPageView = ({
       setSelectedSection(null);
     }
   }, [product.sections, selectedSection]);
-
-  const { width } = useWindowSize();
 
   const adjustSectionHeights = useCallback(() => {
     const isDesktop = width >= 1025;
@@ -454,7 +458,10 @@ const ProductPageView = ({
                   key={image + index}
                   type="button"
                   className={styles.imageCell}
-                  onClick={() => setLightboxIndex(index)}
+                  onClick={() => {
+                    if (width < 1025) return;
+                    setLightboxIndex(index);
+                  }}
                   aria-label={`Открыть фото ${index + 1}`}
                 >
                   <Image
@@ -625,7 +632,7 @@ const ProductPageView = ({
       </div>
       <Footer />
 
-      {lightboxIndex != null && currentImages[lightboxIndex] && (
+      {lightboxIndex != null && width >= 1025 && currentImages[lightboxIndex] && (
         <div
           className={styles.lightbox}
           role="dialog"
@@ -641,6 +648,46 @@ const ProductPageView = ({
           >
             ×
           </button>
+          {currentImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                className={`${styles.lightboxNav} ${styles.lightboxPrev}`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  showLightboxPrev();
+                }}
+                aria-label="Предыдущее фото"
+              >
+                <Image
+                  src="/images/product/gallery-arrow.svg"
+                  alt=""
+                  width={6}
+                  height={11}
+                  className={styles.lightboxNavIcon}
+                  unoptimized
+                />
+              </button>
+              <button
+                type="button"
+                className={`${styles.lightboxNav} ${styles.lightboxNext}`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  showLightboxNext();
+                }}
+                aria-label="Следующее фото"
+              >
+                <Image
+                  src="/images/product/gallery-arrow.svg"
+                  alt=""
+                  width={6}
+                  height={11}
+                  className={styles.lightboxNavIcon}
+                  unoptimized
+                />
+              </button>
+            </>
+          )}
           <div
             className={styles.lightboxStage}
             onClick={(event) => event.stopPropagation()}
@@ -650,26 +697,6 @@ const ProductPageView = ({
               lightboxPointerStartX.current = null;
             }}
           >
-            {currentImages.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  className={`${styles.lightboxNav} ${styles.lightboxPrev}`}
-                  onClick={showLightboxPrev}
-                  aria-label="Предыдущее фото"
-                >
-                  ‹
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.lightboxNav} ${styles.lightboxNext}`}
-                  onClick={showLightboxNext}
-                  aria-label="Следующее фото"
-                >
-                  ›
-                </button>
-              </>
-            )}
             <Image
               src={currentImages[lightboxIndex]}
               alt={`${product.title} — фото ${lightboxIndex + 1}`}
