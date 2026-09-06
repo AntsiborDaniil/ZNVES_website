@@ -6,6 +6,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type PointerEvent,
 } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -118,12 +119,64 @@ const ProductPageView = ({
       if (event.key === "ArrowRight") showLightboxNext();
     };
 
+    // Горизонтальный жест тачпада (два пальца)
+    let wheelAccX = 0;
+    let wheelLockUntil = 0;
+    const onWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+      if (Math.abs(event.deltaX) < 6) return;
+      event.preventDefault();
+
+      const now = Date.now();
+      if (now < wheelLockUntil) return;
+
+      wheelAccX += event.deltaX;
+      const THRESHOLD = 60;
+      if (wheelAccX >= THRESHOLD) {
+        showLightboxNext();
+        wheelAccX = 0;
+        wheelLockUntil = now + 320;
+      } else if (wheelAccX <= -THRESHOLD) {
+        showLightboxPrev();
+        wheelAccX = 0;
+        wheelLockUntil = now + 320;
+      }
+    };
+
     window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("wheel", onWheel, { passive: false });
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("wheel", onWheel);
     };
   }, [lightboxIndex, closeLightbox, showLightboxPrev, showLightboxNext]);
+
+  const lightboxPointerStartX = useRef<number | null>(null);
+
+  const handleLightboxPointerDown = (
+    event: PointerEvent<HTMLDivElement>
+  ) => {
+    if (currentImages.length <= 1) return;
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    if ((event.target as HTMLElement).closest("button")) return;
+    lightboxPointerStartX.current = event.clientX;
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleLightboxPointerUp = (
+    event: PointerEvent<HTMLDivElement>
+  ) => {
+    if (lightboxPointerStartX.current == null) return;
+    const dx = event.clientX - lightboxPointerStartX.current;
+    lightboxPointerStartX.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (Math.abs(dx) < 64) return;
+    if (dx < 0) showLightboxNext();
+    else showLightboxPrev();
+  };
 
   const colorToSizesFromWarehouse = useMemo(() => {
     const map = new Map<string, Set<string>>();
@@ -588,40 +641,44 @@ const ProductPageView = ({
           >
             ×
           </button>
-          {currentImages.length > 1 && (
-            <>
-              <button
-                type="button"
-                className={`${styles.lightboxNav} ${styles.lightboxPrev}`}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  showLightboxPrev();
-                }}
-                aria-label="Предыдущее фото"
-              >
-                ‹
-              </button>
-              <button
-                type="button"
-                className={`${styles.lightboxNav} ${styles.lightboxNext}`}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  showLightboxNext();
-                }}
-                aria-label="Следующее фото"
-              >
-                ›
-              </button>
-            </>
-          )}
-          <Image
-            src={currentImages[lightboxIndex]}
-            alt={`${product.title} — фото ${lightboxIndex + 1}`}
-            width={1200}
-            height={1600}
-            className={styles.lightboxImage}
+          <div
+            className={styles.lightboxStage}
             onClick={(event) => event.stopPropagation()}
-          />
+            onPointerDown={handleLightboxPointerDown}
+            onPointerUp={handleLightboxPointerUp}
+            onPointerCancel={() => {
+              lightboxPointerStartX.current = null;
+            }}
+          >
+            {currentImages.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  className={`${styles.lightboxNav} ${styles.lightboxPrev}`}
+                  onClick={showLightboxPrev}
+                  aria-label="Предыдущее фото"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.lightboxNav} ${styles.lightboxNext}`}
+                  onClick={showLightboxNext}
+                  aria-label="Следующее фото"
+                >
+                  ›
+                </button>
+              </>
+            )}
+            <Image
+              src={currentImages[lightboxIndex]}
+              alt={`${product.title} — фото ${lightboxIndex + 1}`}
+              width={1200}
+              height={1600}
+              className={styles.lightboxImage}
+              draggable={false}
+            />
+          </div>
         </div>
       )}
     </div>
