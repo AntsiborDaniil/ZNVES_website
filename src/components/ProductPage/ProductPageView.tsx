@@ -239,6 +239,8 @@ const ProductPageView = ({
     }
   }, [product.sections, selectedSection]);
 
+  const { width } = useWindowSize();
+
   const adjustSectionHeights = useCallback(() => {
     const isDesktop = width >= 1025;
     const desktopMaxPx =
@@ -271,8 +273,6 @@ const ProductPageView = ({
       }
     });
   }, [openSection, product.sections, width]);
-
-  const { width } = useWindowSize();
 
   useEffect(() => {
     adjustSectionHeights();
@@ -404,12 +404,13 @@ const ProductPageView = ({
                   onClick={() => setLightboxIndex(index)}
                   aria-label={`Открыть фото ${index + 1}`}
                 >
-                  <img
+                  <Image
                     src={image}
                     alt={`${product.title} — фото ${index + 1}`}
+                    fill
+                    sizes="(min-width: 1025px) 30vw, 0px"
                     className={styles.gridImage}
-                    loading={index <= 3 ? "eager" : "lazy"}
-                    decoding="async"
+                    priority={index <= 1}
                   />
                 </button>
               ))}
@@ -613,9 +614,11 @@ const ProductPageView = ({
               </button>
             </>
           )}
-          <img
+          <Image
             src={currentImages[lightboxIndex]}
             alt={`${product.title} — фото ${lightboxIndex + 1}`}
+            width={1200}
+            height={1600}
             className={styles.lightboxImage}
             onClick={(event) => event.stopPropagation()}
           />
