@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   useCallback,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -17,6 +16,10 @@ import {
   buildProductHref,
   type ProductNavFrom,
 } from "../../lib/productNavigation";
+import {
+  isSvgImageSrc,
+  useImageLoadedStates,
+} from "../../hooks/useImageLoadedStates";
 
 type CatalogGridCardProps = {
   product: CatalogProduct;
@@ -37,49 +40,15 @@ const CatalogGridCard = ({
   }, [product.images]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loadedStates, setLoadedStates] = useState<boolean[]>([]);
   const imageContainerRef = useRef<HTMLDivElement | null>(null);
+  const { loadedStates, markImageLoaded } = useImageLoadedStates(
+    imageList,
+    imageContainerRef
+  );
   const router = useRouter();
   const hasPrefetchedRef = useRef(false);
   const prefetchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const PREFETCH_DELAY_MS = 150;
-
-  useEffect(() => {
-    setLoadedStates(new Array(imageList.length).fill(false));
-  }, [imageList]);
-
-  // Снять блюр с картинок, уже загруженных из кэша или при позднем decode (onLoad может не сработать)
-  useEffect(() => {
-    const syncLoadedStateFromDom = () => {
-      const container = imageContainerRef.current;
-      if (!container) return;
-      const imgs = container.querySelectorAll("img");
-      imgs.forEach((img, index) => {
-        if (img.complete && img.naturalWidth > 0 && index < imageList.length) {
-          markImageLoaded(index);
-        }
-      });
-    };
-    const t0 = setTimeout(syncLoadedStateFromDom, 0);
-    const t1 = setTimeout(syncLoadedStateFromDom, 120);
-    const t2 = setTimeout(syncLoadedStateFromDom, 350);
-    return () => {
-      clearTimeout(t0);
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-  }, [imageList.length, imageList]);
-
-  const markImageLoaded = (index: number) => {
-    setLoadedStates((prev) => {
-      if (prev[index]) {
-        return prev;
-      }
-      const next = [...prev];
-      next[index] = true;
-      return next;
-    });
-  };
 
   const updateIndexFromPointer = (clientX: number) => {
     const container = imageContainerRef.current;
@@ -170,7 +139,7 @@ const CatalogGridCard = ({
                   loading="lazy"
                   onLoad={() => markImageLoaded(index)}
                   quality={80}
-                  unoptimized={image.endsWith(".svg")}
+                  unoptimized={isSvgImageSrc(image)}
                 />
               );
             })}

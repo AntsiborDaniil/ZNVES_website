@@ -10,6 +10,10 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import styles from "./ProductCard.module.css";
+import {
+  isSvgImageSrc,
+  useImageLoadedStates,
+} from "../../hooks/useImageLoadedStates";
 
 type ProductCardProps = {
   title: string;
@@ -38,9 +42,12 @@ const ProductCard = ({
   }, [images]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loadedStates, setLoadedStates] = useState<boolean[]>([]);
   const [hoverEnabled, setHoverEnabled] = useState(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const { loadedStates, markImageLoaded } = useImageLoadedStates(
+    imageList,
+    containerRef
+  );
   const lastTapRef = useRef<{ time: number; x: number; y: number } | null>(null);
   const touchUsedRef = useRef(false);
   const DOUBLE_TAP_MS = 350;
@@ -55,23 +62,8 @@ const ProductCard = ({
   }, []);
 
   useEffect(() => {
-    setLoadedStates(new Array(imageList.length).fill(false));
-  }, [imageList]);
-
-  useEffect(() => {
     if (!hoverEnabled) setCurrentIndex(0);
   }, [hoverEnabled]);
-
-  const markImageLoaded = useCallback((index: number) => {
-    setLoadedStates((prev) => {
-      if (prev[index]) {
-        return prev;
-      }
-      const next = [...prev];
-      next[index] = true;
-      return next;
-    });
-  }, []);
 
   const updateIndexFromPointer = useCallback(
     (clientX: number) => {
@@ -148,28 +140,6 @@ const ProductCard = ({
     [handleDoubleTapOrClick]
   );
 
-  const syncLoadedStateFromDom = useCallback(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const imgs = container.querySelectorAll("img");
-    imgs.forEach((img, index) => {
-      if (img.complete && img.naturalWidth > 0 && index < imageList.length) {
-        markImageLoaded(index);
-      }
-    });
-  }, [imageList.length, imageList, markImageLoaded]);
-
-  useEffect(() => {
-    const t0 = setTimeout(syncLoadedStateFromDom, 0);
-    const t1 = setTimeout(syncLoadedStateFromDom, 120);
-    const t2 = setTimeout(syncLoadedStateFromDom, 350);
-    return () => {
-      clearTimeout(t0);
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-  }, [imageList.length, imageList, markImageLoaded, syncLoadedStateFromDom]);
-
   return (
     <div
       className={`${styles.productCard} ${
@@ -201,7 +171,7 @@ const ProductCard = ({
                 alt={`${title} — фото ${index + 1}`}
                 fill
                 sizes="(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 22vw"
-                className={`${styles.productImage} swiper-lazy ${
+                className={`${styles.productImage} ${
                   isActive ? styles.productImageVisible : ""
                 } ${
                   isLoaded
@@ -211,7 +181,7 @@ const ProductCard = ({
                 loading={isSliderCard && index === 0 ? "eager" : "lazy"}
                 onLoad={() => markImageLoaded(index)}
                 quality={80}
-                unoptimized={image.endsWith(".svg")}
+                unoptimized={isSvgImageSrc(image)}
               />
             );
           })}
