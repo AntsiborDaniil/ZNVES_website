@@ -107,10 +107,22 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
   const closeCatalog = () => setIsCatalogOpen(false);
   const closeAccount = () => setIsAccountOpen(false);
 
-  const toggleCatalog = () => {
+  const toggleCatalog = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     setIsAccountOpen(false);
     setIsCatalogOpen((open) => !open);
   };
+
+  const closeCatalogFromMenu = useCallback(() => {
+    setIsCatalogOpen(false);
+  }, []);
+
+  const handleMenuCollectionsClick = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>) => {
+      handleCollectionsClick(event);
+    },
+    [handleCollectionsClick]
+  );
 
   const accountPopover = isAuthenticated ? (
     <AccountPopover isOpen={isAccountOpen} onClose={closeAccount} />
@@ -131,20 +143,9 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
               aria-haspopup="menu"
               onClick={toggleCatalog}
             >
-              Каталог
+              Каталог {isCatalogOpen ? "−" : "+"}
             </button>
           </div>
-          <Link href="/new-in" className={styles.navLink} prefetch={false}>
-            Новинки
-          </Link>
-          <Link
-            href="/#collections"
-            className={styles.navLink}
-            prefetch={false}
-            onClick={handleCollectionsClick}
-          >
-            Коллекции
-          </Link>
         </nav>
 
         <div className={styles.mobileLeft}>
@@ -229,11 +230,16 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
         </div>
       </header>
 
-      <div ref={catalogMenuRef} className={styles.catalogMenuHost}>
+      <div
+        ref={catalogMenuRef}
+        className={styles.catalogMenuHost}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
         <CatalogMegaMenu
           isOpen={isCatalogOpen}
           categories={catalogCategories}
-          onNavigate={closeCatalog}
+          onNavigate={closeCatalogFromMenu}
+          onCollectionsClick={handleMenuCollectionsClick}
         />
       </div>
     </div>
