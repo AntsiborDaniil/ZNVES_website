@@ -477,6 +477,16 @@
     aspect-ratio: 453 / 514;
     overflow: hidden;
     background-color: var(--color-grey-5);
+    padding: 0;
+    border: none;
+    cursor: zoom-in;
+    display: block;
+    width: 100%;
+  }
+
+  .imageCell:focus-visible {
+    outline: 2px solid var(--color-black);
+    outline-offset: 2px;
   }
 
   .gridImage {
@@ -485,6 +495,72 @@
     object-fit: cover;
     object-position: center;
     display: block;
+    pointer-events: none;
+  }
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: rgba(0, 0, 0, 0.85);
+    cursor: zoom-out;
+  }
+
+  .lightboxImage {
+    max-width: min(90vw, 1200px);
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    cursor: default;
+  }
+
+  .lightboxClose {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    z-index: 1;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-white);
+    color: var(--color-black);
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .lightboxNav {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-white);
+    color: var(--color-black);
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+
+  .lightboxPrev {
+    left: 24px;
+  }
+
+  .lightboxNext {
+    right: 24px;
   }
 
   .info {
@@ -550,5 +626,9 @@
     padding-bottom: 15px;
     font-size: var(--font-size-14);
     line-height: var(--line-height-20);
+  }
+
+  .accordionContentOpen {
+    overscroll-behavior: contain;
   }
 }

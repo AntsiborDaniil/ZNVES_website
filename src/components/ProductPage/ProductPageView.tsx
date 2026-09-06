@@ -78,12 +78,52 @@ const ProductPageView = ({
   );
   const [currentImages, setCurrentImages] = useState<string[]>(product.images);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [isSizeGuideOpen] = useState(false);
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [colorSlugToLabel, setColorSlugToLabel] = useState<Record<string, string>>({});
   const [catalogCategories, setCatalogCategories] = useState<ApiCatalogCategory[]>([]);
   const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const closeLightbox = useCallback(() => setLightboxIndex(null), []);
+
+  const showLightboxPrev = useCallback(() => {
+    setLightboxIndex((prev) => {
+      if (prev == null || currentImages.length === 0) return prev;
+      return (prev - 1 + currentImages.length) % currentImages.length;
+    });
+  }, [currentImages.length]);
+
+  const showLightboxNext = useCallback(() => {
+    setLightboxIndex((prev) => {
+      if (prev == null || currentImages.length === 0) return prev;
+      return (prev + 1) % currentImages.length;
+    });
+  }, [currentImages.length]);
+
+  useEffect(() => {
+    setLightboxIndex(null);
+  }, [currentImages]);
+
+  useEffect(() => {
+    if (lightboxIndex == null) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeLightbox();
+      if (event.key === "ArrowLeft") showLightboxPrev();
+      if (event.key === "ArrowRight") showLightboxNext();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [lightboxIndex, closeLightbox, showLightboxPrev, showLightboxNext]);
 
   const colorToSizesFromWarehouse = useMemo(() => {
     const map = new Map<string, Set<string>>();
@@ -200,6 +240,12 @@ const ProductPageView = ({
   }, [product.sections, selectedSection]);
 
   const adjustSectionHeights = useCallback(() => {
+    const isDesktop = width >= 1025;
+    const desktopMaxPx =
+      typeof window !== "undefined"
+        ? Math.max(200, Math.round(window.innerHeight * 0.4))
+        : 320;
+
     product.sections.forEach((section) => {
       const element = contentRefs.current[section.id];
       if (!element) {
@@ -207,12 +253,24 @@ const ProductPageView = ({
       }
 
       if (openSection === section.id) {
-        element.style.maxHeight = `${element.scrollHeight}px`;
+        // Сбросить кап, чтобы корректно измерить полную высоту контента
+        element.style.overflowY = "hidden";
+        element.style.maxHeight = "none";
+        const fullHeight = element.scrollHeight;
+
+        if (isDesktop && fullHeight > desktopMaxPx) {
+          element.style.maxHeight = `${desktopMaxPx}px`;
+          element.style.overflowY = "auto";
+        } else {
+          element.style.maxHeight = `${fullHeight}px`;
+          element.style.overflowY = "hidden";
+        }
       } else {
         element.style.maxHeight = "0px";
+        element.style.overflowY = "hidden";
       }
     });
-  }, [openSection, product.sections]);
+  }, [openSection, product.sections, width]);
 
   const { width } = useWindowSize();
 
@@ -339,7 +397,13 @@ const ProductPageView = ({
               }`}
             >
               {currentImages.map((image, index) => (
-                <div key={image + index} className={styles.imageCell}>
+                <button
+                  key={image + index}
+                  type="button"
+                  className={styles.imageCell}
+                  onClick={() => setLightboxIndex(index)}
+                  aria-label={`Открыть фото ${index + 1}`}
+                >
                   <img
                     src={image}
                     alt={`${product.title} — фото ${index + 1}`}
@@ -347,7 +411,7 @@ const ProductPageView = ({
                     loading={index <= 3 ? "eager" : "lazy"}
                     decoding="async"
                   />
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -506,6 +570,57 @@ const ProductPageView = ({
         />
       </div>
       <Footer />
+
+      {lightboxIndex != null && currentImages[lightboxIndex] && (
+        <div
+          className={styles.lightbox}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${product.title} — фото ${lightboxIndex + 1}`}
+          onClick={closeLightbox}
+        >
+          <button
+            type="button"
+            className={styles.lightboxClose}
+            onClick={closeLightbox}
+            aria-label="Закрыть"
+          >
+            ×
+          </button>
+          {currentImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                className={`${styles.lightboxNav} ${styles.lightboxPrev}`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  showLightboxPrev();
+                }}
+                aria-label="Предыдущее фото"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                className={`${styles.lightboxNav} ${styles.lightboxNext}`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  showLightboxNext();
+                }}
+                aria-label="Следующее фото"
+              >
+                ›
+              </button>
+            </>
+          )}
+          <img
+            src={currentImages[lightboxIndex]}
+            alt={`${product.title} — фото ${lightboxIndex + 1}`}
+            className={styles.lightboxImage}
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 };
