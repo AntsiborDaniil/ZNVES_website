@@ -139,6 +139,18 @@ const CatalogMegaMenu = ({
             >
               <div className={styles.columns} aria-label="Категории">
                 <ul className={styles.column}>
+                  <li>
+                    <Link
+                      href="/catalog"
+                      className={styles.link}
+                      onClick={handleNavigate}
+                      prefetch={false}
+                      role="menuitem"
+                      tabIndex={isActive && isCategoriesOpen ? 0 : -1}
+                    >
+                      All
+                    </Link>
+                  </li>
                   {categories.length === 0 ? (
                     <li className={styles.emptyHint}>Нет категорий</li>
                   ) : (
