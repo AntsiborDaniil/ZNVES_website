@@ -179,6 +179,21 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
                 isCatalogOpen ? styles.catalogSubmenuOpen : ""
               }`}
             >
+              <li className={styles.catalogItem}>
+                <Link
+                  href="/catalog"
+                  className={`${styles.catalogLink} ${
+                    isCatalogActive && !currentCategory
+                      ? styles.catalogLinkActive
+                      : ""
+                  }`}
+                  onClick={handleLinkClick}
+                  prefetch={false}
+                  tabIndex={isCatalogOpen ? undefined : -1}
+                >
+                  All
+                </Link>
+              </li>
               {catalogCategories.map((category) => (
                 <li key={category.slug} className={styles.catalogItem}>
                   <Link
