@@ -24,6 +24,7 @@ const nextConfig = {
   poweredByHeader: false,
   images: {
     // Hobby: Vercel Image Optimization → OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED
+    // Deploy probe: 2026-09-10
     unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
