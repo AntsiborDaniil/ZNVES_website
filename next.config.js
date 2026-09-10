@@ -22,6 +22,8 @@ const nextConfig = {
   reactStrictMode: true,
   compress: true,
   poweredByHeader: false,
+  // Меньший Docker-образ: копируем .next/standalone + static
+  output: "standalone",
   images: {
     // Hobby: Vercel Image Optimization → OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED
     // Deploy probe: 2026-09-10

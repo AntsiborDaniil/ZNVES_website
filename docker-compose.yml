@@ -1,0 +1,52 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://znves.ru}
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://api.znves.ru}
+        NEXT_PUBLIC_YA_DELIVERY_SOURCE_ADDRESS: ${NEXT_PUBLIC_YA_DELIVERY_SOURCE_ADDRESS:-}
+        NEXT_PUBLIC_YANDEX_MAPS_API_KEY: ${NEXT_PUBLIC_YANDEX_MAPS_API_KEY:-}
+        NEXT_PUBLIC_USE_MOCKS: ${NEXT_PUBLIC_USE_MOCKS:-false}
+    env_file:
+      - .env.production
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: 0.0.0.0
+    expose:
+      - "3000"
+    restart: unless-stopped
+    networks:
+      - znves
+
+  nginx:
+    image: nginx:1.27-alpine
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./deploy/certbot/www:/var/www/certbot:ro
+      - ./deploy/certbot/conf:/etc/letsencrypt:ro
+    restart: unless-stopped
+    networks:
+      - znves
+
+  # Опционально: выпуск/обновление сертификатов
+  # docker compose run --rm certbot certonly --webroot -w /var/www/certbot -d znves.ru -d www.znves.ru --email you@example.com --agree-tos --no-eff-email
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./deploy/certbot/www:/var/www/certbot
+      - ./deploy/certbot/conf:/etc/letsencrypt
+    profiles:
+      - certs
+    entrypoint: certbot
+
+networks:
+  znves:
+    driver: bridge
