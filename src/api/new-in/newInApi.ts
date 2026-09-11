@@ -13,18 +13,21 @@ const CATALOG_API_URL = `${API_BASE_URL}/api/catalog/`;
 const cache = new Map<string, { data: CatalogProduct[]; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
 
+const normalizeCategorySlug = (category?: string): string | undefined => {
+  const slug = category?.trim().toLowerCase().replace(/_/g, "-");
+  if (!slug || slug === "all") return undefined;
+  return slug;
+};
+
 // Преобразование API ответа в CatalogProduct
 const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProduct => {
   const baseUrl = API_BASE_URL;
-  
+
   const images = apiProduct.images.map((img) => resolveApiImageUrl(img, baseUrl));
 
   const priceValue = parseFloat(apiProduct.price.replace(/\s/g, "").replace(",", ".")) || 0;
   const formattedPrice = `${Math.round(priceValue).toLocaleString("ru-RU")} ₽`;
 
-  const category = extractCategoryFromSlug(apiProduct.slug) || "";
-
-  // Генерируем стабильный ID на основе slug
   const id = hashString(apiProduct.slug) || index + 1;
 
   const colors = apiProduct.colors ?? [];
@@ -41,7 +44,7 @@ const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProd
     priceValue,
     images,
     isNew: apiProduct.is_new,
-    category,
+    category: "",
     color: defaultColor,
     size: defaultSize,
     colors: colors.length > 0 ? colors : undefined,
@@ -51,64 +54,31 @@ const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProd
   };
 };
 
-// Простая функция хеширования для генерации ID из slug
 const hashString = (str: string): number => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
+    hash = hash & hash;
   }
   return Math.abs(hash);
 };
 
-// Извлечение категории из slug
-const extractCategoryFromSlug = (slug: string): string | null => {
-  const slugLower = slug.toLowerCase();
-  
-  if (slugLower.includes("pant") || slugLower.includes("брюк")) return "Pants";
-  if (slugLower.includes("jean")) return "Jeans";
-  if (slugLower.includes("t-shirt") || slugLower.includes("футболк")) return "T-shirts";
-  if (slugLower.includes("zip") && slugLower.includes("hood")) return "Zip hoodies";
-  if (slugLower.includes("jacket")) return "Jackets";
-  if (slugLower.includes("hoodie")) return "Hoodies";
-  if (slugLower.includes("short")) return "Shorts";
-  
-  return null;
-};
-
-// Нормализация категории для API
-const normalizeCategoryForApi = (category: string): string | undefined => {
-  if (category === "All") return undefined;
-  
-  const categoryMap: Record<string, string> = {
-    Pants: "pants",
-    Jeans: "jeans",
-    "T-shirts": "t-shirt",
-    "Zip hoodies": "zip-hoodie",
-    Jackets: "jackets",
-    Hoodies: "hoodies",
-    Shorts: "shorts",
-  };
-  
-  return categoryMap[category] || category.toLowerCase();
-};
-
-// Функция для получения новых товаров
+/** Новинки; `category` — slug с /categories/, без хардкод-маппинга */
 export const fetchNewInProducts = async (
   category?: string
 ): Promise<CatalogProduct[]> => {
-  const normalizedCategory = category ? normalizeCategoryForApi(category) : undefined;
-  const cacheKey = JSON.stringify({ category: normalizedCategory, is_new: true });
+  const categorySlug = normalizeCategorySlug(category);
+  const cacheKey = JSON.stringify({ category: categorySlug, is_new: true });
   const cached = cache.get(cacheKey);
-  
+
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
     return cached.data;
   }
 
   if (shouldUseMocks()) {
     const data = getMockCatalogList({
-      category: normalizedCategory,
+      category: categorySlug,
       is_new: true,
     });
     const transformedProducts = data.map((product, index) =>
@@ -123,11 +93,11 @@ export const fetchNewInProducts = async (
 
   try {
     const url = new URL(CATALOG_API_URL);
-    
+
     url.searchParams.set("is_new", "true");
-    
-    if (normalizedCategory) {
-      url.searchParams.set("category", normalizedCategory);
+
+    if (categorySlug) {
+      url.searchParams.set("category", categorySlug);
     }
 
     const response = await fetch(url.toString(), {
@@ -143,7 +113,7 @@ export const fetchNewInProducts = async (
     }
 
     const data: ApiProduct[] = await response.json();
-    
+
     const transformedProducts = data.map((product, index) =>
       transformApiProduct(product, index)
     );
@@ -154,11 +124,7 @@ export const fetchNewInProducts = async (
     });
 
     return transformedProducts;
-  } catch (error) {
+  } catch {
     return [];
   }
 };
-
-// Экспорт функции нормализации для использования в компонентах
-export { normalizeCategoryForApi };
-

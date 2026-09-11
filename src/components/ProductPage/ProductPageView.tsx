@@ -29,6 +29,7 @@ import {
 import {
   fetchCatalogCategories,
   fetchCatalogColors,
+  findCatalogCategory,
   getCategoryDisplayName,
   resolveCategorySlug,
   type ApiCatalogCategory,
@@ -422,9 +423,13 @@ const ProductPageView = ({
   const fromParam = searchParams?.get("from");
   const categoryParam = searchParams?.get("category");
   const origin = getBreadcrumbOrigin(fromParam);
-  // Категория из query, иначе — из данных товара (slug/category), без фейкового "t-shirt"
-  const rawCategory = categoryParam?.trim() || product.category?.trim() || "";
-  const categorySlug = rawCategory ? resolveCategorySlug(rawCategory) : null;
+  // Категория только из query (slug с /categories/); product.category больше не угадываем
+  const matchedCategory = categoryParam
+    ? findCatalogCategory(categoryParam, catalogCategories)
+    : undefined;
+  const categorySlug =
+    matchedCategory?.slug ??
+    (categoryParam ? resolveCategorySlug(categoryParam) : null);
   const categoryLabel = categorySlug
     ? getCategoryDisplayName(categorySlug, catalogCategories)
     : null;

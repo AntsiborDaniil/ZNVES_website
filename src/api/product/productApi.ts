@@ -98,7 +98,7 @@ const transformApiProduct = (
   }));
   const defaultColor = availableColors[0]?.value ?? "";
 
-  const category = extractCategoryFromSlug(slug) || "";
+  const category = "";
   const id = hashString(slug || apiProduct.name);
 
   const sectionEntries: Array<{ id: string; title: string; content: string }> = [
@@ -172,21 +172,6 @@ const transformApiProduct = (
     availableColors,
     sections,
   };
-};
-
-// Извлечение категории из slug
-const extractCategoryFromSlug = (slug: string): string | null => {
-  const slugLower = slug.toLowerCase();
-  
-  if (slugLower.includes("pant") || slugLower.includes("брюк")) return "Pants";
-  if (slugLower.includes("jean")) return "Jeans";
-  if (slugLower.includes("t-shirt") || slugLower.includes("футболк")) return "T-shirts";
-  if (slugLower.includes("zip") && slugLower.includes("hood")) return "Zip hoodies";
-  if (slugLower.includes("jacket")) return "Jackets";
-  if (slugLower.includes("hoodie")) return "Hoodies";
-  if (slugLower.includes("short")) return "Shorts";
-  
-  return null;
 };
 
 // Простая функция хеширования для генерации ID из slug

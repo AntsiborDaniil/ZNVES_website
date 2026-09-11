@@ -9,10 +9,10 @@ import type {
 const mockImg = (name: string): string => `/images/catalogs/mock/${name}.svg`;
 
 export const MOCK_CATALOG_CATEGORIES: ApiCatalogCategory[] = [
-  { slug: "t-shirt", name: "T-shirts" },
+  { slug: "t-shirts", name: "T-SHIRTS" },
   { slug: "hoodies", name: "Hoodies" },
   { slug: "zip-hoodie", name: "Zip hoodies" },
-  { slug: "jeans", name: "Jeans" },
+  { slug: "jeans", name: "JEANS" },
   { slug: "jackets", name: "Jackets" },
   { slug: "pants", name: "Pants" },
   { slug: "shorts", name: "Shorts" },
@@ -433,6 +433,7 @@ export const filterMockCatalogProducts = (params: {
       (product) =>
         product.slug.includes(cat) ||
         product.slug.startsWith(cat) ||
+        (cat === "t-shirts" && product.slug.includes("t-shirt")) ||
         (cat === "hoodies" && product.slug.includes("hoodie")) ||
         (cat === "zip-hoodie" && product.slug.includes("zip-hoodie")) ||
         (cat === "bags" && product.slug.includes("bag")) ||

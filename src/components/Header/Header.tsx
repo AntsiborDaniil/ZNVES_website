@@ -12,7 +12,6 @@ import CatalogMegaMenu from "../CatalogMegaMenu/CatalogMegaMenu";
 import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
 import {
-  FALLBACK_CATALOG_CATEGORIES,
   fetchCatalogCategories,
   type ApiCatalogCategory,
 } from "../../api/catalog/catalogApi";
@@ -39,7 +38,7 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isMobileHeader, setIsMobileHeader] = useState(false);
   const [catalogCategories, setCatalogCategories] = useState<ApiCatalogCategory[]>(
-    FALLBACK_CATALOG_CATEGORIES
+    []
   );
   const catalogButtonRef = useRef<HTMLButtonElement>(null);
   const catalogMenuRef = useRef<HTMLDivElement>(null);
@@ -66,7 +65,7 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
 
   useEffect(() => {
     void fetchCatalogCategories().then((data) => {
-      if (data.length > 0) setCatalogCategories(data);
+      setCatalogCategories(data);
     });
   }, []);
 

@@ -25,8 +25,7 @@ const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProd
   const priceValue = parseFloat(apiProduct.price.replace(/\s/g, "").replace(",", ".")) || 0;
   const formattedPrice = `${Math.round(priceValue).toLocaleString("ru-RU")} ₽`;
 
-  // Извлекаем категорию из slug или name
-  const category = extractCategoryFromSlug(apiProduct.slug) || "";
+  const category = "";
 
   // Генерируем стабильный ID на основе slug
   const id = hashString(apiProduct.slug) || index + 1;
@@ -64,23 +63,6 @@ const hashString = (str: string): number => {
     hash = hash & hash; // Convert to 32bit integer
   }
   return Math.abs(hash);
-};
-
-// Извлечение категории из slug
-const extractCategoryFromSlug = (slug: string): string | null => {
-  const slugLower = slug.toLowerCase();
-  
-  if (slugLower.includes("pant") || slugLower.includes("брюк")) return "Pants";
-  if (slugLower.includes("jean")) return "Jeans";
-  if (slugLower.includes("t-shirt") || slugLower.includes("футболк")) return "T-shirts";
-  if (slugLower.includes("zip") && slugLower.includes("hood")) return "Zip hoodies";
-  if (slugLower.includes("jacket")) return "Jackets";
-  if (slugLower.includes("hoodie")) return "Hoodies";
-  if (slugLower.includes("short")) return "Shorts";
-  if (slugLower.includes("bag") || slugLower.includes("сумк")) return "Bags";
-  if (slugLower.includes("ski") || slugLower.includes("suit")) return "Jackets";
-  
-  return null;
 };
 
 // Функция для получения товаров каталога

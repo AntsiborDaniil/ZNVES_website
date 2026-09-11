@@ -1,9 +1,8 @@
-import { resolveCategorySlug } from "../api/catalog/catalogApi";
-
 export type ProductNavFrom = "home" | "catalog" | "new-in";
 
 type BuildProductHrefOptions = {
   from?: ProductNavFrom;
+  /** slug категории с /categories/ */
   category?: string | null;
 };
 
@@ -20,11 +19,8 @@ export const buildProductHref = (
   }
 
   const category = options.category?.trim();
-  if (category) {
-    const slug = resolveCategorySlug(category);
-    if (slug) {
-      params.set("category", slug);
-    }
+  if (category && category.toLowerCase() !== "all") {
+    params.set("category", category);
   }
 
   const query = params.toString();

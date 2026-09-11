@@ -22,7 +22,7 @@ export const mockCartItem = {
     priceValue: 4990,
     images: ["/images/catalogs/mock/tshirt-green.svg"],
     isNew: true,
-    category: "t-shirt",
+    category: "t-shirts",
     color: "green",
     size: "M",
     sortOrder: 1,

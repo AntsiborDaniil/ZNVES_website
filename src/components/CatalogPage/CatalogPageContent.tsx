@@ -16,15 +16,11 @@ import type { CatalogProduct } from "../../types/products";
 import {
   fetchCatalogProductsByCategory,
   fetchCatalogCategories,
-  FALLBACK_CATALOG_CATEGORIES,
   getCatalogCategoryLabel,
   resolveCategorySlug,
   type ApiCatalogCategory,
 } from "../../api/catalog/catalogApi";
-import {
-  fetchNewInProducts,
-  normalizeCategoryForApi as normalizeCategoryForNewInApi,
-} from "../../api/new-in/newInApi";
+import { fetchNewInProducts } from "../../api/new-in/newInApi";
 import { buildProductHref } from "../../lib/productNavigation";
 
 type CatalogPageContentProps = {
@@ -33,7 +29,7 @@ type CatalogPageContentProps = {
 
 const categoryFromUrl = (param: string | null): string => {
   if (!param) return "all";
-  return resolveCategorySlug(param) ?? decodeURIComponent(param);
+  return resolveCategorySlug(param) ?? "all";
 };
 
 const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
@@ -87,13 +83,9 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
       setIsCategoriesLoading(true);
       try {
         const categoriesData = await fetchCatalogCategories();
-        if (categoriesData && categoriesData.length > 0) {
-          setCategories(categoriesData);
-        } else {
-          setCategories(FALLBACK_CATALOG_CATEGORIES);
-        }
+        setCategories(categoriesData);
       } catch {
-        setCategories(FALLBACK_CATALOG_CATEGORIES);
+        setCategories([]);
       } finally {
         setIsCategoriesLoading(false);
       }
@@ -108,26 +100,13 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
       }
       try {
         const categorySlug =
-          categoryParam == null
-            ? undefined
-            : resolveCategorySlug(categoryParam) ??
-              decodeURIComponent(categoryParam);
+          categoryParam == null ? undefined : resolveCategorySlug(categoryParam) ?? undefined;
 
         if (title === "NEW IN") {
-          const categoryForApi =
-            !categorySlug || categorySlug === "all"
-              ? undefined
-              : normalizeCategoryForNewInApi(categorySlug);
-          const newInProducts = await fetchNewInProducts(categoryForApi);
+          const newInProducts = await fetchNewInProducts(categorySlug ?? undefined);
           setProducts(newInProducts);
         } else {
-          const categoryForApi =
-            !categorySlug || categorySlug === "all"
-              ? undefined
-              : categorySlug;
-          const catalogProducts = await fetchCatalogProductsByCategory(
-            categoryForApi
-          );
+          const catalogProducts = await fetchCatalogProductsByCategory(categorySlug ?? undefined);
           setProducts(catalogProducts);
         }
       } catch {
@@ -228,7 +207,7 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
             </button>
             {categories.map((category) => {
               const isActive = category.slug === activeCategory;
-              const label = category.name || getCatalogCategoryLabel(category);
+              const label = getCatalogCategoryLabel(category);
               return (
                 <button
                   key={category.slug}

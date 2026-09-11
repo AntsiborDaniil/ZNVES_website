@@ -9,7 +9,6 @@ import { useKeyboardEvent } from "../../hooks/useKeyboardEvent";
 import {
   buildCatalogCategoryHref,
   fetchCatalogCategories,
-  FALLBACK_CATALOG_CATEGORIES,
   getCatalogCategoryLabel,
   type ApiCatalogCategory,
 } from "../../api/catalog/catalogApi";
@@ -40,7 +39,7 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
 
   useEffect(() => {
     void fetchCatalogCategories().then((data) => {
-      setCatalogCategories(data.length > 0 ? data : FALLBACK_CATALOG_CATEGORIES);
+      setCatalogCategories(data);
     });
   }, []);
 
