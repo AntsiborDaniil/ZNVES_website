@@ -5,12 +5,13 @@ import {
 } from "../productImages";
 
 describe("productImages", () => {
-  it("uses only is_main images for cards when flags exist", () => {
+  it("orders card images with is_main first, then the rest", () => {
     const urls = resolveCardImages(
       [
-        { url: "/media/main-1.jpg", is_main: true },
         { url: "/media/gallery-1.jpg", is_main: false },
+        { url: "/media/main-1.jpg", is_main: true },
         { image: "/media/main-2.jpg", is_main: true },
+        { url: "/media/gallery-2.jpg", is_main: false },
       ],
       "https://api.znves.ru"
     );
@@ -18,6 +19,8 @@ describe("productImages", () => {
     expect(urls).toEqual([
       "https://api.znves.ru/media/main-1.jpg",
       "https://api.znves.ru/media/main-2.jpg",
+      "https://api.znves.ru/media/gallery-1.jpg",
+      "https://api.znves.ru/media/gallery-2.jpg",
     ]);
   });
 

@@ -40,8 +40,8 @@ const parseApiProductImages = (
 
 /**
  * Фото для карточки каталога / hover:
- * если есть is_main — только они (в порядке ответа API);
- * иначе весь список (бэк уже отдаёт main первыми).
+ * если есть is_main — они первыми, затем остальные;
+ * иначе весь список как пришёл с API.
  */
 export const resolveCardImages = (
   images: ApiProductImage[] | undefined | null,
@@ -51,11 +51,14 @@ export const resolveCardImages = (
   if (parsed.length === 0) return [];
 
   const hasMainFlag = parsed.some((image) => image.isMain);
-  const selected = hasMainFlag
-    ? parsed.filter((image) => image.isMain)
+  const ordered = hasMainFlag
+    ? [
+        ...parsed.filter((image) => image.isMain),
+        ...parsed.filter((image) => !image.isMain),
+      ]
     : parsed;
 
-  return selected.map((image) => resolveApiImageUrl(image.url, baseUrl));
+  return ordered.map((image) => resolveApiImageUrl(image.url, baseUrl));
 };
 
 /**
