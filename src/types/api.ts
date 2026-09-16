@@ -1,5 +1,7 @@
 // Типы для API ответов
 
+import type { ApiProductImage } from "../lib/productImages";
+
 export type ApiProductColor = {
   slug: string;
   value: string;
@@ -22,7 +24,7 @@ export type ApiProduct = {
   name: string;
   price: string;
   is_new: boolean;
-  images: string[];
+  images: ApiProductImage[];
   colors?: ApiProductColor[];
   sizes?: ApiProductSize[];
   /** Реальные комбинации цвет+размер (для строгой фильтрации). Если есть — фильтр «красный + S» покажет только товары, у которых у красного есть размер S */
@@ -36,4 +38,5 @@ export type CatalogApiParams = {
 
 // Реэкспорт типов для детальной страницы товара (ApiProductSize и ApiProductColor уже объявлены выше)
 export type { ApiProductDetail, ApiWarehouseItem } from "../api/product/productApi";
+export type { ApiProductImage };
 

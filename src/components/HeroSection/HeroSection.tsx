@@ -42,7 +42,7 @@ const HeroSection = async ({ hero: heroProp }: HeroSectionProps) => {
           fetchPriority="high"
           className={styles.heroBackgroundImage}
           sizes="(max-width: 768px) 1px, 100vw"
-          quality={80}
+          quality={90}
         />
         {/* Mobile: 3 слоя из Figma — фото, осветление, затемнение */}
         <div className={styles.heroMobileStack}>

@@ -80,10 +80,6 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
   useEffect(() => {
     if (!isCatalogOpen) return;
 
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsCatalogOpen(false);
-    };
-
     const onPointer = (event: MouseEvent) => {
       const target = event.target as Node;
       if (
@@ -95,10 +91,8 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
       setIsCatalogOpen(false);
     };
 
-    document.addEventListener("keydown", onKey);
     document.addEventListener("mousedown", onPointer);
     return () => {
-      document.removeEventListener("keydown", onKey);
       document.removeEventListener("mousedown", onPointer);
     };
   }, [isCatalogOpen]);
@@ -229,15 +223,12 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
         </div>
       </header>
 
-      <div
-        ref={catalogMenuRef}
-        className={styles.catalogMenuHost}
-        onMouseDown={(event) => event.stopPropagation()}
-      >
+      <div ref={catalogMenuRef} className={styles.catalogMenuHost}>
         <CatalogMegaMenu
           isOpen={isCatalogOpen}
           categories={catalogCategories}
           onNavigate={closeCatalogFromMenu}
+          onClose={closeCatalogFromMenu}
           onCollectionsClick={handleMenuCollectionsClick}
         />
       </div>

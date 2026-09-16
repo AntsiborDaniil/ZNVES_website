@@ -4,6 +4,10 @@ import type { ProductDetail } from "../../types/products";
 import type { ProductColorOption } from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
 import { resolveApiImageUrl } from "../../lib/imageUrl";
+import {
+  resolveGalleryImages,
+  type ApiProductImage,
+} from "../../lib/productImages";
 import { shouldUseMocks } from "../../mocks/config";
 import { getMockProductDetailBySlug } from "../../mocks/catalogMocks";
 
@@ -39,7 +43,7 @@ export type ApiProductDetail = {
   price: string | number;
   description: string;
   is_new: boolean;
-  images: string[];
+  images: ApiProductImage[];
   sizes: ApiProductSize[];
   colors: ApiProductColor[];
   warehouse_items: ApiWarehouseItem[];
@@ -75,10 +79,7 @@ const transformApiProduct = (
   const baseUrl = API_BASE_URL;
   const slug = apiProduct.slug ?? slugFromUrl ?? "";
 
-  const images = (apiProduct.images ?? []).map((img) => {
-    if (typeof img !== "string") return "";
-    return resolveApiImageUrl(img, baseUrl);
-  });
+  const images = resolveGalleryImages(apiProduct.images, baseUrl).filter(Boolean);
 
   const priceValue =
     typeof apiProduct.price === "number"

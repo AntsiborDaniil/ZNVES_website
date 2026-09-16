@@ -25,9 +25,7 @@ const nextConfig = {
   // Меньший Docker-образ: копируем .next/standalone + static
   output: "standalone",
   images: {
-    // Hobby: Vercel Image Optimization → OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED
-    // Deploy probe: 2026-09-10
-    unoptimized: true,
+    // Timeweb: оптимизация на своём Node (sharp). На Vercel Hobby раньше ломалась.
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],

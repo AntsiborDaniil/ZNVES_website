@@ -3,7 +3,7 @@
 import type { ApiProduct, CatalogApiParams } from "../../types/api";
 import type { CatalogProduct } from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
-import { resolveApiImageUrl } from "../../lib/imageUrl";
+import { resolveCardImages } from "../../lib/productImages";
 import { shouldUseMocks } from "../../mocks/config";
 import { getMockCatalogList } from "../../mocks/catalogMocks";
 
@@ -15,11 +15,7 @@ const CACHE_DURATION = 15 * 60 * 1000; // 15 минут
 
 // Преобразование API ответа в CatalogProduct
 const transformApiProduct = (apiProduct: ApiProduct, index: number): CatalogProduct => {
-  // Извлекаем базовый URL для изображений
-  const baseUrl = API_BASE_URL;
-  
-  // Преобразуем изображения, добавляя базовый URL если нужно
-  const images = apiProduct.images.map((img) => resolveApiImageUrl(img, baseUrl));
+  const images = resolveCardImages(apiProduct.images, API_BASE_URL);
 
   // Парсим цену
   const priceValue = parseFloat(apiProduct.price.replace(/\s/g, "").replace(",", ".")) || 0;

@@ -138,7 +138,7 @@ const CatalogGridCard = ({
                   }`}
                   loading="lazy"
                   onLoad={() => markImageLoaded(index)}
-                  quality={80}
+                  quality={90}
                   unoptimized={isSvgImageSrc(image)}
                 />
               );

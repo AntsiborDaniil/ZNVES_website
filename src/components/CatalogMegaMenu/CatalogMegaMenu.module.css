@@ -20,8 +20,10 @@
 .linksPane {
   display: flex;
   align-items: flex-start;
-  flex: 0 0 50%;
-  width: 50%;
+  flex: 0 0 auto;
+  width: max-content;
+  max-width: min(50vw, 720px);
+  min-width: 260px;
   height: 100%;
   min-height: 100%;
   padding: 40px 48px 48px 39px;
@@ -46,7 +48,8 @@
   display: flex;
   flex-direction: column;
   gap: 36px;
-  width: 100%;
+  width: max-content;
+  max-width: 100%;
   opacity: 0;
   transform: translateY(12px);
   transition:
@@ -66,12 +69,15 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  width: max-content;
 }
 
 .catalogSection {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  width: max-content;
+  max-width: 100%;
 }
 
 .catalogToggle {
@@ -112,25 +118,37 @@
   opacity: 1;
 }
 
-.categoriesWrap > .columns {
+.categoriesWrap > .categoryList {
   overflow: hidden;
   min-height: 0;
 }
 
-.columns {
-  display: flex;
-  gap: 100px;
-  align-items: flex-start;
+.categoriesWrapOpen > .categoryList {
+  overflow: visible;
 }
 
-.column {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+/* Колонки: сверху вниз, при упоре в высоту — следующая колонка */
+.categoryList {
   margin: 0;
   padding: 0;
   list-style: none;
-  min-width: 67px;
+  width: max-content;
+  max-width: 100%;
+  max-height: calc(100dvh - var(--header-height) - 220px);
+  column-width: 140px;
+  column-gap: 80px;
+  column-fill: auto;
+}
+
+.categoryList > li {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  margin: 0 0 18px;
+}
+
+.categoryList > li:last-child {
+  margin-bottom: 0;
 }
 
 .emptyHint {
@@ -155,18 +173,24 @@
   transition: opacity 0.2s ease;
 }
 
+.categoryLink {
+  font-weight: var(--font-weight-regular);
+}
+
 .link:hover,
 .link:focus-visible {
   opacity: 0.7;
 }
 
 @media (max-width: 1200px) {
-  .columns {
-    gap: 60px;
+  .categoryList {
+    column-gap: 48px;
+    column-width: 120px;
   }
 
   .linksPane {
     padding: 32px 24px 40px;
+    min-width: 220px;
   }
 }
 

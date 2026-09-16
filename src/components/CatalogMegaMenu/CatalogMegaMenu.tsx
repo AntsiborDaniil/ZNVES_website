@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import {
   buildCatalogCategoryHref,
   getCatalogCategoryLabel,
   type ApiCatalogCategory,
 } from "../../api/catalog/catalogApi";
+import { useKeyboardEvent } from "../../hooks/useKeyboardEvent";
 import styles from "./CatalogMegaMenu.module.css";
 
 const PANEL_ANIMATION_MS = 450;
@@ -15,26 +16,20 @@ type CatalogMegaMenuProps = {
   isOpen: boolean;
   categories: ApiCatalogCategory[];
   onNavigate?: () => void;
+  onClose?: () => void;
   onCollectionsClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
-};
-
-const splitColumns = (
-  categories: ApiCatalogCategory[]
-): [ApiCatalogCategory[], ApiCatalogCategory[]] => {
-  const mid = Math.ceil(categories.length / 2);
-  return [categories.slice(0, mid), categories.slice(mid)];
 };
 
 const CatalogMegaMenu = ({
   isOpen,
   categories,
   onNavigate,
+  onClose,
   onCollectionsClick,
 }: CatalogMegaMenuProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(true);
-  const [left, right] = splitColumns(categories);
 
   useEffect(() => {
     if (isOpen) {
@@ -53,6 +48,21 @@ const CatalogMegaMenu = ({
 
     return () => window.clearTimeout(timer);
   }, [isOpen]);
+
+  const handleClose = useCallback(() => {
+    onClose?.();
+  }, [onClose]);
+
+  useKeyboardEvent("Escape", handleClose, isOpen);
+
+  const handleBackdropMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+    // Клик по прозрачной зоне вне чёрной панели — закрыть
+    if (event.target === event.currentTarget) {
+      handleClose();
+      return;
+    }
+    event.stopPropagation();
+  };
 
   const stopMenuEvent = (event: MouseEvent) => {
     event.stopPropagation();
@@ -88,10 +98,13 @@ const CatalogMegaMenu = ({
       role="menu"
       aria-label="Каталог"
       aria-hidden={!isActive}
-      onMouseDown={stopMenuEvent}
-      onClick={stopMenuEvent}
+      onMouseDown={handleBackdropMouseDown}
     >
-      <div className={styles.linksPane}>
+      <div
+        className={styles.linksPane}
+        onMouseDown={stopMenuEvent}
+        onClick={stopMenuEvent}
+      >
         <div className={styles.menuBody}>
           <ul className={styles.primaryList}>
             <li>
@@ -137,62 +150,38 @@ const CatalogMegaMenu = ({
               }`}
               aria-hidden={!isCategoriesOpen}
             >
-              <div className={styles.columns} aria-label="Категории">
-                <ul className={styles.column}>
-                  <li>
-                    <Link
-                      href="/catalog"
-                      className={styles.link}
-                      onClick={handleNavigate}
-                      prefetch={false}
-                      role="menuitem"
-                      tabIndex={isActive && isCategoriesOpen ? 0 : -1}
-                    >
-                      All
-                    </Link>
-                  </li>
-                  {categories.length === 0 ? (
-                    <li className={styles.emptyHint}>Нет категорий</li>
-                  ) : (
-                    left.map((category) => (
-                      <li key={category.slug}>
-                        <Link
-                          href={buildCatalogCategoryHref(category.slug)}
-                          className={styles.link}
-                          onClick={handleNavigate}
-                          prefetch={false}
-                          role="menuitem"
-                          tabIndex={
-                            isActive && isCategoriesOpen ? 0 : -1
-                          }
-                        >
-                          {getCatalogCategoryLabel(category)}
-                        </Link>
-                      </li>
-                    ))
-                  )}
-                </ul>
-                {right.length > 0 && (
-                  <ul className={styles.column}>
-                    {right.map((category) => (
-                      <li key={category.slug}>
-                        <Link
-                          href={buildCatalogCategoryHref(category.slug)}
-                          className={styles.link}
-                          onClick={handleNavigate}
-                          prefetch={false}
-                          role="menuitem"
-                          tabIndex={
-                            isActive && isCategoriesOpen ? 0 : -1
-                          }
-                        >
-                          {getCatalogCategoryLabel(category)}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+              <ul className={styles.categoryList} aria-label="Категории">
+                <li>
+                  <Link
+                    href="/catalog"
+                    className={`${styles.link} ${styles.categoryLink}`}
+                    onClick={handleNavigate}
+                    prefetch={false}
+                    role="menuitem"
+                    tabIndex={isActive && isCategoriesOpen ? 0 : -1}
+                  >
+                    All
+                  </Link>
+                </li>
+                {categories.length === 0 ? (
+                  <li className={styles.emptyHint}>Нет категорий</li>
+                ) : (
+                  categories.map((category) => (
+                    <li key={category.slug}>
+                      <Link
+                        href={buildCatalogCategoryHref(category.slug)}
+                        className={`${styles.link} ${styles.categoryLink}`}
+                        onClick={handleNavigate}
+                        prefetch={false}
+                        role="menuitem"
+                        tabIndex={isActive && isCategoriesOpen ? 0 : -1}
+                      >
+                        {getCatalogCategoryLabel(category)}
+                      </Link>
+                    </li>
+                  ))
                 )}
-              </div>
+              </ul>
             </div>
           </div>
         </div>
