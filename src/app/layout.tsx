@@ -1,19 +1,14 @@
-import type { ReactNode } from "react";
-import dynamic from "next/dynamic";
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import "./globals.css";
 import NavigationTracker from "../components/NavigationTracker/NavigationTracker";
 import { CartProvider } from "../contexts/CartContext";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ToastProvider } from "../components/ui/ToastProvider/ToastProvider";
 import ClientModalHosts from "../components/ClientModalHosts/ClientModalHosts";
+import CookieBanner from "../components/CookieBanner/CookieBanner";
 import MockProvider from "../components/MockProvider/MockProvider";
-
-const CookieBanner = dynamic(
-  () => import("../components/CookieBanner/CookieBanner"),
-  { ssr: false }
-);
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],

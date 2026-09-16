@@ -9,10 +9,7 @@ import {
   fetchNewInProducts,
   fetchAllCatalogProducts,
 } from "../api/home/catalogApi";
-import { API_REVALIDATE } from "../lib/apiCache";
 import styles from "./page.module.css";
-
-export const revalidate = API_REVALIDATE.home;
 
 const ProductDisplaySection = dynamic(
   () => import("../components/ProductDisplaySection/ProductDisplaySection"),

@@ -80,14 +80,12 @@ const ProductGallerySwiper = ({
           images.map((image, index) => (
             <SwiperSlide key={image + index}>
               <div className={styles.heroSlide}>
-                <Image
+                <img
                   src={image}
                   alt={`${productTitle} — фото ${index + 1}`}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 55vw"
                   className={styles.heroImage}
-                  priority={index === 0}
-                  quality={90}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  decoding="async"
                 />
               </div>
             </SwiperSlide>
@@ -129,14 +127,7 @@ const ProductGallerySwiper = ({
                   : `Фото ${index + 1}`
               }
             >
-              <Image
-                src={image}
-                alt=""
-                fill
-                sizes="50px"
-                className={styles.thumbImage}
-                quality={75}
-              />
+              <img src={image} alt="" className={styles.thumbImage} />
               {isLastOverflow && (
                 <span className={styles.thumbMore}>+{overflowCount}</span>
               )}

@@ -3,7 +3,6 @@
 import type { ApiProduct, CatalogApiParams } from "../../types/api";
 import type { CatalogProduct } from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
-import { API_REVALIDATE } from "../../lib/apiCache";
 import { resolveCardImages } from "../../lib/productImages";
 import { shouldUseMocks } from "../../mocks/config";
 import { getMockCatalogList } from "../../mocks/catalogMocks";
@@ -102,7 +101,7 @@ export const fetchCatalogProducts = async (
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: API_REVALIDATE.catalog },
+      next: { revalidate: 15 * 60 },
     });
 
     if (!response.ok) {

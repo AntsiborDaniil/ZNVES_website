@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import ProductPageClient from "./ProductPageClient";
 import { API_BASE_URL } from "../../../lib/apiConfig";
-import { API_REVALIDATE } from "../../../lib/apiCache";
 import { fetchProductBySlug } from "../../../api/product/productApi";
-
-export const revalidate = API_REVALIDATE.product;
 
 type ProductPageProps = {
   params: Promise<{

@@ -17,20 +17,6 @@ const securityHeaders = [
   },
 ];
 
-const staticAssetCacheHeaders = [
-  {
-    key: "Cache-Control",
-    value: "public, max-age=31536000, immutable",
-  },
-];
-
-const imageOptimizerCacheHeaders = [
-  {
-    key: "Cache-Control",
-    value: "public, max-age=86400, stale-while-revalidate=604800",
-  },
-];
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -39,42 +25,28 @@ const nextConfig = {
   // Меньший Docker-образ: копируем .next/standalone + static
   output: "standalone",
   images: {
-    // Timeweb: оптимизация на своём Node (sharp). На Vercel Hobby раньше ломалась.
-    formats: ["image/avif", "image/webp"],
+    // Hobby: Vercel Image Optimization → OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED
+    // Deploy probe: 2026-09-10
+    unoptimized: true,
+    formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     qualities: [75, 80, 85, 90],
-    minimumCacheTTL: 60 * 60 * 24,
     remotePatterns: [
-      { protocol: "https", hostname: "api.znves.ru", pathname: "/**" },
-      { protocol: "http", hostname: "62.84.115.11", port: "8000", pathname: "/**" },
+      { protocol: 'https', hostname: 'api.znves.ru', pathname: '/**' },
+      { protocol: 'http', hostname: '62.84.115.11', port: '8000', pathname: '/**' },
     ],
   },
   compiler: {
-    removeConsole:
-      process.env.NODE_ENV === "production"
-        ? {
-            exclude: ["error", "warn"],
-          }
-        : false,
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
   },
   async headers() {
     return [
       {
         source: "/(.*)",
         headers: securityHeaders,
-      },
-      {
-        source: "/_next/static/(.*)",
-        headers: staticAssetCacheHeaders,
-      },
-      {
-        source: "/images/(.*)",
-        headers: staticAssetCacheHeaders,
-      },
-      {
-        source: "/_next/image",
-        headers: imageOptimizerCacheHeaders,
       },
     ];
   },

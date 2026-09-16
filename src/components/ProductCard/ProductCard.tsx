@@ -204,7 +204,7 @@ const ProductCard = ({
                       }`}
                       loading={index === 0 ? "eager" : "lazy"}
                       onLoad={() => markImageLoaded(index)}
-                      quality={90}
+                      quality={80}
                       unoptimized={isSvgImageSrc(image)}
                       draggable={false}
                     />
@@ -233,7 +233,7 @@ const ProductCard = ({
                       }`}
                       loading={isSliderCard && index === 0 ? "eager" : "lazy"}
                       onLoad={() => markImageLoaded(index)}
-                      quality={90}
+                      quality={80}
                       unoptimized={isSvgImageSrc(image)}
                       draggable={false}
                     />
