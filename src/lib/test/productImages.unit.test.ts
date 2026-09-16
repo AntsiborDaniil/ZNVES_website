@@ -24,6 +24,27 @@ describe("productImages", () => {
     ]);
   });
 
+  it("limits card images to 4", () => {
+    const urls = resolveCardImages(
+      [
+        { url: "/media/m1.jpg", is_main: true },
+        { url: "/media/g1.jpg", is_main: false },
+        { url: "/media/g2.jpg", is_main: false },
+        { url: "/media/g3.jpg", is_main: false },
+        { url: "/media/g4.jpg", is_main: false },
+        { url: "/media/g5.jpg", is_main: false },
+      ],
+      "https://api.znves.ru"
+    );
+
+    expect(urls).toEqual([
+      "https://api.znves.ru/media/m1.jpg",
+      "https://api.znves.ru/media/g1.jpg",
+      "https://api.znves.ru/media/g2.jpg",
+      "https://api.znves.ru/media/g3.jpg",
+    ]);
+  });
+
   it("keeps string list order for cards when no is_main flags", () => {
     const urls = resolveCardImages(
       ["/media/a.jpg", "/media/b.jpg"],
