@@ -3,6 +3,7 @@
 import type { ApiProduct } from "../../types/api";
 import type { CatalogProduct } from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
+import { API_REVALIDATE } from "../../lib/apiCache";
 import { resolveCardImages } from "../../lib/productImages";
 import { shouldUseMocks } from "../../mocks/config";
 import { getMockCatalogList } from "../../mocks/catalogMocks";
@@ -103,7 +104,7 @@ export const fetchNewInProducts = async (
       headers: {
         "Content-Type": "application/json",
       },
-      cache: "no-store",
+      next: { revalidate: API_REVALIDATE.catalog },
     });
 
     if (!response.ok) {

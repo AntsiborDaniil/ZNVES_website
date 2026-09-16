@@ -3,6 +3,7 @@
 import type { ApiProduct, CatalogApiParams } from "../../types/api";
 import type { CatalogProduct } from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
+import { API_REVALIDATE } from "../../lib/apiCache";
 import { resolveCardImages } from "../../lib/productImages";
 import { shouldUseMocks } from "../../mocks/config";
 import {
@@ -175,7 +176,7 @@ export const fetchCatalogProducts = async (
       headers: {
         "Content-Type": "application/json",
       },
-      cache: "no-store",
+      next: { revalidate: API_REVALIDATE.catalog },
     });
 
     if (!response.ok) {
@@ -233,7 +234,7 @@ export const fetchCatalogCategories = async (): Promise<ApiCatalogCategory[]> =>
     const response = await fetch(`${CATALOG_API_URL}categories/`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      cache: "no-store",
+      next: { revalidate: API_REVALIDATE.filters },
     });
     if (!response.ok) {
       throw new Error(`API error: ${response.status} ${response.statusText}`);
@@ -261,7 +262,7 @@ export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
     const response = await fetch(`${CATALOG_API_URL}colors/`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      cache: "no-store",
+      next: { revalidate: API_REVALIDATE.filters },
     });
     if (!response.ok) {
       throw new Error(`API error: ${response.status} ${response.statusText}`);
@@ -288,7 +289,7 @@ export const fetchCatalogSizes = async (): Promise<ApiCatalogSize[]> => {
     const response = await fetch(`${CATALOG_API_URL}sizes/`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      cache: "no-store",
+      next: { revalidate: API_REVALIDATE.filters },
     });
     if (!response.ok) {
       throw new Error(`API error: ${response.status} ${response.statusText}`);

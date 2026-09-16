@@ -3,6 +3,7 @@
 import type { ProductDetail } from "../../types/products";
 import type { ProductColorOption } from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
+import { API_REVALIDATE } from "../../lib/apiCache";
 import { resolveApiImageUrl } from "../../lib/imageUrl";
 import {
   resolveGalleryImages,
@@ -199,7 +200,7 @@ const fetchProductBySlugInternal = async (slug: string): Promise<ProductDetail |
   const response = await fetch(url, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
-    cache: "no-store",
+    next: { revalidate: API_REVALIDATE.product },
   });
   if (!response.ok) {
     if (response.status === 404) return null;
@@ -257,7 +258,7 @@ export const fetchCatalogProductRaw = async (slug: string): Promise<ApiProductDe
         const response = await fetch(url, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
-          cache: "no-store",
+          next: { revalidate: API_REVALIDATE.product },
         });
         if (!response.ok) {
           if (response.status === 404) return null;
@@ -288,7 +289,7 @@ const fetchProductImagesByColorInternal = async (
   const response = await fetch(url, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
-    cache: "no-store",
+    next: { revalidate: API_REVALIDATE.product },
   });
   if (!response.ok) {
     if (response.status === 404) return [];
@@ -296,7 +297,10 @@ const fetchProductImagesByColorInternal = async (
   }
   const imagePaths: string[] = await response.json();
   const images = imagePaths.map((img) => resolveApiImageUrl(img, baseUrl));
-  colorImagesCache.set(`${productSlug}-${colorSlug}`, { data: images, timestamp: Date.now() });
+  colorImagesCache.set(`${productSlug}-${colorSlug}`, {
+    data: images,
+    timestamp: Date.now(),
+  });
   return images;
 };
 
@@ -307,14 +311,14 @@ export const fetchProductImagesByColor = async (
 ): Promise<string[]> => {
   const cacheKey = `${productSlug}-${colorSlug}`;
   const cached = colorImagesCache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < COLOR_IMAGES_CACHE_DURATION) return cached.data;
+  if (cached && Date.now() - cached.timestamp < COLOR_IMAGES_CACHE_DURATION) {
+    return cached.data;
+  }
 
   let promise = inFlightImages.get(cacheKey);
   if (!promise) {
     promise = fetchProductImagesByColorInternal(productSlug, colorSlug)
-      .catch((err) => {
-        return [];
-      })
+      .catch(() => [])
       .finally(() => inFlightImages.delete(cacheKey));
     inFlightImages.set(cacheKey, promise);
   }
