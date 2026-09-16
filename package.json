@@ -20,8 +20,10 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.81.0",
-    "sharp": "^0.34.5",
     "swiper": "^12.0.3"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
