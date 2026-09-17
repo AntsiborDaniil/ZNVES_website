@@ -32,7 +32,6 @@ describe("productImages", () => {
         { url: "/media/g2.jpg", is_main: false },
         { url: "/media/g3.jpg", is_main: false },
         { url: "/media/g4.jpg", is_main: false },
-        { url: "/media/g5.jpg", is_main: false },
       ],
       "https://api.znves.ru"
     );

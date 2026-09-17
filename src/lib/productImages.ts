@@ -1,8 +1,5 @@
 import { resolveApiImageUrl } from "./imageUrl";
 
-/** Максимум фото в слайдере карточки каталога */
-export const CARD_IMAGES_LIMIT = 4;
-
 /** Картинка с каталога/товара: строка (legacy) или объект с is_main */
 export type ApiProductImage =
   | string
@@ -41,11 +38,13 @@ const parseApiProductImages = (
   return parsed;
 };
 
+/** Максимум фото в слайдере карточки каталога. */
+const CARD_IMAGES_LIMIT = 4;
+
 /**
  * Фото для карточки каталога / hover:
- * если есть is_main — они первыми, затем остальные;
- * иначе весь список как пришёл с API.
- * Не больше CARD_IMAGES_LIMIT штук.
+ * is_main первыми, затем остальные; не больше CARD_IMAGES_LIMIT.
+ * Если флагов нет — порядок API как есть.
  */
 export const resolveCardImages = (
   images: ApiProductImage[] | undefined | null,

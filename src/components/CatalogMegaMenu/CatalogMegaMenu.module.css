@@ -174,7 +174,7 @@
 }
 
 .categoryLink {
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-light);
 }
 
 .link:hover,
