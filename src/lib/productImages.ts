@@ -38,13 +38,10 @@ const parseApiProductImages = (
   return parsed;
 };
 
-/** Максимум фото в слайдере карточки каталога. */
-const CARD_IMAGES_LIMIT = 4;
-
 /**
  * Фото для карточки каталога / hover:
- * is_main первыми, затем остальные; не больше CARD_IMAGES_LIMIT.
- * Если флагов нет — порядок API как есть.
+ * если есть is_main — только они (в порядке ответа API);
+ * иначе весь список (бэк уже отдаёт main первыми).
  */
 export const resolveCardImages = (
   images: ApiProductImage[] | undefined | null,
@@ -54,16 +51,11 @@ export const resolveCardImages = (
   if (parsed.length === 0) return [];
 
   const hasMainFlag = parsed.some((image) => image.isMain);
-  const ordered = hasMainFlag
-    ? [
-        ...parsed.filter((image) => image.isMain),
-        ...parsed.filter((image) => !image.isMain),
-      ]
+  const selected = hasMainFlag
+    ? parsed.filter((image) => image.isMain)
     : parsed;
 
-  return ordered
-    .slice(0, CARD_IMAGES_LIMIT)
-    .map((image) => resolveApiImageUrl(image.url, baseUrl));
+  return selected.map((image) => resolveApiImageUrl(image.url, baseUrl));
 };
 
 /**

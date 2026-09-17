@@ -5,13 +5,12 @@ import {
 } from "../productImages";
 
 describe("productImages", () => {
-  it("orders card images with is_main first, then the rest", () => {
+  it("uses only is_main images for cards when flags exist", () => {
     const urls = resolveCardImages(
       [
-        { url: "/media/gallery-1.jpg", is_main: false },
         { url: "/media/main-1.jpg", is_main: true },
+        { url: "/media/gallery-1.jpg", is_main: false },
         { image: "/media/main-2.jpg", is_main: true },
-        { url: "/media/gallery-2.jpg", is_main: false },
       ],
       "https://api.znves.ru"
     );
@@ -19,28 +18,6 @@ describe("productImages", () => {
     expect(urls).toEqual([
       "https://api.znves.ru/media/main-1.jpg",
       "https://api.znves.ru/media/main-2.jpg",
-      "https://api.znves.ru/media/gallery-1.jpg",
-      "https://api.znves.ru/media/gallery-2.jpg",
-    ]);
-  });
-
-  it("limits card images to 4", () => {
-    const urls = resolveCardImages(
-      [
-        { url: "/media/m1.jpg", is_main: true },
-        { url: "/media/g1.jpg", is_main: false },
-        { url: "/media/g2.jpg", is_main: false },
-        { url: "/media/g3.jpg", is_main: false },
-        { url: "/media/g4.jpg", is_main: false },
-      ],
-      "https://api.znves.ru"
-    );
-
-    expect(urls).toEqual([
-      "https://api.znves.ru/media/m1.jpg",
-      "https://api.znves.ru/media/g1.jpg",
-      "https://api.znves.ru/media/g2.jpg",
-      "https://api.znves.ru/media/g3.jpg",
     ]);
   });
 

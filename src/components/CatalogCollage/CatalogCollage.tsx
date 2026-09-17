@@ -62,7 +62,6 @@ const CatalogCollage = ({
 
   const desktopProducts = products.slice(0, 4);
   const collageProducts = products.slice(0, 2);
-  const formatPrice = (price: string) => `${price} ₽`;
 
   return (
     <section id={id} className={styles.section}>
@@ -115,7 +114,7 @@ const CatalogCollage = ({
               const infoBlock = (
                 <div className={styles.collageInfo}>
                   <span className={styles.collageTitle}>{product.title}</span>
-                  <span className={styles.collagePrice}>{formatPrice(product.price)}</span>
+                  <span className={styles.collagePrice}>{product.price}</span>
                 </div>
               );
 
