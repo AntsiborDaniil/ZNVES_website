@@ -50,9 +50,11 @@ const ProductCard = ({
 
   const hasCarousel = imageList.length > 1;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [hoverEnabled, setHoverEnabled] = useState(true);
+  // null до mount — SSR и первый client paint совпадают (без Swiper)
+  const [hoverEnabled, setHoverEnabled] = useState<boolean | null>(null);
+  const isDesktopHover = hoverEnabled === true;
   // Карусель фото только в каталоге / new-in (не в слайдерах Bestsellers и т.п.)
-  const useImageSwiper = !hoverEnabled && hasCarousel && !isSliderCard;
+  const useImageSwiper = hoverEnabled === false && hasCarousel && !isSliderCard;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const cardSwiperRef = useRef<SwiperInstance | null>(null);
@@ -76,8 +78,8 @@ const ProductCard = ({
   }, [imageList]);
 
   useEffect(() => {
-    if (hoverEnabled) setCurrentIndex(0);
-  }, [hoverEnabled]);
+    if (isDesktopHover) setCurrentIndex(0);
+  }, [isDesktopHover]);
 
   const updateIndexFromPointer = useCallback(
     (clientX: number) => {
@@ -96,17 +98,17 @@ const ProductCard = ({
   );
 
   const handlePointerMoveHover = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!hoverEnabled || !hasCarousel) return;
+    if (!isDesktopHover || !hasCarousel) return;
     updateIndexFromPointer(event.clientX);
   };
 
   const handlePointerEnterHover = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!hoverEnabled || !hasCarousel) return;
+    if (!isDesktopHover || !hasCarousel) return;
     updateIndexFromPointer(event.clientX);
   };
 
   const handlePointerLeaveHover = () => {
-    if (hoverEnabled) setCurrentIndex(0);
+    if (isDesktopHover) setCurrentIndex(0);
   };
 
   const handleClickCapture = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -116,15 +118,13 @@ const ProductCard = ({
     swipeMovedRef.current = false;
   };
 
+  const cardClassName = zoomOnHover
+    ? `${styles.productCard} ${styles.zoomOnHover}`
+    : styles.productCard;
+
   return (
-    <div
-      className={`${styles.productCard} ${
-        isSliderCard ? styles.sliderCard : ""
-      } ${variant === "grid" ? styles.gridCard : ""} ${
-        zoomOnHover ? styles.zoomOnHover : ""
-      }`}
-      onClickCapture={handleClickCapture}
-    >
+    <div className={cardClassName} onClickCapture={handleClickCapture}>
+
       <div className={styles.imageWrapper}>
         <div
           className={`${styles.imageContainer} ${

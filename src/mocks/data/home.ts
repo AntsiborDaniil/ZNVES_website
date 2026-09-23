@@ -9,6 +9,6 @@ export const MOCK_HOME_PAGE: HomePageContent = {
     cta_text: "Перейти в каталог",
     cta_href: "/catalog",
   },
-  catalog_featured_image: "/images/home/collage-featured.webp",
+  catalog_featured_image: "/images/home/collage-catalog.webp",
   collections: [],
 };

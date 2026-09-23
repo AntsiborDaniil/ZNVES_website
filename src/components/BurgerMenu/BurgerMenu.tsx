@@ -128,6 +128,28 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
         </button>
 
         <div className={styles.menuContent}>
+          <Link
+            href="/"
+            className={`${styles.menuHeader} ${
+              pathname === "/" ? styles.menuHeaderActive : ""
+            }`}
+            onClick={handleLinkClick}
+            prefetch={false}
+          >
+            ГЛАВНАЯ
+          </Link>
+
+          <Link
+            href="/new-in"
+            className={`${styles.menuHeader} ${
+              pathname.startsWith("/new-in") ? styles.menuHeaderActive : ""
+            }`}
+            onClick={handleLinkClick}
+            prefetch={false}
+          >
+            НОВИНКИ
+          </Link>
+
           <div className={styles.menuSection}>
             <button
               type="button"

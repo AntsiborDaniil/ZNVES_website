@@ -20,16 +20,10 @@ type CatalogCollageProps = {
   featuredImage?: string;
 };
 
-const DEFAULT_FEATURED_IMAGE = "/images/home/collage-featured.webp";
+const DEFAULT_FEATURED_IMAGE = "/images/home/collage-catalog.webp";
 
-const resolveFeaturedImage = (src?: string) => {
-  if (!src) return DEFAULT_FEATURED_IMAGE;
-  // Старый локальный PNG удалён — подставляем webp
-  if (src.includes("collage-featured.png")) {
-    return DEFAULT_FEATURED_IMAGE;
-  }
-  return src;
-};
+/** Lookbook всегда из репозитория — с API может прийти старое фото. */
+const resolveFeaturedImage = (_src?: string) => DEFAULT_FEATURED_IMAGE;
 
 const CatalogCollage = ({
   id = "catalog-section",
@@ -69,8 +63,7 @@ const CatalogCollage = ({
     void load();
   }, [hasServerData]);
 
-  const desktopProducts = products.slice(0, 4);
-  const collageProducts = products.slice(0, 2);
+  const gridProducts = products.slice(0, 4);
 
   return (
     <section id={id} className={styles.section}>
@@ -94,7 +87,7 @@ const CatalogCollage = ({
               <span className={styles.goLink}>Перейти</span>
             </Link>
             <div className={styles.productGrid}>
-              {desktopProducts.map((product) => (
+              {gridProducts.map((product) => (
                 <Link
                   key={product.id}
                   href={buildProductHref(product.slug || product.id, {
@@ -109,73 +102,31 @@ const CatalogCollage = ({
                     images={product.images}
                     isNew={false}
                     variant="grid"
-                    zoomOnHover
                   />
                 </Link>
               ))}
             </div>
           </div>
 
-          <div className={styles.collageGrid}>
-            {collageProducts.map((product, index) => {
-              const primaryImage = product.images[0];
-              const secondaryImage = product.images[1] ?? product.images[0];
-              const infoBlock = (
-                <div className={styles.collageInfo}>
-                  <span className={styles.collageTitle}>{product.title}</span>
-                  <span className={styles.collagePrice}>{product.price}</span>
-                </div>
-              );
-
-              const isRight = index % 2 === 1;
-
-              return (
-                <Link
-                  key={product.id}
-                  href={buildProductHref(product.slug || product.id, {
-                    from: "home",
-                  })}
-                  className={styles.collageCol}
-                  prefetch={false}
-                >
-                  <div
-                    className={
-                      isRight
-                        ? `${styles.collageImageWrap} ${styles.collageImageWrapSmall}`
-                        : styles.collageImageWrap
-                    }
-                  >
-                    <Image
-                      src={primaryImage}
-                      alt={product.title}
-                      fill
-                      sizes="50vw"
-                      className={styles.collageImage}
-                    />
-                  </div>
-
-                  {isRight ? infoBlock : null}
-
-                  <div
-                    className={
-                      !isRight
-                        ? `${styles.collageImageWrap} ${styles.collageImageWrapSmallLeft}`
-                        : styles.collageImageWrap
-                    }
-                  >
-                    <Image
-                      src={secondaryImage}
-                      alt={`${product.title} detail`}
-                      fill
-                      sizes="50vw"
-                      className={styles.collageImage}
-                    />
-                  </div>
-
-                  {!isRight ? infoBlock : null}
-                </Link>
-              );
-            })}
+          <div className={styles.mobileGrid}>
+            {gridProducts.map((product) => (
+              <Link
+                key={product.id}
+                href={buildProductHref(product.slug || product.id, {
+                  from: "home",
+                })}
+                className={styles.productLink}
+                prefetch={false}
+              >
+                <ProductCard
+                  title={product.title}
+                  price={product.price}
+                  images={product.images}
+                  isNew={false}
+                  variant="grid"
+                />
+              </Link>
+            ))}
           </div>
 
           <div className={styles.mobileMore}>

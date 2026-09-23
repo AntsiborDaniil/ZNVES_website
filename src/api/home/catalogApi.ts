@@ -96,12 +96,15 @@ export const fetchCatalogProducts = async (
       url.searchParams.set("is_new", params.is_new.toString());
     }
 
+    // Новинки для Bestsellers — короткий TTL; пустой ISR-кеш иначе «залипает»
+    const revalidateSeconds = params.is_new ? 60 : 15 * 60;
+
     const response = await fetch(url.toString(), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 15 * 60 },
+      next: { revalidate: revalidateSeconds },
     });
 
     if (!response.ok) {
@@ -114,11 +117,13 @@ export const fetchCatalogProducts = async (
       transformApiProduct(product, index)
     );
 
-    // Сохраняем в кеш
-    cache.set(cacheKey, {
-      data: transformedProducts,
-      timestamp: Date.now(),
-    });
+    // Не кешируем пустой ответ — иначе Bestsellers «залипает» без новинок
+    if (transformedProducts.length > 0) {
+      cache.set(cacheKey, {
+        data: transformedProducts,
+        timestamp: Date.now(),
+      });
+    }
 
     return transformedProducts;
   } catch (error) {

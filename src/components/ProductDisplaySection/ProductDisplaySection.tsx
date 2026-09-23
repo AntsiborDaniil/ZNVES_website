@@ -16,7 +16,8 @@ import Button from "../ui/Button/Button";
 import SliderSkeleton from "./SliderSkeleton";
 import styles from "./ProductDisplaySection.module.css";
 import type { CatalogProduct } from "../../types/products";
-import { fetchNewInProducts, fetchAllCatalogProducts } from "../../api/home/catalogApi";
+import { fetchAllCatalogProducts } from "../../api/home/catalogApi";
+import { fetchNewInProducts } from "../../api/new-in/newInApi";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css";
@@ -64,12 +65,15 @@ const ProductDisplaySection = ({
   const [products, setProducts] = useState<CatalogProduct[]>(
     initialProducts ?? []
   );
-  const [isLoading, setIsLoading] = useState(initialProducts == null);
+  const [isLoading, setIsLoading] = useState(
+    initialProducts == null || initialProducts.length === 0
+  );
   const [progress, setProgress] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const { width } = useWindowSize();
 
   const isLimitedSlider = maxProducts != null;
+  const wantsNewIn = isNewInTitle(title);
 
   useEffect(() => {
     if (width === 0) return;
@@ -87,27 +91,39 @@ const ProductDisplaySection = ({
   }, [width]);
 
   useEffect(() => {
-    if (initialProducts != null) return;
+    let cancelled = false;
 
     const loadProducts = async () => {
-      setIsLoading(true);
+      // SSR мог отдать [] (ошибка API / ISR) — всегда догружаем на клиенте.
+      // Если уже есть товары с сервера — обновляем в фоне без скелетона.
+      const hasServerProducts =
+        initialProducts != null && initialProducts.length > 0;
+      if (!hasServerProducts) {
+        setIsLoading(true);
+      }
+
       try {
-        if (isNewInTitle(title)) {
-          const newInProducts = await fetchNewInProducts();
-          setProducts(newInProducts);
-        } else {
-          const catalogProducts = await fetchAllCatalogProducts();
-          setProducts(catalogProducts);
+        const nextProducts = wantsNewIn
+          ? await fetchNewInProducts()
+          : await fetchAllCatalogProducts();
+        if (cancelled) return;
+        if (nextProducts.length > 0 || !hasServerProducts) {
+          setProducts(nextProducts);
         }
       } catch {
-        setProducts([]);
+        if (!cancelled && !hasServerProducts) {
+          setProducts([]);
+        }
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
 
-    loadProducts();
-  }, [title, initialProducts]);
+    void loadProducts();
+    return () => {
+      cancelled = true;
+    };
+  }, [title, initialProducts, wantsNewIn]);
 
   const displayProducts = useMemo(() => {
     if (!isLimitedSlider) return products;

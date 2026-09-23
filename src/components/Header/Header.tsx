@@ -53,7 +53,7 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
   useEffect(() => {
     if (!isCatalogOpen) return;
 
-    const onPointer = (event: MouseEvent) => {
+    const onPointer = (event: PointerEvent) => {
       const target = event.target as Node;
       if (
         catalogButtonRef.current?.contains(target) ||
@@ -64,9 +64,10 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
       setIsCatalogOpen(false);
     };
 
-    document.addEventListener("mousedown", onPointer);
+    // pointerdown + capture: стабильнее, чем mousedown (меньше гонок с click-toggle)
+    document.addEventListener("pointerdown", onPointer);
     return () => {
-      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("pointerdown", onPointer);
     };
   }, [isCatalogOpen]);
 
@@ -74,6 +75,7 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
   const closeAccount = () => setIsAccountOpen(false);
 
   const toggleCatalog = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     event.stopPropagation();
     setIsAccountOpen(false);
     setIsCatalogOpen((open) => !open);

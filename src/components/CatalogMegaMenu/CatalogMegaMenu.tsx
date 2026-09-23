@@ -54,12 +54,9 @@ const CatalogMegaMenu = ({
   useKeyboardEvent("Escape", handleClose, isOpen);
 
   const handleBackdropMouseDown = (event: MouseEvent<HTMLDivElement>) => {
-    // Клик по прозрачной зоне вне чёрной панели — закрыть
     if (event.target === event.currentTarget) {
       handleClose();
-      return;
     }
-    event.stopPropagation();
   };
 
   const stopMenuEvent = (event: MouseEvent) => {
@@ -98,6 +95,18 @@ const CatalogMegaMenu = ({
           <ul className={styles.primaryList}>
             <li>
               <Link
+                href="/"
+                className={styles.link}
+                onClick={handleNavigate}
+                prefetch={false}
+                role="menuitem"
+                tabIndex={isActive ? 0 : -1}
+              >
+                Главная
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/new-in"
                 className={styles.link}
                 onClick={handleNavigate}
@@ -121,45 +130,46 @@ const CatalogMegaMenu = ({
               Catalog {isCategoriesOpen ? "−" : "+"}
             </button>
 
-            <div
-              className={`${styles.categoriesWrap} ${
-                isCategoriesOpen ? styles.categoriesWrapOpen : ""
+            <ul
+              className={`${styles.categoryList} ${
+                isCategoriesOpen ? styles.categoryListOpen : ""
               }`}
+              aria-label="Категории"
               aria-hidden={!isCategoriesOpen}
             >
-              <ul className={styles.categoryList} aria-label="Категории">
-                <li>
-                  <Link
-                    href="/catalog"
-                    className={`${styles.link} ${styles.categoryLink}`}
-                    onClick={handleNavigate}
-                    prefetch={false}
-                    role="menuitem"
-                    tabIndex={isActive && isCategoriesOpen ? 0 : -1}
-                  >
-                    All
-                  </Link>
+              <li className={styles.categoryItem}>
+                <Link
+                  href="/catalog"
+                  className={`${styles.link} ${styles.categoryLink}`}
+                  onClick={handleNavigate}
+                  prefetch={false}
+                  role="menuitem"
+                  tabIndex={isActive && isCategoriesOpen ? 0 : -1}
+                >
+                  All
+                </Link>
+              </li>
+              {categories.length === 0 ? (
+                <li className={`${styles.categoryItem} ${styles.emptyHint}`}>
+                  Нет категорий
                 </li>
-                {categories.length === 0 ? (
-                  <li className={styles.emptyHint}>Нет категорий</li>
-                ) : (
-                  categories.map((category) => (
-                    <li key={category.slug}>
-                      <Link
-                        href={buildCatalogCategoryHref(category.slug)}
-                        className={`${styles.link} ${styles.categoryLink}`}
-                        onClick={handleNavigate}
-                        prefetch={false}
-                        role="menuitem"
-                        tabIndex={isActive && isCategoriesOpen ? 0 : -1}
-                      >
-                        {getCatalogCategoryLabel(category)}
-                      </Link>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </div>
+              ) : (
+                categories.map((category) => (
+                  <li key={category.slug} className={styles.categoryItem}>
+                    <Link
+                      href={buildCatalogCategoryHref(category.slug)}
+                      className={`${styles.link} ${styles.categoryLink}`}
+                      onClick={handleNavigate}
+                      prefetch={false}
+                      role="menuitem"
+                      tabIndex={isActive && isCategoriesOpen ? 0 : -1}
+                    >
+                      {getCatalogCategoryLabel(category)}
+                    </Link>
+                  </li>
+                ))
+              )}
+            </ul>
           </div>
         </div>
       </div>

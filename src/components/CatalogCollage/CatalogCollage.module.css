@@ -25,28 +25,22 @@
 
 .lookbookImage {
   object-fit: cover;
-  transition: transform 0.55s ease;
-}
-
-@media (hover: hover) {
-  .lookbook:hover .lookbookImage {
-    transform: scale(1.08);
-  }
 }
 
 .goLink {
   position: absolute;
   top: 30px;
   right: 30px;
+  left: auto;
   z-index: 1;
-  color: var(--color-black);
+  color: var(--color-white);
   font-size: var(--font-size-16);
   line-height: var(--line-height-30);
   letter-spacing: var(--letter-spacing-tight);
   text-transform: uppercase;
   text-decoration: underline;
   text-underline-offset: 3px;
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 .productGrid {
@@ -62,70 +56,12 @@
   min-width: 0;
 }
 
-/* Mobile: asymmetric collage */
-.collageGrid {
+/* Mobile: ровная сетка 2×2 как на десктопе */
+.mobileGrid {
   display: none;
   grid-template-columns: 1fr 1fr;
   gap: var(--gap-cards);
   align-items: start;
-}
-
-.collageCol {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  text-decoration: none;
-  color: inherit;
-}
-
-.collageImageWrap {
-  position: relative;
-  width: 100%;
-  height: 240px;
-  overflow: hidden;
-  background: var(--color-grey-5);
-}
-
-.collageImageWrapSmall {
-  aspect-ratio: unset !important;
-  height: 148px;
-}
-
-.collageImageWrapSmallLeft {
-  aspect-ratio: unset !important;
-  height: 224px;
-}
-
-.collageImage {
-  object-fit: cover;
-  transition: transform 0.55s ease;
-}
-
-@media (hover: hover) {
-  .collageCol:hover .collageImage {
-    transform: scale(1.08);
-  }
-}
-
-.collageInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.collageTitle {
-  font-size: var(--font-size-16);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-18);
-  letter-spacing: var(--letter-spacing-tight);
-  text-transform: uppercase;
-}
-
-.collagePrice {
-  font-size: var(--font-size-14);
-  font-weight: var(--font-weight-light);
-  line-height: var(--line-height-18);
-  color: var(--color-black);
 }
 
 .skeleton {
@@ -163,23 +99,9 @@
     display: none;
   }
 
-  .collageGrid {
+  .mobileGrid {
     display: grid;
     gap: 8px;
-  }
-
-  .collageCol {
-    gap: 8px;
-  }
-
-  .collageTitle {
-    font-size: var(--font-size-12);
-    line-height: var(--line-height-12);
-  }
-
-  .collagePrice {
-    font-size: var(--font-size-12);
-    line-height: var(--line-height-12);
   }
 
   .mobileMore {

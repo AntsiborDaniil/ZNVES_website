@@ -9,7 +9,6 @@ let startPromise: Promise<void> | null = null;
 
 export const startMockWorker = async (): Promise<void> => {
   if (typeof window === "undefined") return;
-  if (worker) return;
 
   if (!startPromise) {
     worker = setupWorker(...mockHandlers);
@@ -22,7 +21,13 @@ export const startMockWorker = async (): Promise<void> => {
           url: "/mockServiceWorker.js",
         },
       })
-      .then(() => undefined);
+      .then(() => undefined)
+      .catch((error) => {
+        // Сброс, чтобы следующий вызов мог повторить старт
+        worker = null;
+        startPromise = null;
+        throw error;
+      });
   }
 
   await startPromise;

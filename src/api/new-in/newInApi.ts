@@ -103,7 +103,8 @@ export const fetchNewInProducts = async (
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 5 * 60 },
+      // В браузере Next revalidate не работает — явный no-store для свежих новинок
+      cache: "no-store",
     });
 
     if (!response.ok) {
@@ -116,10 +117,12 @@ export const fetchNewInProducts = async (
       transformApiProduct(product, index)
     );
 
-    cache.set(cacheKey, {
-      data: transformedProducts,
-      timestamp: Date.now(),
-    });
+    if (transformedProducts.length > 0) {
+      cache.set(cacheKey, {
+        data: transformedProducts,
+        timestamp: Date.now(),
+      });
+    }
 
     return transformedProducts;
   } catch {

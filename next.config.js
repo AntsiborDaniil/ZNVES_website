@@ -53,7 +53,8 @@ const nextConfig = {
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
+            // Без immutable: ассеты в /images часто меняют по тому же имени
+            value: "public, max-age=86400, must-revalidate",
           },
         ],
       },
