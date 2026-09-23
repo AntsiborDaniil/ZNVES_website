@@ -1,15 +1,15 @@
 import Image from "next/image";
 import styles from "./HeroSection.module.css";
-import Button from "../ui/Button/Button";
 import { fetchHomePage } from "../../api/home/homeApi";
 import type { HomeHero } from "../../types/home";
 
-const HERO_MOBILE_LIGHTEN = "/images/home/hero-mobile-lighten.png";
-const HERO_MOBILE_DARKEN = "/images/home/hero-mobile-darken.png";
+/** Локальные ассеты hero (не берём URL картинок с API — там могут быть старые). */
+const HERO_DESKTOP_IMAGE = "/images/home/hero-desktop.webp";
+const HERO_MOBILE_IMAGE = "/images/home/hero-mobile.webp";
 
 const DEFAULT_HERO: HomeHero = {
-  desktop_image: "/images/home/hero-desktop.webp",
-  mobile_image: "/images/home/hero-mobile.webp",
+  desktop_image: HERO_DESKTOP_IMAGE,
+  mobile_image: HERO_MOBILE_IMAGE,
   title: "NEW COLLECTION",
   cta_text: "Перейти в каталог",
   cta_href: "/catalog",
@@ -31,6 +31,13 @@ const HeroSection = async ({ hero: heroProp }: HeroSectionProps) => {
     }
   }
 
+  // Картинки всегда из репозитория; title/cta можно оставить с API
+  hero = {
+    ...hero,
+    desktop_image: HERO_DESKTOP_IMAGE,
+    mobile_image: HERO_MOBILE_IMAGE,
+  };
+
   return (
     <section className={styles.hero}>
       <div className={styles.heroBackground}>
@@ -42,9 +49,8 @@ const HeroSection = async ({ hero: heroProp }: HeroSectionProps) => {
           fetchPriority="high"
           className={styles.heroBackgroundImage}
           sizes="(max-width: 768px) 1px, 100vw"
-          quality={80}
+          quality={90}
         />
-        {/* Mobile: 3 слоя из Figma — фото, осветление, затемнение */}
         <div className={styles.heroMobileStack}>
           <Image
             src={hero.mobile_image}
@@ -56,29 +62,7 @@ const HeroSection = async ({ hero: heroProp }: HeroSectionProps) => {
             sizes="(max-width: 768px) 100vw, 0px"
             quality={90}
           />
-          <Image
-            src={HERO_MOBILE_LIGHTEN}
-            alt=""
-            fill
-            className={styles.heroMobileLighten}
-            sizes="(max-width: 768px) 100vw, 0px"
-          />
-          <Image
-            src={HERO_MOBILE_DARKEN}
-            alt=""
-            fill
-            className={styles.heroMobileDarken}
-            sizes="(max-width: 768px) 100vw, 0px"
-          />
         </div>
-        <div className={styles.overlay} />
-        <div className={styles.gradient} />
-      </div>
-      <div className={styles.heroContent}>
-        <p className={styles.title}>{hero.title}</p>
-        <Button href={hero.cta_href} variant="primary" className={styles.cta}>
-          {hero.cta_text}
-        </Button>
       </div>
     </section>
   );

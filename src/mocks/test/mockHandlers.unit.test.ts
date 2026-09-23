@@ -147,17 +147,11 @@ describe("mock API handlers", () => {
     expect(user?.email).toBe(MOCK_DEV_USER.email);
   });
 
-  it("returns mock home page content with matched collection images", async () => {
+  it("returns mock home page content without collection plaques", async () => {
     const home = await fetchHomePage();
 
     expect(home.hero.title).toBe("NEW COLLECTION");
     expect(home.catalog_featured_image).toContain("/images/home/");
-    expect(home.collections).toHaveLength(2);
-    expect(home.collections[0]?.title).toBe("Ski suit");
-    expect(home.collections[0]?.image).toBe("/images/home/collection-bag.png");
-    expect(home.collections[0]?.href).toBe("/catalog");
-    expect(home.collections[1]?.title).toBe("Bag square");
-    expect(home.collections[1]?.image).toBe("/images/home/collection-ski.png");
-    expect(home.collections[1]?.href).toBe("/catalog");
+    expect(home.collections).toHaveLength(0);
   });
 });

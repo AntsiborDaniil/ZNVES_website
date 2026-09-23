@@ -20,10 +20,6 @@ const CatalogCollage = dynamic(
   () => import("../components/CatalogCollage/CatalogCollage")
 );
 
-const CollectionBanners = dynamic(
-  () => import("../components/CollectionBanner/CollectionBanner")
-);
-
 export default async function HomePage() {
   const [homePage, newInProducts, catalogProducts] = await Promise.all([
     fetchHomePage(),
@@ -49,7 +45,6 @@ export default async function HomePage() {
           products={catalogProducts}
           featuredImage={homePage.catalog_featured_image}
         />
-        <CollectionBanners items={homePage.collections} />
       </div>
       <Footer />
     </div>
