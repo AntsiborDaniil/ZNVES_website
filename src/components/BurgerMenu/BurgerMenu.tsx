@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useCallback, useEffect, useId, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import styles from "./BurgerMenu.module.css";
 import { useKeyboardEvent } from "../../hooks/useKeyboardEvent";
 import {
@@ -20,17 +20,9 @@ type BurgerMenuProps = {
   onToggle: () => void;
 };
 
-const scrollToCollections = () => {
-  const el = document.getElementById("collections");
-  if (!el) return false;
-  el.scrollIntoView({ behavior: "smooth", block: "start" });
-  return true;
-};
-
 const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
   const menuId = useId();
   const pathname = usePathname();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { openCart, isCartOpen } = useCart();
   const { isAuthenticated, openAuth } = useAuth();
@@ -54,32 +46,6 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
       onToggle();
     }
   }, [isOpen, onToggle]);
-
-  const handleCollectionsClick = useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement>) => {
-      event.preventDefault();
-      handleLinkClick();
-
-      window.setTimeout(() => {
-        if (pathname === "/") {
-          scrollToCollections();
-          window.history.replaceState(null, "", "/#collections");
-          return;
-        }
-
-        router.push("/");
-        let tries = 0;
-        const timer = window.setInterval(() => {
-          tries += 1;
-          if (scrollToCollections() || tries > 40) {
-            window.clearInterval(timer);
-            window.history.replaceState(null, "", "/#collections");
-          }
-        }, 50);
-      }, 80);
-    },
-    [handleLinkClick, pathname, router]
-  );
 
   useKeyboardEvent(
     "Escape",
@@ -213,15 +179,6 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
             </ul>
             <div className={styles.menuDivider} aria-hidden />
           </div>
-
-          <Link
-            href="/#collections"
-            className={styles.menuHeader}
-            onClick={handleCollectionsClick}
-            prefetch={false}
-          >
-            КОЛЛЕКЦИИ
-          </Link>
 
           <button
             type="button"

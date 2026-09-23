@@ -31,7 +31,7 @@ export default async function HomePage() {
     <div className={styles.app}>
       <HomeScrollReset />
       <Header />
-      <HeroSection hero={homePage.hero} />
+      <HeroSection />
       <div className={styles.productDisplaySections}>
         <ProductDisplaySection
           title="Bestsellers"

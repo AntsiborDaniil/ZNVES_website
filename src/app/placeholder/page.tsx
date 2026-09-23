@@ -19,8 +19,8 @@ const PlaceholderPage = () => {
           <p className={styles.badge}>Скоро</p>
           <h1 className={styles.title}>Мы обновляем витрину</h1>
           <p className={styles.description}>
-            Команда завершает последние штрихи, чтобы показать новые коллекции и
-            сервисы. Совсем скоро страница снова будет доступна.
+            Команда завершает последние штрихи, чтобы показать обновлённый
+            каталог и сервисы. Совсем скоро страница снова будет доступна.
           </p>
           <div className={styles.statusGrid}>
             <div className={styles.statusCard}>

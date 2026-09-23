@@ -103,7 +103,7 @@ export const fetchNewInProducts = async (
       headers: {
         "Content-Type": "application/json",
       },
-      cache: "no-store",
+      next: { revalidate: 5 * 60 },
     });
 
     if (!response.ok) {

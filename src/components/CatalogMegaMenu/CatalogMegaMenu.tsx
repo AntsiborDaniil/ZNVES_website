@@ -17,7 +17,6 @@ type CatalogMegaMenuProps = {
   categories: ApiCatalogCategory[];
   onNavigate?: () => void;
   onClose?: () => void;
-  onCollectionsClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
 };
 
 const CatalogMegaMenu = ({
@@ -25,7 +24,6 @@ const CatalogMegaMenu = ({
   categories,
   onNavigate,
   onClose,
-  onCollectionsClick,
 }: CatalogMegaMenuProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isActive, setIsActive] = useState(false);
@@ -73,15 +71,6 @@ const CatalogMegaMenu = ({
     onNavigate?.();
   };
 
-  const handleCollections = (event: MouseEvent<HTMLAnchorElement>) => {
-    event.stopPropagation();
-    if (onCollectionsClick) {
-      onCollectionsClick(event);
-      return;
-    }
-    onNavigate?.();
-  };
-
   const toggleCategories = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     event.preventDefault();
@@ -117,18 +106,6 @@ const CatalogMegaMenu = ({
                 tabIndex={isActive ? 0 : -1}
               >
                 Новинки
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/#collections"
-                className={styles.link}
-                onClick={handleCollections}
-                prefetch={false}
-                role="menuitem"
-                tabIndex={isActive ? 0 : -1}
-              >
-                Коллекции
               </Link>
             </li>
           </ul>

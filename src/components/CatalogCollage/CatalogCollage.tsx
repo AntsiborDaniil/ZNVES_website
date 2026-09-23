@@ -20,7 +20,16 @@ type CatalogCollageProps = {
   featuredImage?: string;
 };
 
-const DEFAULT_FEATURED_IMAGE = "/images/home/collage-featured.png";
+const DEFAULT_FEATURED_IMAGE = "/images/home/collage-featured.webp";
+
+const resolveFeaturedImage = (src?: string) => {
+  if (!src) return DEFAULT_FEATURED_IMAGE;
+  // Старый локальный PNG удалён — подставляем webp
+  if (src.includes("collage-featured.png")) {
+    return DEFAULT_FEATURED_IMAGE;
+  }
+  return src;
+};
 
 const CatalogCollage = ({
   id = "catalog-section",
@@ -34,7 +43,7 @@ const CatalogCollage = ({
     productsProp ?? []
   );
   const [featuredImage, setFeaturedImage] = useState(
-    featuredImageProp ?? DEFAULT_FEATURED_IMAGE
+    resolveFeaturedImage(featuredImageProp)
   );
   const [isLoading, setIsLoading] = useState(!hasServerData);
 
@@ -49,7 +58,7 @@ const CatalogCollage = ({
           fetchHomePage(),
         ]);
         setProducts(catalogProducts);
-        setFeaturedImage(homePage.catalog_featured_image);
+        setFeaturedImage(resolveFeaturedImage(homePage.catalog_featured_image));
       } catch {
         setProducts([]);
         setFeaturedImage(DEFAULT_FEATURED_IMAGE);

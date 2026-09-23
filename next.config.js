@@ -25,13 +25,13 @@ const nextConfig = {
   // Меньший Docker-образ: копируем .next/standalone + static
   output: "standalone",
   images: {
-    // Hobby: Vercel Image Optimization → OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED
-    // Deploy probe: 2026-09-10
+    // Self-host (Timeweb): без sharp — прямые URL. Ресайз — sizes/quality на Image.
+    // Не включать optimizer без sharp: ломал npm ci / деплой ранее.
     unoptimized: true,
     formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    qualities: [75, 80, 85, 90],
+    qualities: [75, 80, 85],
     remotePatterns: [
       { protocol: 'https', hostname: 'api.znves.ru', pathname: '/**' },
       { protocol: 'http', hostname: '62.84.115.11', port: '8000', pathname: '/**' },
@@ -47,6 +47,33 @@ const nextConfig = {
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+      {
+        source: "/images/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/_next/static/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/icon.png",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400",
+          },
+        ],
       },
     ];
   },

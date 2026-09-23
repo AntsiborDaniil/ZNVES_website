@@ -150,7 +150,7 @@ describe("mock API handlers", () => {
   it("returns mock home page content without collection plaques", async () => {
     const home = await fetchHomePage();
 
-    expect(home.hero.title).toBe("NEW COLLECTION");
+    expect(home.hero.title).toBe("ZNVES");
     expect(home.catalog_featured_image).toContain("/images/home/");
     expect(home.collections).toHaveLength(0);
   });

@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
 import BurgerMenu from "../BurgerMenu/BurgerMenu";
 import CartIcon from "../ui/CartIcon/CartIcon";
 import AccountIcon from "../ui/AccountIcon/AccountIcon";
@@ -23,16 +22,7 @@ type HeaderProps = {
   variant?: HeaderVariant;
 };
 
-const scrollToCollections = () => {
-  const el = document.getElementById("collections");
-  if (!el) return false;
-  el.scrollIntoView({ behavior: "smooth", block: "start" });
-  return true;
-};
-
 const Header = ({ variant = "solid" }: HeaderProps) => {
-  const pathname = usePathname();
-  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
@@ -45,23 +35,6 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
   const { getTotalItems, openCart } = useCart();
   const { isAuthenticated, openAuth } = useAuth();
   const cartCount = getTotalItems();
-
-  const handleCollectionsClick = useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement>) => {
-      event.preventDefault();
-      setIsCatalogOpen(false);
-      setIsAccountOpen(false);
-
-      if (pathname === "/") {
-        scrollToCollections();
-        window.history.replaceState(null, "", "/#collections");
-        return;
-      }
-
-      router.push("/#collections");
-    },
-    [pathname, router]
-  );
 
   useEffect(() => {
     void fetchCatalogCategories().then((data) => {
@@ -109,13 +82,6 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
   const closeCatalogFromMenu = useCallback(() => {
     setIsCatalogOpen(false);
   }, []);
-
-  const handleMenuCollectionsClick = useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement>) => {
-      handleCollectionsClick(event);
-    },
-    [handleCollectionsClick]
-  );
 
   const accountPopover = isAuthenticated ? (
     <AccountPopover isOpen={isAccountOpen} onClose={closeAccount} />
@@ -229,7 +195,6 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
           categories={catalogCategories}
           onNavigate={closeCatalogFromMenu}
           onClose={closeCatalogFromMenu}
-          onCollectionsClick={handleMenuCollectionsClick}
         />
       </div>
     </div>

@@ -199,7 +199,7 @@ const fetchProductBySlugInternal = async (slug: string): Promise<ProductDetail |
   const response = await fetch(url, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
-    cache: "no-store",
+    next: { revalidate: 5 * 60 },
   });
   if (!response.ok) {
     if (response.status === 404) return null;
@@ -257,7 +257,7 @@ export const fetchCatalogProductRaw = async (slug: string): Promise<ApiProductDe
         const response = await fetch(url, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
-          cache: "no-store",
+          next: { revalidate: 5 * 60 },
         });
         if (!response.ok) {
           if (response.status === 404) return null;
@@ -288,7 +288,7 @@ const fetchProductImagesByColorInternal = async (
   const response = await fetch(url, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
-    cache: "no-store",
+    next: { revalidate: 5 * 60 },
   });
   if (!response.ok) {
     if (response.status === 404) return [];
