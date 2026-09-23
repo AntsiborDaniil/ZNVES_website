@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-section);
-  padding: var(--space-section) var(--space-page) 0;
+  padding: var(--space-section) var(--space-page);
 }
 
 /* Desktop: lookbook + 2×2 product grid */

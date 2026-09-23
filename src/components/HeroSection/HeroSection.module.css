@@ -10,8 +10,7 @@
 
 .heroBackground {
   position: absolute;
-  /* Десктоп: боковые отступы как у секций страницы */
-  inset: 0 var(--space-page);
+  inset: 0;
   z-index: 0;
 }
 
@@ -105,10 +104,6 @@
     height: calc(100vh - var(--header-height-mobile));
     min-height: 560px;
     align-items: flex-end;
-  }
-
-  .heroBackground {
-    inset: 0;
   }
 
   .heroBackgroundImage {
