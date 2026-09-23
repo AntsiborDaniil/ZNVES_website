@@ -1,5 +1,4 @@
 import styles from "./HeroSection.module.css";
-import Button from "../ui/Button/Button";
 
 /** Локальные ассеты hero (не берём URL картинок с API — там могут быть старые). */
 const HERO_DESKTOP_IMAGE = "/images/home/hero-desktop.webp";
@@ -28,11 +27,6 @@ const HeroSection = () => {
             fetchPriority="high"
           />
         </picture>
-      </div>
-      <div className={styles.heroContent}>
-        <Button href="/catalog" variant="underline" className={styles.cta}>
-          Смотреть больше
-        </Button>
       </div>
     </section>
   );
