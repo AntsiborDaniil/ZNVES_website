@@ -133,7 +133,7 @@ const Footer = () => {
               Telegram
             </Link>
             <Link
-              href="https://www.instagram.com/real.ponama?igsh=b2w5YWdoNmJ2djVo"
+              href="https://www.instagram.com/znves.ru?stkn=MjJzN2FxYWZtbHJo"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.columnInst}

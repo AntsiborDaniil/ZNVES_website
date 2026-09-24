@@ -20,9 +20,9 @@ const inter = Inter({
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://znves.ru";
-const defaultTitle = "ZNVES — Одежда и аксессуары";
+const defaultTitle = "ZNVES";
 const defaultDescription =
-  "ZNVES — интернет-магазин стильной одежды: футболки, худи, джинсы, куртки и многое другое. Удобная доставка СДЭК и Яндекс. Доставка по России.";
+  "Интернет-магазин стильной одежды с фокусом на посадке и качестве. Доставка по России";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -44,17 +44,19 @@ export const metadata: Metadata = {
     description: defaultDescription,
     images: [
       {
-        url: "/images/logo.png",
-        width: 512,
-        height: 512,
+        // То же фото, что desktop hero; JPEG — для превью в браузерах/мессенджерах
+        url: "/images/og-hero.jpg",
+        width: 1200,
+        height: 900,
         alt: "ZNVES",
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: defaultTitle,
     description: defaultDescription,
+    images: ["/images/og-hero.jpg"],
   },
 };
 
