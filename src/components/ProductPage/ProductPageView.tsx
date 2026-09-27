@@ -634,9 +634,32 @@ const ProductPageView = ({
                       aria-hidden={!isOpen}
                     >
                       <div className={styles.accordionContentInner}>
-                        {section.content.split("\n").map((paragraph, index) => (
-                          <p key={index}>{paragraph}</p>
-                        ))}
+                        {section.table ? (
+                          <table className={styles.accordionTable}>
+                            <thead>
+                              <tr>
+                                {section.table.columns.map((column, index) => (
+                                  <th key={index} scope="col">
+                                    {column}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {section.table.rows.map((row, rowIndex) => (
+                                <tr key={rowIndex}>
+                                  {row.map((cell, cellIndex) => (
+                                    <td key={cellIndex}>{cell}</td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        ) : (
+                          section.content.split("\n").map((paragraph, index) => (
+                            <p key={index}>{paragraph}</p>
+                          ))
+                        )}
                       </div>
                     </div>
                   </div>

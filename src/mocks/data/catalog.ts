@@ -405,7 +405,12 @@ const toProductDetail = (seed: MockProductSeed): ApiProductDetail => ({
     warehouseItems(seed.slug, variant.color_slug, variant.size_slugs, seed.weight)
   ),
   print_application: "Логотип ZNVES нанесен методом вышивки.",
-  sizes_table: "S — 44, M — 46, L — 48, XL — 50.",
+  sizes_table: [
+    { size: "S", height: "160-165", order: 1 },
+    { size: "M", height: "165-170", order: 2 },
+    { size: "L", height: "170-175", order: 3 },
+    { size: "XL", height: "175-180", order: 4 },
+  ],
   model_params: "Рост модели 175 см, размер M.",
   composition_and_care: "Натуральные и смесовые материалы. Деликатная стирка до 30°C.",
   delivery_info: "Доставка СДЭК и Яндекс по России.",

@@ -38,10 +38,17 @@ export type CatalogProduct = {
     sortOrder: number;
 };
 
+export type ProductAccordionTable = {
+    columns: string[];
+    rows: string[][];
+};
+
 export type ProductAccordionSection = {
     id: string;
     title: string;
     content: string;
+    /** Табличный контент (например, размерная сетка) — рендерится вместо content */
+    table?: ProductAccordionTable;
 };
 
 export type ProductColorOption = {

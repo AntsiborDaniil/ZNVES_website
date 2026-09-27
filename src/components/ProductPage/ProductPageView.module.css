@@ -428,6 +428,26 @@
   margin-top: 0;
 }
 
+.accordionTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.accordionTable th,
+.accordionTable td {
+  padding: 6px 12px 6px 0;
+  border-bottom: 1px solid var(--color-grey-3);
+}
+
+.accordionTable th {
+  font-weight: var(--font-weight-bold);
+}
+
+.accordionTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
 .suggestions {
   width: 100%;
   padding: 0;

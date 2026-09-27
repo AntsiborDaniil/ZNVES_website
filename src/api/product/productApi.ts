@@ -1,7 +1,11 @@
 // API для страницы товара
 
-import type { ProductDetail } from "../../types/products";
-import type { ProductColorOption } from "../../types/products";
+import type {
+  ProductAccordionSection,
+  ProductAccordionTable,
+  ProductColorOption,
+  ProductDetail,
+} from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
 import { resolveApiImageUrl } from "../../lib/imageUrl";
 import {
@@ -23,6 +27,14 @@ export type ApiProductColor = {
   slug: string;
   value: string;
   hex: string;
+};
+
+export type ApiSizesTableRow = {
+  size: string;
+  height?: string;
+  order?: number;
+  /** Бек может добавить новые колонки (обхват, длина и т.п.) */
+  [key: string]: string | number | undefined;
 };
 
 export type ApiWarehouseItem = {
@@ -49,8 +61,8 @@ export type ApiProductDetail = {
   warehouse_items: ApiWarehouseItem[];
   /** Описание нанесения */
   print_application?: string;
-  /** Описание размеров / размерная сетка */
-  sizes_table?: string;
+  /** Размерная сетка: строки таблицы (раньше приходила строкой — поддерживаем оба формата) */
+  sizes_table?: ApiSizesTableRow[] | string;
   /** Параметры модели */
   model_params?: string;
   /** Состав и уход */
@@ -70,6 +82,55 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
 const inFlightRaw = new Map<string, Promise<ApiProductDetail | null>>();
 const inFlightBySlug = new Map<string, Promise<ProductDetail | null>>();
 const inFlightImages = new Map<string, Promise<string[]>>();
+
+// Текстовое поле с ручки: всё, что не строка, считаем отсутствующим (чтобы смена типа на беке не роняла страницу)
+const toText = (value: unknown): string =>
+  typeof value === "string" ? value.trim() : "";
+
+const SIZES_TABLE_COLUMN_LABELS: Record<string, string> = {
+  size: "Размер",
+  height: "Рост",
+};
+const SIZES_TABLE_HIDDEN_KEYS = new Set(["order", "id"]);
+
+// Размерная сетка: колонки строим из ключей строк (известные — с русскими подписями, в начале)
+const toSizesTable = (value: unknown): ProductAccordionTable | null => {
+  if (!Array.isArray(value)) return null;
+
+  const rows = value
+    .filter(
+      (row): row is ApiSizesTableRow =>
+        typeof row === "object" && row !== null && !Array.isArray(row)
+    )
+    .map((row, index) => ({ row, index }))
+    .sort((a, b) => {
+      const orderA = typeof a.row.order === "number" ? a.row.order : Infinity;
+      const orderB = typeof b.row.order === "number" ? b.row.order : Infinity;
+      return orderA - orderB || a.index - b.index;
+    })
+    .map(({ row }) => row);
+  if (rows.length === 0) return null;
+
+  const keys: string[] = [];
+  for (const row of rows) {
+    for (const key of Object.keys(row)) {
+      if (!SIZES_TABLE_HIDDEN_KEYS.has(key) && !keys.includes(key)) keys.push(key);
+    }
+  }
+  const knownKeys = Object.keys(SIZES_TABLE_COLUMN_LABELS).filter((key) => keys.includes(key));
+  const orderedKeys = [...knownKeys, ...keys.filter((key) => !knownKeys.includes(key))];
+  if (orderedKeys.length === 0) return null;
+
+  return {
+    columns: orderedKeys.map((key) => SIZES_TABLE_COLUMN_LABELS[key] ?? key),
+    rows: rows.map((row) =>
+      orderedKeys.map((key) => {
+        const cell = row[key];
+        return cell == null ? "—" : String(cell);
+      })
+    ),
+  };
+};
 
 // Преобразование API ответа в ProductDetail (только данные с ручки, без доп. опций)
 const transformApiProduct = (
@@ -102,58 +163,32 @@ const transformApiProduct = (
   const category = "";
   const id = hashString(slug || apiProduct.name);
 
-  const sectionEntries: Array<{ id: string; title: string; content: string }> = [
+  const sections: ProductAccordionSection[] = [
     {
       id: "description",
       title: "Описание",
-      content: apiProduct.description || "Описание товара отсутствует.",
+      content: toText(apiProduct.description) || "Описание товара отсутствует.",
     },
   ];
 
-  if (apiProduct.print_application?.trim()) {
-    sectionEntries.push({
-      id: "print_application",
-      title: "Нанесение",
-      content: apiProduct.print_application.trim(),
-    });
-  }
-  if (apiProduct.sizes_table?.trim()) {
-    sectionEntries.push({
-      id: "sizes_table",
-      title: "Размерная сетка",
-      content: apiProduct.sizes_table.trim(),
-    });
-  }
-  if (apiProduct.model_params?.trim()) {
-    sectionEntries.push({
-      id: "model_params",
-      title: "Параметры модели",
-      content: apiProduct.model_params.trim(),
-    });
-  }
-  if (apiProduct.composition_and_care?.trim()) {
-    sectionEntries.push({
-      id: "composition_and_care",
-      title: "Состав и уход",
-      content: apiProduct.composition_and_care.trim(),
-    });
-  }
-  if (apiProduct.delivery_info?.trim()) {
-    sectionEntries.push({
-      id: "delivery_info",
-      title: "Доставка",
-      content: apiProduct.delivery_info.trim(),
-    });
-  }
-  if (apiProduct.return_info?.trim()) {
-    sectionEntries.push({
-      id: "return_info",
-      title: "Возврат",
-      content: apiProduct.return_info.trim(),
-    });
+  const pushTextSection = (id: string, title: string, value: unknown) => {
+    const content = toText(value);
+    if (content) sections.push({ id, title, content });
+  };
+
+  pushTextSection("print_application", "Нанесение", apiProduct.print_application);
+
+  const sizesTable = toSizesTable(apiProduct.sizes_table);
+  if (sizesTable) {
+    sections.push({ id: "sizes_table", title: "Размерная сетка", content: "", table: sizesTable });
+  } else {
+    pushTextSection("sizes_table", "Размерная сетка", apiProduct.sizes_table);
   }
 
-  const sections = sectionEntries;
+  pushTextSection("model_params", "Параметры модели", apiProduct.model_params);
+  pushTextSection("composition_and_care", "Состав и уход", apiProduct.composition_and_care);
+  pushTextSection("delivery_info", "Доставка", apiProduct.delivery_info);
+  pushTextSection("return_info", "Возврат", apiProduct.return_info);
 
   return {
     id,
