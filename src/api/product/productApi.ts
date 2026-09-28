@@ -29,12 +29,10 @@ export type ApiProductColor = {
   hex: string;
 };
 
-export type ApiSizesTableRow = {
-  size: string;
-  height?: string;
-  order?: number;
-  /** Бек может добавить новые колонки (обхват, длина и т.п.) */
-  [key: string]: string | number | undefined;
+/** Размерная сетка: бек отдаёт готовые заголовки и строки ячеек */
+export type ApiSizesTable = {
+  columns: string[];
+  rows: string[][];
 };
 
 export type ApiWarehouseItem = {
@@ -61,8 +59,8 @@ export type ApiProductDetail = {
   warehouse_items: ApiWarehouseItem[];
   /** Описание нанесения */
   print_application?: string;
-  /** Размерная сетка: строки таблицы (раньше приходила строкой — поддерживаем оба формата) */
-  sizes_table?: ApiSizesTableRow[] | string;
+  /** Размерная сетка (раньше приходила строкой — поддерживаем оба формата) */
+  sizes_table?: ApiSizesTable | string;
   /** Параметры модели */
   model_params?: string;
   /** Состав и уход */
@@ -87,49 +85,26 @@ const inFlightImages = new Map<string, Promise<string[]>>();
 const toText = (value: unknown): string =>
   typeof value === "string" ? value.trim() : "";
 
-const SIZES_TABLE_COLUMN_LABELS: Record<string, string> = {
-  size: "Размер",
-  height: "Рост",
-};
-const SIZES_TABLE_HIDDEN_KEYS = new Set(["order", "id"]);
+const toCell = (value: unknown): string =>
+  typeof value === "string" || typeof value === "number" ? String(value).trim() : "";
 
-// Размерная сетка: колонки строим из ключей строк (известные — с русскими подписями, в начале)
+// Размерная сетка { columns, rows }: пустые ячейки показываем прочерком, строки выравниваем по числу колонок
 const toSizesTable = (value: unknown): ProductAccordionTable | null => {
-  if (!Array.isArray(value)) return null;
+  if (typeof value !== "object" || value === null) return null;
+  const { columns, rows } = value as Partial<Record<keyof ApiSizesTable, unknown>>;
+  if (!Array.isArray(columns) || !Array.isArray(rows)) return null;
 
-  const rows = value
-    .filter(
-      (row): row is ApiSizesTableRow =>
-        typeof row === "object" && row !== null && !Array.isArray(row)
-    )
-    .map((row, index) => ({ row, index }))
-    .sort((a, b) => {
-      const orderA = typeof a.row.order === "number" ? a.row.order : Infinity;
-      const orderB = typeof b.row.order === "number" ? b.row.order : Infinity;
-      return orderA - orderB || a.index - b.index;
-    })
-    .map(({ row }) => row);
-  if (rows.length === 0) return null;
+  const headers = columns.map(toCell);
+  if (headers.length === 0) return null;
 
-  const keys: string[] = [];
-  for (const row of rows) {
-    for (const key of Object.keys(row)) {
-      if (!SIZES_TABLE_HIDDEN_KEYS.has(key) && !keys.includes(key)) keys.push(key);
-    }
-  }
-  const knownKeys = Object.keys(SIZES_TABLE_COLUMN_LABELS).filter((key) => keys.includes(key));
-  const orderedKeys = [...knownKeys, ...keys.filter((key) => !knownKeys.includes(key))];
-  if (orderedKeys.length === 0) return null;
+  const cells = rows
+    .filter((row): row is unknown[] => Array.isArray(row))
+    .map((row) => headers.map((_, index) => toCell(row[index])))
+    .filter((row) => row.some(Boolean))
+    .map((row) => row.map((cell) => cell || "—"));
+  if (cells.length === 0) return null;
 
-  return {
-    columns: orderedKeys.map((key) => SIZES_TABLE_COLUMN_LABELS[key] ?? key),
-    rows: rows.map((row) =>
-      orderedKeys.map((key) => {
-        const cell = row[key];
-        return cell == null ? "—" : String(cell);
-      })
-    ),
-  };
+  return { columns: headers, rows: cells };
 };
 
 // Преобразование API ответа в ProductDetail (только данные с ручки, без доп. опций)
