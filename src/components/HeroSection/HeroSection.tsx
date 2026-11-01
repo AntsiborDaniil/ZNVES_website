@@ -4,11 +4,15 @@ import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import styles from "./HeroSection.module.css";
 
 const HERO_DESKTOP_VIDEO = "/videos/home/hero-desktop-v3.mp4";
-const HERO_MOBILE_VIDEO = "/videos/home/hero-mobile-v2.mp4";
+const HERO_MOBILE_VIDEO = "/videos/home/hero-mobile-v3.mp4";
+const HERO_MOBILE_POSTER = "/images/home/hero-mobile-poster.jpg";
 
-/** Узкий экран ИЛИ тач-телефон (в т.ч. landscape >768px) — только mobile-ролик. */
+/** Узкий экран ИЛИ тач-телефон (в т.ч. landscape >768px) — mobile-ролик. */
 const NARROW_MQ = "(max-width: 768px)";
 const TOUCH_PHONE_MQ = "(pointer: coarse) and (max-width: 1024px)";
+
+/** На мобилке даём сети сначала отдать HTML/JS/картинки, потом качаем ролик. */
+const MOBILE_VIDEO_DELAY_MS = 1500;
 
 const shouldUseMobileHeroVideo = (): boolean => {
   if (typeof window === "undefined") return true;
@@ -37,6 +41,11 @@ const videoStyle: CSSProperties = {
   objectPosition: "center center",
 };
 
+const posterStyle: CSSProperties = {
+  ...videoStyle,
+  zIndex: 0,
+};
+
 const forcePlay = (video: HTMLVideoElement) => {
   video.muted = true;
   video.defaultMuted = true;
@@ -51,8 +60,10 @@ const forcePlay = (video: HTMLVideoElement) => {
 
 const HeroSection = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  // null до выбора на клиенте — в DOM не попадает desktop URL на мобилке
+  const delayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // null до выбора на клиенте — desktop URL не попадает в DOM на мобилке
   const [src, setSrc] = useState<string | null>(null);
+  const [useMobile, setUseMobile] = useState(false);
   const [screenHeight, setScreenHeight] = useState<number | null>(null);
 
   // На мобилке при скролле адресная строка прячется и меняет высоту
@@ -84,17 +95,37 @@ const HeroSection = () => {
     const narrowMq = window.matchMedia(NARROW_MQ);
     const touchPhoneMq = window.matchMedia(TOUCH_PHONE_MQ);
 
+    const clearDelay = () => {
+      if (delayTimerRef.current != null) {
+        clearTimeout(delayTimerRef.current);
+        delayTimerRef.current = null;
+      }
+    };
+
     const sync = () => {
-      // В DOM только один URL: на телефоне desktop-ролик даже не упоминается
-      setSrc(
-        shouldUseMobileHeroVideo() ? HERO_MOBILE_VIDEO : HERO_DESKTOP_VIDEO
-      );
+      clearDelay();
+      const mobile = shouldUseMobileHeroVideo();
+      setUseMobile(mobile);
+
+      if (mobile) {
+        // Сразу постер; ролик — после короткой паузы (и на узком desktop тоже)
+        setSrc(null);
+        delayTimerRef.current = setTimeout(() => {
+          setSrc(HERO_MOBILE_VIDEO);
+          delayTimerRef.current = null;
+        }, MOBILE_VIDEO_DELAY_MS);
+        return;
+      }
+
+      // Широкий desktop — сразу desktop-ролик
+      setSrc(HERO_DESKTOP_VIDEO);
     };
 
     sync();
     narrowMq.addEventListener("change", sync);
     touchPhoneMq.addEventListener("change", sync);
     return () => {
+      clearDelay();
       narrowMq.removeEventListener("change", sync);
       touchPhoneMq.removeEventListener("change", sync);
     };
@@ -123,18 +154,30 @@ const HeroSection = () => {
         screenHeight ? { ...heroStyle, height: `${screenHeight}px` } : heroStyle
       }
     >
+      {useMobile ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={HERO_MOBILE_POSTER}
+          alt=""
+          aria-hidden
+          style={posterStyle}
+          decoding="async"
+          fetchPriority="high"
+        />
+      ) : null}
       {src ? (
         <video
           key={src}
           ref={videoRef}
           className={styles.heroVideo}
-          style={videoStyle}
+          style={{ ...videoStyle, zIndex: 1 }}
           src={src}
+          poster={useMobile ? HERO_MOBILE_POSTER : undefined}
           muted
           autoPlay
           loop
           playsInline
-          preload="metadata"
+          preload={useMobile ? "metadata" : "auto"}
           disablePictureInPicture
           aria-hidden
           tabIndex={-1}
