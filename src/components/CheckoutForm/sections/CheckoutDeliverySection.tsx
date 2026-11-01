@@ -82,7 +82,8 @@ export interface CheckoutDeliverySectionProps {
 const DELIVERY_OPTIONS = [
   { option: "cdek_pickup" as const, label: "СДЭК до пункта выдачи" },
   { option: "yandex_pickup" as const, label: "ЯНДЕКС до пункта выдачи" },
-  { option: "yandex_courier" as const, label: "ЯНДЕКС курьером" },
+  // Временно скрыто — курьерская доставка пока недоступна на сайте
+  // { option: "yandex_courier" as const, label: "ЯНДЕКС курьером" },
 ] as const;
 
 const TARIFF_DESCRIPTION_MAP: Record<string, string> = {

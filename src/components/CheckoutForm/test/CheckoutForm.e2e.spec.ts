@@ -47,7 +47,8 @@ test.describe("Checkout flows (cart modal)", () => {
     await expect(page.getByRole("button", { name: "Оформить заказ" })).toBeEnabled();
   });
 
-  test("switches to Yandex courier option", async ({ page }) => {
+  // Курьерская доставка временно скрыта на сайте
+  test.skip("switches to Yandex courier option", async ({ page }) => {
     await page.getByText("ЯНДЕКС курьером", { exact: true }).click();
     await expect(page.getByText("ЯНДЕКС курьером", { exact: true })).toBeVisible();
   });

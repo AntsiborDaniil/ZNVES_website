@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import styles from "./HeroSection.module.css";
 
-const HERO_DESKTOP_VIDEO = "/videos/home/hero-desktop-v2.mp4";
+const HERO_DESKTOP_VIDEO = "/videos/home/hero-desktop-v3.mp4";
 const HERO_MOBILE_VIDEO = "/videos/home/hero-mobile-v2.mp4";
 
 const MOBILE_MQ = "(max-width: 768px)";

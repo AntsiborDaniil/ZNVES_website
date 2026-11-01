@@ -44,15 +44,16 @@ const pvzFieldsList = [
   { key: "yandexPvz" as const, label: "Яндекс (ПВЗ)", placeholder: "Введите адрес ПВЗ Яндекс" },
 ];
 
-const courierFieldsList = [
-  { key: "city" as const, label: "Город", placeholder: "Москва" },
-  { key: "street" as const, label: "Улица", placeholder: "ул. Ленина" },
-  { key: "house" as const, label: "Дом", placeholder: "15А" },
-  { key: "apartment" as const, label: "Квартира / офис", placeholder: "42" },
-  { key: "floor" as const, label: "Этаж", placeholder: "3" },
-  { key: "intercom" as const, label: "Домофон", placeholder: "42К1234" },
-  { key: "comment" as const, label: "Комментарий курьеру", placeholder: "Позвонить за 10 минут" },
-];
+// Временно скрыто вместе с блоком «Курьерская доставка» ниже
+// const courierFieldsList = [
+//   { key: "city" as const, label: "Город", placeholder: "Москва" },
+//   { key: "street" as const, label: "Улица", placeholder: "ул. Ленина" },
+//   { key: "house" as const, label: "Дом", placeholder: "15А" },
+//   { key: "apartment" as const, label: "Квартира / офис", placeholder: "42" },
+//   { key: "floor" as const, label: "Этаж", placeholder: "3" },
+//   { key: "intercom" as const, label: "Домофон", placeholder: "42К1234" },
+//   { key: "comment" as const, label: "Комментарий курьеру", placeholder: "Позвонить за 10 минут" },
+// ];
 
 type PersonalDataProps = {
   standalone?: boolean;
@@ -457,6 +458,7 @@ const PersonalData = ({ standalone = false, onPasswordModeChange }: PersonalData
           </div>
         </div>
 
+        {/* Временно скрыто — курьерская доставка пока недоступна на сайте
         <div className={styles.deliverySeparator} />
 
         <div className={styles.deliveryBlock}>
@@ -488,6 +490,7 @@ const PersonalData = ({ standalone = false, onPasswordModeChange }: PersonalData
             ))}
           </div>
         </div>
+        */}
 
         <div className={styles.actions}>
           <button
