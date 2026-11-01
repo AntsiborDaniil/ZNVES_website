@@ -95,7 +95,8 @@ const HeroSection = () => {
   const releasedRef = useRef(false);
   const playRetryRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [src, setSrc] = useState<string | null>(null);
-  const [useMobile, setUseMobile] = useState(false);
+  // true по умолчанию → SSR уже отдаёт mobile poster (LCP), не чёрный экран
+  const [useMobile, setUseMobile] = useState(true);
   const [screenHeight, setScreenHeight] = useState<number | null>(null);
   /** Постер/маска сверху, пока video не в playing — нативная ▶/❚❚ не видна. */
   const [coverVisible, setCoverVisible] = useState(true);
@@ -174,13 +175,13 @@ const HeroSection = () => {
           setSrc(null);
           return;
         }
-        // Даём covers bestsellers занять канал (~1.2s постер), потом видео
+        // LTE: сначала poster + bestsellers covers, видео позже
         mobileSrcTimer = setTimeout(() => {
           if (releasedRef.current) return;
           setSrc((prev) =>
             prev === HERO_MOBILE_VIDEO ? prev : HERO_MOBILE_VIDEO
           );
-        }, 1200);
+        }, 2500);
         if (videoRef.current?.currentSrc?.includes("hero-mobile")) {
           ensurePlaying(videoRef.current);
         }

@@ -1,4 +1,3 @@
-import { preload } from "react-dom";
 import ProductDisplaySection, {
   BESTSELLERS_MAX_PRODUCTS,
 } from "../components/ProductDisplaySection/ProductDisplaySection";
@@ -6,23 +5,16 @@ import CatalogCollage from "../components/CatalogCollage/CatalogCollage";
 import {
   fetchNewInProducts,
   fetchAllCatalogProducts,
+  toCoverOnlyProducts,
 } from "../api/home/catalogApi";
 import { fetchHomePage } from "../api/home/homeApi";
-
-const HOME_COVER_PRELOAD_COUNT = 4;
 
 /** Bestsellers — отдельный RSC-чанк, не блокирует hero. */
 export async function HomeBestsellers() {
   const products = await fetchNewInProducts();
-  const limited = products.slice(0, BESTSELLERS_MAX_PRODUCTS);
-
-  // Прогрев origin covers до гидрации карточек (параллельно с next/image priority)
-  for (const product of limited.slice(0, HOME_COVER_PRELOAD_COUNT)) {
-    const cover = product.images[0];
-    if (cover) {
-      preload(cover, { as: "image" });
-    }
-  }
+  const limited = toCoverOnlyProducts(
+    products.slice(0, BESTSELLERS_MAX_PRODUCTS)
+  );
 
   return (
     <ProductDisplaySection
@@ -45,7 +37,7 @@ export async function HomeCatalogCollage() {
 
   return (
     <CatalogCollage
-      products={catalogProducts.slice(0, 4)}
+      products={toCoverOnlyProducts(catalogProducts.slice(0, 4))}
       featuredImage={homePage.catalog_featured_image}
     />
   );

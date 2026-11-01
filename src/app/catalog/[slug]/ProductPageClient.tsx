@@ -47,13 +47,13 @@ const ProductPageBody = ({
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    let cancelled = false;
-
-    // SSR уже отдал товар — тихий soft-refresh без скелетона
-    const quiet = hasSsr && attempt === 0;
-    if (!quiet) {
-      setState({ status: "loading" });
+    // SSR уже отдал товар — не дублируем fetch на LTE (забирает слоты у JPG)
+    if (hasSsr && attempt === 0) {
+      return;
     }
+
+    let cancelled = false;
+    setState({ status: "loading" });
 
     fetchProductWithWarehouse(slug)
       .then((data) => {
@@ -66,16 +66,12 @@ const ProductPageBody = ({
           });
           return;
         }
-        if (!quiet) {
-          setState({ status: "not-found" });
-        }
+        setState({ status: "not-found" });
       })
       .catch((error) => {
         if (cancelled) return;
         console.error(`Не удалось загрузить товар «${slug}»`, error);
-        if (!quiet) {
-          setState({ status: "error" });
-        }
+        setState({ status: "error" });
       });
 
     return () => {

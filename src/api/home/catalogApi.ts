@@ -86,15 +86,23 @@ export const fetchCatalogProducts = async (
     return transformedProducts;
   }
 
-  try {
+  const loadOnce = async (): Promise<CatalogProduct[]> => {
     const url = new URL(CATALOG_API_URL);
-    
+
     if (params.category) {
       url.searchParams.set("category", params.category);
     }
-    
+
     if (params.is_new !== undefined) {
       url.searchParams.set("is_new", params.is_new.toString());
+    }
+
+    if (params.page != null) {
+      url.searchParams.set("page", String(params.page));
+    }
+
+    if (params.page_size != null) {
+      url.searchParams.set("page_size", String(params.page_size));
     }
 
     // Новинки для Bestsellers — короткий TTL; пустой ISR-кеш иначе «залипает»
@@ -112,13 +120,25 @@ export const fetchCatalogProducts = async (
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
 
-    const data: ApiProduct[] = await response.json();
-    
-    const transformedProducts = data.map((product, index) =>
-      transformApiProduct(product, index)
-    );
+    const payload: unknown = await response.json();
+    const list: ApiProduct[] = Array.isArray(payload)
+      ? payload
+      : Array.isArray((payload as { results?: ApiProduct[] })?.results)
+        ? ((payload as { results: ApiProduct[] }).results)
+        : [];
 
-    // Не кешируем пустой ответ — иначе Bestsellers «залипает» без новинок
+    return list.map((product, index) => transformApiProduct(product, index));
+  };
+
+  try {
+    let transformedProducts = await loadOnce();
+
+    // LTE: один retry при abort/timeout — не сразу «Товары не найдены»
+    if (transformedProducts.length === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      transformedProducts = await loadOnce();
+    }
+
     if (transformedProducts.length > 0) {
       cache.set(cacheKey, {
         data: transformedProducts,
@@ -127,21 +147,49 @@ export const fetchCatalogProducts = async (
     }
 
     return transformedProducts;
-  } catch (error) {
-    // Возвращаем пустой массив в случае ошибки
-    return [];
+  } catch {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      const retried = await loadOnce();
+      if (retried.length > 0) {
+        cache.set(cacheKey, {
+          data: retried,
+          timestamp: Date.now(),
+        });
+      }
+      return retried;
+    } catch {
+      return [];
+    }
   }
 };
+
+/** Cover-only DTO для слайдеров главной — меньше JSON на LTE */
+export const toCoverOnlyProducts = (
+  products: CatalogProduct[]
+): CatalogProduct[] =>
+  products.map((product) => ({
+    ...product,
+    images: product.images.slice(0, 1),
+    colors: undefined,
+    sizes: undefined,
+    variants: undefined,
+  }));
 
 // Функция для получения новых товаров (для слайдера NEW IN)
 export const fetchNewInProducts = async (): Promise<CatalogProduct[]> => {
   return fetchCatalogProducts({
     is_new: true,
+    page: 1,
+    page_size: 8,
   });
 };
 
 // Функция для получения всех товаров каталога (для слайдера CATALOG)
 export const fetchAllCatalogProducts = async (): Promise<CatalogProduct[]> => {
-  return fetchCatalogProducts({});
+  return fetchCatalogProducts({
+    page: 1,
+    page_size: 12,
+  });
 };
 

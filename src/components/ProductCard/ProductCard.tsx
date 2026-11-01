@@ -194,7 +194,7 @@ const ProductCard = ({
                 aria-hidden
               />
               {allowMedia && coverSrc ? (
-                // Нативный img: стабильнее next/image внутри Swiper, SSR cover в HTML
+                // Нативный img: сразу opacity 1 — LTE не держит вечный шиммер
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={coverSrc}
@@ -204,7 +204,7 @@ const ProductCard = ({
                       ? styles.productImageLoaded
                       : styles.productImageLoading
                   }`}
-                  loading={imagePriority ? "eager" : "lazy"}
+                  loading={imagePriority || loadImage ? "eager" : "lazy"}
                   decoding="async"
                   fetchPriority={imagePriority ? "high" : "auto"}
                   draggable={false}

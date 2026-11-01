@@ -16,18 +16,26 @@ import styles from "./ProductPageView.module.css";
 
 const MAX_VISIBLE_THUMBS = 7;
 const PLACEHOLDER = "/images/catalogs/placeholder.png";
+/** На LTE сразу греем первые кадры — иначе свайп ждёт полные JPG по одному */
+const INITIAL_UNLOCK = 4;
 
 type ProductGallerySwiperProps = {
   images: string[];
   productTitle: string;
 };
 
-/** Сначала только cover; соседи — после onLoad cover или при свайпе. */
 const buildNeighborWindow = (active: number, total: number): Set<number> => {
   const next = new Set<number>();
-  for (let i = active - 1; i <= active + 1; i += 1) {
+  for (let i = active - 1; i <= active + 2; i += 1) {
     if (i >= 0 && i < total) next.add(i);
   }
+  return next;
+};
+
+const buildInitialUnlock = (total: number): Set<number> => {
+  const next = new Set<number>();
+  const until = Math.min(INITIAL_UNLOCK, total);
+  for (let i = 0; i < until; i += 1) next.add(i);
   return next;
 };
 
@@ -36,22 +44,14 @@ const ProductGallerySwiper = ({
   productTitle,
 }: ProductGallerySwiperProps) => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [coverReady, setCoverReady] = useState(false);
-  const [unlocked, setUnlocked] = useState(() => {
-    const initial = new Set<number>();
-    if (images.length > 0) initial.add(0);
-    return initial;
-  });
+  const [unlocked, setUnlocked] = useState(() =>
+    buildInitialUnlock(images.length)
+  );
   const gallerySwiperRef = useRef<SwiperInstance | null>(null);
-  const coverReadyRef = useRef(false);
 
   useEffect(() => {
     setActiveImageIndex(0);
-    coverReadyRef.current = false;
-    setCoverReady(false);
-    const initial = new Set<number>();
-    if (images.length > 0) initial.add(0);
-    setUnlocked(initial);
+    setUnlocked(buildInitialUnlock(images.length));
     gallerySwiperRef.current?.slideTo(0, 0);
   }, [images]);
 
@@ -75,29 +75,6 @@ const ProductGallerySwiper = ({
     },
     [images.length, mergeUnlock]
   );
-
-  const onCoverSettled = useCallback(() => {
-    if (coverReadyRef.current) return;
-    coverReadyRef.current = true;
-    setCoverReady(true);
-    unlockAround(0);
-  }, [unlockAround]);
-
-  // Кэш: onLoad может не сработать — добираем complete из DOM
-  useEffect(() => {
-    if (coverReadyRef.current || images.length === 0) return;
-    const cover = images[0];
-    const imgs = document.querySelectorAll<HTMLImageElement>(
-      `.${styles.heroImage}`
-    );
-    for (const img of imgs) {
-      if (img.getAttribute("src") !== cover) continue;
-      if (img.complete) {
-        onCoverSettled();
-        return;
-      }
-    }
-  }, [images, onCoverSettled, unlocked]);
 
   const hasOverflow = images.length > MAX_VISIBLE_THUMBS;
   const overflowCount = hasOverflow
@@ -140,6 +117,7 @@ const ProductGallerySwiper = ({
             className: styles.imageSlider,
             onSwiper: (swiper: SwiperInstance) => {
               gallerySwiperRef.current = swiper;
+              unlockAround(swiper.activeIndex);
             },
             onSlideChange: (swiper: SwiperInstance) => {
               setActiveImageIndex(swiper.activeIndex);
@@ -161,13 +139,11 @@ const ProductGallerySwiper = ({
                       src={image}
                       alt={`${productTitle} — фото ${index + 1}`}
                       className={styles.heroImage}
-                      loading={isCover || index === activeImageIndex ? "eager" : "lazy"}
+                      loading={index < INITIAL_UNLOCK ? "eager" : "lazy"}
                       decoding="async"
                       fetchPriority={isCover ? "high" : "auto"}
-                      onLoad={isCover ? onCoverSettled : undefined}
                       onError={(event) => {
                         event.currentTarget.src = PLACEHOLDER;
-                        if (isCover) onCoverSettled();
                       }}
                     />
                   ) : (
@@ -200,9 +176,6 @@ const ProductGallerySwiper = ({
         {visibleThumbs.map((image, index) => {
           const isLastOverflow =
             overflowCount > 0 && index === visibleThumbs.length - 1;
-          // Thumbs после cover — не конкурируют с первым кадром
-          const thumbLoading =
-            coverReady && index === activeImageIndex ? "eager" : "lazy";
           return (
             <button
               key={image + index}
@@ -219,10 +192,10 @@ const ProductGallerySwiper = ({
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={coverReady ? image : undefined}
+                src={image}
                 alt=""
                 className={styles.thumbImage}
-                loading={thumbLoading}
+                loading={index < 2 ? "eager" : "lazy"}
                 decoding="async"
                 onError={(event) => {
                   event.currentTarget.src = PLACEHOLDER;

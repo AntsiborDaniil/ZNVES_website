@@ -19,8 +19,8 @@ import { useCart } from "../../contexts/CartContext";
 import { useToast } from "../ui/ToastProvider/ToastProvider";
 import { toCatalogProduct } from "../../data/products";
 import styles from "./ProductPageView.module.css";
-import ProductDisplaySection from "../ProductDisplaySection/ProductDisplaySection";
 import ProductGallerySwiper from "./ProductGallerySwiper";
+import LazyRelatedSection from "./LazyRelatedSection";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import {
   fetchProductImagesByColor,
@@ -221,15 +221,39 @@ const ProductPageView = ({
     warehouseItems.length,
   ]);
 
+  // После cover/галереи — иначе на LTE эти fetch отбирают слоты у JPG
   useEffect(() => {
-    fetchCatalogColors().then((colors) => {
-      const map: Record<string, string> = {};
-      colors.forEach((c) => {
-        map[c.slug] = c.value;
+    let cancelled = false;
+    const run = () => {
+      if (cancelled) return;
+      void fetchCatalogColors().then((colors) => {
+        if (cancelled) return;
+        const map: Record<string, string> = {};
+        colors.forEach((c) => {
+          map[c.slug] = c.value;
+        });
+        setColorSlugToLabel(map);
       });
-      setColorSlugToLabel(map);
-    });
-    fetchCatalogCategories().then(setCatalogCategories);
+      void fetchCatalogCategories().then((cats) => {
+        if (!cancelled) setCatalogCategories(cats);
+      });
+    };
+
+    let idleId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(run, { timeout: 2800 });
+    } else {
+      timeoutId = setTimeout(run, 1200);
+    }
+
+    return () => {
+      cancelled = true;
+      if (idleId != null && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId != null) clearTimeout(timeoutId);
+    };
   }, []);
 
   useEffect(() => {
@@ -268,12 +292,14 @@ const ProductPageView = ({
         return;
       }
 
-      // Первый проход: уже есть SSR-covers — не гасим UI, подменяем только если URL другие
+      // Boot: оставляем SSR-covers, не конкурируем с галереей на LTE
       const isBoot = colorImagesBootRef.current;
       colorImagesBootRef.current = false;
-      if (!isBoot) {
-        setIsLoadingImages(true);
+      if (isBoot && product.images.length > 0) {
+        return;
       }
+
+      setIsLoadingImages(true);
 
       try {
         const colorImages = await fetchProductImagesByColor(
@@ -491,35 +517,35 @@ const ProductPageView = ({
               productTitle={product.title}
             />
 
-            <div
-              className={`${styles.imageGrid} ${
-                isLoadingImages ? styles.imageGridLoading : ""
-              }`}
-            >
-              {currentImages.map((image, index) => (
-                <button
-                  key={image + index}
-                  type="button"
-                  className={styles.imageCell}
-                  onClick={() => {
-                    if (width < 1025) return;
-                    setLightboxIndex(index);
-                  }}
-                  aria-label={`Открыть фото ${index + 1}`}
-                >
-                  <Image
-                    src={image}
-                    alt={`${product.title} — фото ${index + 1}`}
-                    fill
-                    sizes="(min-width: 1025px) 30vw, 0px"
-                    className={styles.gridImage}
-                    priority={index === 0}
-                    loading={index <= 1 ? "eager" : "lazy"}
-                    fetchPriority={index === 0 ? "high" : "auto"}
-                  />
-                </button>
-              ))}
-            </div>
+            {/* Desktop-only: на mobile не монтируем — иначе JPG конкурируют с галереей */}
+            {width >= 1025 ? (
+              <div
+                className={`${styles.imageGrid} ${
+                  isLoadingImages ? styles.imageGridLoading : ""
+                }`}
+              >
+                {currentImages.map((image, index) => (
+                  <button
+                    key={image + index}
+                    type="button"
+                    className={styles.imageCell}
+                    onClick={() => setLightboxIndex(index)}
+                    aria-label={`Открыть фото ${index + 1}`}
+                  >
+                    <Image
+                      src={image}
+                      alt={`${product.title} — фото ${index + 1}`}
+                      fill
+                      sizes="(min-width: 1025px) 30vw, 0px"
+                      className={styles.gridImage}
+                      priority={index === 0}
+                      loading={index <= 1 ? "eager" : "lazy"}
+                      fetchPriority={index === 0 ? "high" : "auto"}
+                    />
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           <div className={styles.info}>
@@ -691,12 +717,7 @@ const ProductPageView = ({
         </section>
       </main>
       <div className={styles.suggestions}>
-        <ProductDisplaySection
-          title="Вам также может понравиться"
-          showShopNow={false}
-          headerAlign="center"
-          navFrom="catalog"
-        />
+        <LazyRelatedSection />
       </div>
       <Footer />
 

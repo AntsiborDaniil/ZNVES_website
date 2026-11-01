@@ -61,8 +61,9 @@ const ProductDisplaySection = ({
   initialProducts,
 }: ProductDisplaySectionProps) => {
   const swiperRef = useRef<SwiperInstance | null>(null);
-  const [maxVisible, setMaxVisible] = useState<number | "auto">(4);
-  const [spaceBetween, setSpaceBetween] = useState(20);
+  // Mobile-first: не стартуем с 4 → 2 после hydration (layout thrash на LTE)
+  const [maxVisible, setMaxVisible] = useState<number | "auto">(2);
+  const [spaceBetween, setSpaceBetween] = useState(8);
   const [products, setProducts] = useState<CatalogProduct[]>(
     initialProducts ?? []
   );
@@ -109,15 +110,26 @@ const ProductDisplaySection = ({
     const loadProducts = async () => {
       setIsLoading(true);
 
+      const loadOnce = () =>
+        wantsNewIn ? fetchNewInProducts() : fetchAllCatalogProducts();
+
       try {
-        const nextProducts = wantsNewIn
-          ? await fetchNewInProducts()
-          : await fetchAllCatalogProducts();
+        let nextProducts = await loadOnce();
+        // LTE abort → один retry, не сразу empty
+        if (!cancelled && nextProducts.length === 0) {
+          await new Promise((resolve) => setTimeout(resolve, 700));
+          if (!cancelled) nextProducts = await loadOnce();
+        }
         if (cancelled) return;
         setProducts(nextProducts);
       } catch {
         if (!cancelled) {
-          setProducts([]);
+          try {
+            await new Promise((resolve) => setTimeout(resolve, 700));
+            if (!cancelled) setProducts(await loadOnce());
+          } catch {
+            if (!cancelled) setProducts([]);
+          }
         }
       } finally {
         if (!cancelled) setIsLoading(false);

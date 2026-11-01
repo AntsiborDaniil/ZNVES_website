@@ -131,12 +131,17 @@
   pointer-events: none;
 }
 
+/* Слайдер/cover: сразу видно (шиммер снизу), не ждём onLoad — иначе LTE = вечный фолбек */
 .productImageCarousel {
-  opacity: 0;
+  opacity: 1;
 }
 
 .productImageLoading {
   opacity: 0;
+}
+
+.productImageCarousel.productImageLoading {
+  opacity: 1;
 }
 
 /* stacked: видимость только через .productImageVisible (активный кадр) */
