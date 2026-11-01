@@ -29,7 +29,11 @@ export const useImageLoadedStates = (
   useEffect(() => {
     setLoadedStates(new Array(imageList.length).fill(false));
 
-    const listeners: Array<{ img: HTMLImageElement; onLoad: () => void }> = [];
+    const listeners: Array<{
+      img: HTMLImageElement;
+      onLoad: () => void;
+      onError: () => void;
+    }> = [];
 
     const syncFromDom = (): boolean => {
       const container = containerRef.current;
@@ -47,13 +51,21 @@ export const useImageLoadedStates = (
           return;
         }
 
+        // Битая картинка — не держим шиммер вечно
+        if (img.complete && img.naturalWidth === 0) {
+          markImageLoaded(index);
+          return;
+        }
+
         allReady = false;
         const alreadyBound = listeners.some((entry) => entry.img === img);
         if (alreadyBound) return;
 
         const onLoad = () => markImageLoaded(index);
+        const onError = () => markImageLoaded(index);
         img.addEventListener("load", onLoad);
-        listeners.push({ img, onLoad });
+        img.addEventListener("error", onError);
+        listeners.push({ img, onLoad, onError });
       });
 
       return allReady && imgs.length >= imageList.length;
@@ -61,9 +73,10 @@ export const useImageLoadedStates = (
 
     if (syncFromDom()) {
       return () => {
-        listeners.forEach(({ img, onLoad }) =>
-          img.removeEventListener("load", onLoad)
-        );
+        listeners.forEach(({ img, onLoad, onError }) => {
+          img.removeEventListener("load", onLoad);
+          img.removeEventListener("error", onError);
+        });
       };
     }
 
@@ -76,14 +89,19 @@ export const useImageLoadedStates = (
     // Safety stop — don't poll forever if images never resolve
     const maxWaitId = window.setTimeout(() => {
       window.clearInterval(intervalId);
-    }, 15_000);
+      // По таймауту считаем оставшиеся «загруженными», чтобы UI не завис
+      for (let i = 0; i < imageList.length; i += 1) {
+        markImageLoaded(i);
+      }
+    }, 12_000);
 
     return () => {
       window.clearInterval(intervalId);
       window.clearTimeout(maxWaitId);
-      listeners.forEach(({ img, onLoad }) =>
-        img.removeEventListener("load", onLoad)
-      );
+      listeners.forEach(({ img, onLoad, onError }) => {
+        img.removeEventListener("load", onLoad);
+        img.removeEventListener("error", onError);
+      });
     };
   }, [imageList, containerRef, markImageLoaded]);
 

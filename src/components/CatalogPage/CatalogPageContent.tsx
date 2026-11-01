@@ -40,9 +40,6 @@ const categoryFromUrl = (param: string | null): string => {
 const normalizeSlug = (value: string): string =>
   value.trim().toLowerCase().replace(/_/g, "-");
 
-/** Сколько карточек монтируем сразу из уже загруженной порции (DOM, не сеть). */
-const DOM_CHUNK = 8;
-
 const CatalogPageContent = ({
   title,
   initialProducts = [],
@@ -79,10 +76,6 @@ const CatalogPageContent = ({
     categoryFromUrl(categoryParam)
   );
 
-  const [visibleCount, setVisibleCount] = useState(() =>
-    Math.min(DOM_CHUNK, initialProducts.length || DOM_CHUNK)
-  );
-
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const loadingMoreRef = useRef(false);
   const categoryRequestIdRef = useRef(0);
@@ -97,7 +90,6 @@ const CatalogPageContent = ({
     setProducts(initialProducts);
     setHasMore(initialHasMore);
     setNextPage(2);
-    setVisibleCount(Math.min(DOM_CHUNK, Math.max(initialProducts.length, 0)));
     setLoadError(null);
     setIsLoading(initialProducts.length === 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- ключ отражает смену SSR-порции
@@ -164,7 +156,6 @@ const CatalogPageContent = ({
         setProducts(page.products);
         setHasMore(page.hasMore);
         setNextPage(2);
-        setVisibleCount(Math.min(DOM_CHUNK, page.products.length));
         if (page.products.length === 0) {
           setLoadError(null);
         }
@@ -229,7 +220,6 @@ const CatalogPageContent = ({
       setProducts((prev) => [...prev, ...unique]);
       setHasMore(page.hasMore);
       setNextPage((p) => p + 1);
-      setVisibleCount((v) => v + Math.min(DOM_CHUNK, unique.length));
     } catch {
       setHasMore(false);
     } finally {
@@ -242,12 +232,9 @@ const CatalogPageContent = ({
     return [...products].sort((a, b) => a.sortOrder - b.sortOrder);
   }, [products]);
 
-  // DOM-чанк внутри уже загруженных + сеть при hasMore
+  // Догрузка следующей страницы с API по скроллу (уже загруженные показываем все)
   useEffect(() => {
-    const loaded = filteredProducts.length;
-    const needsDomMore = visibleCount < loaded;
-    const needsNetworkMore = !needsDomMore && hasMore;
-    if (!needsDomMore && !needsNetworkMore) return;
+    if (!hasMore) return;
 
     const node = loadMoreRef.current;
     if (!node) return;
@@ -255,26 +242,13 @@ const CatalogPageContent = ({
     const observer = new IntersectionObserver(
       (entries) => {
         if (!entries.some((e) => e.isIntersecting)) return;
-        if (visibleCount < filteredProducts.length) {
-          setVisibleCount((prev) =>
-            Math.min(prev + DOM_CHUNK, filteredProducts.length)
-          );
-          return;
-        }
-        if (hasMore) {
-          void appendNextPage();
-        }
+        void appendNextPage();
       },
-      { rootMargin: "320px 0px" }
+      { rootMargin: "480px 0px" }
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [
-    appendNextPage,
-    filteredProducts.length,
-    hasMore,
-    visibleCount,
-  ]);
+  }, [appendNextPage, hasMore, filteredProducts.length]);
 
   const handleRetry = useCallback(() => {
     setLoadError(null);
@@ -300,7 +274,6 @@ const CatalogPageContent = ({
         setProducts(page.products);
         setHasMore(page.hasMore);
         setNextPage(2);
-        setVisibleCount(Math.min(DOM_CHUNK, page.products.length));
         if (page.products.length === 0) {
           setLoadError(null);
         }
@@ -315,15 +288,8 @@ const CatalogPageContent = ({
     })();
   }, [categoryParam, isNewIn, refreshSharedCategories]);
 
-  const visibleProducts = useMemo(
-    () => filteredProducts.slice(0, visibleCount),
-    [filteredProducts, visibleCount]
-  );
-
   const showSentinel =
-    !isLoading &&
-    filteredProducts.length > 0 &&
-    (visibleCount < filteredProducts.length || hasMore);
+    !isLoading && filteredProducts.length > 0 && hasMore;
 
   const categoryHref = (slug: string) => {
     if (slug === "all") return pathname;
@@ -395,7 +361,7 @@ const CatalogPageContent = ({
         ) : (
           <>
             <div className={styles.productsGrid}>
-              {visibleProducts.map((product, index) => (
+              {filteredProducts.map((product, index) => (
                 <Link
                   key={`${String(product.slug ?? product.id)}-${index}`}
                   href={buildProductHref(product.slug || product.id, {

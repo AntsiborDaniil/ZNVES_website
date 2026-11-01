@@ -12,9 +12,6 @@ const HERO_MOBILE_POSTER = "/images/home/hero-mobile-poster.jpg";
 const NARROW_MQ = "(max-width: 768px)";
 const TOUCH_PHONE_MQ = "(pointer: coarse) and (max-width: 1024px)";
 
-/** Короткий запас после load — сеть для LCP, но автоплей не «остывает». */
-const MOBILE_VIDEO_AFTER_LOAD_MS = 600;
-
 type NetworkInformationLike = {
   saveData?: boolean;
   effectiveType?: string;
@@ -67,8 +64,9 @@ const armAutoplay = (video: HTMLVideoElement) => {
   video.removeAttribute("controls");
   if ("disableRemotePlayback" in video) {
     try {
-      (video as HTMLVideoElement & { disableRemotePlayback: boolean }).disableRemotePlayback =
-        true;
+      (
+        video as HTMLVideoElement & { disableRemotePlayback: boolean }
+      ).disableRemotePlayback = true;
     } catch {
       /* ignore */
     }
@@ -79,13 +77,7 @@ const forcePlay = (video: HTMLVideoElement) => {
   armAutoplay(video);
   const playPromise = video.play();
   if (playPromise && typeof playPromise.catch === "function") {
-    playPromise.catch(() => {
-      // Повтор после жеста/готовности кадра
-      window.setTimeout(() => {
-        armAutoplay(video);
-        void video.play().catch(() => {});
-      }, 250);
-    });
+    playPromise.catch(() => {});
   }
 };
 
@@ -115,12 +107,39 @@ const posterStyle: CSSProperties = {
 
 const HeroSection = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const cancelScheduleRef = useRef<(() => void) | null>(null);
   const releasedRef = useRef(false);
+  const playRetryRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // null до выбора на клиенте — desktop URL не попадает в DOM на мобилке
   const [src, setSrc] = useState<string | null>(null);
   const [useMobile, setUseMobile] = useState(false);
   const [screenHeight, setScreenHeight] = useState<number | null>(null);
+
+  const stopPlayRetry = () => {
+    if (playRetryRef.current != null) {
+      clearInterval(playRetryRef.current);
+      playRetryRef.current = null;
+    }
+  };
+
+  /** Крутим play(), пока ролик реально не играет — без ожидания скролла. */
+  const ensurePlaying = (video: HTMLVideoElement) => {
+    if (releasedRef.current) return;
+    forcePlay(video);
+    stopPlayRetry();
+    let attempts = 0;
+    playRetryRef.current = setInterval(() => {
+      attempts += 1;
+      if (releasedRef.current || attempts > 40) {
+        stopPlayRetry();
+        return;
+      }
+      if (!video.paused && !video.ended && video.currentTime > 0) {
+        stopPlayRetry();
+        return;
+      }
+      forcePlay(video);
+    }, 200);
+  };
 
   // На мобилке при скролле адресная строка прячется и меняет высоту
   // окна — в этот момент не пересчитываем, чтобы hero не прыгал.
@@ -152,69 +171,22 @@ const HeroSection = () => {
     const touchPhoneMq = window.matchMedia(TOUCH_PHONE_MQ);
     releasedRef.current = false;
 
-    const clearSchedule = () => {
-      cancelScheduleRef.current?.();
-      cancelScheduleRef.current = null;
-    };
-
-    const scheduleMobileVideoStart = () => {
-      if (isConstrainedMobileNetwork()) {
-        setSrc(null);
-        return;
-      }
-
-      let idleId: number | null = null;
-      let delayId: ReturnType<typeof setTimeout> | null = null;
-      let cancelled = false;
-
-      const startVideo = () => {
-        if (cancelled || releasedRef.current) return;
-        setSrc(HERO_MOBILE_VIDEO);
-      };
-
-      const afterLoad = () => {
-        if (cancelled) return;
-        delayId = setTimeout(() => {
-          if (cancelled) return;
-          if (typeof window.requestIdleCallback === "function") {
-            idleId = window.requestIdleCallback(() => startVideo(), {
-              timeout: 1500,
-            });
-          } else {
-            startVideo();
-          }
-        }, MOBILE_VIDEO_AFTER_LOAD_MS);
-      };
-
-      if (document.readyState === "complete") {
-        afterLoad();
-      } else {
-        window.addEventListener("load", afterLoad, { once: true });
-      }
-
-      cancelScheduleRef.current = () => {
-        cancelled = true;
-        window.removeEventListener("load", afterLoad);
-        if (delayId != null) clearTimeout(delayId);
-        if (idleId != null && typeof window.cancelIdleCallback === "function") {
-          window.cancelIdleCallback(idleId);
-        }
-      };
-    };
-
     const sync = () => {
-      clearSchedule();
       const mobile = shouldUseMobileHeroVideo();
       setUseMobile(mobile);
 
       if (mobile) {
-        // Не сбрасываем уже играющий mobile-ролик при ложном re-sync
-        setSrc((prev) => (prev === HERO_MOBILE_VIDEO ? prev : null));
-        if (videoRef.current?.getAttribute("src")?.includes("hero-mobile")) {
-          forcePlay(videoRef.current);
+        if (isConstrainedMobileNetwork()) {
+          setSrc(null);
           return;
         }
-        scheduleMobileVideoStart();
+        // Сразу ставим src — без ожидания window.load / idle / скролла
+        setSrc((prev) =>
+          prev === HERO_MOBILE_VIDEO ? prev : HERO_MOBILE_VIDEO
+        );
+        if (videoRef.current?.currentSrc?.includes("hero-mobile")) {
+          ensurePlaying(videoRef.current);
+        }
         return;
       }
 
@@ -227,55 +199,59 @@ const HeroSection = () => {
 
     const onHeroRelease = () => {
       releasedRef.current = true;
-      clearSchedule();
+      stopPlayRetry();
       releaseVideo(videoRef.current);
       setSrc(null);
     };
     window.addEventListener(HERO_RELEASE_EVENT, onHeroRelease);
 
-    // Любой первый жест — добиваем autoplay, если iOS блокировал
+    // Запасной unlock жестом (если политика автоплея всё же блокирует)
     const unlock = () => {
       const video = videoRef.current;
-      if (video && !releasedRef.current && video.paused && video.currentSrc) {
-        forcePlay(video);
-      }
+      if (!video || releasedRef.current) return;
+      if (video.paused && video.currentSrc) ensurePlaying(video);
     };
-    window.addEventListener("touchstart", unlock, { passive: true, once: true });
-    window.addEventListener("click", unlock, { once: true });
+    window.addEventListener("touchstart", unlock, { passive: true });
+    window.addEventListener("pointerdown", unlock, { passive: true });
+    window.addEventListener("scroll", unlock, { passive: true, once: true });
 
     return () => {
-      clearSchedule();
+      stopPlayRetry();
       releaseVideo(videoRef.current);
       narrowMq.removeEventListener("change", sync);
       touchPhoneMq.removeEventListener("change", sync);
       window.removeEventListener(HERO_RELEASE_EVENT, onHeroRelease);
       window.removeEventListener("touchstart", unlock);
-      window.removeEventListener("click", unlock);
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("scroll", unlock);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount once
   }, []);
 
   useLayoutEffect(() => {
     const video = videoRef.current;
     if (!video || !src || releasedRef.current) return;
 
-    forcePlay(video);
+    ensurePlaying(video);
 
     const onReady = () => {
-      if (!releasedRef.current) forcePlay(video);
+      if (!releasedRef.current) ensurePlaying(video);
     };
+    const onPlaying = () => stopPlayRetry();
     const onEnded = () => {
-      if (!releasedRef.current) forcePlay(video);
+      if (!releasedRef.current) ensurePlaying(video);
     };
     const onPause = () => {
       if (releasedRef.current) return;
       if (document.visibilityState !== "visible") return;
       if (!video.getAttribute("src") && !video.currentSrc) return;
-      forcePlay(video);
+      ensurePlaying(video);
     };
 
     video.addEventListener("loadeddata", onReady);
     video.addEventListener("canplay", onReady);
     video.addEventListener("canplaythrough", onReady);
+    video.addEventListener("playing", onPlaying);
     video.addEventListener("ended", onEnded);
     video.addEventListener("pause", onPause);
 
@@ -283,14 +259,19 @@ const HeroSection = () => {
       video.removeEventListener("loadeddata", onReady);
       video.removeEventListener("canplay", onReady);
       video.removeEventListener("canplaythrough", onReady);
+      video.removeEventListener("playing", onPlaying);
       video.removeEventListener("ended", onEnded);
       video.removeEventListener("pause", onPause);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- ensurePlaying stable enough via refs
   }, [src]);
 
   const bindVideoRef = (el: HTMLVideoElement | null) => {
     videoRef.current = el;
-    if (el) armAutoplay(el);
+    if (el) {
+      armAutoplay(el);
+      if (src && !releasedRef.current) ensurePlaying(el);
+    }
   };
 
   return (

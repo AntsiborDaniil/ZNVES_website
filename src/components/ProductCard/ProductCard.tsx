@@ -216,6 +216,7 @@ const ProductCard = ({
                         index === 0 && imagePriority ? "high" : "auto"
                       }
                       onLoad={() => markImageLoaded(index)}
+                      onError={() => markImageLoaded(index)}
                       quality={variant === "grid" ? 70 : 80}
                       unoptimized={isSvgImageSrc(image)}
                       draggable={false}
@@ -269,6 +270,7 @@ const ProductCard = ({
                           imagePriority && index === 0 ? "high" : "auto"
                         }
                         onLoad={() => markImageLoaded(index)}
+                        onError={() => markImageLoaded(index)}
                         quality={variant === "grid" ? 70 : 80}
                         unoptimized={isSvgImageSrc(image)}
                         draggable={false}
