@@ -54,8 +54,10 @@ const forcePlay = (video: HTMLVideoElement) => {
   video.muted = true;
   video.defaultMuted = true;
   video.playsInline = true;
+  video.loop = true;
   video.setAttribute("muted", "");
   video.setAttribute("playsinline", "");
+  video.setAttribute("loop", "");
   const playPromise = video.play();
   if (playPromise && typeof playPromise.catch === "function") {
     playPromise.catch(() => {});
@@ -129,7 +131,6 @@ const HeroSection = () => {
     };
 
     const scheduleMobileVideoStart = () => {
-      // Слабая сеть: только постер — не конкурируем с каталогом
       if (isConstrainedMobileNetwork()) {
         setSrc(null);
         return;
@@ -176,18 +177,20 @@ const HeroSection = () => {
 
     const sync = () => {
       clearSchedule();
-      releaseVideo(videoRef.current);
-
       const mobile = shouldUseMobileHeroVideo();
       setUseMobile(mobile);
 
       if (mobile) {
-        setSrc(null);
+        // Не сбрасываем уже играющий mobile-ролик при ложном re-sync
+        setSrc((prev) => (prev === HERO_MOBILE_VIDEO ? prev : null));
+        if (videoRef.current?.getAttribute("src")?.includes("hero-mobile")) {
+          forcePlay(videoRef.current);
+          return;
+        }
         scheduleMobileVideoStart();
         return;
       }
 
-      // Широкий desktop — сразу desktop-ролик
       setSrc(HERO_DESKTOP_VIDEO);
     };
 
@@ -195,16 +198,13 @@ const HeroSection = () => {
     narrowMq.addEventListener("change", sync);
     touchPhoneMq.addEventListener("change", sync);
 
-    const onPageHide = () => {
-      releaseVideo(videoRef.current);
-      setSrc(null);
-    };
+    // Только уход с главной — освобождаем сеть для каталога.
+    // pagehide/visibility НЕ трогаем: на iOS они срабатывают при скролле/сворачивании.
     const onHeroRelease = () => {
       clearSchedule();
       releaseVideo(videoRef.current);
       setSrc(null);
     };
-    window.addEventListener("pagehide", onPageHide);
     window.addEventListener(HERO_RELEASE_EVENT, onHeroRelease);
 
     return () => {
@@ -212,7 +212,6 @@ const HeroSection = () => {
       releaseVideo(videoRef.current);
       narrowMq.removeEventListener("change", sync);
       touchPhoneMq.removeEventListener("change", sync);
-      window.removeEventListener("pagehide", onPageHide);
       window.removeEventListener(HERO_RELEASE_EVENT, onHeroRelease);
     };
   }, []);
@@ -224,27 +223,24 @@ const HeroSection = () => {
     forcePlay(video);
 
     const onReady = () => forcePlay(video);
+    const onEnded = () => forcePlay(video);
     video.addEventListener("loadeddata", onReady);
     video.addEventListener("canplay", onReady);
-
-    const onVisibility = () => {
-      if (document.hidden) {
-        try {
-          video.pause();
-        } catch {
-          /* ignore */
-        }
-      } else {
-        forcePlay(video);
-      }
+    video.addEventListener("ended", onEnded);
+    // Если браузер поставил на pause сам — возвращаем play (кроме реального ухода)
+    const onPause = () => {
+      if (document.visibilityState !== "visible") return;
+      // После releaseVideo src пустой — не реанимируем
+      if (!video.getAttribute("src") && !video.currentSrc) return;
+      forcePlay(video);
     };
-    document.addEventListener("visibilitychange", onVisibility);
+    video.addEventListener("pause", onPause);
 
     return () => {
       video.removeEventListener("loadeddata", onReady);
       video.removeEventListener("canplay", onReady);
-      document.removeEventListener("visibilitychange", onVisibility);
-      releaseVideo(video);
+      video.removeEventListener("ended", onEnded);
+      video.removeEventListener("pause", onPause);
     };
   }, [src]);
 
@@ -278,8 +274,7 @@ const HeroSection = () => {
           autoPlay
           loop
           playsInline
-          // Desktop: auto — иначе лагает буфер. Mobile: none до явного play.
-          preload={useMobile ? "none" : "auto"}
+          preload={useMobile ? "metadata" : "auto"}
           disablePictureInPicture
           aria-hidden
           tabIndex={-1}

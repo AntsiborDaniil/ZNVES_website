@@ -2,108 +2,126 @@
 
 Дата: 2026-11-01
 
-## Что сделано
+## Статус сейчас
 
-### 1. Hero-видео: cover + центрирование + мобильный ролик
+Каталог на SSR снова отдаёт товары. Hero на мобилке/десктопе разведён по роликам. Ниже — что уже в коде, что болит, и что дожали в этой итерации.
 
-**Проблема:** видео в hero заполняло блок так, что кадр визуально «съезжал» по вертикали относительно области на экране.
+---
 
-**Решение:**
+## 1. Каталог: «не все товары» / подгрузка
 
-- cover через `object-fit: cover` + `object-position: center center` на весь контейнер (`inset: 0`, `width/height: 100%`)
-- отдельный ролик для мобилки: `public/videos/home/hero-mobile-v2.mp4` (из `IMG_7357.MOV`)
-- desktop: `public/videos/home/hero-desktop-v2.mp4`
-- выбор источника по `(max-width: 768px)`
+### Факт по API
 
-Видео заполняет viewport без искажения и обрезается равномерно от центра.
+`GET https://api.znves.ru/api/catalog/` сейчас отдаёт **ровно 12 товаров** (плоский JSON-массив). Параметры `page`, `page_size`, `limit`, `offset` **не увеличивают** выдачу — бэкенд просто игнорирует пагинацию. Пока на API только 12 SKU, фронт больше показать не может.
 
-**Файлы:**
+### Что сделано на фронте
 
-- `src/components/HeroSection/HeroSection.module.css`
-- `src/components/HeroSection/HeroSection.tsx`
-- `public/videos/home/hero-mobile-v2.mp4`
-- `public/videos/home/hero-desktop-v2.mp4`
+- SSR для `/catalog` и `/new-in`: товары и категории приходят с сервера → первая отрисовка не пустая.
+- `CatalogCategoriesProvider` в layout — категории в Header/Burger без отдельного клиентского «пустого» старта.
+- Soft-refresh после SSR: пустой ответ клиента **не затирает** уже показанные SSR-товары.
+- `fetchWithTimeout` (AbortController, ~25s) вместо `AbortSignal.timeout` (ломался в Safari).
+- **Прогрессивный рендер сетки:** сначала 8 карточек, дальше +8 по `IntersectionObserver` (sentinel + `rootMargin`). Когда API начнёт отдавать десятки позиций — подгрузка уже готова; сейчас догрузит оставшиеся 4 из 12 без лишней сети на картинки ниже fold.
 
-### 2. Модалка подтверждения данных перед оформлением заказа
+### Что нужно с бэка (если «все» = больше 12)
 
-**Поведение:** при нажатии «Оформить заказ» в корзине сначала проходит валидация формы, затем открывается модалка с проверкой введённых данных. Создание заказа / оплата стартуют только после «Оформить заказ» в модалке.
+- Пагинированный ответ (`count` + `results` / `next`) или снятие лимита на list.
+- Фронт сможет дергать следующую страницу в том же sentinel-flow.
 
-**В модалке показываются:**
+**Файлы:** `src/app/catalog/page.tsx`, `src/app/new-in/page.tsx`, `src/components/CatalogPage/CatalogPageContent.tsx`, `src/api/catalog/catalogApi.ts`, `src/lib/fetchWithTimeout.ts`, `src/contexts/CatalogCategoriesContext.tsx`
 
-- получатель (ФИО)
-- телефон
-- email
-- способ доставки
-- адрес (ПВЗ или курьерский)
-- другой получатель (если указан)
-- способ оплаты
-- итоговая сумма
+---
 
-Кнопки: «Оформить заказ» / «Изменить данные» (закрывает модалку и возвращает к форме).
+## 2. Hero-видео: loop и «само ставится на паузу»
 
-**Файлы:**
+### Причина паузы
 
-- `src/components/OrderConfirmModal/OrderConfirmModal.tsx` — новый компонент
-- `src/components/OrderConfirmModal/OrderConfirmModal.module.css` — стили в духе существующих модалок
-- `src/components/CheckoutForm/CheckoutForm.tsx` — показ модалки после валидации, submit по подтверждению
-- `src/components/CheckoutForm/test/CheckoutForm.e2e.spec.ts` — e2e учитывает шаг подтверждения
+- `visibilitychange` / `pagehide` на iOS срабатывают при скролле, сворачивании вкладки и иногда при UI chrome — код **снимал `src`** или ставил `pause()`.
+- `HERO_RELEASE_EVENT` стрелял слишком широко (`lastPath === "/"` **или** путь каталога), из‑за чего ролик мог гаситься даже при навигации вокруг home.
 
-### 3. Промокод больше не слетает при правках формы
+### Что сделано
 
-**Проблема:** после активации промокода он сбрасывался при изменении данных, не связанных с добавлением товара (ФИО, адрес, доставка и т.п.).
+- Убраны pause/release по `visibilitychange` / `pagehide`.
+- Release только при **уходе с `/`**: `lastPath === "/" && pathname !== "/"`.
+- На `pause` при `document.visibilityState === "visible"` — принудительный `play()` (muted + loop + playsInline).
+- Слушатели `ended` / `canplay` / `loadeddata` снова поднимают воспроизведение.
+- Mobile: отложенный старт после `load` + idle (~2s), постер сразу; Save-Data / 2g — только постер.
+- Desktop: `hero-desktop-v4.mp4`, `preload="auto"`.
+- Mobile: `hero-mobile-v3.mp4` + `hero-mobile-poster.jpg`, `preload="metadata"`.
 
-**Причина:** в `CartModal` при каждом открытии/ремоунте вызывался `setAppliedPromo(null)`.
+**Файлы:** `src/components/HeroSection/HeroSection.tsx`, `src/components/NavigationTracker/NavigationTracker.tsx`
 
-**Решение:**
+**Ассеты:** `public/videos/home/hero-desktop-v4.mp4`, `public/videos/home/hero-mobile-v3.mp4`, `public/images/home/hero-mobile-poster.jpg`
 
-- при открытии корзины больше не чистим `appliedPromo` — только локальные ошибки ввода; поле подставляется из активного промокода
-- в `CartContext` сброс промокода только при реальном изменении состава/количества корзины (по signature позиций), с toast
+---
 
-**Файлы:**
+## 3. Fallback карточек (красивее)
 
-- `src/components/CartModal/CartModal.tsx`
-- `src/contexts/CartContext.tsx`
-- `src/contexts/test/CartContext.unit.test.tsx`
+### Было
 
-### 4. `dev:mock`: промокоды, автозаполнение, ЛК со всеми статусами
+Blur полупрозрачного/пустого `next/image` — серое пятно без структуры.
 
-**Разделение режимов:**
+### Стало
 
-| Команда | API |
-|--------|-----|
-| `npm run dev` / `dev:prod-api` | реальный прод-API |
-| `npm run dev:mock` | MSW + локальные мок-данные |
+- Shimmer-плейсхолдер внутри слайда картинки, пока кадр не `onLoad` / DOM-complete.
+- Картинка fade-in (`opacity 0 → 1`), без blur-fallback.
+- `CatalogSkeleton` — более мягкий градиентный shimmer под сетку 4/3/2.
 
-Подробности: `src/mocks/README.md`.
+**Файлы:** `src/components/ProductCard/ProductCard.tsx`, `ProductCard.module.css`, `CatalogSkeleton.module.css`
 
-**Что добавлено/усилено:**
+---
 
-- промокоды `SALE10`, `WELCOME`, `ZNVES500`, `BIG1000` (`data/promos.ts`)
-- автозаполнение checkout без логина (`MOCK_CHECKOUT_AUTOFILL`, только при `shouldUseMocks()`)
-- ЛК: `dev@znves.ru` / `password123`, код `123456`
-- заказы: Ожидает оплаты / Оплачен / Доставляется / Доставлен / Отменён
-- баннер в консоли при старте MSW; worker не стартует без флага
-- e2e стартует через `dev:mock`
+## 4. Оптимизация загрузки карточек и видео
 
-**Файлы:**
+### Карточки
 
-- `src/mocks/data/promos.ts`, `account.ts`, `orders.ts`
-- `src/mocks/config.ts`, `browser.ts`, `handlers/discountHandlers.ts`
-- `src/mocks/README.md`
-- `src/components/CheckoutForm/CheckoutForm.tsx`
-- `src/components/AccountPage/Orders/Orders.tsx`
-- `package.json`, `playwright.config.ts`
+- В grid сначала монтируется активный/первый кадр; остальные — после desktop-hover (или уже загруженные).
+- `imagePriority` для первых 4 карточек в каталоге (`eager` + `fetchPriority=high`).
+- Остальные — `lazy`.
+- `quality={70}` в grid, `80` в слайдерах.
+- Узкие `sizes` для grid: `48vw` / `30vw` / `22vw`.
+- Прогрессивный mount карточек (см. §1) снижает пик одновременных image-request.
+
+### Видео
+
+- Mobile не качает desktop-ролик (MQ + touch-phone).
+- Старт mobile-ролика после window.load + delay + idle — сеть свободна для каталога/LCP.
+- При уходе с главной — `releaseVideo` (pause + clear src), чтобы каталог не конкурировал с hero.
+- На главной loop не рвём pagehide/visibility.
+
+---
+
+## 5. Прочее уже в проде / рядом
+
+- Курьер Яндекса скрыт в UI checkout / personal data / delivery-payment (закомментирован).
+- `MOCK_HOME_PAGE` — dynamic import, чтобы билд без моков не падал.
+- Деплой сайта: **Vercel** с `master` (Timeweb App Platform для ZNVES не используется; там другой проект).
+
+---
 
 ## Как проверить
 
-1. Главная: hero-видео на desktop/mobile — кадр по центру области, без «съезда» вверх/вниз.
-2. На мобилке (≤768px) должен играть `hero-mobile-v2.mp4` (ролик из `IMG_7357.MOV`).
-3. Корзина → заполнить данные → «Оформить заказ» → должна появиться модалка подтверждения.
-4. «Изменить данные» — возврат к форме без создания заказа.
-5. «Оформить заказ» в модалке — создание заказа / переход к оплате как раньше.
-6. Активировать промокод → менять ФИО/телефон/доставку — промокод остаётся.
-7. Добавить/удалить товар или изменить количество — промокод сбрасывается с toast.
-8. `npm run dev:mock` → форма checkout уже заполнена; `SALE10` применяется; ЛК показывает все статусы заказов.
-9. `npm run dev` → пустая форма, реальный API, без MSW-баннера.
-10. `dev:mock`: логин `dev@znves.ru` / `password123` + код `123456` → `/account` открывается; F5 не разлогинивает (сессия в localStorage).
-11. Проверка моков в браузере: `window.__ZNVES_USE_MOCKS__` (не `process.env` — в Console `process` нет). Auth/promo работают напрямую через store, даже если Service Worker пустой.
+1. `/` desktop: hero loop без самопаузы при скролле; уход в каталог — видео отпускает сеть.
+2. `/` mobile: сначала постер, через ~2s+idle стартует `hero-mobile-v3`; loop держится.
+3. `/catalog`: сразу сетка (SSR); shimmer на карточках → fade-in фото; при >8 SKU — догрузка по скроллу.
+4. Медленная сеть: скелетон каталога и shimmer карточек выглядят ровно, без «мыльного» blur.
+5. API по-прежнему 12 позиций — в «All» должно быть 12, не «обрезанный» клиентский сброс.
+
+---
+
+## Открытые зависимости от бэка
+
+| Тема | Нужно |
+|------|--------|
+| Больше товаров в каталоге | Пагинация или снятие лимита list API |
+| Ещё легче mobile hero | Опционально: HLS / ещё меньший CRF / отдельный short loop |
+
+---
+
+## Ключевые пути этой итерации
+
+- `src/components/HeroSection/HeroSection.tsx`
+- `src/components/NavigationTracker/NavigationTracker.tsx`
+- `src/components/ProductCard/ProductCard.tsx` + `.module.css`
+- `src/components/CatalogPage/CatalogPageContent.tsx`
+- `src/components/CatalogPage/CatalogSkeleton.module.css`
+- `LAST_STAGE.md` (этот файл)

@@ -19,6 +19,36 @@
   background-color: var(--color-grey-5);
 }
 
+.imageShimmer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    110deg,
+    var(--color-grey-5) 20%,
+    #ebebeb 45%,
+    var(--color-grey-5) 70%
+  );
+  background-size: 220% 100%;
+  animation: cardShimmer 1.35s ease-in-out infinite;
+}
+
+.imageShimmerHidden {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  animation: none;
+}
+
+@keyframes cardShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 .imageContainerCarousel {
   user-select: none;
 }
@@ -91,28 +121,34 @@
 .productImage {
   position: absolute;
   inset: 0;
+  z-index: 1;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
   opacity: 0;
-  transition: opacity 0.45s ease, filter 0.5s ease, transform 0.55s ease;
+  transition: opacity 0.4s ease, transform 0.55s ease;
   pointer-events: none;
 }
 
 .productImageCarousel {
-  opacity: 1;
+  opacity: 0;
 }
 
 .productImageLoading {
-  filter: blur(12px);
+  opacity: 0;
 }
 
+/* stacked: видимость только через .productImageVisible (активный кадр) */
 .productImageLoaded {
-  filter: blur(0);
+  filter: none;
 }
 
 .productImageVisible {
+  opacity: 1;
+}
+
+.productImageCarousel.productImageLoaded {
   opacity: 1;
 }
 

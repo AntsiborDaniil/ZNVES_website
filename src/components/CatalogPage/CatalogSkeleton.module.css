@@ -23,13 +23,15 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(
-    110deg,
-    var(--color-grey-5) 25%,
-    #e4e4e4 50%,
-    var(--color-grey-5) 75%
+    105deg,
+    #f0f0f0 0%,
+    #f7f7f7 35%,
+    #ebebeb 50%,
+    #f7f7f7 65%,
+    #f0f0f0 100%
   );
-  background-size: 200% 100%;
-  animation: shimmer 1.4s ease-in-out infinite;
+  background-size: 220% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
 }
 
 .info {

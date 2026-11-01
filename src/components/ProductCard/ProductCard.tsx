@@ -30,6 +30,8 @@ type ProductCardProps = {
   isSliderCard?: boolean;
   variant?: "slider" | "grid";
   zoomOnHover?: boolean;
+  /** Первые карточки в сетке — быстрее LCP */
+  imagePriority?: boolean;
 };
 
 const ProductCard = ({
@@ -40,6 +42,7 @@ const ProductCard = ({
   isSliderCard = false,
   variant = "slider",
   zoomOnHover = false,
+  imagePriority = false,
 }: ProductCardProps) => {
   const imageList = useMemo(() => {
     if (images.length === 0) {
@@ -192,6 +195,12 @@ const ProductCard = ({
                     className: styles.cardSwiperSlide,
                   },
                   <div className={styles.imageSlide}>
+                    <div
+                      className={`${styles.imageShimmer} ${
+                        loadedStates[index] ? styles.imageShimmerHidden : ""
+                      }`}
+                      aria-hidden
+                    />
                     <Image
                       src={image}
                       alt={`${title} — фото ${index + 1}`}
@@ -202,10 +211,12 @@ const ProductCard = ({
                           ? styles.productImageLoaded
                           : styles.productImageLoading
                       }`}
-                      loading={index === 0 ? "eager" : "lazy"}
-                      fetchPriority={index === 0 ? "high" : "auto"}
+                      loading={index === 0 && imagePriority ? "eager" : "lazy"}
+                      fetchPriority={
+                        index === 0 && imagePriority ? "high" : "auto"
+                      }
                       onLoad={() => markImageLoaded(index)}
-                      quality={80}
+                      quality={variant === "grid" ? 70 : 80}
                       unoptimized={isSvgImageSrc(image)}
                       draggable={false}
                     />
@@ -218,29 +229,51 @@ const ProductCard = ({
               {imageList.map((image, index) => {
                 const isActive = index === currentIndex;
                 const isLoaded = loadedStates[index];
+                // В сетке сначала только активный кадр — остальные по hover/свайпу
+                const shouldMount =
+                  isActive ||
+                  index === 0 ||
+                  isDesktopHover ||
+                  Boolean(loadedStates[index]);
                 return (
                   <div key={image + index} className={styles.imageSlide}>
-                    <Image
-                      src={image}
-                      alt={`${title} — фото ${index + 1}`}
-                      fill
-                      sizes="(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 22vw"
-                      className={`${styles.productImage} ${
-                        isActive ? styles.productImageVisible : ""
-                      } ${
-                        isLoaded
-                          ? styles.productImageLoaded
-                          : styles.productImageLoading
-                      }`}
-                      loading={isSliderCard && index === 0 ? "eager" : "lazy"}
-                      fetchPriority={
-                        isSliderCard && index === 0 ? "high" : "auto"
-                      }
-                      onLoad={() => markImageLoaded(index)}
-                      quality={80}
-                      unoptimized={isSvgImageSrc(image)}
-                      draggable={false}
-                    />
+                    {isActive || index === 0 ? (
+                      <div
+                        className={`${styles.imageShimmer} ${
+                          isLoaded ? styles.imageShimmerHidden : ""
+                        }`}
+                        aria-hidden
+                      />
+                    ) : null}
+                    {shouldMount ? (
+                      <Image
+                        src={image}
+                        alt={`${title} — фото ${index + 1}`}
+                        fill
+                        sizes={
+                          variant === "grid"
+                            ? "(max-width: 768px) 48vw, (max-width: 1200px) 30vw, 22vw"
+                            : "(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 22vw"
+                        }
+                        className={`${styles.productImage} ${
+                          isActive && isLoaded ? styles.productImageVisible : ""
+                        } ${
+                          isLoaded
+                            ? styles.productImageLoaded
+                            : styles.productImageLoading
+                        }`}
+                        loading={
+                          imagePriority && index === 0 ? "eager" : "lazy"
+                        }
+                        fetchPriority={
+                          imagePriority && index === 0 ? "high" : "auto"
+                        }
+                        onLoad={() => markImageLoaded(index)}
+                        quality={variant === "grid" ? 70 : 80}
+                        unoptimized={isSvgImageSrc(image)}
+                        draggable={false}
+                      />
+                    ) : null}
                   </div>
                 );
               })}

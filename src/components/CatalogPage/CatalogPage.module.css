@@ -160,6 +160,15 @@
   z-index: 1;
 }
 
+.loadMoreSentinel {
+  width: 100%;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
 .catalogCard {
   display: flex;
   flex-direction: column;

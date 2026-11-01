@@ -26,7 +26,8 @@ const NavigationTracker = () => {
 
     if (lastPath && lastPath !== pathname) {
       sessionStorage.setItem(PREVIOUS_PATH_KEY, lastPath);
-      if (lastPath === "/" || pathname.startsWith("/catalog") || pathname.startsWith("/new-in")) {
+      // Только при уходе с главной — не трогаем loop, пока пользователь на /
+      if (lastPath === "/" && pathname !== "/") {
         window.dispatchEvent(new Event(HERO_RELEASE_EVENT));
       }
     }

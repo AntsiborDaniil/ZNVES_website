@@ -244,6 +244,41 @@ const CatalogPageContent = ({
     return [...products].sort((a, b) => a.sortOrder - b.sortOrder);
   }, [products]);
 
+  // Прогрессивный показ карточек: сначала первая порция, остальное — по скроллу
+  const INITIAL_VISIBLE = 8;
+  const LOAD_MORE_STEP = 8;
+  const [visibleCount, setVisibleCount] = useState(() =>
+    Math.min(INITIAL_VISIBLE, Math.max(filteredProducts.length, INITIAL_VISIBLE))
+  );
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setVisibleCount(Math.min(INITIAL_VISIBLE, filteredProducts.length) || INITIAL_VISIBLE);
+  }, [filteredProducts]);
+
+  useEffect(() => {
+    const total = filteredProducts.length;
+    if (visibleCount >= total) return;
+
+    const node = loadMoreRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        setVisibleCount((prev) => Math.min(prev + LOAD_MORE_STEP, total));
+      },
+      { rootMargin: "240px 0px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [filteredProducts.length, visibleCount]);
+
+  const visibleProducts = useMemo(
+    () => filteredProducts.slice(0, visibleCount),
+    [filteredProducts, visibleCount]
+  );
+
   return (
     <>
       <div className={styles.intro}>
@@ -310,7 +345,7 @@ const CatalogPageContent = ({
         ) : (
           <>
             <div className={styles.productsGrid}>
-              {filteredProducts.map((product, index) => (
+              {visibleProducts.map((product, index) => (
                 <Link
                   key={`${String(product.slug ?? product.id)}-${index}`}
                   href={buildProductHref(product.slug || product.id, {
@@ -327,10 +362,19 @@ const CatalogPageContent = ({
                     images={product.images}
                     isNew={product.isNew}
                     variant="grid"
+                    imagePriority={index < 4}
                   />
                 </Link>
               ))}
             </div>
+
+            {visibleCount < filteredProducts.length ? (
+              <div
+                ref={loadMoreRef}
+                className={styles.loadMoreSentinel}
+                aria-hidden
+              />
+            ) : null}
 
             {filteredProducts.length === 0 && (
               <div className={styles.emptyStateWrap}>
