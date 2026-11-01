@@ -203,6 +203,7 @@ const ProductCard = ({
                           : styles.productImageLoading
                       }`}
                       loading={index === 0 ? "eager" : "lazy"}
+                      fetchPriority={index === 0 ? "high" : "auto"}
                       onLoad={() => markImageLoaded(index)}
                       quality={80}
                       unoptimized={isSvgImageSrc(image)}
@@ -232,6 +233,9 @@ const ProductCard = ({
                           : styles.productImageLoading
                       }`}
                       loading={isSliderCard && index === 0 ? "eager" : "lazy"}
+                      fetchPriority={
+                        isSliderCard && index === 0 ? "high" : "auto"
+                      }
                       onLoad={() => markImageLoaded(index)}
                       quality={80}
                       unoptimized={isSvgImageSrc(image)}

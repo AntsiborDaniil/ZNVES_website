@@ -11,8 +11,13 @@ const HERO_MOBILE_POSTER = "/images/home/hero-mobile-poster.jpg";
 const NARROW_MQ = "(max-width: 768px)";
 const TOUCH_PHONE_MQ = "(pointer: coarse) and (max-width: 1024px)";
 
-/** На мобилке даём сети сначала отдать HTML/JS/картинки, потом качаем ролик. */
-const MOBILE_VIDEO_DELAY_MS = 1500;
+/** После window.load — запас, затем idle, чтобы каталог/карточки успели занять сеть. */
+const MOBILE_VIDEO_AFTER_LOAD_MS = 2000;
+
+type NetworkInformationLike = {
+  saveData?: boolean;
+  effectiveType?: string;
+};
 
 const shouldUseMobileHeroVideo = (): boolean => {
   if (typeof window === "undefined") return true;
@@ -20,6 +25,40 @@ const shouldUseMobileHeroVideo = (): boolean => {
     window.matchMedia(NARROW_MQ).matches ||
     window.matchMedia(TOUCH_PHONE_MQ).matches
   );
+};
+
+/** 2g / Save-Data — оставляем только постер, видео не качаем. */
+const isConstrainedMobileNetwork = (): boolean => {
+  if (typeof navigator === "undefined") return false;
+  const conn = (navigator as Navigator & { connection?: NetworkInformationLike })
+    .connection;
+  if (!conn) return false;
+  if (conn.saveData) return true;
+  const type = conn.effectiveType;
+  return type === "slow-2g" || type === "2g";
+};
+
+const releaseVideo = (video: HTMLVideoElement | null) => {
+  if (!video) return;
+  try {
+    video.pause();
+  } catch {
+    /* ignore */
+  }
+  video.removeAttribute("src");
+  video.load();
+};
+
+const forcePlay = (video: HTMLVideoElement) => {
+  video.muted = true;
+  video.defaultMuted = true;
+  video.playsInline = true;
+  video.setAttribute("muted", "");
+  video.setAttribute("playsinline", "");
+  const playPromise = video.play();
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch(() => {});
+  }
 };
 
 /* Инлайн, чтобы заполнение не зависело от загрузки CSS-модуля */
@@ -46,21 +85,9 @@ const posterStyle: CSSProperties = {
   zIndex: 0,
 };
 
-const forcePlay = (video: HTMLVideoElement) => {
-  video.muted = true;
-  video.defaultMuted = true;
-  video.playsInline = true;
-  video.setAttribute("muted", "");
-  video.setAttribute("playsinline", "");
-  const playPromise = video.play();
-  if (playPromise && typeof playPromise.catch === "function") {
-    playPromise.catch(() => {});
-  }
-};
-
 const HeroSection = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const delayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelScheduleRef = useRef<(() => void) | null>(null);
   // null до выбора на клиенте — desktop URL не попадает в DOM на мобилке
   const [src, setSrc] = useState<string | null>(null);
   const [useMobile, setUseMobile] = useState(false);
@@ -95,25 +122,67 @@ const HeroSection = () => {
     const narrowMq = window.matchMedia(NARROW_MQ);
     const touchPhoneMq = window.matchMedia(TOUCH_PHONE_MQ);
 
-    const clearDelay = () => {
-      if (delayTimerRef.current != null) {
-        clearTimeout(delayTimerRef.current);
-        delayTimerRef.current = null;
+    const clearSchedule = () => {
+      cancelScheduleRef.current?.();
+      cancelScheduleRef.current = null;
+    };
+
+    const scheduleMobileVideoStart = () => {
+      // Слабая сеть: только постер — не конкурируем с каталогом
+      if (isConstrainedMobileNetwork()) {
+        setSrc(null);
+        return;
       }
+
+      let idleId: number | null = null;
+      let delayId: ReturnType<typeof setTimeout> | null = null;
+      let cancelled = false;
+
+      const startVideo = () => {
+        if (cancelled) return;
+        setSrc(HERO_MOBILE_VIDEO);
+      };
+
+      const afterLoad = () => {
+        if (cancelled) return;
+        delayId = setTimeout(() => {
+          if (cancelled) return;
+          if (typeof window.requestIdleCallback === "function") {
+            idleId = window.requestIdleCallback(() => startVideo(), {
+              timeout: 3000,
+            });
+          } else {
+            startVideo();
+          }
+        }, MOBILE_VIDEO_AFTER_LOAD_MS);
+      };
+
+      if (document.readyState === "complete") {
+        afterLoad();
+      } else {
+        window.addEventListener("load", afterLoad, { once: true });
+      }
+
+      cancelScheduleRef.current = () => {
+        cancelled = true;
+        window.removeEventListener("load", afterLoad);
+        if (delayId != null) clearTimeout(delayId);
+        if (idleId != null && typeof window.cancelIdleCallback === "function") {
+          window.cancelIdleCallback(idleId);
+        }
+      };
     };
 
     const sync = () => {
-      clearDelay();
+      clearSchedule();
+      releaseVideo(videoRef.current);
+
       const mobile = shouldUseMobileHeroVideo();
       setUseMobile(mobile);
 
       if (mobile) {
-        // Сразу постер; ролик — после короткой паузы (и на узком desktop тоже)
         setSrc(null);
-        delayTimerRef.current = setTimeout(() => {
-          setSrc(HERO_MOBILE_VIDEO);
-          delayTimerRef.current = null;
-        }, MOBILE_VIDEO_DELAY_MS);
+        scheduleMobileVideoStart();
         return;
       }
 
@@ -124,10 +193,18 @@ const HeroSection = () => {
     sync();
     narrowMq.addEventListener("change", sync);
     touchPhoneMq.addEventListener("change", sync);
+
+    const onPageHide = () => {
+      releaseVideo(videoRef.current);
+    };
+    window.addEventListener("pagehide", onPageHide);
+
     return () => {
-      clearDelay();
+      clearSchedule();
+      releaseVideo(videoRef.current);
       narrowMq.removeEventListener("change", sync);
       touchPhoneMq.removeEventListener("change", sync);
+      window.removeEventListener("pagehide", onPageHide);
     };
   }, []);
 
@@ -141,9 +218,24 @@ const HeroSection = () => {
     video.addEventListener("loadeddata", onReady);
     video.addEventListener("canplay", onReady);
 
+    const onVisibility = () => {
+      if (document.hidden) {
+        try {
+          video.pause();
+        } catch {
+          /* ignore */
+        }
+      } else {
+        forcePlay(video);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
     return () => {
       video.removeEventListener("loadeddata", onReady);
       video.removeEventListener("canplay", onReady);
+      document.removeEventListener("visibilitychange", onVisibility);
+      releaseVideo(video);
     };
   }, [src]);
 
@@ -177,7 +269,7 @@ const HeroSection = () => {
           autoPlay
           loop
           playsInline
-          preload={useMobile ? "metadata" : "auto"}
+          preload="none"
           disablePictureInPicture
           aria-hidden
           tabIndex={-1}

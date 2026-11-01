@@ -3,6 +3,7 @@
 import type { ApiProduct, CatalogApiParams } from "../../types/api";
 import type { CatalogProduct } from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
+import { fetchWithTimeout } from "../../lib/fetchWithTimeout";
 import { resolveCardImages } from "../../lib/productImages";
 import { shouldUseMocks } from "../../lib/useMocks";
 
@@ -165,7 +166,7 @@ export const fetchCatalogProducts = async (
       url.searchParams.set("is_new", params.is_new.toString());
     }
 
-    const response = await fetch(url.toString(), {
+    const response = await fetchWithTimeout(url.toString(), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -226,7 +227,7 @@ export const fetchCatalogCategories = async (): Promise<ApiCatalogCategory[]> =>
     return list;
   }
   try {
-    const response = await fetch(`${CATALOG_API_URL}categories/`, {
+    const response = await fetchWithTimeout(`${CATALOG_API_URL}categories/`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       next: { revalidate: 5 * 60 },
@@ -255,7 +256,7 @@ export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
     return data;
   }
   try {
-    const response = await fetch(`${CATALOG_API_URL}colors/`, {
+    const response = await fetchWithTimeout(`${CATALOG_API_URL}colors/`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       next: { revalidate: 5 * 60 },
@@ -283,7 +284,7 @@ export const fetchCatalogSizes = async (): Promise<ApiCatalogSize[]> => {
     return data;
   }
   try {
-    const response = await fetch(`${CATALOG_API_URL}sizes/`, {
+    const response = await fetchWithTimeout(`${CATALOG_API_URL}sizes/`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       next: { revalidate: 5 * 60 },

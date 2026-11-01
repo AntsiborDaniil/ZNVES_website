@@ -94,6 +94,8 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
     const loadProducts = async () => {
       if (!hasLoadedOnceRef.current) {
         setIsLoading(true);
@@ -104,24 +106,25 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
 
         if (title === "NEW IN") {
           const newInProducts = await fetchNewInProducts(categorySlug ?? undefined);
-          setProducts(newInProducts);
+          if (!cancelled) setProducts(newInProducts);
         } else {
           const catalogProducts = await fetchCatalogProductsByCategory(categorySlug ?? undefined);
-          setProducts(catalogProducts);
+          if (!cancelled) setProducts(catalogProducts);
         }
       } catch {
-        setProducts([]);
+        if (!cancelled) setProducts([]);
       } finally {
-        hasLoadedOnceRef.current = true;
-        setIsLoading(false);
+        if (!cancelled) {
+          hasLoadedOnceRef.current = true;
+          setIsLoading(false);
+        }
       }
     };
 
-    const timeoutId = setTimeout(() => {
-      void loadProducts();
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
+    void loadProducts();
+    return () => {
+      cancelled = true;
+    };
   }, [title, categoryParam]);
 
   useEffect(() => {

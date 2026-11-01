@@ -3,6 +3,7 @@
 import type { ApiProduct, CatalogApiParams } from "../../types/api";
 import type { CatalogProduct } from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
+import { fetchWithTimeout } from "../../lib/fetchWithTimeout";
 import { resolveCardImages } from "../../lib/productImages";
 import { shouldUseMocks } from "../../lib/useMocks";
 
@@ -99,7 +100,7 @@ export const fetchCatalogProducts = async (
     // Новинки для Bestsellers — короткий TTL; пустой ISR-кеш иначе «залипает»
     const revalidateSeconds = params.is_new ? 60 : 15 * 60;
 
-    const response = await fetch(url.toString(), {
+    const response = await fetchWithTimeout(url.toString(), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

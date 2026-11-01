@@ -136,7 +136,8 @@ const CatalogGridCard = ({
                       ? styles.catalogCardImageLoaded
                       : styles.catalogCardImageLoading
                   }`}
-                  loading="lazy"
+                  loading={index === 0 ? "eager" : "lazy"}
+                  fetchPriority={index === 0 ? "high" : "auto"}
                   onLoad={() => markImageLoaded(index)}
                   quality={80}
                   unoptimized={isSvgImageSrc(image)}
