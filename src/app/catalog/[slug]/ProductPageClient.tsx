@@ -14,42 +14,74 @@ import styles from "../../not-found.module.css";
 
 type ProductPageClientProps = {
   slug: string;
+  initialProduct?: ProductDetail | null;
+  initialWarehouseItems?: ApiWarehouseItem[];
 };
 
 type LoadState =
   | { status: "loading" }
-  | { status: "ready"; product: ProductDetail; warehouseItems: ApiWarehouseItem[] }
+  | {
+      status: "ready";
+      product: ProductDetail;
+      warehouseItems: ApiWarehouseItem[];
+    }
   | { status: "not-found" }
   | { status: "error" };
 
-const ProductPageBody = ({ slug }: ProductPageClientProps) => {
-  const [state, setState] = useState<LoadState>({ status: "loading" });
+const ProductPageBody = ({
+  slug,
+  initialProduct = null,
+  initialWarehouseItems = [],
+}: ProductPageClientProps) => {
+  const hasSsr = initialProduct != null;
+
+  const [state, setState] = useState<LoadState>(() =>
+    hasSsr && initialProduct
+      ? {
+          status: "ready",
+          product: initialProduct,
+          warehouseItems: initialWarehouseItems,
+        }
+      : { status: "loading" }
+  );
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
-    setState({ status: "loading" });
+
+    // SSR уже отдал товар — тихий soft-refresh без скелетона
+    const quiet = hasSsr && attempt === 0;
+    if (!quiet) {
+      setState({ status: "loading" });
+    }
 
     fetchProductWithWarehouse(slug)
       .then((data) => {
         if (cancelled) return;
-        setState(
-          data
-            ? { status: "ready", product: data.product, warehouseItems: data.warehouseItems }
-            : { status: "not-found" }
-        );
+        if (data) {
+          setState({
+            status: "ready",
+            product: data.product,
+            warehouseItems: data.warehouseItems,
+          });
+          return;
+        }
+        if (!quiet) {
+          setState({ status: "not-found" });
+        }
       })
       .catch((error) => {
         if (cancelled) return;
-        // Сетевые ошибки и ошибки разбора ответа — не 404, показываем их как ошибку загрузки
         console.error(`Не удалось загрузить товар «${slug}»`, error);
-        setState({ status: "error" });
+        if (!quiet) {
+          setState({ status: "error" });
+        }
       });
 
     return () => {
       cancelled = true;
     };
-  }, [slug, attempt]);
+  }, [slug, attempt, hasSsr]);
 
   const handleRetry = useCallback(() => setAttempt((value) => value + 1), []);
 
@@ -57,7 +89,6 @@ const ProductPageBody = ({ slug }: ProductPageClientProps) => {
     return <LoadingStub label="Загрузка товара…" />;
   }
 
-  // notFound() вызываем только при рендере — из async-колбэка Next его не перехватывает
   if (state.status === "not-found") {
     notFound();
   }
@@ -70,10 +101,15 @@ const ProductPageBody = ({ slug }: ProductPageClientProps) => {
           <div className={styles.card}>
             <h1 className={styles.title}>Не удалось загрузить товар</h1>
             <p className={styles.description}>
-              Произошла ошибка при загрузке. Попробуйте обновить страницу чуть позже.
+              Произошла ошибка при загрузке. Попробуйте обновить страницу чуть
+              позже.
             </p>
             <div className={styles.actions}>
-              <button type="button" className={styles.primaryButton} onClick={handleRetry}>
+              <button
+                type="button"
+                className={styles.primaryButton}
+                onClick={handleRetry}
+              >
                 Повторить
               </button>
               <Link href="/catalog" className={styles.secondaryButton}>
@@ -88,14 +124,25 @@ const ProductPageBody = ({ slug }: ProductPageClientProps) => {
   }
 
   return (
-    <ProductPageView product={state.product} warehouseItems={state.warehouseItems} />
+    <ProductPageView
+      product={state.product}
+      warehouseItems={state.warehouseItems}
+    />
   );
 };
 
-const ProductPageClient = ({ slug }: ProductPageClientProps) => {
+const ProductPageClient = ({
+  slug,
+  initialProduct = null,
+  initialWarehouseItems = [],
+}: ProductPageClientProps) => {
   return (
     <Suspense fallback={<LoadingStub label="Загрузка товара…" />}>
-      <ProductPageBody slug={slug} />
+      <ProductPageBody
+        slug={slug}
+        initialProduct={initialProduct}
+        initialWarehouseItems={initialWarehouseItems}
+      />
     </Suspense>
   );
 };
