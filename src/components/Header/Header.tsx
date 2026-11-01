@@ -10,10 +10,7 @@ import AccountPopover from "../AccountPopover/AccountPopover";
 import CatalogMegaMenu from "../CatalogMegaMenu/CatalogMegaMenu";
 import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
-import {
-  fetchCatalogCategories,
-  type ApiCatalogCategory,
-} from "../../api/catalog/catalogApi";
+import { useCatalogCategories } from "../../contexts/CatalogCategoriesContext";
 import styles from "./Header.module.css";
 
 type HeaderVariant = "transparent" | "green" | "solid" | "light";
@@ -27,20 +24,12 @@ const Header = ({ variant = "solid" }: HeaderProps) => {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isMobileHeader, setIsMobileHeader] = useState(false);
-  const [catalogCategories, setCatalogCategories] = useState<ApiCatalogCategory[]>(
-    []
-  );
   const catalogButtonRef = useRef<HTMLButtonElement>(null);
   const catalogMenuRef = useRef<HTMLDivElement>(null);
   const { getTotalItems, openCart } = useCart();
   const { isAuthenticated, openAuth } = useAuth();
+  const { categories: catalogCategories } = useCatalogCategories();
   const cartCount = getTotalItems();
-
-  useEffect(() => {
-    void fetchCatalogCategories().then((data) => {
-      setCatalogCategories(data);
-    });
-  }, []);
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 1024px)");

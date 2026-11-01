@@ -5,10 +5,12 @@ import "./globals.css";
 import NavigationTracker from "../components/NavigationTracker/NavigationTracker";
 import { CartProvider } from "../contexts/CartContext";
 import { AuthProvider } from "../contexts/AuthContext";
+import { CatalogCategoriesProvider } from "../contexts/CatalogCategoriesContext";
 import { ToastProvider } from "../components/ui/ToastProvider/ToastProvider";
 import ClientModalHosts from "../components/ClientModalHosts/ClientModalHosts";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import MockProvider from "../components/MockProvider/MockProvider";
+import { fetchCatalogCategories } from "../api/catalog/catalogApi";
 
 /* Без массива weight: Turbopack падает на next/font/google
    ("queries have exactly one entry" / @vercel/turbopack-next/.../font).
@@ -62,7 +64,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const initialCategories = await fetchCatalogCategories();
+
   return (
     <html lang="ru" className={inter.variable}>
       <body className={inter.className}>
@@ -70,10 +74,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <ToastProvider>
             <AuthProvider>
               <CartProvider>
-                <NavigationTracker />
-                {children}
-                <ClientModalHosts />
-                <CookieBanner />
+                <CatalogCategoriesProvider initialCategories={initialCategories}>
+                  <NavigationTracker />
+                  {children}
+                  <ClientModalHosts />
+                  <CookieBanner />
+                </CatalogCategoriesProvider>
               </CartProvider>
             </AuthProvider>
           </ToastProvider>

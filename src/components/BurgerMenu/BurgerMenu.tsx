@@ -8,12 +8,11 @@ import styles from "./BurgerMenu.module.css";
 import { useKeyboardEvent } from "../../hooks/useKeyboardEvent";
 import {
   buildCatalogCategoryHref,
-  fetchCatalogCategories,
   getCatalogCategoryLabel,
-  type ApiCatalogCategory,
 } from "../../api/catalog/catalogApi";
 import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
+import { useCatalogCategories } from "../../contexts/CatalogCategoriesContext";
 
 type BurgerMenuProps = {
   isOpen: boolean;
@@ -26,14 +25,8 @@ const BurgerMenu = ({ isOpen, onToggle }: BurgerMenuProps) => {
   const searchParams = useSearchParams();
   const { openCart, isCartOpen } = useCart();
   const { isAuthenticated, openAuth } = useAuth();
+  const { categories: catalogCategories } = useCatalogCategories();
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
-  const [catalogCategories, setCatalogCategories] = useState<ApiCatalogCategory[]>([]);
-
-  useEffect(() => {
-    void fetchCatalogCategories().then((data) => {
-      setCatalogCategories(data);
-    });
-  }, []);
 
   useEffect(() => {
     if (isOpen) {

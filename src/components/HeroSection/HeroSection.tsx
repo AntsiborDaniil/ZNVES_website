@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { HERO_RELEASE_EVENT } from "../NavigationTracker/NavigationTracker";
 import styles from "./HeroSection.module.css";
 
 const HERO_DESKTOP_VIDEO = "/videos/home/hero-desktop-v4.mp4";
@@ -196,8 +197,15 @@ const HeroSection = () => {
 
     const onPageHide = () => {
       releaseVideo(videoRef.current);
+      setSrc(null);
+    };
+    const onHeroRelease = () => {
+      clearSchedule();
+      releaseVideo(videoRef.current);
+      setSrc(null);
     };
     window.addEventListener("pagehide", onPageHide);
+    window.addEventListener(HERO_RELEASE_EVENT, onHeroRelease);
 
     return () => {
       clearSchedule();
@@ -205,6 +213,7 @@ const HeroSection = () => {
       narrowMq.removeEventListener("change", sync);
       touchPhoneMq.removeEventListener("change", sync);
       window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener(HERO_RELEASE_EVENT, onHeroRelease);
     };
   }, []);
 

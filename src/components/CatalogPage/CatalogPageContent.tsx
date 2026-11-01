@@ -15,16 +15,19 @@ import Link from "next/link";
 import type { CatalogProduct } from "../../types/products";
 import {
   fetchCatalogProductsByCategory,
-  fetchCatalogCategories,
   getCatalogCategoryLabel,
   resolveCategorySlug,
   type ApiCatalogCategory,
 } from "../../api/catalog/catalogApi";
 import { fetchNewInProducts } from "../../api/new-in/newInApi";
 import { buildProductHref } from "../../lib/productNavigation";
+import { useCatalogCategories } from "../../contexts/CatalogCategoriesContext";
 
 type CatalogPageContentProps = {
   title: string;
+  initialProducts?: CatalogProduct[];
+  initialCategories?: ApiCatalogCategory[];
+  initialCategoryParam?: string | null;
 };
 
 const categoryFromUrl = (param: string | null): string => {
@@ -32,29 +35,43 @@ const categoryFromUrl = (param: string | null): string => {
   return resolveCategorySlug(param) ?? "all";
 };
 
-const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
+const CatalogPageContent = ({
+  title,
+  initialProducts = [],
+  initialCategories = [],
+  initialCategoryParam = null,
+}: CatalogPageContentProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const {
+    categories: sharedCategories,
+    refresh: refreshSharedCategories,
+  } = useCatalogCategories();
 
-  const categoryParam = searchParams?.get("category");
+  const categoryParam =
+    searchParams?.get("category") ?? initialCategoryParam ?? null;
   const navFrom = title === "NEW IN" ? "new-in" : "catalog";
 
-  const [products, setProducts] = useState<CatalogProduct[]>([]);
-  const [categories, setCategories] = useState<ApiCatalogCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
+  const [products, setProducts] = useState<CatalogProduct[]>(initialProducts);
+  const [categories, setCategories] = useState<ApiCatalogCategory[]>(() =>
+    initialCategories.length > 0 ? initialCategories : sharedCategories
+  );
+  const [isLoading, setIsLoading] = useState(initialProducts.length === 0);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(
+    initialCategories.length === 0 && sharedCategories.length === 0
+  );
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const [activeCategory, setActiveCategory] = useState<string>(
     categoryFromUrl(categoryParam)
   );
   const categoriesRef = useRef<HTMLElement | null>(null);
-  /** true после первой успешной загрузки — при смене категории скелетон не показываем */
-  const hasLoadedOnceRef = useRef(false);
+  const ssrProductsUsedRef = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
-  // Обработчики для drag-скролла категорий
+
   const handleMouseDown = (e: React.MouseEvent<HTMLElement>) => {
     if (!categoriesRef.current) return;
     setIsDragging(true);
@@ -79,45 +96,74 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
   };
 
   useEffect(() => {
-    const loadCategories = async () => {
+    if (sharedCategories.length > 0) {
+      setCategories(sharedCategories);
+      setIsCategoriesLoading(false);
+    }
+  }, [sharedCategories]);
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      setIsCategoriesLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    void (async () => {
       setIsCategoriesLoading(true);
       try {
-        const categoriesData = await fetchCatalogCategories();
-        setCategories(categoriesData);
-      } catch {
-        setCategories([]);
+        await refreshSharedCategories();
       } finally {
-        setIsCategoriesLoading(false);
+        if (!cancelled) setIsCategoriesLoading(false);
       }
+    })();
+    return () => {
+      cancelled = true;
     };
-    void loadCategories();
-  }, []);
+  }, [categories.length, refreshSharedCategories]);
 
   useEffect(() => {
     let cancelled = false;
 
     const loadProducts = async () => {
-      if (!hasLoadedOnceRef.current) {
+      const useSsrQuiet =
+        !ssrProductsUsedRef.current && initialProducts.length > 0;
+      if (useSsrQuiet) {
+        ssrProductsUsedRef.current = true;
+        setIsLoading(false);
+      } else if (products.length === 0) {
         setIsLoading(true);
       }
+
+      setLoadError(null);
+
       try {
         const categorySlug =
-          categoryParam == null ? undefined : resolveCategorySlug(categoryParam) ?? undefined;
+          categoryParam == null
+            ? undefined
+            : resolveCategorySlug(categoryParam) ?? undefined;
 
-        if (title === "NEW IN") {
-          const newInProducts = await fetchNewInProducts(categorySlug ?? undefined);
-          if (!cancelled) setProducts(newInProducts);
-        } else {
-          const catalogProducts = await fetchCatalogProductsByCategory(categorySlug ?? undefined);
-          if (!cancelled) setProducts(catalogProducts);
+        const nextProducts =
+          title === "NEW IN"
+            ? await fetchNewInProducts(categorySlug)
+            : await fetchCatalogProductsByCategory(categorySlug);
+
+        if (cancelled) return;
+
+        // Пустой ответ при живом SSR не затираем (часто сеть/timeout)
+        if (nextProducts.length > 0) {
+          setProducts(nextProducts);
+        } else if (!useSsrQuiet) {
+          setProducts(nextProducts);
         }
       } catch {
-        if (!cancelled) setProducts([]);
-      } finally {
-        if (!cancelled) {
-          hasLoadedOnceRef.current = true;
-          setIsLoading(false);
+        if (!cancelled && products.length === 0) {
+          setLoadError(
+            "Не удалось загрузить товары. Проверьте сеть и попробуйте ещё раз."
+          );
         }
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
     };
 
@@ -125,7 +171,8 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
     return () => {
       cancelled = true;
     };
-  }, [title, categoryParam]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- products length только для UX скелетона
+  }, [title, categoryParam, initialProducts.length]);
 
   useEffect(() => {
     setActiveCategory(categoryFromUrl(categoryParam));
@@ -143,7 +190,6 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
         }
       }
 
-      // Убираем старые query фильтров, если остались в URL
       params.delete("color");
       params.delete("size");
       params.delete("order");
@@ -163,6 +209,36 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
     },
     [updateURL]
   );
+
+  const handleRetry = useCallback(() => {
+    setLoadError(null);
+    setIsLoading(true);
+    void (async () => {
+      try {
+        const categorySlug =
+          categoryParam == null
+            ? undefined
+            : resolveCategorySlug(categoryParam) ?? undefined;
+        const nextProducts =
+          title === "NEW IN"
+            ? await fetchNewInProducts(categorySlug)
+            : await fetchCatalogProductsByCategory(categorySlug);
+        setProducts(nextProducts);
+        if (nextProducts.length === 0) {
+          setLoadError(
+            "Не удалось загрузить товары. Проверьте сеть и попробуйте ещё раз."
+          );
+        }
+        await refreshSharedCategories();
+      } catch {
+        setLoadError(
+          "Не удалось загрузить товары. Проверьте сеть и попробуйте ещё раз."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, [categoryParam, title, refreshSharedCategories]);
 
   const filteredProducts = useMemo(() => {
     return [...products].sort((a, b) => a.sortOrder - b.sortOrder);
@@ -239,8 +315,6 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
                   key={`${String(product.slug ?? product.id)}-${index}`}
                   href={buildProductHref(product.slug || product.id, {
                     from: navFrom,
-                    // Не подставляем product.category при "all" — иначе в крошках
-                    // появляется фейковый/дефолтный "t-shirt"
                     category:
                       activeCategory !== "all" ? activeCategory : null,
                   })}
@@ -292,20 +366,38 @@ const CatalogPageContent = ({ title }: CatalogPageContentProps) => {
                     </svg>
                   </div>
                 </div>
-                <h2 className={styles.emptyStateTitle}>Таких товаров нет</h2>
+                <h2 className={styles.emptyStateTitle}>
+                  {loadError ? "Не удалось загрузить" : "Таких товаров нет"}
+                </h2>
                 <p className={styles.emptyStateText}>
-                  В этой выборке пока пусто.
-                  <br />
-                  Откройте весь каталог — там есть что посмотреть.
+                  {loadError ? (
+                    loadError
+                  ) : (
+                    <>
+                      В этой выборке пока пусто.
+                      <br />
+                      Откройте весь каталог — там есть что посмотреть.
+                    </>
+                  )}
                 </p>
-                {activeCategory !== "all" && (
+                {loadError ? (
                   <button
                     type="button"
                     className={styles.emptyStateButton}
-                    onClick={() => handleCategoryChange("all")}
+                    onClick={handleRetry}
                   >
-                    Смотреть все
+                    Повторить
                   </button>
+                ) : (
+                  activeCategory !== "all" && (
+                    <button
+                      type="button"
+                      className={styles.emptyStateButton}
+                      onClick={() => handleCategoryChange("all")}
+                    >
+                      Смотреть все
+                    </button>
+                  )
                 )}
               </div>
             )}
