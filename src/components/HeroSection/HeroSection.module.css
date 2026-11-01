@@ -22,4 +22,28 @@
   border: 0;
   outline: 0;
   pointer-events: none;
+  /* Без нативных play/pause оверлеев iOS/Safari */
+  -webkit-appearance: none;
+}
+
+.heroVideo::-webkit-media-controls,
+.heroVideo::-webkit-media-controls-enclosure,
+.heroVideo::-webkit-media-controls-panel,
+.heroVideo::-webkit-media-controls-panel-container,
+.heroVideo::-webkit-media-controls-start-playback-button,
+.heroVideo::-webkit-media-controls-overlay-play-button,
+.heroVideo::-webkit-media-controls-play-button,
+.heroVideo::-webkit-media-controls-timeline,
+.heroVideo::-webkit-media-controls-current-time-display,
+.heroVideo::-webkit-media-controls-time-remaining-display,
+.heroVideo::-webkit-media-controls-mute-button,
+.heroVideo::-webkit-media-controls-toggle-closed-captions-button,
+.heroVideo::-webkit-media-controls-volume-slider,
+.heroVideo::-webkit-media-controls-fullscreen-button {
+  display: none !important;
+  -webkit-appearance: none;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none !important;
 }

@@ -9,11 +9,22 @@ type LoadingStubProps = {
   inline?: boolean;
 };
 
-export default function LoadingStub({ label = "Загрузка…", inline }: LoadingStubProps) {
+export default function LoadingStub({
+  label = "Загрузка…",
+  inline,
+}: LoadingStubProps) {
   return (
-    <div className={inline ? styles.inline : styles.wrapper}>
-      <div className={styles.spinner} aria-hidden />
-      {label && <p className={styles.label}>{label}</p>}
+    <div
+      className={inline ? styles.inline : styles.wrapper}
+      role="status"
+      aria-busy="true"
+      aria-label={label}
+    >
+      <div className={styles.mark} aria-hidden>
+        <span className={styles.ring} />
+        <span className={styles.core} />
+      </div>
+      {label ? <p className={styles.label}>{label}</p> : null}
     </div>
   );
 }

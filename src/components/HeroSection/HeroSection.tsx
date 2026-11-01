@@ -12,8 +12,8 @@ const HERO_MOBILE_POSTER = "/images/home/hero-mobile-poster.jpg";
 const NARROW_MQ = "(max-width: 768px)";
 const TOUCH_PHONE_MQ = "(pointer: coarse) and (max-width: 1024px)";
 
-/** После window.load — запас, затем idle, чтобы каталог/карточки успели занять сеть. */
-const MOBILE_VIDEO_AFTER_LOAD_MS = 2000;
+/** Короткий запас после load — сеть для LCP, но автоплей не «остывает». */
+const MOBILE_VIDEO_AFTER_LOAD_MS = 600;
 
 type NetworkInformationLike = {
   saveData?: boolean;
@@ -50,17 +50,42 @@ const releaseVideo = (video: HTMLVideoElement | null) => {
   video.load();
 };
 
-const forcePlay = (video: HTMLVideoElement) => {
+/** Mute + playsInline ДО play — иначе iOS показывает кнопку запуска. */
+const armAutoplay = (video: HTMLVideoElement) => {
   video.muted = true;
   video.defaultMuted = true;
-  video.playsInline = true;
+  video.autoplay = true;
   video.loop = true;
+  video.playsInline = true;
+  video.controls = false;
   video.setAttribute("muted", "");
-  video.setAttribute("playsinline", "");
+  video.setAttribute("autoplay", "");
   video.setAttribute("loop", "");
+  video.setAttribute("playsinline", "");
+  video.setAttribute("webkit-playsinline", "");
+  video.setAttribute("disablepictureinpicture", "");
+  video.removeAttribute("controls");
+  if ("disableRemotePlayback" in video) {
+    try {
+      (video as HTMLVideoElement & { disableRemotePlayback: boolean }).disableRemotePlayback =
+        true;
+    } catch {
+      /* ignore */
+    }
+  }
+};
+
+const forcePlay = (video: HTMLVideoElement) => {
+  armAutoplay(video);
   const playPromise = video.play();
   if (playPromise && typeof playPromise.catch === "function") {
-    playPromise.catch(() => {});
+    playPromise.catch(() => {
+      // Повтор после жеста/готовности кадра
+      window.setTimeout(() => {
+        armAutoplay(video);
+        void video.play().catch(() => {});
+      }, 250);
+    });
   }
 };
 
@@ -91,6 +116,7 @@ const posterStyle: CSSProperties = {
 const HeroSection = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const cancelScheduleRef = useRef<(() => void) | null>(null);
+  const releasedRef = useRef(false);
   // null до выбора на клиенте — desktop URL не попадает в DOM на мобилке
   const [src, setSrc] = useState<string | null>(null);
   const [useMobile, setUseMobile] = useState(false);
@@ -124,6 +150,7 @@ const HeroSection = () => {
   useLayoutEffect(() => {
     const narrowMq = window.matchMedia(NARROW_MQ);
     const touchPhoneMq = window.matchMedia(TOUCH_PHONE_MQ);
+    releasedRef.current = false;
 
     const clearSchedule = () => {
       cancelScheduleRef.current?.();
@@ -141,7 +168,7 @@ const HeroSection = () => {
       let cancelled = false;
 
       const startVideo = () => {
-        if (cancelled) return;
+        if (cancelled || releasedRef.current) return;
         setSrc(HERO_MOBILE_VIDEO);
       };
 
@@ -151,7 +178,7 @@ const HeroSection = () => {
           if (cancelled) return;
           if (typeof window.requestIdleCallback === "function") {
             idleId = window.requestIdleCallback(() => startVideo(), {
-              timeout: 3000,
+              timeout: 1500,
             });
           } else {
             startVideo();
@@ -198,14 +225,23 @@ const HeroSection = () => {
     narrowMq.addEventListener("change", sync);
     touchPhoneMq.addEventListener("change", sync);
 
-    // Только уход с главной — освобождаем сеть для каталога.
-    // pagehide/visibility НЕ трогаем: на iOS они срабатывают при скролле/сворачивании.
     const onHeroRelease = () => {
+      releasedRef.current = true;
       clearSchedule();
       releaseVideo(videoRef.current);
       setSrc(null);
     };
     window.addEventListener(HERO_RELEASE_EVENT, onHeroRelease);
+
+    // Любой первый жест — добиваем autoplay, если iOS блокировал
+    const unlock = () => {
+      const video = videoRef.current;
+      if (video && !releasedRef.current && video.paused && video.currentSrc) {
+        forcePlay(video);
+      }
+    };
+    window.addEventListener("touchstart", unlock, { passive: true, once: true });
+    window.addEventListener("click", unlock, { once: true });
 
     return () => {
       clearSchedule();
@@ -213,36 +249,49 @@ const HeroSection = () => {
       narrowMq.removeEventListener("change", sync);
       touchPhoneMq.removeEventListener("change", sync);
       window.removeEventListener(HERO_RELEASE_EVENT, onHeroRelease);
+      window.removeEventListener("touchstart", unlock);
+      window.removeEventListener("click", unlock);
     };
   }, []);
 
   useLayoutEffect(() => {
     const video = videoRef.current;
-    if (!video || !src) return;
+    if (!video || !src || releasedRef.current) return;
 
     forcePlay(video);
 
-    const onReady = () => forcePlay(video);
-    const onEnded = () => forcePlay(video);
-    video.addEventListener("loadeddata", onReady);
-    video.addEventListener("canplay", onReady);
-    video.addEventListener("ended", onEnded);
-    // Если браузер поставил на pause сам — возвращаем play (кроме реального ухода)
+    const onReady = () => {
+      if (!releasedRef.current) forcePlay(video);
+    };
+    const onEnded = () => {
+      if (!releasedRef.current) forcePlay(video);
+    };
     const onPause = () => {
+      if (releasedRef.current) return;
       if (document.visibilityState !== "visible") return;
-      // После releaseVideo src пустой — не реанимируем
       if (!video.getAttribute("src") && !video.currentSrc) return;
       forcePlay(video);
     };
+
+    video.addEventListener("loadeddata", onReady);
+    video.addEventListener("canplay", onReady);
+    video.addEventListener("canplaythrough", onReady);
+    video.addEventListener("ended", onEnded);
     video.addEventListener("pause", onPause);
 
     return () => {
       video.removeEventListener("loadeddata", onReady);
       video.removeEventListener("canplay", onReady);
+      video.removeEventListener("canplaythrough", onReady);
       video.removeEventListener("ended", onEnded);
       video.removeEventListener("pause", onPause);
     };
   }, [src]);
+
+  const bindVideoRef = (el: HTMLVideoElement | null) => {
+    videoRef.current = el;
+    if (el) armAutoplay(el);
+  };
 
   return (
     <section
@@ -265,7 +314,7 @@ const HeroSection = () => {
       {src ? (
         <video
           key={src}
-          ref={videoRef}
+          ref={bindVideoRef}
           className={styles.heroVideo}
           style={{ ...videoStyle, zIndex: 1 }}
           src={src}
@@ -274,8 +323,11 @@ const HeroSection = () => {
           autoPlay
           loop
           playsInline
-          preload={useMobile ? "metadata" : "auto"}
+          preload="auto"
+          controls={false}
+          controlsList="nodownload nofullscreen noremoteplayback noplaybackrate"
           disablePictureInPicture
+          disableRemotePlayback
           aria-hidden
           tabIndex={-1}
         />

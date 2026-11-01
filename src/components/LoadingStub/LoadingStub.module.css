@@ -4,8 +4,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 20px;
   min-height: 50vh;
-  padding: 2rem;
+  padding: 48px 24px;
+  background: var(--color-white);
 }
 
 .inline {
@@ -13,16 +15,32 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  gap: 16px;
+  padding: 32px 20px;
 }
 
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 3px solid rgba(82, 82, 82, 0.15);
-  border-top-color: #2d5a27;
+.mark {
+  position: relative;
+  width: 36px;
+  height: 36px;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--color-grey-3);
+  border-top-color: var(--color-black);
   border-radius: 50%;
-  animation: spin 0.9s linear infinite;
+  animation: spin 0.85s linear infinite;
+}
+
+.core {
+  position: absolute;
+  inset: 11px;
+  background: var(--color-black);
+  border-radius: 50%;
+  opacity: 0.12;
+  animation: pulse 1.4s ease-in-out infinite;
 }
 
 @keyframes spin {
@@ -31,10 +49,24 @@
   }
 }
 
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.1;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.22;
+    transform: scale(1);
+  }
+}
+
 .label {
-  margin: 1rem 0 0 0;
-  color: #525252c9;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  margin: 0;
+  color: var(--color-grey-4);
+  font-family: var(--font-family);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-light);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
