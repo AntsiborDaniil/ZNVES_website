@@ -164,13 +164,13 @@ export const fetchCatalogProducts = async (
   }
 };
 
-/** Cover-only DTO для слайдеров главной — меньше JSON на LTE */
+/** Лёгкий DTO для главной: без variants/colors; до 5 фото для desktop hover */
 export const toCoverOnlyProducts = (
   products: CatalogProduct[]
 ): CatalogProduct[] =>
   products.map((product) => ({
     ...product,
-    images: product.images.slice(0, 1),
+    images: product.images.slice(0, 5),
     colors: undefined,
     sizes: undefined,
     variants: undefined,

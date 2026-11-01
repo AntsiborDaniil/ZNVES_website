@@ -50,23 +50,26 @@ const ProductCard = ({
   imagePriority = false,
   loadImage = true,
 }: ProductCardProps) => {
+  // null до mount — SSR и первый client paint совпадают (без Swiper)
+  const [hoverEnabled, setHoverEnabled] = useState<boolean | null>(null);
+  const isDesktopHover = hoverEnabled === true;
+
   const imageList = useMemo(() => {
     if (images.length === 0) {
       return ["/images/catalogs/placeholder.png"];
     }
-    // Слайдеры главной / section — только cover
-    if (isSliderCard) {
+    // Mobile slider: только cover. Desktop — все кадры для hover
+    if (isSliderCard && hoverEnabled === false) {
       return [images[0]];
     }
     return images;
-  }, [images, isSliderCard]);
+  }, [images, isSliderCard, hoverEnabled]);
 
   const hasCarousel = imageList.length > 1;
   const [currentIndex, setCurrentIndex] = useState(0);
-  // null до mount — SSR и первый client paint совпадают (без Swiper)
-  const [hoverEnabled, setHoverEnabled] = useState<boolean | null>(null);
-  const isDesktopHover = hoverEnabled === true;
   const useImageSwiper = hoverEnabled === false && hasCarousel && !isSliderCard;
+  /** Одиночный cover только на mobile-слайдере; на desktop — hover-стек */
+  const useSliderCoverOnly = isSliderCard && !isDesktopHover;
 
   // Priority / явный loadImage=false: сразу; иначе — IO (каталог ниже fold)
   const [nearViewport, setNearViewport] = useState(
@@ -185,7 +188,7 @@ const ProductCard = ({
               : undefined
           }
         >
-          {isSliderCard ? (
+          {useSliderCoverOnly ? (
             <>
               <div
                 className={`${styles.imageShimmer} ${
