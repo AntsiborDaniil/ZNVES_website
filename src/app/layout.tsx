@@ -10,9 +10,11 @@ import ClientModalHosts from "../components/ClientModalHosts/ClientModalHosts";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import MockProvider from "../components/MockProvider/MockProvider";
 
+/* Без массива weight: Turbopack падает на next/font/google
+   ("queries have exactly one entry" / @vercel/turbopack-next/.../font).
+   Variable Inter тянет все начертания одним файлом. */
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
-  weight: ["300", "400", "500", "700"],
   variable: "--font-inter",
   display: "swap",
   preload: true,

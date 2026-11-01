@@ -1,5 +1,5 @@
 import type { AuthUser } from "../../api/auth/authApi";
-import { MOCK_AUTH_CODE, MOCK_DEV_USER } from "../config";
+import { MOCK_AUTH_CODE, MOCK_DEV_USER } from "../data/account";
 
 type PendingVerification = {
   kind: "register" | "login";
@@ -23,12 +23,92 @@ const passwordResetTokens = new Map<string, string>();
 const sessions = new Map<string, string>();
 
 let sessionCounter = 0;
-/** Последняя успешная сессия — fallback для browser MSW, где Set-Cookie с API-домена не ставится. */
+/** Последняя успешная сессия в памяти (до reload). */
 let lastSessionToken: string | null = null;
+
+/**
+ * Browser MSW не может выставить cookie для api.znves.ru с localhost
+ * (cross-origin Set-Cookie игнорируется). Храним сессию на origin страницы.
+ */
+const MOCK_SESSION_STORAGE_KEY = "znves:mock-access-session";
+
+type PersistedMockSession = {
+  token: string;
+  email: string;
+};
 
 const emailKey = (email: string): string => email.trim().toLowerCase();
 
 const buildUsername = (email: string): string => email.split("@")[0] ?? "user";
+
+const canUseWebStorage = (): boolean =>
+  typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+
+const readPersistedMockSession = (): PersistedMockSession | null => {
+  if (!canUseWebStorage()) return null;
+  try {
+    const raw = window.localStorage.getItem(MOCK_SESSION_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedMockSession;
+    if (
+      typeof parsed?.token === "string" &&
+      parsed.token &&
+      typeof parsed?.email === "string" &&
+      parsed.email
+    ) {
+      return { token: parsed.token, email: emailKey(parsed.email) };
+    }
+  } catch {
+    /* ignore */
+  }
+  return null;
+};
+
+const persistMockSession = (token: string, email: string): void => {
+  const payload: PersistedMockSession = {
+    token,
+    email: emailKey(email),
+  };
+  lastSessionToken = token;
+
+  if (canUseWebStorage()) {
+    try {
+      window.localStorage.setItem(MOCK_SESSION_STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+      /* ignore */
+    }
+  }
+
+  // Видно в Application → Cookies на localhost (для отладки).
+  // На запросы к api.znves.ru браузер его не отправит — handlers читают localStorage.
+  if (typeof document !== "undefined") {
+    document.cookie = `access-token=${encodeURIComponent(token)}; Path=/; SameSite=Lax`;
+  }
+};
+
+const clearPersistedMockSession = (): void => {
+  lastSessionToken = null;
+  if (canUseWebStorage()) {
+    try {
+      window.localStorage.removeItem(MOCK_SESSION_STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
+  if (typeof document !== "undefined") {
+    document.cookie =
+      "access-token=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
+  }
+};
+
+/** После reload: поднять token→email в память из localStorage. */
+const restorePersistedSessionIntoMemory = (): void => {
+  const persisted = readPersistedMockSession();
+  if (!persisted) return;
+  if (!users.has(persisted.email)) return;
+  sessions.set(persisted.token, persisted.email);
+  lastSessionToken = persisted.token;
+};
 
 const createAuthUser = (
   email: string,
@@ -71,8 +151,24 @@ export const resetAuthStore = (): void => {
   passwordResetTokens.clear();
   sessions.clear();
   sessionCounter = 0;
+  clearPersistedMockSession();
+  seedDevUser();
+};
+
+/**
+ * Имитация перезагрузки страницы в тестах:
+ * память пустая, localStorage с сессией сохранён.
+ */
+export const simulateAuthStoreReload = (): void => {
+  users.clear();
+  pendingVerifications.clear();
+  pendingPasswordResets.clear();
+  passwordResetTokens.clear();
+  sessions.clear();
+  sessionCounter = 0;
   lastSessionToken = null;
   seedDevUser();
+  restorePersistedSessionIntoMemory();
 };
 
 export const startRegistration = (payload: {
@@ -146,7 +242,7 @@ export const verifyCode = (
     pendingVerifications.delete(key);
     const token = `mock-session-${++sessionCounter}`;
     sessions.set(token, key);
-    lastSessionToken = token;
+    persistMockSession(token, key);
     return { ok: true, token, user };
   }
 
@@ -158,26 +254,45 @@ export const verifyCode = (
   pendingVerifications.delete(key);
   const token = `mock-session-${++sessionCounter}`;
   sessions.set(token, key);
-  lastSessionToken = token;
+  persistMockSession(token, key);
   return { ok: true, token, user: stored.user };
 };
 
-export const getUserByToken = (token: string | null): AuthUser | null => {
-  if (token) {
-    const email = sessions.get(token);
-    if (email) {
-      return users.get(email)?.user ?? null;
-    }
-  }
+/**
+ * Резолв сессии для MSW-handlers:
+ * 1) Cookie заголовка (если браузер/тесты его прислали)
+ * 2) localStorage на origin страницы (основной путь в browser MSW)
+ * 3) lastSessionToken в памяти
+ */
+export const resolveSessionToken = (cookieHeader: string | null): string | null => {
+  restorePersistedSessionIntoMemory();
+  return parseAccessToken(cookieHeader) || lastSessionToken || readPersistedMockSession()?.token || null;
+};
 
-  if (lastSessionToken && lastSessionToken !== token) {
-    const email = sessions.get(lastSessionToken);
+export const getUserByToken = (token: string | null): AuthUser | null => {
+  restorePersistedSessionIntoMemory();
+
+  const candidates = [token, lastSessionToken, readPersistedMockSession()?.token];
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    const email = sessions.get(candidate);
     if (email) {
       return users.get(email)?.user ?? null;
     }
   }
 
   return null;
+};
+
+export const clearMockAuthSession = (): void => {
+  if (lastSessionToken) {
+    sessions.delete(lastSessionToken);
+  }
+  const persisted = readPersistedMockSession();
+  if (persisted) {
+    sessions.delete(persisted.token);
+  }
+  clearPersistedMockSession();
 };
 
 export const updateUserByToken = (

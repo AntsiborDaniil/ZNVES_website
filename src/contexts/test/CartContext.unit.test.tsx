@@ -107,4 +107,32 @@ describe("CartProvider promo reset", () => {
       screen.queryByText("Промокод сброшен — изменился состав корзины")
     ).not.toBeInTheDocument();
   });
+
+  it("keeps promo while cart composition stays the same", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ToastProvider>
+        <CartProvider>
+          <PromoCartControls />
+        </CartProvider>
+      </ToastProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("promo")).toHaveTextContent("none");
+    });
+
+    await user.click(screen.getByRole("button", { name: "Apply promo" }));
+    expect(screen.getByTestId("promo")).toHaveTextContent("SALE10");
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(screen.getByTestId("promo")).toHaveTextContent("SALE10");
+    expect(
+      screen.queryByText("Промокод сброшен — изменился состав корзины")
+    ).not.toBeInTheDocument();
+  });
 });

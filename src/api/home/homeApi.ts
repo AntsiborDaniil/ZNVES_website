@@ -1,6 +1,5 @@
 import { API_BASE_URL } from "../../lib/apiConfig";
-import { shouldUseMocks } from "../../mocks/config";
-import { MOCK_HOME_PAGE } from "../../mocks/data/home";
+import { shouldUseMocks } from "../../lib/useMocks";
 import type { HomePageContent } from "../../types/home";
 
 const HOME_API_URL = `${API_BASE_URL}/api/home/`;
@@ -16,6 +15,7 @@ export const fetchHomePage = async (): Promise<HomePageContent> => {
   }
 
   if (shouldUseMocks()) {
+    const { MOCK_HOME_PAGE } = await import("../../mocks/data/home");
     memoryCache = { data: MOCK_HOME_PAGE, timestamp: Date.now() };
     return MOCK_HOME_PAGE;
   }

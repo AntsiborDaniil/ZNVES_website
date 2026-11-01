@@ -1,5 +1,6 @@
 import { API_BASE_URL } from "../../lib/apiConfig";
 import { getCsrfToken } from "../../lib/csrf";
+import { shouldUseMocks } from "../../lib/useMocks";
 import { AuthApiError, parseAuthApiErrorResponse } from "./authApiErrors";
 
 export { AuthApiError, humanizeAuthErrorMessage, parseAuthApiErrorBody } from "./authApiErrors";
@@ -148,27 +149,55 @@ const authPostVerify = async (url: string, payload: object): Promise<AuthUser> =
 };
 
 export const registerUser = async (payload: RegisterPayload): Promise<void> => {
+  if (shouldUseMocks()) {
+    const { mockRegisterUser } = await import("./authMockApi");
+    await mockRegisterUser(payload);
+    return;
+  }
   await authPost(REGISTER_URL, payload);
 };
 
 export const verifyRegistration = async (payload: VerifyPayload): Promise<AuthUser> => {
+  if (shouldUseMocks()) {
+    const { mockVerifyCode } = await import("./authMockApi");
+    return mockVerifyCode(payload);
+  }
   return authPostVerify(REGISTER_VERIFY_URL, payload);
 };
 
 export const loginUser = async (payload: LoginPayload): Promise<void> => {
+  if (shouldUseMocks()) {
+    const { mockLoginUser } = await import("./authMockApi");
+    await mockLoginUser(payload);
+    return;
+  }
   await authPost(LOGIN_URL, payload);
 };
 
 export const verifyLogin = async (payload: VerifyPayload): Promise<AuthUser> => {
+  if (shouldUseMocks()) {
+    const { mockVerifyCode } = await import("./authMockApi");
+    return mockVerifyCode(payload);
+  }
   return authPostVerify(LOGIN_VERIFY_URL, payload);
 };
 
 export const resendAuthCode = async (email: string): Promise<void> => {
+  if (shouldUseMocks()) {
+    const { mockResendAuthCode } = await import("./authMockApi");
+    await mockResendAuthCode(email);
+    return;
+  }
   await authPost(RESEND_CODE_URL, { email });
 };
 
 /** Шаг 1: запрос кода сброса пароля на email */
 export const requestPasswordReset = async (email: string): Promise<void> => {
+  if (shouldUseMocks()) {
+    const { mockRequestPasswordReset } = await import("./authMockApi");
+    await mockRequestPasswordReset(email.trim());
+    return;
+  }
   await authPost(
     PASSWORD_RESET_REQUEST_URL,
     { email: email.trim() },
@@ -183,6 +212,12 @@ export const verifyPasswordResetCode = async (
 ): Promise<void> => {
   if (typeof window === "undefined") {
     throw new Error("Вызов только на клиенте");
+  }
+
+  if (shouldUseMocks()) {
+    const { mockVerifyPasswordResetCode } = await import("./authMockApi");
+    await mockVerifyPasswordResetCode(email.trim(), code.trim());
+    return;
   }
 
   const response = await fetch(PASSWORD_RESET_VERIFY_URL, {
@@ -203,6 +238,12 @@ export const changePasswordWithResetToken = async (newPassword: string): Promise
     throw new Error("Вызов только на клиенте");
   }
 
+  if (shouldUseMocks()) {
+    const { mockChangePasswordWithResetToken } = await import("./authMockApi");
+    await mockChangePasswordWithResetToken(newPassword);
+    return;
+  }
+
   const response = await fetch(PASSWORD_RESET_CHANGE_URL, {
     method: "POST",
     credentials: "include",
@@ -218,6 +259,10 @@ export const changePasswordWithResetToken = async (newPassword: string): Promise
 export const getCurrentUser = async (): Promise<AuthUser | null> => {
   if (typeof window === "undefined") {
     return null;
+  }
+  if (shouldUseMocks()) {
+    const { mockGetCurrentUser } = await import("./authMockApi");
+    return mockGetCurrentUser();
   }
   try {
     const response = await fetch(AUTH_USER_URL, {
@@ -278,6 +323,10 @@ export const updateCurrentUser = async (
   if (typeof window === "undefined") {
     throw new Error("Вызов только на клиенте");
   }
+  if (shouldUseMocks()) {
+    const { mockUpdateCurrentUser } = await import("./authMockApi");
+    return mockUpdateCurrentUser(payload);
+  }
   const response = await fetch(AUTH_USER_URL, {
     method: "PATCH",
     credentials: "include",
@@ -309,6 +358,10 @@ export const updateUserDeliveryData = async (
 ): Promise<AuthUserDeliveryData> => {
   if (typeof window === "undefined") {
     throw new Error("Вызов только на клиенте");
+  }
+  if (shouldUseMocks()) {
+    const { mockUpdateUserDeliveryData } = await import("./authMockApi");
+    return mockUpdateUserDeliveryData(payload);
   }
   const response = await fetch(AUTH_USER_DELIVERY_URL, {
     method: "PATCH",
@@ -342,6 +395,11 @@ export const changePassword = async (
 ): Promise<void> => {
   if (typeof window === "undefined") {
     throw new Error("Вызов только на клиенте");
+  }
+  if (shouldUseMocks()) {
+    const { mockChangePassword } = await import("./authMockApi");
+    await mockChangePassword(payload);
+    return;
   }
   const response = await fetch(AUTH_CHANGE_PASSWORD_URL, {
     method: "POST",

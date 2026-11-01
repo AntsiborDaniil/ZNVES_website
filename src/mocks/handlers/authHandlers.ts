@@ -1,14 +1,14 @@
 import { http, HttpResponse } from "msw";
-import { getMockApiBase } from "../config";
+import { getMockApiBase } from "../apiBase";
 import {
   buildPasswordResetCookies,
   buildSessionCookies,
   changePasswordByToken,
   changePasswordWithResetToken,
   getUserByToken,
-  parseAccessToken,
   parsePasswordResetToken,
   resendCode,
+  resolveSessionToken,
   startLogin,
   startPasswordReset,
   startRegistration,
@@ -83,14 +83,15 @@ export const createAuthHandlers = () => {
     }),
 
     http.get(`${base}/api/auth/user/`, ({ request }) => {
-      const token = parseAccessToken(request.headers.get("cookie"));
+      // Cookie с api.znves.ru на localhost не ставится — resolveSessionToken читает localStorage
+      const token = resolveSessionToken(request.headers.get("cookie"));
       const user = getUserByToken(token);
       if (!user) return HttpResponse.json({ detail: "Unauthorized" }, { status: 401 });
       return HttpResponse.json(user);
     }),
 
     http.patch(`${base}/api/auth/user/`, async ({ request }) => {
-      const token = parseAccessToken(request.headers.get("cookie"));
+      const token = resolveSessionToken(request.headers.get("cookie"));
       const patch = await readJson<Record<string, string>>(request);
       const user = updateUserByToken(token, patch);
       if (!user) return HttpResponse.json({ detail: "Unauthorized" }, { status: 401 });
@@ -98,7 +99,7 @@ export const createAuthHandlers = () => {
     }),
 
     http.patch(`${base}/api/auth/user/delivery-data/`, async ({ request }) => {
-      const token = parseAccessToken(request.headers.get("cookie"));
+      const token = resolveSessionToken(request.headers.get("cookie"));
       const patch = await readJson<Record<string, string>>(request);
       const data = updateDeliveryByToken(token, patch);
       if (!data) return HttpResponse.json({ detail: "Unauthorized" }, { status: 401 });
@@ -106,7 +107,7 @@ export const createAuthHandlers = () => {
     }),
 
     http.post(`${base}/api/auth/user/change-password/`, async ({ request }) => {
-      const token = parseAccessToken(request.headers.get("cookie"));
+      const token = resolveSessionToken(request.headers.get("cookie"));
       const body = await readJson<{
         current_password: string;
         new_password: string;

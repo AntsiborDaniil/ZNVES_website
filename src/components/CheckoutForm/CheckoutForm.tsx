@@ -19,9 +19,49 @@ import CheckoutDeliverySection, {
   type YandexCourierOffer,
 } from "./sections/CheckoutDeliverySection";
 import CheckoutPaymentSection from "./sections/CheckoutPaymentSection";
+import OrderConfirmModal, {
+  type OrderConfirmField,
+} from "../OrderConfirmModal/OrderConfirmModal";
+import { MOCK_CHECKOUT_AUTOFILL } from "../../mocks/data/account";
+import { shouldUseMocks } from "../../lib/useMocks";
 
 /** Кеш по slug на время сессии — меньше повторных запросов при оформлении заказа */
 const productRawCache = new Map<string, ApiProductDetail | null>();
+
+const EMPTY_CHECKOUT_FORM = {
+  firstName: "",
+  lastName: "",
+  phone: "",
+  email: "",
+  deliveryFirstName: "",
+  deliveryLastName: "",
+  deliveryPhone: "",
+  deliveryEmail: "",
+  city: "",
+  street: "",
+  house: "",
+  apartment: "",
+  floor: "",
+  entrance: "",
+  intercom: "",
+  pickupCity: "Москва",
+  postalCode: "",
+  pvzAddress: "",
+  deliveryType: "cdek",
+  deliveryMethod: "pickup",
+  paymentMethod: "sberbank",
+  differentRecipient: false,
+  deliveryComment: "",
+};
+
+/** В prod форма пустая; в dev:mock — тестовые данные для быстрой проверки флоу */
+const getInitialCheckoutForm = () => {
+  if (!shouldUseMocks()) return { ...EMPTY_CHECKOUT_FORM };
+  return {
+    ...EMPTY_CHECKOUT_FORM,
+    ...MOCK_CHECKOUT_AUTOFILL,
+  };
+};
 
 interface CheckoutFormProps {
   onOrderSubmit?: (orderNumber: string) => void;
@@ -98,31 +138,7 @@ const CheckoutForm = ({
     }
     openCart();
   };
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    email: "",
-    deliveryFirstName: "",
-    deliveryLastName: "",
-    deliveryPhone: "",
-    deliveryEmail: "",
-    city: "",
-    street: "",
-    house: "",
-    apartment: "",
-    floor: "",
-    entrance: "",
-    intercom: "",
-    pickupCity: "Москва",
-    postalCode: "",
-    pvzAddress: "",
-    deliveryType: "cdek",
-    deliveryMethod: "pickup",
-    paymentMethod: "sberbank",
-    differentRecipient: false,
-    deliveryComment: "",
-  });
+  const [formData, setFormData] = useState(getInitialCheckoutForm);
   const isModalCourier = formData.deliveryMethod === "yandex";
   const isModalPickup = formData.deliveryMethod === "pickup";
   const modalDeliveryOption: ModalDeliveryOption =
@@ -138,11 +154,25 @@ const CheckoutForm = ({
     !!formData.pvzAddress.trim() &&
     formData.deliveryMethod === "pickup" &&
     !showContinueButtonAgain;
-  const [mapSearchValue, setMapSearchValue] = useState("");
-  const [pvzAddressInputValue, setPvzAddressInputValue] = useState("");
+  const [mapSearchValue, setMapSearchValue] = useState(() =>
+    shouldUseMocks()
+      ? [
+          MOCK_CHECKOUT_AUTOFILL.city,
+          MOCK_CHECKOUT_AUTOFILL.street,
+          MOCK_CHECKOUT_AUTOFILL.house,
+        ]
+          .filter(Boolean)
+          .join(", ")
+      : ""
+  );
+  const [pvzAddressInputValue, setPvzAddressInputValue] = useState(() =>
+    shouldUseMocks() ? MOCK_CHECKOUT_AUTOFILL.pvzAddress : ""
+  );
   const pvzAddressDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const pvzAddressThrottleRef = useRef(0);
-  const pvzAddressLatestRef = useRef("");
+  const pvzAddressLatestRef = useRef(
+    shouldUseMocks() ? MOCK_CHECKOUT_AUTOFILL.pvzAddress : ""
+  );
   const [pvzOptions, setPvzOptions] = useState<PvzListOption[]>([]);
   const filteredPvzOptions = useMemo(
     () => filterPvzByCityAddressDetails(pvzOptions, pvzAddressInputValue),
@@ -157,6 +187,7 @@ const CheckoutForm = ({
   const isUpdatingFromMapRef = useRef(false);
   const lastGeocodedAddressRef = useRef<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pvzCode, setPvzCode] = useState<string>(""); // Для CDEK
   const [pvzId, setPvzId] = useState<string>(""); // Для Яндекс
   const [errors, setErrors] = useState<Record<string, boolean>>({});
@@ -1316,6 +1347,102 @@ const CheckoutForm = ({
     return true;
   };
 
+  const paymentMethodLabel = useMemo(() => {
+    if (formData.paymentMethod === "card") return "Оплата банковской картой";
+    if (formData.paymentMethod === "sberbank") return "СБП";
+    if (formData.paymentMethod === "yandexpay") return "Яндекс Пэй";
+    if (formData.paymentMethod === "installment") return "Рассрочка";
+    return formData.paymentMethod;
+  }, [formData.paymentMethod]);
+
+  const confirmAddress = useMemo(() => {
+    if (formData.deliveryMethod === "pickup") {
+      return (pvzAddressLatestRef.current || formData.pvzAddress || "").trim();
+    }
+    return [
+      formData.city || "Москва",
+      formData.street,
+      formData.house,
+      formData.apartment && `кв. ${formData.apartment}`,
+      formData.floor && `${formData.floor} этаж`,
+      formData.entrance && `подъезд ${formData.entrance}`,
+      formData.intercom && `домофон ${formData.intercom}`,
+      formData.deliveryComment && `комментарий: ${formData.deliveryComment}`,
+    ]
+      .filter(Boolean)
+      .join(", ");
+  }, [
+    formData.deliveryMethod,
+    formData.pvzAddress,
+    formData.city,
+    formData.street,
+    formData.house,
+    formData.apartment,
+    formData.floor,
+    formData.entrance,
+    formData.intercom,
+    formData.deliveryComment,
+  ]);
+
+  const confirmFields = useMemo((): OrderConfirmField[] => {
+    const fields: OrderConfirmField[] = [
+      {
+        label: "Получатель",
+        value: `${formData.firstName} ${formData.lastName}`.trim(),
+      },
+      { label: "Телефон", value: formData.phone },
+      { label: "Email", value: formData.email },
+      { label: "Доставка", value: modalDeliverySummaryLabel },
+      { label: "Адрес", value: confirmAddress || "—" },
+    ];
+
+    if (formData.deliveryMethod !== "pickup" && formData.differentRecipient) {
+      fields.push({
+        label: "Другой получатель",
+        value: [
+          `${formData.deliveryFirstName} ${formData.deliveryLastName}`.trim(),
+          formData.deliveryPhone,
+          formData.deliveryEmail,
+        ]
+          .filter(Boolean)
+          .join(", "),
+      });
+    }
+
+    fields.push({ label: "Оплата", value: paymentMethodLabel });
+    return fields;
+  }, [
+    formData.firstName,
+    formData.lastName,
+    formData.phone,
+    formData.email,
+    formData.deliveryMethod,
+    formData.differentRecipient,
+    formData.deliveryFirstName,
+    formData.deliveryLastName,
+    formData.deliveryPhone,
+    formData.deliveryEmail,
+    modalDeliverySummaryLabel,
+    confirmAddress,
+    paymentMethodLabel,
+  ]);
+
+  const handleRequestSubmitOrder = () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    if (formData.deliveryMethod === "yandex" && !courierAvailable) {
+      return;
+    }
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setShowConfirmModal(true);
+  };
+
   const handleSubmitOrder = async () => {
     if (isSubmitting) {
       return;
@@ -1327,6 +1454,7 @@ const CheckoutForm = ({
 
     // Валидация формы
     if (!validateForm()) {
+      setShowConfirmModal(false);
       return;
     }
 
@@ -1615,6 +1743,7 @@ const CheckoutForm = ({
       redirectToCartWithError(message);
     } finally {
       setIsSubmitting(false);
+      setShowConfirmModal(false);
     }
   };
 
@@ -1701,12 +1830,26 @@ const CheckoutForm = ({
             modalPromo={modalPromo}
             submitButtonRef={submitButtonRef}
             onInputChange={handleInputChange}
-            onSubmitOrder={handleSubmitOrder}
+            onSubmitOrder={handleRequestSubmitOrder}
             formatPrice={formatPrice}
           />
         </div>
       </div>
     </div>
+    {showConfirmModal && (
+      <OrderConfirmModal
+        fields={confirmFields}
+        totalLabel="Итоговая сумма"
+        totalValue={formatPrice(totalAmount)}
+        isSubmitting={isSubmitting}
+        onConfirm={() => {
+          void handleSubmitOrder();
+        }}
+        onClose={() => {
+          if (!isSubmitting) setShowConfirmModal(false);
+        }}
+      />
+    )}
     {paymentErrorToast && (
       <PromoErrorToast
         message={paymentErrorToast}

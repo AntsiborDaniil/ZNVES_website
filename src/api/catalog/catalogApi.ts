@@ -4,13 +4,7 @@ import type { ApiProduct, CatalogApiParams } from "../../types/api";
 import type { CatalogProduct } from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
 import { resolveCardImages } from "../../lib/productImages";
-import { shouldUseMocks } from "../../mocks/config";
-import {
-  getMockCatalogCategories,
-  getMockCatalogColors,
-  getMockCatalogList,
-  getMockCatalogSizes,
-} from "../../mocks/catalogMocks";
+import { shouldUseMocks } from "../../lib/useMocks";
 
 const CATALOG_API_URL = `${API_BASE_URL}/api/catalog/`;
 
@@ -148,6 +142,7 @@ export const fetchCatalogProducts = async (
   }
 
   if (shouldUseMocks()) {
+    const { getMockCatalogList } = await import("../../mocks/catalogMocks");
     const data = getMockCatalogList(params);
     const transformedProducts = data.map((product, index) =>
       transformApiProduct(product, index)
@@ -225,6 +220,7 @@ export const fetchCatalogCategories = async (): Promise<ApiCatalogCategory[]> =>
     return categoriesCacheState.data;
   }
   if (shouldUseMocks()) {
+    const { getMockCatalogCategories } = await import("../../mocks/catalogMocks");
     const list = getMockCatalogCategories();
     categoriesCacheState = { data: list, timestamp: Date.now() };
     return list;
@@ -253,6 +249,7 @@ export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
     return colorsCacheState.data;
   }
   if (shouldUseMocks()) {
+    const { getMockCatalogColors } = await import("../../mocks/catalogMocks");
     const data = getMockCatalogColors();
     colorsCacheState = { data, timestamp: Date.now() };
     return data;
@@ -280,6 +277,7 @@ export const fetchCatalogSizes = async (): Promise<ApiCatalogSize[]> => {
     return sizesCacheState.data;
   }
   if (shouldUseMocks()) {
+    const { getMockCatalogSizes } = await import("../../mocks/catalogMocks");
     const data = getMockCatalogSizes();
     sizesCacheState = { data, timestamp: Date.now() };
     return data;

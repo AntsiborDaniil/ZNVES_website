@@ -6,6 +6,8 @@ import {
   getUserByToken,
   parseAccessToken,
   resetAuthStore,
+  resolveSessionToken,
+  simulateAuthStoreReload,
   startLogin,
   startPasswordReset,
   startRegistration,
@@ -107,6 +109,28 @@ describe("authStore", () => {
   it("parses access token from cookie header", () => {
     expect(parseAccessToken("access-token=abc123; other=1")).toBe("abc123");
     expect(parseAccessToken(null)).toBeNull();
+  });
+
+  it("keeps account session without cross-origin cookie after reload", () => {
+    startLogin({
+      email: MOCK_DEV_USER.email,
+      password: MOCK_DEV_USER.password,
+    });
+    const session = verifyCode(MOCK_DEV_USER.email, MOCK_AUTH_CODE);
+    expect(session.ok).toBe(true);
+    if (!session.ok) return;
+
+    // Как в browser MSW: Cookie на api.znves.ru не приходит
+    expect(getUserByToken(null)?.email).toBe(MOCK_DEV_USER.email);
+    expect(resolveSessionToken(null)).toBe(session.token);
+
+    // Перезагрузка страницы: память пустая, localStorage жив
+    simulateAuthStoreReload();
+    expect(resolveSessionToken(null)).toBe(session.token);
+    expect(getUserByToken(null)?.email).toBe(MOCK_DEV_USER.email);
+    expect(getUserByToken(null)?.delivery_data?.city).toBe(
+      MOCK_DEV_USER.delivery_data.city
+    );
   });
 
   it("resets password with temporary token", () => {

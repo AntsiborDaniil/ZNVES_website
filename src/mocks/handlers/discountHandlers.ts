@@ -1,24 +1,21 @@
 import { http, HttpResponse } from "msw";
-import { getMockApiBase } from "../config";
-
-const MOCK_PROMO_CODES: Record<string, string> = {
-  SALE10: "499.00",
-  WELCOME: "300.00",
-};
+import { getMockApiBase } from "../apiBase";
+import { getMockPromoDiscount } from "../data/promos";
 
 export const createDiscountHandlers = () => {
   const base = getMockApiBase();
 
   return [
     http.post(`${base}/api/discounts/promo/:code/`, async ({ params, request }) => {
-      const code = String(params.code ?? "")
-        .trim()
-        .toUpperCase();
+      const rawCode = String(params.code ?? "");
+      const code = rawCode.trim().toUpperCase();
       const body = (await request.json().catch(() => ({}))) as {
         previous_promo_code?: string | null;
+        order_total?: string;
+        cart_items?: unknown[];
       };
 
-      const discount = MOCK_PROMO_CODES[code];
+      const discount = getMockPromoDiscount(code);
       if (!discount) {
         return HttpResponse.json(
           {

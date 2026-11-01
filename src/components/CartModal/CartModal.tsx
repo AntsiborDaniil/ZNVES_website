@@ -214,13 +214,20 @@ const CartModal = ({
     return () => document.removeEventListener("keydown", handleKey);
   }, [isCartOpen, closeCart]);
 
+  // При открытии корзины сбрасываем только локальные ошибки ввода.
+  // appliedPromo живёт в CartContext — его нельзя чистить здесь:
+  // remount модалки / повторный open иначе снимают уже активированный промокод
+  // при правках формы, не связанных с составом корзины.
+  const wasCartOpenRef = useRef(false);
   useEffect(() => {
-    if (!isCartOpen) return;
-    setAppliedPromo(null);
-    setPromoInputValue("");
+    const justOpened = isCartOpen && !wasCartOpenRef.current;
+    wasCartOpenRef.current = isCartOpen;
+    if (!justOpened) return;
+
     setPromoErrorMessage(null);
     lastFailedPromoRef.current = null;
-  }, [isCartOpen, setAppliedPromo]);
+    setPromoInputValue(appliedPromo?.promoCode ?? "");
+  }, [isCartOpen, appliedPromo?.promoCode]);
 
   useEffect(() => {
     const needsColors = items.some((item) => !item.colorLabel);

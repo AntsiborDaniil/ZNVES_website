@@ -149,6 +149,9 @@ const getStatusDisplayName = (status: string): string => {
   ) {
     return "Завершен";
   }
+  if (s.includes("отмен") || s === "cancelled" || s === "canceled") {
+    return "Отменён";
+  }
   return status || "—";
 };
 

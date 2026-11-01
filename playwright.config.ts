@@ -14,7 +14,8 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: "npm run dev",
+    // e2e всегда на моках — не путать с `npm run dev` (реальный API)
+    command: "npm run dev:mock",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

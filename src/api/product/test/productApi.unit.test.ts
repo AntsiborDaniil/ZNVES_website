@@ -1,8 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fetchProductWithWarehouse } from "../productApi";
 
-vi.mock("../../../mocks/config", async (importOriginal) => ({
-  ...(await importOriginal<object>()),
+vi.mock("../../../lib/useMocks", () => ({
   shouldUseMocks: () => false,
 }));
 

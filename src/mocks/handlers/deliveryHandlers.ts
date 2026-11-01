@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import { getFallbackPvzForCity } from "../../api/delivery/cdekApi";
-import { getMockApiBase } from "../config";
+import { getMockApiBase } from "../apiBase";
 
 const MOCK_DELIVERY_CONFIG = {
   yaDeliverySourceAddress: "Москва, Промышленная улица, 12А, 115516",

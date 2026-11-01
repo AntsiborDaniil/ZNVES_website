@@ -4,7 +4,7 @@ import MockProvider from "../MockProvider";
 
 const shouldUseMocksMock = vi.fn();
 
-vi.mock("../../../mocks/config", () => ({
+vi.mock("../../../lib/useMocks", () => ({
   shouldUseMocks: () => shouldUseMocksMock(),
 }));
 

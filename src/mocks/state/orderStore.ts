@@ -6,6 +6,7 @@ let orderCounter = orders.length;
 
 const isActiveOrder = (order: ApiMyOrderItem): boolean => {
   const status = (order.status || "").toLowerCase();
+  if (status.includes("отмен") || status.includes("cancel")) return false;
   return (
     status.includes("ожидает") ||
     status === "создан" ||

@@ -1,5 +1,5 @@
 import type { ApiMyOrderItem } from "../../api/order/orderApi";
-import { MOCK_DEV_USER } from "../config";
+import { MOCK_DEV_USER } from "./account";
 
 const buyer = {
   full_name: `${MOCK_DEV_USER.first_name} ${MOCK_DEV_USER.last_name}`,
@@ -8,8 +8,25 @@ const buyer = {
 } as const;
 
 /**
- * Заказы для ЛК: покрывают статусы
- * «Ожидает оплаты» / «Оплачен» / «Доставляется» / «Доставлен».
+ * Статусы, которые ЛК умеет показывать (см. Orders.tsx):
+ * - Ожидает оплаты → «Новый (не оплачен)»
+ * - Оплачен
+ * - Доставляется
+ * - Доставлен → «Завершен»
+ * - Отменён
+ */
+export const MOCK_ORDER_STATUSES = [
+  "Ожидает оплаты",
+  "Оплачен",
+  "Доставляется",
+  "Доставлен",
+  "Отменён",
+] as const;
+
+export type MockOrderStatus = (typeof MOCK_ORDER_STATUSES)[number];
+
+/**
+ * Заказы для ЛК в `dev:mock`: по одному на каждый статус.
  */
 export const MOCK_INITIAL_ORDERS: ApiMyOrderItem[] = [
   {
@@ -50,6 +67,7 @@ export const MOCK_INITIAL_ORDERS: ApiMyOrderItem[] = [
     status: "Оплачен",
     payment_type: "card",
     delivery_service: "yandex",
+    promocode: "SALE10",
     created_at: "2026-08-17T14:30:00.000Z",
     updated_at: "2026-08-17T15:00:00.000Z",
     customer_data: { ...buyer },
@@ -137,6 +155,30 @@ export const MOCK_INITIAL_ORDERS: ApiMyOrderItem[] = [
     delivery_data: {
       pvz_code: "MSK3",
       full_address: `${MOCK_DEV_USER.delivery_data.city}, ул. ${MOCK_DEV_USER.delivery_data.street}, ${MOCK_DEV_USER.delivery_data.house}, кв. ${MOCK_DEV_USER.delivery_data.apartment}`,
+    },
+  },
+  {
+    id: "467478",
+    total_amount: "7 490 ₽",
+    status: "Отменён",
+    payment_type: "sberbank",
+    delivery_service: "cdek",
+    created_at: "2026-07-28T12:00:00.000Z",
+    updated_at: "2026-07-28T13:20:00.000Z",
+    customer_data: { ...buyer },
+    positions: [
+      {
+        id: "e1b2c3d4-e5f6-4789-a012-3456789abc09",
+        product_name: "T-SHIRT VOYAGE",
+        color: "black",
+        size: "m",
+        quantity: 1,
+        product_image: "/images/catalogs/mock/tshirt-green.svg",
+      },
+    ],
+    delivery_data: {
+      pvz_code: "MSK1",
+      full_address: MOCK_DEV_USER.delivery_data.cdek_full_pvz_address,
     },
   },
 ];

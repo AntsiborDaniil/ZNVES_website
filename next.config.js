@@ -22,6 +22,10 @@ const nextConfig = {
   reactStrictMode: true,
   compress: true,
   poweredByHeader: false,
+  // Явно прокидываем в клиентский бандл (Turbopack иногда теряет CLI-only NEXT_PUBLIC_*)
+  env: {
+    NEXT_PUBLIC_USE_MOCKS: process.env.NEXT_PUBLIC_USE_MOCKS ?? "false",
+  },
   // Меньший Docker-образ: копируем .next/standalone + static
   output: "standalone",
   images: {
@@ -55,6 +59,15 @@ const nextConfig = {
             key: "Cache-Control",
             // Без immutable: ассеты в /images часто меняют по тому же имени
             value: "public, max-age=86400, must-revalidate",
+          },
+        ],
+      },
+      {
+        source: "/videos/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=604800, must-revalidate",
           },
         ],
       },

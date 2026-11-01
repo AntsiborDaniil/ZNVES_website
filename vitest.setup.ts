@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { afterAll, afterEach, beforeAll } from "vitest";
-import { shouldUseMocks } from "./src/mocks/config";
+import { shouldUseMocks } from "./src/lib/useMocks";
 import { resetAllMockStores } from "./src/mocks/reset";
 import {
   mockServer,

@@ -2,6 +2,7 @@
 
 import { API_BASE_URL } from "../../lib/apiConfig";
 import { getCsrfToken } from "../../lib/csrf";
+import { shouldUseMocks } from "../../lib/useMocks";
 import { getProductById } from "../../data/products";
 import { fetchCatalogProductRaw, type ApiProductDetail } from "../product/productApi";
 import type { CartItem } from "../../types/cart";
@@ -113,6 +114,19 @@ export async function applyPromoCode(
   const trimmed = promoCode.trim();
   if (!trimmed) {
     return { success: false, error: "Введите промокод" };
+  }
+
+  if (shouldUseMocks()) {
+    const { getMockPromoDiscount } = await import("../../mocks/data/promos");
+    const discount = getMockPromoDiscount(trimmed);
+    if (!discount) {
+      return { success: false, error: "Промокод не найден" };
+    }
+    return {
+      success: true,
+      promo_code: trimmed.toUpperCase(),
+      discount,
+    };
   }
 
   const body: PromoRequestBody = {

@@ -2,7 +2,7 @@
 
 import { API_BASE_URL } from "../../lib/apiConfig";
 import { getCsrfToken } from "../../lib/csrf";
-import { shouldUseMocks } from "../../mocks/config";
+import { shouldUseMocks } from "../../lib/useMocks";
 
 /** Собирает URL изображения товара: если передан путь без протокола — дополняем базовым URL API. */
 function buildProductImageUrl(value: string | undefined): string {

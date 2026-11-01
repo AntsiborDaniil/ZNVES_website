@@ -1,30 +1,37 @@
-import { API_BASE_URL } from "../lib/apiConfig";
+/**
+ * Barrel только для тестов/e2e.
+ * Не импортировать из клиентских API/компонентов — HMR Turbopack ломается
+ * на толстых re-export графах (`env`/`config`).
+ */
+export { MOCK_AUTH_CODE, MOCK_CHECKOUT_AUTOFILL, MOCK_DEV_USER } from "./data/account";
+export {
+  MOCK_ORDER_STATUSES,
+  MOCK_INITIAL_ORDERS,
+} from "./data/orders";
+export {
+  MOCK_PROMO_CODES,
+  MOCK_PROMO_CODE_LIST,
+  getMockPromoDiscount,
+} from "./data/promos";
+export { getMockApiBase } from "./apiBase";
 
-/** Фиксированный код подтверждения в mock-режиме */
-export const MOCK_AUTH_CODE = "123456";
+import { MOCK_AUTH_CODE, MOCK_DEV_USER } from "./data/account";
+import { MOCK_PROMO_CODE_LIST, MOCK_PROMO_CODES } from "./data/promos";
 
-/** Тестовый пользователь ЛК (профиль + адреса доставки). Вход: email / password, код 123456 */
-export const MOCK_DEV_USER = {
-  email: "dev@znves.ru",
-  password: "password123",
-  first_name: "Екатерина",
-  last_name: "Смирнова",
-  phone_number: "+79991234567",
-  delivery_data: {
-    cdek_full_pvz_address: "Москва, ул. Тверская, 12, ПВЗ СДЭК",
-    yandex_full_pvz_address: "Москва, Пятницкая ул., 8, ПВЗ Яндекс",
-    city: "Москва",
-    street: "Арбат",
-    house: "25",
-    apartment: "12",
-    floor: "3",
-    intercom: "12К",
-    comment: "Позвонить за 10 минут",
-  },
-} as const;
+export const getMockModeBanner = (): string => {
+  const promos = MOCK_PROMO_CODE_LIST.map(
+    (p) => `${p.code} (−${p.discount} ₽)`
+  ).join(", ");
 
-/** Включить моки явно: NEXT_PUBLIC_USE_MOCKS=true или `npm run dev:mock` */
-export const shouldUseMocks = (): boolean =>
-  process.env.NEXT_PUBLIC_USE_MOCKS === "true";
+  return [
+    "[ZNVES mocks] Режим dev:mock активен.",
+    `ЛК: ${MOCK_DEV_USER.email} / ${MOCK_DEV_USER.password}, код ${MOCK_AUTH_CODE}`,
+    `Промокоды: ${promos}`,
+    "Прод: npm run dev (без NEXT_PUBLIC_USE_MOCKS).",
+    "Проверка флага в браузере: window.__ZNVES_USE_MOCKS__",
+  ].join("\n");
+};
 
-export const getMockApiBase = (): string => API_BASE_URL.replace(/\/$/, "");
+export const MOCK_PROMO_CODE_MAP: Record<string, string> = Object.fromEntries(
+  Object.values(MOCK_PROMO_CODES).map((p) => [p.code, p.discount])
+);

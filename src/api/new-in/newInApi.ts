@@ -4,8 +4,7 @@ import type { ApiProduct } from "../../types/api";
 import type { CatalogProduct } from "../../types/products";
 import { API_BASE_URL } from "../../lib/apiConfig";
 import { resolveCardImages } from "../../lib/productImages";
-import { shouldUseMocks } from "../../mocks/config";
-import { getMockCatalogList } from "../../mocks/catalogMocks";
+import { shouldUseMocks } from "../../lib/useMocks";
 
 const CATALOG_API_URL = `${API_BASE_URL}/api/catalog/`;
 
@@ -75,6 +74,7 @@ export const fetchNewInProducts = async (
   }
 
   if (shouldUseMocks()) {
+    const { getMockCatalogList } = await import("../../mocks/catalogMocks");
     const data = getMockCatalogList({
       category: categorySlug,
       is_new: true,

@@ -5,6 +5,8 @@ export const MOCK_HOME_PAGE: HomePageContent = {
   hero: {
     desktop_image: "/images/home/hero-desktop.webp",
     mobile_image: "/images/home/hero-mobile.webp",
+    desktop_video: "/videos/home/hero-desktop-v2.mp4",
+    mobile_video: "/videos/home/hero-mobile-v2.mp4",
     title: "ZNVES",
     cta_text: "Перейти в каталог",
     cta_href: "/catalog",

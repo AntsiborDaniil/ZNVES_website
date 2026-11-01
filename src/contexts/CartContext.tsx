@@ -42,13 +42,26 @@ const saveCartToStorage = (items: CartItem[]) => {
   }
 };
 
+const cartLinesSignature = (cartItems: CartItem[]) =>
+  JSON.stringify(
+    cartItems.map((item) => ({
+      id: item.productId,
+      size: item.size,
+      color: item.color,
+      qty: item.quantity,
+    }))
+  );
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const { showToast } = useToast();
   const [items, setItems] = useState<CartItem[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const skipPromoResetRef = useRef(true);
+  const showToastRef = useRef(showToast);
+  const prevCartSignatureRef = useRef<string | null>(null);
+
+  showToastRef.current = showToast;
 
   const openCart = useCallback(() => {
     setIsCartOpen(true);
@@ -72,22 +85,30 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [items, isHydrated]);
 
-  // Сбрасываем промокод при изменении состава корзины и уведомляем пользователя
+  // Сбрасываем промокод только при реальном изменении состава/количества корзины
   useEffect(() => {
     if (!isHydrated) return;
 
-    if (skipPromoResetRef.current) {
-      skipPromoResetRef.current = false;
+    const signature = cartLinesSignature(items);
+
+    if (prevCartSignatureRef.current === null) {
+      prevCartSignatureRef.current = signature;
       return;
     }
 
+    if (prevCartSignatureRef.current === signature) {
+      return;
+    }
+
+    prevCartSignatureRef.current = signature;
+
     setAppliedPromo((currentPromo) => {
       if (currentPromo) {
-        showToast(PROMO_RESET_TOAST);
+        showToastRef.current(PROMO_RESET_TOAST);
       }
       return null;
     });
-  }, [items, isHydrated, showToast]);
+  }, [items, isHydrated]);
 
   const addItem = useCallback(
     async (

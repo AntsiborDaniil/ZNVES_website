@@ -29,6 +29,13 @@ test.describe("Checkout flows (cart modal)", () => {
     );
 
     await page.getByRole("button", { name: "Оформить заказ" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Подтверждение заказа" })
+    ).toBeVisible();
+    await page
+      .getByRole("dialog", { name: "Подтверждение заказа" })
+      .getByRole("button", { name: "Оформить заказ" })
+      .click();
     const response = await payResponse;
     expect(response.ok()).toBeTruthy();
   });

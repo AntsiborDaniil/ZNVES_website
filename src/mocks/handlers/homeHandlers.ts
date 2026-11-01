@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import { getMockApiBase } from "../config";
+import { getMockApiBase } from "../apiBase";
 import { MOCK_HOME_PAGE } from "../data/home";
 
 export const createHomeHandlers = () => {

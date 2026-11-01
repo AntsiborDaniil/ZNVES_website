@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import type { OrderRequest } from "../../api/order/orderApi";
-import { getMockApiBase } from "../config";
+import { getMockApiBase } from "../apiBase";
 import { createMockOrder, getMockOrders } from "../state/orderStore";
 
 const readJson = async <T>(request: Request): Promise<T> =>

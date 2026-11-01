@@ -12,8 +12,7 @@ import {
   resolveGalleryImages,
   type ApiProductImage,
 } from "../../lib/productImages";
-import { shouldUseMocks } from "../../mocks/config";
-import { getMockProductDetailBySlug } from "../../mocks/catalogMocks";
+import { shouldUseMocks } from "../../lib/useMocks";
 
 const CATALOG_API_URL = `${API_BASE_URL}/api/catalog/`;
 
@@ -198,6 +197,7 @@ const hashString = (str: string): number => {
 
 const fetchProductBySlugInternal = async (slug: string): Promise<ProductDetail | null> => {
   if (shouldUseMocks()) {
+    const { getMockProductDetailBySlug } = await import("../../mocks/catalogMocks");
     const data = getMockProductDetailBySlug(slug);
     if (!data) return null;
     const transformedProduct = transformApiProduct(data, slug);
@@ -257,6 +257,7 @@ export const fetchCatalogProductRaw = async (slug: string): Promise<ApiProductDe
     promise = (async () => {
       try {
         if (shouldUseMocks()) {
+          const { getMockProductDetailBySlug } = await import("../../mocks/catalogMocks");
           const data = getMockProductDetailBySlug(slug);
           if (!data) return null;
           rawCache.set(slug, { data, timestamp: Date.now() });
