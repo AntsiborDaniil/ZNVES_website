@@ -140,7 +140,12 @@ export async function openCartModal(page: Page) {
 export async function fillCheckoutPersonalData(page: Page) {
   await page.locator("#firstName").fill("Иван");
   await page.locator("#lastName").fill("Иванов");
-  await page.locator("#phone").fill("9991234567");
+  // Маскированный PhoneInput: fill() иногда теряет цифру — вводим посимвольно
+  const phone = page.locator("#phone");
+  await phone.click();
+  await phone.fill("");
+  await phone.pressSequentially("9991234567", { delay: 15 });
+  await expect(phone).toHaveValue("(999) 123-45-67");
   await page.locator("#email").fill("ivan@example.ru");
 }
 

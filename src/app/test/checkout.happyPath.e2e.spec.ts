@@ -48,6 +48,13 @@ test.describe("Guest purchase happy path", () => {
     );
 
     await page.getByRole("button", { name: "Оформить заказ" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Подтверждение заказа" })
+    ).toBeVisible();
+    await page
+      .getByRole("dialog", { name: "Подтверждение заказа" })
+      .getByRole("button", { name: "Оформить заказ" })
+      .click();
     await orderCreated;
     await paymentStarted;
   });
