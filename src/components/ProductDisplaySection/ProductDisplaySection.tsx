@@ -66,11 +66,13 @@ const ProductDisplaySection = ({
   const [products, setProducts] = useState<CatalogProduct[]>(
     initialProducts ?? []
   );
-  const [isLoading, setIsLoading] = useState(
-    initialProducts == null || initialProducts.length === 0
-  );
+  const hasServerProducts =
+    initialProducts != null && initialProducts.length > 0;
+  const [isLoading, setIsLoading] = useState(!hasServerProducts);
   const [progress, setProgress] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
+  /** Слайды, для которых уже можно монтировать cover (viewport + буфер) */
+  const [mediaUntil, setMediaUntil] = useState(4);
   const { width } = useWindowSize();
 
   const isLimitedSlider = maxProducts != null;
@@ -91,28 +93,30 @@ const ProductDisplaySection = ({
     }
   }, [width]);
 
+  // SSR уже отдал список — синхронизируем без скелетона и без лишнего refetch
   useEffect(() => {
+    if (!hasServerProducts || !initialProducts) return;
+    setProducts(initialProducts);
+    setIsLoading(false);
+  }, [hasServerProducts, initialProducts]);
+
+  useEffect(() => {
+    // Есть SSR-данные — не конкурируем за сеть повторным запросом
+    if (hasServerProducts) return;
+
     let cancelled = false;
 
     const loadProducts = async () => {
-      // SSR мог отдать [] (ошибка API / ISR) — всегда догружаем на клиенте.
-      // Если уже есть товары с сервера — обновляем в фоне без скелетона.
-      const hasServerProducts =
-        initialProducts != null && initialProducts.length > 0;
-      if (!hasServerProducts) {
-        setIsLoading(true);
-      }
+      setIsLoading(true);
 
       try {
         const nextProducts = wantsNewIn
           ? await fetchNewInProducts()
           : await fetchAllCatalogProducts();
         if (cancelled) return;
-        if (nextProducts.length > 0 || !hasServerProducts) {
-          setProducts(nextProducts);
-        }
+        setProducts(nextProducts);
       } catch {
-        if (!cancelled && !hasServerProducts) {
+        if (!cancelled) {
           setProducts([]);
         }
       } finally {
@@ -124,7 +128,13 @@ const ProductDisplaySection = ({
     return () => {
       cancelled = true;
     };
-  }, [title, initialProducts, wantsNewIn]);
+  }, [title, hasServerProducts, wantsNewIn]);
+
+  useEffect(() => {
+    const visible = typeof maxVisible === "number" ? maxVisible : 4;
+    const until = activeIndex + visible + 1;
+    setMediaUntil((prev) => Math.max(prev, until, visible));
+  }, [activeIndex, maxVisible]);
 
   const displayProducts = useMemo(() => {
     if (!isLimitedSlider) return products;
@@ -301,7 +311,8 @@ const ProductDisplaySection = ({
                     images={product.images}
                     isNew={product.isNew}
                     isSliderCard={true}
-                    imagePriority={index < 4}
+                    imagePriority={index < 2}
+                    loadImage={index <= mediaUntil}
                   />
                 </Link>
               </SwiperSlide>

@@ -379,6 +379,7 @@ const CatalogPageContent = ({
                     isNew={product.isNew}
                     variant="grid"
                     imagePriority={index < 4}
+                    loadImage
                   />
                 </Link>
               ))}

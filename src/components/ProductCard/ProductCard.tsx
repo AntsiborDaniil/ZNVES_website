@@ -30,8 +30,13 @@ type ProductCardProps = {
   isSliderCard?: boolean;
   variant?: "slider" | "grid";
   zoomOnHover?: boolean;
-  /** Первые карточки в сетке — быстрее LCP */
+  /** Первые карточки — LCP / SSR priority */
   imagePriority?: boolean;
+  /**
+   * false — только шиммер (offscreen в слайдере).
+   * По умолчанию true; без priority картинка ждёт IntersectionObserver.
+   */
+  loadImage?: boolean;
 };
 
 const ProductCard = ({
@@ -43,12 +48,13 @@ const ProductCard = ({
   variant = "slider",
   zoomOnHover = false,
   imagePriority = false,
+  loadImage = true,
 }: ProductCardProps) => {
   const imageList = useMemo(() => {
     if (images.length === 0) {
       return ["/images/catalogs/placeholder.png"];
     }
-    // Слайдеры главной / section — только cover, без соседних кадров
+    // Слайдеры главной / section — только cover
     if (isSliderCard) {
       return [images[0]];
     }
@@ -60,8 +66,12 @@ const ProductCard = ({
   // null до mount — SSR и первый client paint совпадают (без Swiper)
   const [hoverEnabled, setHoverEnabled] = useState<boolean | null>(null);
   const isDesktopHover = hoverEnabled === true;
-  // Карусель фото только в каталоге / new-in (не в слайдерах Bestsellers и т.п.)
   const useImageSwiper = hoverEnabled === false && hasCarousel && !isSliderCard;
+
+  // Priority / явный loadImage=false: сразу; иначе — IO (каталог ниже fold)
+  const [nearViewport, setNearViewport] = useState(
+    () => imagePriority || isSliderCard
+  );
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const cardSwiperRef = useRef<SwiperInstance | null>(null);
@@ -71,6 +81,8 @@ const ProductCard = ({
     containerRef
   );
 
+  const allowMedia = loadImage && (imagePriority || nearViewport || isSliderCard);
+
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 769px)");
     setHoverEnabled(mq.matches);
@@ -78,6 +90,29 @@ const ProductCard = ({
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, []);
+
+  useEffect(() => {
+    if (imagePriority || isSliderCard || !loadImage) {
+      setNearViewport(true);
+      return;
+    }
+    const root = containerRef.current;
+    if (!root || typeof IntersectionObserver === "undefined") {
+      setNearViewport(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setNearViewport(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "240px 0px", threshold: 0.01 }
+    );
+    io.observe(root);
+    return () => io.disconnect();
+  }, [imagePriority, isSliderCard, loadImage]);
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -129,9 +164,11 @@ const ProductCard = ({
     ? `${styles.productCard} ${styles.zoomOnHover}`
     : styles.productCard;
 
+  const coverSrc = imageList[0];
+  const coverLoaded = Boolean(loadedStates[0]);
+
   return (
     <div className={cardClassName} onClickCapture={handleClickCapture}>
-
       <div className={styles.imageWrapper}>
         <div
           className={`${styles.imageContainer} ${
@@ -148,7 +185,35 @@ const ProductCard = ({
               : undefined
           }
         >
-          {useImageSwiper ? (
+          {isSliderCard ? (
+            <>
+              <div
+                className={`${styles.imageShimmer} ${
+                  coverLoaded ? styles.imageShimmerHidden : ""
+                }`}
+                aria-hidden
+              />
+              {allowMedia && coverSrc ? (
+                // Нативный img: стабильнее next/image внутри Swiper, SSR cover в HTML
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={coverSrc}
+                  alt={title}
+                  className={`${styles.productImage} ${styles.productImageCarousel} ${
+                    coverLoaded
+                      ? styles.productImageLoaded
+                      : styles.productImageLoading
+                  }`}
+                  loading={imagePriority ? "eager" : "lazy"}
+                  decoding="async"
+                  fetchPriority={imagePriority ? "high" : "auto"}
+                  draggable={false}
+                  onLoad={() => markImageLoaded(0)}
+                  onError={() => markImageLoaded(0)}
+                />
+              ) : null}
+            </>
+          ) : useImageSwiper ? (
             createElement(
               Swiper as ComponentType<Record<string, unknown>>,
               {
@@ -192,9 +257,8 @@ const ProductCard = ({
                 },
               },
               imageList.map((image, index) => {
-                // Текущий ±1 — eager; иначе native lazy в Swiper на мобилке часто не стартует
                 const inWindow = Math.abs(index - currentIndex) <= 1;
-                const shouldRender = inWindow || index === 0;
+                const shouldRender = allowMedia && (inWindow || index === 0);
                 return createElement(
                   SwiperSlide as ComponentType<Record<string, unknown>>,
                   {
@@ -242,14 +306,13 @@ const ProductCard = ({
                 const isLoaded = loadedStates[index];
                 const nearActive = Math.abs(index - currentIndex) <= 1;
                 const coverPriority = imagePriority && index === 0;
-                // Слайдер: только cover. Иначе активный + сосед + первый; desktop hover — все
-                const shouldMount = isSliderCard
-                  ? index === 0
-                  : isActive ||
+                const shouldMount =
+                  allowMedia &&
+                  (isActive ||
                     nearActive ||
                     index === 0 ||
                     isDesktopHover ||
-                    Boolean(loadedStates[index]);
+                    Boolean(loadedStates[index]));
                 return (
                   <div key={image + index} className={styles.imageSlide}>
                     {isActive || index === 0 ? (
