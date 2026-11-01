@@ -1,4 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// Эти тесты проверяют fetch-флоу прода; mock-store обходим
+vi.mock("../../../lib/useMocks", () => ({
+  shouldUseMocks: () => false,
+}));
+
 import {
   AUTH_VERIFY_SESSION_ERROR_MESSAGE,
   AuthApiError,
