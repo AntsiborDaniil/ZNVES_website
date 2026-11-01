@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import styles from "./HeroSection.module.css";
 
-const HERO_DESKTOP_VIDEO = "/videos/home/hero-desktop-v3.mp4";
+const HERO_DESKTOP_VIDEO = "/videos/home/hero-desktop-v4.mp4";
 const HERO_MOBILE_VIDEO = "/videos/home/hero-mobile-v3.mp4";
 const HERO_MOBILE_POSTER = "/images/home/hero-mobile-poster.jpg";
 
@@ -269,7 +269,8 @@ const HeroSection = () => {
           autoPlay
           loop
           playsInline
-          preload="none"
+          // Desktop: auto — иначе лагает буфер. Mobile: none до явного play.
+          preload={useMobile ? "none" : "auto"}
           disablePictureInPicture
           aria-hidden
           tabIndex={-1}

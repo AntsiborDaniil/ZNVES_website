@@ -1,14 +1,13 @@
-/** Таймаут клиентских/серверных fetch, чтобы UI не висел бесконечно на плохой сети. */
-export const DEFAULT_FETCH_TIMEOUT_MS = 10_000;
+/** Таймаут fetch. 10s на LTE часто мало — запас для мобилки. */
+export const DEFAULT_FETCH_TIMEOUT_MS = 25_000;
 
 type FetchWithTimeoutInit = RequestInit & {
   timeoutMs?: number;
 };
 
 /**
- * fetch + AbortSignal.timeout.
- * Если передан свой `signal`, при его abort тоже отменяем запрос
- * (через AbortSignal.any, с fallback на один timeout-signal).
+ * fetch с таймаутом через AbortController (без AbortSignal.timeout —
+ * его нет в части Safari, из‑за этого каталог на мобилке отдавал []).
  */
 export const fetchWithTimeout = (
   input: RequestInfo | URL,
@@ -17,11 +16,26 @@ export const fetchWithTimeout = (
   const { timeoutMs = DEFAULT_FETCH_TIMEOUT_MS, signal: outerSignal, ...rest } =
     init;
 
-  const timeoutSignal = AbortSignal.timeout(timeoutMs);
-  const signal =
-    outerSignal && typeof AbortSignal.any === "function"
-      ? AbortSignal.any([outerSignal, timeoutSignal])
-      : timeoutSignal;
+  const controller = new AbortController();
+  const timerId = setTimeout(() => {
+    controller.abort();
+  }, timeoutMs);
 
-  return fetch(input, { ...rest, signal });
+  const onOuterAbort = () => {
+    controller.abort();
+  };
+
+  if (outerSignal) {
+    if (outerSignal.aborted) {
+      clearTimeout(timerId);
+      controller.abort();
+    } else {
+      outerSignal.addEventListener("abort", onOuterAbort);
+    }
+  }
+
+  return fetch(input, { ...rest, signal: controller.signal }).finally(() => {
+    clearTimeout(timerId);
+    outerSignal?.removeEventListener("abort", onOuterAbort);
+  });
 };
