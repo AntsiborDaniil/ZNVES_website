@@ -1,7 +1,8 @@
 import CatalogPage from "../../components/CatalogPage/CatalogPage";
 import {
+  CATALOG_PAGE_SIZE,
   fetchCatalogCategories,
-  fetchCatalogProductsByCategory,
+  fetchCatalogProductsPageByCategory,
   resolveCategorySlug,
 } from "../../api/catalog/catalogApi";
 
@@ -18,17 +19,18 @@ export default async function Catalog({ searchParams }: CatalogRouteProps) {
       ? undefined
       : resolveCategorySlug(categoryParam) ?? undefined;
 
-  const [initialProducts, initialCategories] = await Promise.all([
-    fetchCatalogProductsByCategory(categorySlug),
+  const [firstPage, initialCategories] = await Promise.all([
+    fetchCatalogProductsPageByCategory(categorySlug, 1, CATALOG_PAGE_SIZE),
     fetchCatalogCategories(),
   ]);
 
   return (
     <CatalogPage
       title="CATALOG"
-      initialProducts={initialProducts}
+      initialProducts={firstPage.products}
       initialCategories={initialCategories}
       initialCategoryParam={categoryParam ?? null}
+      initialHasMore={firstPage.hasMore}
     />
   );
 }

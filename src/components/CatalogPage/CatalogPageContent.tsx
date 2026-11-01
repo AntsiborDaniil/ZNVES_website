@@ -7,19 +7,20 @@ import {
   useRef,
   useState,
 } from "react";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useSearchParams, usePathname } from "next/navigation";
 import styles from "./CatalogPage.module.css";
 import ProductCard from "../ProductCard/ProductCard";
 import CatalogSkeleton from "./CatalogSkeleton";
 import Link from "next/link";
 import type { CatalogProduct } from "../../types/products";
 import {
-  fetchCatalogProductsByCategory,
+  CATALOG_PAGE_SIZE,
+  fetchCatalogProductsPage,
+  fetchCatalogProductsPageByCategory,
   getCatalogCategoryLabel,
   resolveCategorySlug,
   type ApiCatalogCategory,
 } from "../../api/catalog/catalogApi";
-import { fetchNewInProducts } from "../../api/new-in/newInApi";
 import { buildProductHref } from "../../lib/productNavigation";
 import { useCatalogCategories } from "../../contexts/CatalogCategoriesContext";
 
@@ -28,6 +29,7 @@ type CatalogPageContentProps = {
   initialProducts?: CatalogProduct[];
   initialCategories?: ApiCatalogCategory[];
   initialCategoryParam?: string | null;
+  initialHasMore?: boolean;
 };
 
 const categoryFromUrl = (param: string | null): string => {
@@ -35,13 +37,19 @@ const categoryFromUrl = (param: string | null): string => {
   return resolveCategorySlug(param) ?? "all";
 };
 
+const normalizeSlug = (value: string): string =>
+  value.trim().toLowerCase().replace(/_/g, "-");
+
+/** Сколько карточек монтируем сразу из уже загруженной порции (DOM, не сеть). */
+const DOM_CHUNK = 8;
+
 const CatalogPageContent = ({
   title,
   initialProducts = [],
   initialCategories = [],
   initialCategoryParam = null,
+  initialHasMore = false,
 }: CatalogPageContentProps) => {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const {
@@ -52,12 +60,16 @@ const CatalogPageContent = ({
   const categoryParam =
     searchParams?.get("category") ?? initialCategoryParam ?? null;
   const navFrom = title === "NEW IN" ? "new-in" : "catalog";
+  const isNewIn = title === "NEW IN";
 
   const [products, setProducts] = useState<CatalogProduct[]>(initialProducts);
+  const [hasMore, setHasMore] = useState(initialHasMore);
+  const [nextPage, setNextPage] = useState(2);
   const [categories, setCategories] = useState<ApiCatalogCategory[]>(() =>
     initialCategories.length > 0 ? initialCategories : sharedCategories
   );
   const [isLoading, setIsLoading] = useState(initialProducts.length === 0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(
     initialCategories.length === 0 && sharedCategories.length === 0
   );
@@ -66,34 +78,30 @@ const CatalogPageContent = ({
   const [activeCategory, setActiveCategory] = useState<string>(
     categoryFromUrl(categoryParam)
   );
-  const categoriesRef = useRef<HTMLElement | null>(null);
-  const ssrProductsUsedRef = useRef(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLElement>) => {
-    if (!categoriesRef.current) return;
-    setIsDragging(true);
-    setStartX(e.pageX - categoriesRef.current.offsetLeft);
-    setScrollLeft(categoriesRef.current.scrollLeft);
-  };
+  const [visibleCount, setVisibleCount] = useState(() =>
+    Math.min(DOM_CHUNK, initialProducts.length || DOM_CHUNK)
+  );
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    if (!isDragging || !categoriesRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - categoriesRef.current.offsetLeft;
-    const walk = (x - startX) * 2;
-    categoriesRef.current.scrollLeft = scrollLeft - walk;
-  };
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const loadingMoreRef = useRef(false);
+  const categoryRequestIdRef = useRef(0);
+  const productsRef = useRef(products);
+  productsRef.current = products;
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+  const ssrSyncKey = `${title}|${categoryParam ?? ""}|${initialProducts.length}|${initialProducts[0]?.slug ?? ""}|${initialHasMore}`;
 
-  const handleMouseLeave = () => {
-    setIsDragging(false);
-  };
+  // Синхрон с RSC при смене категории (Link) — не ждём отдельный client fetch
+  useEffect(() => {
+    setActiveCategory(categoryFromUrl(categoryParam));
+    setProducts(initialProducts);
+    setHasMore(initialHasMore);
+    setNextPage(2);
+    setVisibleCount(Math.min(DOM_CHUNK, Math.max(initialProducts.length, 0)));
+    setLoadError(null);
+    setIsLoading(initialProducts.length === 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- ключ отражает смену SSR-порции
+  }, [ssrSyncKey]);
 
   useEffect(() => {
     if (sharedCategories.length > 0) {
@@ -122,93 +130,151 @@ const CatalogPageContent = ({
     };
   }, [categories.length, refreshSharedCategories]);
 
+  // Если SSR пустой — добираем первую страницу на клиенте
   useEffect(() => {
+    if (initialProducts.length > 0) return;
+
+    const requestId = ++categoryRequestIdRef.current;
     let cancelled = false;
 
-    const loadProducts = async () => {
-      const useSsrQuiet =
-        !ssrProductsUsedRef.current && initialProducts.length > 0;
-      if (useSsrQuiet) {
-        ssrProductsUsedRef.current = true;
-        setIsLoading(false);
-      } else if (products.length === 0) {
-        setIsLoading(true);
-      }
-
+    const loadFirstPage = async () => {
+      setIsLoading(true);
       setLoadError(null);
-
       try {
         const categorySlug =
           categoryParam == null
             ? undefined
             : resolveCategorySlug(categoryParam) ?? undefined;
 
-        const nextProducts =
-          title === "NEW IN"
-            ? await fetchNewInProducts(categorySlug)
-            : await fetchCatalogProductsByCategory(categorySlug);
+        const page = isNewIn
+          ? await fetchCatalogProductsPage({
+              is_new: true,
+              category: categorySlug,
+              page: 1,
+              page_size: CATALOG_PAGE_SIZE,
+            })
+          : await fetchCatalogProductsPageByCategory(
+              categorySlug,
+              1,
+              CATALOG_PAGE_SIZE
+            );
 
-        if (cancelled) return;
+        if (cancelled || requestId !== categoryRequestIdRef.current) return;
 
-        // Пустой ответ при живом SSR не затираем (часто сеть/timeout)
-        if (nextProducts.length > 0) {
-          setProducts(nextProducts);
-        } else if (!useSsrQuiet) {
-          setProducts(nextProducts);
+        setProducts(page.products);
+        setHasMore(page.hasMore);
+        setNextPage(2);
+        setVisibleCount(Math.min(DOM_CHUNK, page.products.length));
+        if (page.products.length === 0) {
+          setLoadError(null);
         }
       } catch {
-        if (!cancelled && products.length === 0) {
+        if (!cancelled && requestId === categoryRequestIdRef.current) {
           setLoadError(
             "Не удалось загрузить товары. Проверьте сеть и попробуйте ещё раз."
           );
+          setProducts([]);
+          setHasMore(false);
         }
       } finally {
-        if (!cancelled) setIsLoading(false);
+        if (!cancelled && requestId === categoryRequestIdRef.current) {
+          setIsLoading(false);
+        }
       }
     };
 
-    void loadProducts();
+    void loadFirstPage();
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- products length только для UX скелетона
-  }, [title, categoryParam, initialProducts.length]);
+  }, [categoryParam, initialProducts.length, isNewIn]);
 
-  useEffect(() => {
-    setActiveCategory(categoryFromUrl(categoryParam));
-  }, [categoryParam]);
+  const appendNextPage = useCallback(async () => {
+    if (loadingMoreRef.current || !hasMore) return;
+    loadingMoreRef.current = true;
+    setIsLoadingMore(true);
 
-  const updateURL = useCallback(
-    (updates: { category?: string }) => {
-      const params = new URLSearchParams(searchParams?.toString() || "");
+    try {
+      const categorySlug =
+        categoryParam == null
+          ? undefined
+          : resolveCategorySlug(categoryParam) ?? undefined;
 
-      if (updates.category !== undefined) {
-        if (updates.category === "All" || updates.category === "all") {
-          params.delete("category");
-        } else {
-          params.set("category", updates.category);
-        }
+      const page = isNewIn
+        ? await fetchCatalogProductsPage({
+            is_new: true,
+            category: categorySlug,
+            page: nextPage,
+            page_size: CATALOG_PAGE_SIZE,
+          })
+        : await fetchCatalogProductsPageByCategory(
+            categorySlug,
+            nextPage,
+            CATALOG_PAGE_SIZE
+          );
+
+      if (page.products.length === 0) {
+        setHasMore(false);
+        return;
       }
 
-      params.delete("color");
-      params.delete("size");
-      params.delete("order");
+      const seen = new Set(productsRef.current.map((p) => p.slug));
+      const unique = page.products.filter((p) => !seen.has(p.slug));
+      // Бэк без пагинации вернул те же slug — больше не просим
+      if (unique.length === 0) {
+        setHasMore(false);
+        return;
+      }
 
-      const newURL = params.toString()
-        ? `${pathname}?${params.toString()}`
-        : pathname;
-      router.push(newURL, { scroll: false });
-    },
-    [searchParams, pathname, router]
-  );
+      setProducts((prev) => [...prev, ...unique]);
+      setHasMore(page.hasMore);
+      setNextPage((p) => p + 1);
+      setVisibleCount((v) => v + Math.min(DOM_CHUNK, unique.length));
+    } catch {
+      setHasMore(false);
+    } finally {
+      loadingMoreRef.current = false;
+      setIsLoadingMore(false);
+    }
+  }, [categoryParam, hasMore, isNewIn, nextPage]);
 
-  const handleCategoryChange = useCallback(
-    (slug: string) => {
-      setActiveCategory(slug);
-      updateURL({ category: slug === "all" ? "All" : slug });
-    },
-    [updateURL]
-  );
+  const filteredProducts = useMemo(() => {
+    return [...products].sort((a, b) => a.sortOrder - b.sortOrder);
+  }, [products]);
+
+  // DOM-чанк внутри уже загруженных + сеть при hasMore
+  useEffect(() => {
+    const loaded = filteredProducts.length;
+    const needsDomMore = visibleCount < loaded;
+    const needsNetworkMore = !needsDomMore && hasMore;
+    if (!needsDomMore && !needsNetworkMore) return;
+
+    const node = loadMoreRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        if (visibleCount < filteredProducts.length) {
+          setVisibleCount((prev) =>
+            Math.min(prev + DOM_CHUNK, filteredProducts.length)
+          );
+          return;
+        }
+        if (hasMore) {
+          void appendNextPage();
+        }
+      },
+      { rootMargin: "320px 0px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [
+    appendNextPage,
+    filteredProducts.length,
+    hasMore,
+    visibleCount,
+  ]);
 
   const handleRetry = useCallback(() => {
     setLoadError(null);
@@ -219,15 +285,24 @@ const CatalogPageContent = ({
           categoryParam == null
             ? undefined
             : resolveCategorySlug(categoryParam) ?? undefined;
-        const nextProducts =
-          title === "NEW IN"
-            ? await fetchNewInProducts(categorySlug)
-            : await fetchCatalogProductsByCategory(categorySlug);
-        setProducts(nextProducts);
-        if (nextProducts.length === 0) {
-          setLoadError(
-            "Не удалось загрузить товары. Проверьте сеть и попробуйте ещё раз."
-          );
+        const page = isNewIn
+          ? await fetchCatalogProductsPage({
+              is_new: true,
+              category: categorySlug,
+              page: 1,
+              page_size: CATALOG_PAGE_SIZE,
+            })
+          : await fetchCatalogProductsPageByCategory(
+              categorySlug,
+              1,
+              CATALOG_PAGE_SIZE
+            );
+        setProducts(page.products);
+        setHasMore(page.hasMore);
+        setNextPage(2);
+        setVisibleCount(Math.min(DOM_CHUNK, page.products.length));
+        if (page.products.length === 0) {
+          setLoadError(null);
         }
         await refreshSharedCategories();
       } catch {
@@ -238,46 +313,25 @@ const CatalogPageContent = ({
         setIsLoading(false);
       }
     })();
-  }, [categoryParam, title, refreshSharedCategories]);
-
-  const filteredProducts = useMemo(() => {
-    return [...products].sort((a, b) => a.sortOrder - b.sortOrder);
-  }, [products]);
-
-  // Прогрессивный показ карточек: сначала первая порция, остальное — по скроллу
-  const INITIAL_VISIBLE = 8;
-  const LOAD_MORE_STEP = 8;
-  const [visibleCount, setVisibleCount] = useState(() =>
-    Math.min(INITIAL_VISIBLE, Math.max(filteredProducts.length, INITIAL_VISIBLE))
-  );
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    setVisibleCount(Math.min(INITIAL_VISIBLE, filteredProducts.length) || INITIAL_VISIBLE);
-  }, [filteredProducts]);
-
-  useEffect(() => {
-    const total = filteredProducts.length;
-    if (visibleCount >= total) return;
-
-    const node = loadMoreRef.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((e) => e.isIntersecting)) return;
-        setVisibleCount((prev) => Math.min(prev + LOAD_MORE_STEP, total));
-      },
-      { rootMargin: "240px 0px" }
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [filteredProducts.length, visibleCount]);
+  }, [categoryParam, isNewIn, refreshSharedCategories]);
 
   const visibleProducts = useMemo(
     () => filteredProducts.slice(0, visibleCount),
     [filteredProducts, visibleCount]
   );
+
+  const showSentinel =
+    !isLoading &&
+    filteredProducts.length > 0 &&
+    (visibleCount < filteredProducts.length || hasMore);
+
+  const categoryHref = (slug: string) => {
+    if (slug === "all") return pathname;
+    return `${pathname}?category=${encodeURIComponent(slug)}`;
+  };
+
+  const isCategoryActive = (slug: string) =>
+    normalizeSlug(slug) === normalizeSlug(activeCategory);
 
   return (
     <>
@@ -300,39 +354,35 @@ const CatalogPageContent = ({
             <div className={styles.categorySkeletonPill} />
           </div>
         ) : (
-          <nav
-            ref={categoriesRef}
-            className={styles.categories}
-            aria-label="Категории"
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseLeave}
-          >
-            <button
-              key="all"
+          <nav className={styles.categories} aria-label="Категории">
+            <Link
+              href={categoryHref("all")}
+              scroll={false}
               className={`${styles.categoryButton} ${
-                activeCategory === "all" ? styles.categoryButtonActive : ""
+                isCategoryActive("all") ? styles.categoryButtonActive : ""
               }`}
-              onClick={() => handleCategoryChange("all")}
-              type="button"
+              onClick={() => setActiveCategory("all")}
+              prefetch
             >
               All
-            </button>
+            </Link>
             {categories.map((category) => {
-              const isActive = category.slug === activeCategory;
               const label = getCatalogCategoryLabel(category);
               return (
-                <button
+                <Link
                   key={category.slug}
+                  href={categoryHref(category.slug)}
+                  scroll={false}
                   className={`${styles.categoryButton} ${
-                    isActive ? styles.categoryButtonActive : ""
+                    isCategoryActive(category.slug)
+                      ? styles.categoryButtonActive
+                      : ""
                   }`}
-                  onClick={() => handleCategoryChange(category.slug)}
-                  type="button"
+                  onClick={() => setActiveCategory(normalizeSlug(category.slug))}
+                  prefetch
                 >
                   {label}
-                </button>
+                </Link>
               );
             })}
           </nav>
@@ -368,12 +418,18 @@ const CatalogPageContent = ({
               ))}
             </div>
 
-            {visibleCount < filteredProducts.length ? (
+            {showSentinel ? (
               <div
                 ref={loadMoreRef}
                 className={styles.loadMoreSentinel}
                 aria-hidden
               />
+            ) : null}
+
+            {isLoadingMore ? (
+              <p className={styles.loadingMoreLabel} role="status">
+                Загрузка…
+              </p>
             ) : null}
 
             {filteredProducts.length === 0 && (
@@ -434,13 +490,14 @@ const CatalogPageContent = ({
                   </button>
                 ) : (
                   activeCategory !== "all" && (
-                    <button
-                      type="button"
+                    <Link
+                      href={categoryHref("all")}
+                      scroll={false}
                       className={styles.emptyStateButton}
-                      onClick={() => handleCategoryChange("all")}
+                      onClick={() => setActiveCategory("all")}
                     >
                       Смотреть все
-                    </button>
+                    </Link>
                   )
                 )}
               </div>

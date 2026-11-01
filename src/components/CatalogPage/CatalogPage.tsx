@@ -12,6 +12,7 @@ type CatalogPageProps = {
   initialProducts?: CatalogProduct[];
   initialCategories?: ApiCatalogCategory[];
   initialCategoryParam?: string | null;
+  initialHasMore?: boolean;
 };
 
 const CatalogPage = ({
@@ -19,6 +20,7 @@ const CatalogPage = ({
   initialProducts = [],
   initialCategories = [],
   initialCategoryParam = null,
+  initialHasMore = false,
 }: CatalogPageProps) => {
   return (
     <div className={styles.page}>
@@ -30,6 +32,7 @@ const CatalogPage = ({
             initialProducts={initialProducts}
             initialCategories={initialCategories}
             initialCategoryParam={initialCategoryParam}
+            initialHasMore={initialHasMore}
           />
         </Suspense>
       </main>

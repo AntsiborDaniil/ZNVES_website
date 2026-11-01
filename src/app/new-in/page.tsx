@@ -1,9 +1,10 @@
 import CatalogPage from "../../components/CatalogPage/CatalogPage";
 import {
+  CATALOG_PAGE_SIZE,
   fetchCatalogCategories,
+  fetchCatalogProductsPage,
   resolveCategorySlug,
 } from "../../api/catalog/catalogApi";
-import { fetchNewInProducts } from "../../api/new-in/newInApi";
 
 type NewInRouteProps = {
   searchParams: Promise<{ category?: string | string[] }>;
@@ -18,17 +19,23 @@ export default async function NewIn({ searchParams }: NewInRouteProps) {
       ? undefined
       : resolveCategorySlug(categoryParam) ?? undefined;
 
-  const [initialProducts, initialCategories] = await Promise.all([
-    fetchNewInProducts(categorySlug),
+  const [firstPage, initialCategories] = await Promise.all([
+    fetchCatalogProductsPage({
+      is_new: true,
+      category: categorySlug,
+      page: 1,
+      page_size: CATALOG_PAGE_SIZE,
+    }),
     fetchCatalogCategories(),
   ]);
 
   return (
     <CatalogPage
       title="NEW IN"
-      initialProducts={initialProducts}
+      initialProducts={firstPage.products}
       initialCategories={initialCategories}
       initialCategoryParam={categoryParam ?? null}
+      initialHasMore={firstPage.hasMore}
     />
   );
 }

@@ -34,6 +34,10 @@ export type ApiProduct = {
 export type CatalogApiParams = {
   category?: string;
   is_new?: boolean;
+  /** 1-based page (DRF-style). */
+  page?: number;
+  /** Page size; paired with `page`. */
+  page_size?: number;
 };
 
 // Реэкспорт типов для детальной страницы товара (ApiProductSize и ApiProductColor уже объявлены выше)

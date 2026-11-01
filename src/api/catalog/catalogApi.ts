@@ -77,8 +77,22 @@ export type ApiCatalogSize = {
   value: string;
 };
 
-// Кеш для запросов
-const cache = new Map<string, { data: CatalogProduct[]; timestamp: number }>();
+/** Размер первой/следующей порции каталога (SSR + infinite scroll). */
+export const CATALOG_PAGE_SIZE = 12;
+
+export type CatalogPageResult = {
+  products: CatalogProduct[];
+  /** Есть ли ещё страницы на бэке (DRF next / полный page_size). */
+  hasMore: boolean;
+  page: number;
+  pageSize: number;
+  total: number | null;
+  /** `full` — бэк отдал весь список массивом (пагинацию игнорирует). */
+  mode: "paged" | "full";
+};
+
+// Кеш страниц каталога
+const cache = new Map<string, { result: CatalogPageResult; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
 
 // Преобразование API ответа в CatalogProduct
@@ -131,40 +145,121 @@ const hashString = (str: string): number => {
   return Math.abs(hash);
 };
 
-// Функция для получения товаров каталога с фильтрами
-export const fetchCatalogProducts = async (
+const isApiProductArray = (value: unknown): value is ApiProduct[] =>
+  Array.isArray(value) &&
+  (value.length === 0 ||
+    (typeof value[0] === "object" &&
+      value[0] !== null &&
+      "slug" in value[0]));
+
+type DrfCatalogPage = {
+  count?: number;
+  next?: string | null;
+  previous?: string | null;
+  results: ApiProduct[];
+};
+
+const isDrfCatalogPage = (value: unknown): value is DrfCatalogPage =>
+  typeof value === "object" &&
+  value !== null &&
+  "results" in value &&
+  Array.isArray((value as DrfCatalogPage).results);
+
+const parseCatalogPayload = (
+  data: unknown,
+  page: number,
+  pageSize: number,
+  sortOffset: number
+): CatalogPageResult => {
+  if (isDrfCatalogPage(data)) {
+    const products = data.results.map((product, index) =>
+      transformApiProduct(product, sortOffset + index)
+    );
+    const hasMore =
+      data.next != null && data.next !== ""
+        ? true
+        : typeof data.count === "number"
+          ? page * pageSize < data.count
+          : products.length >= pageSize;
+
+    return {
+      products,
+      hasMore,
+      page,
+      pageSize,
+      total: typeof data.count === "number" ? data.count : null,
+      mode: "paged",
+    };
+  }
+
+  if (isApiProductArray(data)) {
+    // Плоский массив = бэкенд отдал всю выборку разом (пагинацию игнорирует)
+    const products = data.map((product, index) =>
+      transformApiProduct(product, sortOffset + index)
+    );
+    return {
+      products,
+      hasMore: false,
+      page: 1,
+      pageSize,
+      total: products.length,
+      mode: "full",
+    };
+  }
+
+  return {
+    products: [],
+    hasMore: false,
+    page,
+    pageSize,
+    total: 0,
+    mode: "full",
+  };
+};
+
+/** Одна страница каталога (SSR / infinite scroll). */
+export const fetchCatalogProductsPage = async (
   params: CatalogApiParams = {}
-): Promise<CatalogProduct[]> => {
-  const cacheKey = JSON.stringify(params);
+): Promise<CatalogPageResult> => {
+  const page = Math.max(1, params.page ?? 1);
+  const pageSize = Math.max(1, params.page_size ?? CATALOG_PAGE_SIZE);
+  const sortOffset = (page - 1) * pageSize;
+  const requestParams: CatalogApiParams = {
+    ...params,
+    page,
+    page_size: pageSize,
+  };
+  const cacheKey = JSON.stringify(requestParams);
   const cached = cache.get(cacheKey);
-  
+
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    return cached.data;
+    return cached.result;
   }
 
   if (shouldUseMocks()) {
-    const { getMockCatalogList } = await import("../../mocks/catalogMocks");
-    const data = getMockCatalogList(params);
-    const transformedProducts = data.map((product, index) =>
-      transformApiProduct(product, index)
-    );
+    const { getMockCatalogPage } = await import("../../mocks/catalogMocks");
+    const payload = getMockCatalogPage(requestParams);
+    const parsed = parseCatalogPayload(payload, page, pageSize, sortOffset);
     cache.set(cacheKey, {
-      data: transformedProducts,
+      result: parsed,
       timestamp: Date.now(),
     });
-    return transformedProducts;
+    return parsed;
   }
 
   try {
     const url = new URL(CATALOG_API_URL);
-    
+
     if (params.category) {
       url.searchParams.set("category", params.category);
     }
-    
+
     if (params.is_new !== undefined) {
       url.searchParams.set("is_new", params.is_new.toString());
     }
+
+    url.searchParams.set("page", String(page));
+    url.searchParams.set("page_size", String(pageSize));
 
     const response = await fetchWithTimeout(url.toString(), {
       method: "GET",
@@ -178,21 +273,44 @@ export const fetchCatalogProducts = async (
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
 
-    const data: ApiProduct[] = await response.json();
-    
-    const transformedProducts = data.map((product, index) =>
-      transformApiProduct(product, index)
-    );
+    const data: unknown = await response.json();
+    const parsed = parseCatalogPayload(data, page, pageSize, sortOffset);
+
+    // Защита от «фейковой» пагинации: page>1 снова те же slug → стоп
+    if (page > 1 && parsed.mode === "full") {
+      return { ...parsed, products: [], hasMore: false };
+    }
 
     cache.set(cacheKey, {
-      data: transformedProducts,
+      result: parsed,
       timestamp: Date.now(),
     });
 
-    return transformedProducts;
-  } catch (error) {
-    return [];
+    return parsed;
+  } catch {
+    return {
+      products: [],
+      hasMore: false,
+      page,
+      pageSize,
+      total: null,
+      mode: "full",
+    };
   }
+};
+
+/** Все товары по фильтрам (без пагинации UI) — для мест, где нужен полный список. */
+export const fetchCatalogProducts = async (
+  params: CatalogApiParams = {}
+): Promise<CatalogProduct[]> => {
+  // Без page — одна выгрузка как раньше (бэк может отдать весь массив)
+  const { page: _page, page_size: _pageSize, ...rest } = params;
+  const result = await fetchCatalogProductsPage({
+    ...rest,
+    page: 1,
+    page_size: params.page_size ?? 500,
+  });
+  return result.products;
 };
 
 /** Товары каталога; `category` — slug как с /categories/, без маппинга */
@@ -206,6 +324,23 @@ export const fetchCatalogProductsByCategory = async (
 
   return fetchCatalogProducts({
     category: normalizeCategoryKey(slug),
+  });
+};
+
+export const fetchCatalogProductsPageByCategory = async (
+  category?: string,
+  page = 1,
+  pageSize = CATALOG_PAGE_SIZE
+): Promise<CatalogPageResult> => {
+  const slug = category?.trim();
+  if (!slug || slug.toLowerCase() === "all") {
+    return fetchCatalogProductsPage({ page, page_size: pageSize });
+  }
+
+  return fetchCatalogProductsPage({
+    category: normalizeCategoryKey(slug),
+    page,
+    page_size: pageSize,
   });
 };
 

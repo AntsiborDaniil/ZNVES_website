@@ -68,23 +68,23 @@
   overflow-y: hidden;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
   scrollbar-width: none;
   -ms-overflow-style: none;
   flex-wrap: nowrap;
-  cursor: grab;
 }
 
 .categories::-webkit-scrollbar {
   display: none;
 }
 
-.categories:active {
-  cursor: grabbing;
-}
-
 .categoryButton {
   position: relative;
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px;
+  margin: 0;
   border: none;
   background: none;
   font-family: var(--font-family);
@@ -94,9 +94,12 @@
   letter-spacing: 0;
   text-transform: uppercase;
   color: var(--color-black);
+  text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .categoryButton:hover,
@@ -167,6 +170,17 @@
   padding: 0;
   pointer-events: none;
   visibility: hidden;
+}
+
+.loadingMoreLabel {
+  margin: 12px 0 0;
+  text-align: center;
+  font-family: var(--font-family);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-light);
+  letter-spacing: var(--letter-spacing-tight);
+  text-transform: uppercase;
+  color: var(--color-grey-4);
 }
 
 .catalogCard {
@@ -383,6 +397,9 @@
 }
 
 .emptyStateButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-family);
   font-size: var(--font-size-14);
   font-weight: var(--font-weight-regular);
@@ -395,6 +412,7 @@
   border: 1px solid var(--color-black);
   border-radius: 0;
   cursor: pointer;
+  text-decoration: none;
   text-transform: uppercase;
   transition:
     background-color 0.2s ease,
@@ -466,7 +484,8 @@
   .categoryButton {
     font-size: var(--font-size-10);
     line-height: var(--line-height-18);
-    padding: 0;
+    padding: 12px 6px;
+    min-height: 44px;
   }
 
 
