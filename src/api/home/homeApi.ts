@@ -35,6 +35,7 @@ export const fetchHomePage = async (): Promise<HomePageContent> => {
     memoryCache = { data, timestamp: Date.now() };
     return data;
   } catch {
+    const { MOCK_HOME_PAGE } = await import("../../mocks/data/home");
     return MOCK_HOME_PAGE;
   }
 };
