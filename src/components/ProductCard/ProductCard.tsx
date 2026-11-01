@@ -187,8 +187,11 @@ const ProductCard = ({
                   event.stopPropagation();
                 },
               },
-              imageList.map((image, index) =>
-                createElement(
+              imageList.map((image, index) => {
+                // Текущий ±1 — eager; иначе native lazy в Swiper на мобилке часто не стартует
+                const inWindow = Math.abs(index - currentIndex) <= 1;
+                const shouldRender = inWindow || index === 0;
+                return createElement(
                   SwiperSlide as ComponentType<Record<string, unknown>>,
                   {
                     key: image + index,
@@ -201,38 +204,42 @@ const ProductCard = ({
                       }`}
                       aria-hidden
                     />
-                    <Image
-                      src={image}
-                      alt={`${title} — фото ${index + 1}`}
-                      fill
-                      sizes="(max-width: 768px) 70vw, 40vw"
-                      className={`${styles.productImage} ${styles.productImageCarousel} ${
-                        loadedStates[index]
-                          ? styles.productImageLoaded
-                          : styles.productImageLoading
-                      }`}
-                      loading={index === 0 && imagePriority ? "eager" : "lazy"}
-                      fetchPriority={
-                        index === 0 && imagePriority ? "high" : "auto"
-                      }
-                      onLoad={() => markImageLoaded(index)}
-                      onError={() => markImageLoaded(index)}
-                      quality={variant === "grid" ? 70 : 80}
-                      unoptimized={isSvgImageSrc(image)}
-                      draggable={false}
-                    />
+                    {shouldRender ? (
+                      <Image
+                        src={image}
+                        alt={`${title} — фото ${index + 1}`}
+                        fill
+                        sizes="(max-width: 768px) 70vw, 40vw"
+                        className={`${styles.productImage} ${styles.productImageCarousel} ${
+                          loadedStates[index]
+                            ? styles.productImageLoaded
+                            : styles.productImageLoading
+                        }`}
+                        loading={inWindow || index === 0 ? "eager" : "lazy"}
+                        fetchPriority={
+                          index === 0 && imagePriority ? "high" : "auto"
+                        }
+                        onLoad={() => markImageLoaded(index)}
+                        onError={() => markImageLoaded(index)}
+                        quality={variant === "grid" ? 70 : 80}
+                        unoptimized={isSvgImageSrc(image)}
+                        draggable={false}
+                      />
+                    ) : null}
                   </div>
-                )
-              )
+                );
+              })
             )
           ) : (
             <div className={`${styles.imageTrack} ${styles.imageTrackStacked}`}>
               {imageList.map((image, index) => {
                 const isActive = index === currentIndex;
                 const isLoaded = loadedStates[index];
-                // В сетке сначала только активный кадр — остальные по hover/свайпу
+                const nearActive = Math.abs(index - currentIndex) <= 1;
+                // Активный + сосед + первый; на desktop hover — все
                 const shouldMount =
                   isActive ||
+                  nearActive ||
                   index === 0 ||
                   isDesktopHover ||
                   Boolean(loadedStates[index]);
@@ -264,7 +271,11 @@ const ProductCard = ({
                             : styles.productImageLoading
                         }`}
                         loading={
-                          imagePriority && index === 0 ? "eager" : "lazy"
+                          imagePriority && index === 0
+                            ? "eager"
+                            : nearActive || isActive
+                              ? "eager"
+                              : "lazy"
                         }
                         fetchPriority={
                           imagePriority && index === 0 ? "high" : "auto"

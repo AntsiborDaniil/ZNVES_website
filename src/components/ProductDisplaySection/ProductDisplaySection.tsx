@@ -297,6 +297,7 @@ const ProductDisplaySection = ({
                     images={product.images}
                     isNew={product.isNew}
                     isSliderCard={true}
+                    imagePriority={index < 3}
                   />
                 </Link>
               </SwiperSlide>
