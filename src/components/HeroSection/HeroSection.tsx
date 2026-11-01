@@ -5,9 +5,9 @@ import { HERO_RELEASE_EVENT } from "../NavigationTracker/NavigationTracker";
 import styles from "./HeroSection.module.css";
 
 const HERO_DESKTOP_VIDEO = "/videos/home/hero-desktop-v4.mp4";
-const HERO_MOBILE_VIDEO = "/videos/home/hero-mobile-v5.mp4";
-/** webp легче jpg — маска до playing */
-const HERO_MOBILE_POSTER = "/images/home/hero-mobile.webp";
+const HERO_MOBILE_VIDEO = "/videos/home/hero-mobile-v6.mp4";
+/** Кадр из hero-mobile-v6 (последние 10с) — маска до playing */
+const HERO_MOBILE_POSTER = "/images/home/hero-mobile.webp?v=6";
 
 /** Узкий экран ИЛИ тач-телефон (в т.ч. landscape >768px) — mobile-ролик. */
 const NARROW_MQ = "(max-width: 768px)";
