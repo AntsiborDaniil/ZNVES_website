@@ -47,7 +47,7 @@ const releaseVideo = (video: HTMLVideoElement | null) => {
   video.load();
 };
 
-/** Mute + playsInline ДО play — иначе iOS показывает кнопку запуска. */
+/** Mute + playsInline ДО play — иначе мобильные браузеры показывают кнопку. */
 const armAutoplay = (video: HTMLVideoElement) => {
   video.muted = true;
   video.defaultMuted = true;
@@ -81,7 +81,6 @@ const forcePlay = (video: HTMLVideoElement) => {
   }
 };
 
-/* Инлайн, чтобы заполнение не зависело от загрузки CSS-модуля */
 const heroStyle: CSSProperties = {
   position: "relative",
   display: "block",
@@ -90,29 +89,15 @@ const heroStyle: CSSProperties = {
   background: "var(--color-black)",
 };
 
-const videoStyle: CSSProperties = {
-  position: "absolute",
-  inset: 0,
-  display: "block",
-  width: "100%",
-  height: "100%",
-  objectFit: "cover",
-  objectPosition: "center center",
-};
-
-const posterStyle: CSSProperties = {
-  ...videoStyle,
-  zIndex: 0,
-};
-
 const HeroSection = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const releasedRef = useRef(false);
   const playRetryRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  // null до выбора на клиенте — desktop URL не попадает в DOM на мобилке
   const [src, setSrc] = useState<string | null>(null);
   const [useMobile, setUseMobile] = useState(false);
   const [screenHeight, setScreenHeight] = useState<number | null>(null);
+  /** Постер/маска сверху, пока video не в playing — нативная ▶/❚❚ не видна. */
+  const [coverVisible, setCoverVisible] = useState(true);
 
   const stopPlayRetry = () => {
     if (playRetryRef.current != null) {
@@ -121,7 +106,6 @@ const HeroSection = () => {
     }
   };
 
-  /** Крутим play(), пока ролик реально не играет — без ожидания скролла. */
   const ensurePlaying = (video: HTMLVideoElement) => {
     if (releasedRef.current) return;
     forcePlay(video);
@@ -129,20 +113,37 @@ const HeroSection = () => {
     let attempts = 0;
     playRetryRef.current = setInterval(() => {
       attempts += 1;
-      if (releasedRef.current || attempts > 40) {
+      if (releasedRef.current || attempts > 50) {
         stopPlayRetry();
         return;
       }
       if (!video.paused && !video.ended && video.currentTime > 0) {
         stopPlayRetry();
+        setCoverVisible(false);
         return;
       }
       forcePlay(video);
-    }, 200);
+    }, 160);
   };
 
-  // На мобилке при скролле адресная строка прячется и меняет высоту
-  // окна — в этот момент не пересчитываем, чтобы hero не прыгал.
+  // Preload mobile-ролика в <head> как можно раньше
+  useLayoutEffect(() => {
+    if (!shouldUseMobileHeroVideo() || isConstrainedMobileNetwork()) return;
+
+    const existing = document.head.querySelector(
+      `link[data-znves-hero-preload="1"]`
+    );
+    if (existing) return;
+
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "video";
+    link.href = HERO_MOBILE_VIDEO;
+    link.type = "video/mp4";
+    link.setAttribute("data-znves-hero-preload", "1");
+    document.head.appendChild(link);
+  }, []);
+
   useLayoutEffect(() => {
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
     let lastWidth = window.innerWidth;
@@ -174,13 +175,13 @@ const HeroSection = () => {
     const sync = () => {
       const mobile = shouldUseMobileHeroVideo();
       setUseMobile(mobile);
+      setCoverVisible(true);
 
       if (mobile) {
         if (isConstrainedMobileNetwork()) {
           setSrc(null);
           return;
         }
-        // Сразу ставим src — без ожидания window.load / idle / скролла
         setSrc((prev) =>
           prev === HERO_MOBILE_VIDEO ? prev : HERO_MOBILE_VIDEO
         );
@@ -202,10 +203,10 @@ const HeroSection = () => {
       stopPlayRetry();
       releaseVideo(videoRef.current);
       setSrc(null);
+      setCoverVisible(true);
     };
     window.addEventListener(HERO_RELEASE_EVENT, onHeroRelease);
 
-    // Запасной unlock жестом (если политика автоплея всё же блокирует)
     const unlock = () => {
       const video = videoRef.current;
       if (!video || releasedRef.current) return;
@@ -232,12 +233,16 @@ const HeroSection = () => {
     const video = videoRef.current;
     if (!video || !src || releasedRef.current) return;
 
+    setCoverVisible(true);
     ensurePlaying(video);
 
     const onReady = () => {
       if (!releasedRef.current) ensurePlaying(video);
     };
-    const onPlaying = () => stopPlayRetry();
+    const onPlaying = () => {
+      stopPlayRetry();
+      setCoverVisible(false);
+    };
     const onEnded = () => {
       if (!releasedRef.current) ensurePlaying(video);
     };
@@ -245,6 +250,8 @@ const HeroSection = () => {
       if (releasedRef.current) return;
       if (document.visibilityState !== "visible") return;
       if (!video.getAttribute("src") && !video.currentSrc) return;
+      // Снова маска — нативная кнопка паузы/play не должна мелькать
+      setCoverVisible(true);
       ensurePlaying(video);
     };
 
@@ -263,7 +270,7 @@ const HeroSection = () => {
       video.removeEventListener("ended", onEnded);
       video.removeEventListener("pause", onPause);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- ensurePlaying stable enough via refs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
   const bindVideoRef = (el: HTMLVideoElement | null) => {
@@ -281,25 +288,12 @@ const HeroSection = () => {
         screenHeight ? { ...heroStyle, height: `${screenHeight}px` } : heroStyle
       }
     >
-      {useMobile ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={HERO_MOBILE_POSTER}
-          alt=""
-          aria-hidden
-          style={posterStyle}
-          decoding="async"
-          fetchPriority="high"
-        />
-      ) : null}
       {src ? (
         <video
           key={src}
           ref={bindVideoRef}
           className={styles.heroVideo}
-          style={{ ...videoStyle, zIndex: 1 }}
           src={src}
-          poster={useMobile ? HERO_MOBILE_POSTER : undefined}
           muted
           autoPlay
           loop
@@ -313,6 +307,27 @@ const HeroSection = () => {
           tabIndex={-1}
         />
       ) : null}
+
+      {/* Непрозрачная маска: нативный ▶/❚❚ браузера остаётся под ней */}
+      <div
+        className={`${styles.cover} ${
+          coverVisible ? styles.coverVisible : styles.coverHidden
+        }`}
+        aria-hidden
+      >
+        {useMobile ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={HERO_MOBILE_POSTER}
+            alt=""
+            className={styles.coverImage}
+            decoding="async"
+            fetchPriority="high"
+          />
+        ) : (
+          <div className={styles.coverSolid} />
+        )}
+      </div>
     </section>
   );
 };

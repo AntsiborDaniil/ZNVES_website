@@ -14,6 +14,7 @@
 .heroVideo {
   position: absolute;
   inset: 0;
+  z-index: 1;
   display: block;
   width: 100%;
   height: 100%;
@@ -21,8 +22,8 @@
   object-position: center center;
   border: 0;
   outline: 0;
+  /* Клики не доходят до video → браузер не открывает controls по тапу */
   pointer-events: none;
-  /* Без нативных play/pause оверлеев iOS/Safari */
   -webkit-appearance: none;
 }
 
@@ -46,4 +47,40 @@
   width: 0 !important;
   height: 0 !important;
   pointer-events: none !important;
+}
+
+.cover {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: var(--color-black);
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+
+.coverVisible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.coverHidden {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.45s ease,
+    visibility 0s linear 0.45s;
+}
+
+.coverImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.coverSolid {
+  width: 100%;
+  height: 100%;
+  background: var(--color-black);
 }
