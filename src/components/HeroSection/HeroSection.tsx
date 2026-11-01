@@ -127,24 +127,6 @@ const HeroSection = () => {
     }, 160);
   };
 
-  // Preload mobile-ролика в <head> как можно раньше
-  useLayoutEffect(() => {
-    if (!shouldUseMobileHeroVideo() || isConstrainedMobileNetwork()) return;
-
-    const existing = document.head.querySelector(
-      `link[data-znves-hero-preload="1"]`
-    );
-    if (existing) return;
-
-    const link = document.createElement("link");
-    link.rel = "preload";
-    link.as = "video";
-    link.href = HERO_MOBILE_VIDEO;
-    link.type = "video/mp4";
-    link.setAttribute("data-znves-hero-preload", "1");
-    document.head.appendChild(link);
-  }, []);
-
   useLayoutEffect(() => {
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
     let lastWidth = window.innerWidth;
@@ -172,20 +154,33 @@ const HeroSection = () => {
     const narrowMq = window.matchMedia(NARROW_MQ);
     const touchPhoneMq = window.matchMedia(TOUCH_PHONE_MQ);
     releasedRef.current = false;
+    let mobileSrcTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const clearMobileSrcTimer = () => {
+      if (mobileSrcTimer != null) {
+        clearTimeout(mobileSrcTimer);
+        mobileSrcTimer = null;
+      }
+    };
 
     const sync = () => {
       const mobile = shouldUseMobileHeroVideo();
       setUseMobile(mobile);
       setCoverVisible(true);
+      clearMobileSrcTimer();
 
       if (mobile) {
         if (isConstrainedMobileNetwork()) {
           setSrc(null);
           return;
         }
-        setSrc((prev) =>
-          prev === HERO_MOBILE_VIDEO ? prev : HERO_MOBILE_VIDEO
-        );
+        // Даём covers bestsellers занять канал (~1.2s постер), потом видео
+        mobileSrcTimer = setTimeout(() => {
+          if (releasedRef.current) return;
+          setSrc((prev) =>
+            prev === HERO_MOBILE_VIDEO ? prev : HERO_MOBILE_VIDEO
+          );
+        }, 1200);
         if (videoRef.current?.currentSrc?.includes("hero-mobile")) {
           ensurePlaying(videoRef.current);
         }
@@ -218,6 +213,7 @@ const HeroSection = () => {
     window.addEventListener("scroll", unlock, { passive: true, once: true });
 
     return () => {
+      clearMobileSrcTimer();
       stopPlayRetry();
       releaseVideo(videoRef.current);
       narrowMq.removeEventListener("change", sync);
@@ -299,7 +295,7 @@ const HeroSection = () => {
           autoPlay
           loop
           playsInline
-          preload="auto"
+          preload={useMobile ? "metadata" : "auto"}
           controls={false}
           controlsList="nodownload nofullscreen noremoteplayback noplaybackrate"
           disablePictureInPicture

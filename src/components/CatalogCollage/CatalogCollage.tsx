@@ -11,6 +11,7 @@ import type { CatalogProduct } from "../../types/products";
 import { fetchAllCatalogProducts } from "../../api/home/catalogApi";
 import { fetchHomePage } from "../../api/home/homeApi";
 import { buildProductHref } from "../../lib/productNavigation";
+import { releaseHomeHero } from "../NavigationTracker/NavigationTracker";
 
 type CatalogCollageProps = {
   id?: string;
@@ -95,6 +96,7 @@ const CatalogCollage = ({
                   })}
                   className={styles.productLink}
                   prefetch={false}
+                  onPointerDown={() => releaseHomeHero()}
                 >
                   <ProductCard
                     title={product.title}
@@ -117,6 +119,7 @@ const CatalogCollage = ({
                 })}
                 className={styles.productLink}
                 prefetch={false}
+                onPointerDown={() => releaseHomeHero()}
               >
                 <ProductCard
                   title={product.title}

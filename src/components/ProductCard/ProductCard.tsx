@@ -48,8 +48,12 @@ const ProductCard = ({
     if (images.length === 0) {
       return ["/images/catalogs/placeholder.png"];
     }
+    // Слайдеры главной / section — только cover, без соседних кадров
+    if (isSliderCard) {
+      return [images[0]];
+    }
     return images;
-  }, [images]);
+  }, [images, isSliderCard]);
 
   const hasCarousel = imageList.length > 1;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -215,6 +219,7 @@ const ProductCard = ({
                             ? styles.productImageLoaded
                             : styles.productImageLoading
                         }`}
+                        priority={imagePriority && index === 0}
                         loading={inWindow || index === 0 ? "eager" : "lazy"}
                         fetchPriority={
                           index === 0 && imagePriority ? "high" : "auto"
@@ -236,13 +241,15 @@ const ProductCard = ({
                 const isActive = index === currentIndex;
                 const isLoaded = loadedStates[index];
                 const nearActive = Math.abs(index - currentIndex) <= 1;
-                // Активный + сосед + первый; на desktop hover — все
-                const shouldMount =
-                  isActive ||
-                  nearActive ||
-                  index === 0 ||
-                  isDesktopHover ||
-                  Boolean(loadedStates[index]);
+                const coverPriority = imagePriority && index === 0;
+                // Слайдер: только cover. Иначе активный + сосед + первый; desktop hover — все
+                const shouldMount = isSliderCard
+                  ? index === 0
+                  : isActive ||
+                    nearActive ||
+                    index === 0 ||
+                    isDesktopHover ||
+                    Boolean(loadedStates[index]);
                 return (
                   <div key={image + index} className={styles.imageSlide}>
                     {isActive || index === 0 ? (
@@ -270,16 +277,13 @@ const ProductCard = ({
                             ? styles.productImageLoaded
                             : styles.productImageLoading
                         }`}
+                        priority={coverPriority}
                         loading={
-                          imagePriority && index === 0
+                          coverPriority || nearActive || isActive
                             ? "eager"
-                            : nearActive || isActive
-                              ? "eager"
-                              : "lazy"
+                            : "lazy"
                         }
-                        fetchPriority={
-                          imagePriority && index === 0 ? "high" : "auto"
-                        }
+                        fetchPriority={coverPriority ? "high" : "auto"}
                         onLoad={() => markImageLoaded(index)}
                         onError={() => markImageLoaded(index)}
                         quality={variant === "grid" ? 70 : 80}

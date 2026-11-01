@@ -28,6 +28,7 @@ import {
   buildProductHref,
   type ProductNavFrom,
 } from "../../lib/productNavigation";
+import { releaseHomeHero } from "../NavigationTracker/NavigationTracker";
 
 export const BESTSELLERS_MAX_PRODUCTS = 8;
 
@@ -290,6 +291,9 @@ const ProductDisplaySection = ({
                   className={styles.slideLink}
                   aria-label={`Перейти к товару ${product.title}`}
                   prefetch={false}
+                  onPointerDown={
+                    navFrom === "home" ? () => releaseHomeHero() : undefined
+                  }
                 >
                   <ProductCard
                     title={product.title}
@@ -297,7 +301,7 @@ const ProductDisplaySection = ({
                     images={product.images}
                     isNew={product.isNew}
                     isSliderCard={true}
-                    imagePriority={index < 3}
+                    imagePriority={index < 4}
                   />
                 </Link>
               </SwiperSlide>

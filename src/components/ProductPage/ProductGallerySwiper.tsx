@@ -4,7 +4,6 @@ import {
   createElement,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
   type ComponentType,
@@ -23,13 +22,12 @@ type ProductGallerySwiperProps = {
   productTitle: string;
 };
 
-/** Окно вокруг активного слайда — без native lazy (ломается в Swiper на мобилке). */
-const buildWindow = (active: number, total: number): Set<number> => {
+/** Сначала только cover; соседи — после onLoad cover или при свайпе. */
+const buildNeighborWindow = (active: number, total: number): Set<number> => {
   const next = new Set<number>();
-  for (let i = active - 1; i <= active + 2; i += 1) {
+  for (let i = active - 1; i <= active + 1; i += 1) {
     if (i >= 0 && i < total) next.add(i);
   }
-  if (total > 0) next.add(0);
   return next;
 };
 
@@ -38,44 +36,68 @@ const ProductGallerySwiper = ({
   productTitle,
 }: ProductGallerySwiperProps) => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [unlocked, setUnlocked] = useState(() =>
-    buildWindow(0, images.length)
-  );
+  const [coverReady, setCoverReady] = useState(false);
+  const [unlocked, setUnlocked] = useState(() => {
+    const initial = new Set<number>();
+    if (images.length > 0) initial.add(0);
+    return initial;
+  });
   const gallerySwiperRef = useRef<SwiperInstance | null>(null);
+  const coverReadyRef = useRef(false);
 
   useEffect(() => {
     setActiveImageIndex(0);
-    setUnlocked(buildWindow(0, images.length));
-    gallerySwiperRef.current?.slideTo(0);
+    coverReadyRef.current = false;
+    setCoverReady(false);
+    const initial = new Set<number>();
+    if (images.length > 0) initial.add(0);
+    setUnlocked(initial);
+    gallerySwiperRef.current?.slideTo(0, 0);
   }, [images]);
+
+  const mergeUnlock = useCallback((indices: Iterable<number>) => {
+    setUnlocked((prev) => {
+      let changed = false;
+      const merged = new Set(prev);
+      for (const i of indices) {
+        if (!merged.has(i)) {
+          merged.add(i);
+          changed = true;
+        }
+      }
+      return changed ? merged : prev;
+    });
+  }, []);
 
   const unlockAround = useCallback(
     (index: number) => {
-      setUnlocked((prev) => {
-        const windowed = buildWindow(index, images.length);
-        let changed = false;
-        windowed.forEach((i) => {
-          if (!prev.has(i)) changed = true;
-        });
-        if (!changed) return prev;
-        const merged = new Set(prev);
-        windowed.forEach((i) => merged.add(i));
-        return merged;
-      });
+      mergeUnlock(buildNeighborWindow(index, images.length));
     },
-    [images.length]
+    [images.length, mergeUnlock]
   );
 
-  // Прогрев URL в кэш браузера для разблокированных кадров
+  const onCoverSettled = useCallback(() => {
+    if (coverReadyRef.current) return;
+    coverReadyRef.current = true;
+    setCoverReady(true);
+    unlockAround(0);
+  }, [unlockAround]);
+
+  // Кэш: onLoad может не сработать — добираем complete из DOM
   useEffect(() => {
-    unlocked.forEach((index) => {
-      const src = images[index];
-      if (!src) return;
-      const probe = new window.Image();
-      probe.decoding = "async";
-      probe.src = src;
-    });
-  }, [unlocked, images]);
+    if (coverReadyRef.current || images.length === 0) return;
+    const cover = images[0];
+    const imgs = document.querySelectorAll<HTMLImageElement>(
+      `.${styles.heroImage}`
+    );
+    for (const img of imgs) {
+      if (img.getAttribute("src") !== cover) continue;
+      if (img.complete) {
+        onCoverSettled();
+        return;
+      }
+    }
+  }, [images, onCoverSettled, unlocked]);
 
   const hasOverflow = images.length > MAX_VISIBLE_THUMBS;
   const overflowCount = hasOverflow
@@ -89,11 +111,6 @@ const ProductGallerySwiper = ({
     unlockAround(index);
     gallerySwiperRef.current?.slideTo(index);
   };
-
-  const thumbEagerUntil = useMemo(
-    () => Math.min(3, visibleThumbs.length),
-    [visibleThumbs.length]
-  );
 
   return (
     <div className={styles.imageSliderWrap}>
@@ -123,7 +140,6 @@ const ProductGallerySwiper = ({
             className: styles.imageSlider,
             onSwiper: (swiper: SwiperInstance) => {
               gallerySwiperRef.current = swiper;
-              unlockAround(swiper.activeIndex);
             },
             onSlideChange: (swiper: SwiperInstance) => {
               setActiveImageIndex(swiper.activeIndex);
@@ -135,6 +151,7 @@ const ProductGallerySwiper = ({
           },
           images.map((image, index) => {
             const isUnlocked = unlocked.has(index);
+            const isCover = index === 0;
             return (
               <SwiperSlide key={image + index}>
                 <div className={styles.heroSlide}>
@@ -144,11 +161,13 @@ const ProductGallerySwiper = ({
                       src={image}
                       alt={`${productTitle} — фото ${index + 1}`}
                       className={styles.heroImage}
-                      loading="eager"
+                      loading={isCover || index === activeImageIndex ? "eager" : "lazy"}
                       decoding="async"
-                      fetchPriority={index === 0 ? "high" : "auto"}
+                      fetchPriority={isCover ? "high" : "auto"}
+                      onLoad={isCover ? onCoverSettled : undefined}
                       onError={(event) => {
                         event.currentTarget.src = PLACEHOLDER;
+                        if (isCover) onCoverSettled();
                       }}
                     />
                   ) : (
@@ -181,6 +200,9 @@ const ProductGallerySwiper = ({
         {visibleThumbs.map((image, index) => {
           const isLastOverflow =
             overflowCount > 0 && index === visibleThumbs.length - 1;
+          // Thumbs после cover — не конкурируют с первым кадром
+          const thumbLoading =
+            coverReady && index === activeImageIndex ? "eager" : "lazy";
           return (
             <button
               key={image + index}
@@ -197,10 +219,10 @@ const ProductGallerySwiper = ({
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={image}
+                src={coverReady ? image : undefined}
                 alt=""
                 className={styles.thumbImage}
-                loading={index < thumbEagerUntil ? "eager" : "lazy"}
+                loading={thumbLoading}
                 decoding="async"
                 onError={(event) => {
                   event.currentTarget.src = PLACEHOLDER;

@@ -9,6 +9,12 @@ const PREVIOUS_PATH_KEY = "znves:previousPath";
 /** Hero освобождает сеть, когда уходим с главной на каталог / другие страницы */
 export const HERO_RELEASE_EVENT = "znves:hero-release";
 
+/** Вызывать на pointerdown по ссылке с главной — раньше, чем смена pathname */
+export const releaseHomeHero = (): void => {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(HERO_RELEASE_EVENT));
+};
+
 const NavigationTracker = () => {
   const pathname = usePathname();
   const [isMounted, setIsMounted] = useState(false);

@@ -8,7 +8,6 @@ import {
   useState,
   type PointerEvent,
 } from "react";
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -21,6 +20,7 @@ import { useToast } from "../ui/ToastProvider/ToastProvider";
 import { toCatalogProduct } from "../../data/products";
 import styles from "./ProductPageView.module.css";
 import ProductDisplaySection from "../ProductDisplaySection/ProductDisplaySection";
+import ProductGallerySwiper from "./ProductGallerySwiper";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import {
   fetchProductImagesByColor,
@@ -38,10 +38,8 @@ import {
   getBreadcrumbOrigin,
 } from "../../lib/productNavigation";
 
-const ProductGallerySwiper = dynamic(
-  () => import("./ProductGallerySwiper"),
-  { ssr: false }
-);
+const sameImageList = (a: string[], b: string[]) =>
+  a.length === b.length && a.every((url, i) => url === b[i]);
 
 type ProductPageViewProps = {
   product: ProductDetail;
@@ -256,33 +254,54 @@ const ProductPageView = ({
     }
   }, [selectedColor, selectedSize, colorToSizesFromWarehouse, product.availableSizes]);
 
+  const colorImagesBootRef = useRef(true);
   useEffect(() => {
+    colorImagesBootRef.current = true;
+  }, [product.slug]);
+
+  useEffect(() => {
+    let cancelled = false;
+
     const loadImagesByColor = async () => {
       if (!product.slug || !selectedColor) {
         setCurrentImages(product.images);
         return;
       }
 
-      setIsLoadingImages(true);
+      // Первый проход: уже есть SSR-covers — не гасим UI, подменяем только если URL другие
+      const isBoot = colorImagesBootRef.current;
+      colorImagesBootRef.current = false;
+      if (!isBoot) {
+        setIsLoadingImages(true);
+      }
+
       try {
         const colorImages = await fetchProductImagesByColor(
           product.slug,
           selectedColor
         );
+        if (cancelled) return;
 
-        if (colorImages.length > 0) {
-          setCurrentImages(colorImages);
-        } else {
+        const next =
+          colorImages.length > 0 ? colorImages : product.images;
+        setCurrentImages((prev) =>
+          sameImageList(prev, next) ? prev : next
+        );
+      } catch {
+        if (!cancelled) {
           setCurrentImages(product.images);
         }
-      } catch {
-        setCurrentImages(product.images);
       } finally {
-        setIsLoadingImages(false);
+        if (!cancelled) {
+          setIsLoadingImages(false);
+        }
       }
     };
 
-    loadImagesByColor();
+    void loadImagesByColor();
+    return () => {
+      cancelled = true;
+    };
   }, [product.slug, selectedColor, product.images]);
 
   const handleToggleSection = (id: string) => {
@@ -494,7 +513,9 @@ const ProductPageView = ({
                     fill
                     sizes="(min-width: 1025px) 30vw, 0px"
                     className={styles.gridImage}
-                    priority={index <= 1}
+                    priority={index === 0}
+                    loading={index <= 1 ? "eager" : "lazy"}
+                    fetchPriority={index === 0 ? "high" : "auto"}
                   />
                 </button>
               ))}
