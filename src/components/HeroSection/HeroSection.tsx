@@ -6,7 +6,17 @@ import styles from "./HeroSection.module.css";
 const HERO_DESKTOP_VIDEO = "/videos/home/hero-desktop-v3.mp4";
 const HERO_MOBILE_VIDEO = "/videos/home/hero-mobile-v2.mp4";
 
-const MOBILE_MQ = "(max-width: 768px)";
+/** Узкий экран ИЛИ тач-телефон (в т.ч. landscape >768px) — только mobile-ролик. */
+const NARROW_MQ = "(max-width: 768px)";
+const TOUCH_PHONE_MQ = "(pointer: coarse) and (max-width: 1024px)";
+
+const shouldUseMobileHeroVideo = (): boolean => {
+  if (typeof window === "undefined") return true;
+  return (
+    window.matchMedia(NARROW_MQ).matches ||
+    window.matchMedia(TOUCH_PHONE_MQ).matches
+  );
+};
 
 /* Инлайн, чтобы заполнение не зависело от загрузки CSS-модуля */
 const heroStyle: CSSProperties = {
@@ -41,6 +51,7 @@ const forcePlay = (video: HTMLVideoElement) => {
 
 const HeroSection = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  // null до выбора на клиенте — в DOM не попадает desktop URL на мобилке
   const [src, setSrc] = useState<string | null>(null);
   const [screenHeight, setScreenHeight] = useState<number | null>(null);
 
@@ -70,13 +81,23 @@ const HeroSection = () => {
   }, []);
 
   useLayoutEffect(() => {
-    const mobileMq = window.matchMedia(MOBILE_MQ);
-    const sync = () =>
-      setSrc(mobileMq.matches ? HERO_MOBILE_VIDEO : HERO_DESKTOP_VIDEO);
+    const narrowMq = window.matchMedia(NARROW_MQ);
+    const touchPhoneMq = window.matchMedia(TOUCH_PHONE_MQ);
+
+    const sync = () => {
+      // В DOM только один URL: на телефоне desktop-ролик даже не упоминается
+      setSrc(
+        shouldUseMobileHeroVideo() ? HERO_MOBILE_VIDEO : HERO_DESKTOP_VIDEO
+      );
+    };
 
     sync();
-    mobileMq.addEventListener("change", sync);
-    return () => mobileMq.removeEventListener("change", sync);
+    narrowMq.addEventListener("change", sync);
+    touchPhoneMq.addEventListener("change", sync);
+    return () => {
+      narrowMq.removeEventListener("change", sync);
+      touchPhoneMq.removeEventListener("change", sync);
+    };
   }, []);
 
   useLayoutEffect(() => {
@@ -113,7 +134,7 @@ const HeroSection = () => {
           autoPlay
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           disablePictureInPicture
           aria-hidden
           tabIndex={-1}
