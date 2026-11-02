@@ -127,8 +127,22 @@ const getDeliveryServiceName = (type: string, method: string) => {
   return type || "—";
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  created: "Новый (не оплачен)",
+  pending_payment: "Новый (не оплачен)",
+  paid: "Оплачен",
+  processing: "Собирается",
+  shipped: "Доставляется",
+  ready_for_pickup: "В пункте выдачи",
+  delivered: "Завершен",
+  completed: "Завершен",
+  cancelled: "Отменён",
+  canceled: "Отменён",
+};
+
 const getStatusDisplayName = (status: string): string => {
   const s = (status || "").toLowerCase();
+  if (STATUS_LABELS[s]) return STATUS_LABELS[s];
   if (
     s === "pending_payment" ||
     s === "created" ||
@@ -169,6 +183,7 @@ const isUnpaidStatus = (status: string) => {
 const isDeliveredStatus = (status: string) => {
   const s = (status || "").toLowerCase();
   return (
+    s === "delivered" ||
     s === "completed" ||
     s === "завершен" ||
     s === "завершён" ||
@@ -235,7 +250,9 @@ const isPaidTrackableStatus = (status: string) => {
     s === "оплачен" ||
     s.includes("доставляется") ||
     s.includes("в пути") ||
-    s === "shipped"
+    s === "processing" ||
+    s === "shipped" ||
+    s === "ready_for_pickup"
   );
 };
 
