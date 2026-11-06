@@ -127,69 +127,145 @@ const getDeliveryServiceName = (type: string, method: string) => {
   return type || "—";
 };
 
+/** Ключи — нормализованные коды/фразы бэка (lowercase, `_` вместо пробелов). */
 const STATUS_LABELS: Record<string, string> = {
+  // неоплачен / новый
   created: "Новый (не оплачен)",
+  new: "Новый (не оплачен)",
+  pending: "Новый (не оплачен)",
   pending_payment: "Новый (не оплачен)",
+  payment_pending: "Новый (не оплачен)",
+  awaiting_payment: "Новый (не оплачен)",
+  waiting_for_payment: "Новый (не оплачен)",
+  unpaid: "Новый (не оплачен)",
+  not_paid: "Новый (не оплачен)",
+  // оплачен
   paid: "Оплачен",
+  payment_success: "Оплачен",
+  payment_succeeded: "Оплачен",
+  // сборка
   processing: "Собирается",
+  in_progress: "Собирается",
+  assembling: "Собирается",
+  preparing: "Собирается",
+  confirmed: "Собирается",
+  // доставка
   shipped: "Доставляется",
+  shipping: "Доставляется",
+  in_transit: "Доставляется",
+  in_delivery: "Доставляется",
+  on_the_way: "Доставляется",
+  delivering: "Доставляется",
+  dispatch: "Доставляется",
+  dispatched: "Доставляется",
+  // ПВЗ
   ready_for_pickup: "В пункте выдачи",
+  ready_to_pickup: "В пункте выдачи",
+  at_pickup_point: "В пункте выдачи",
+  pickup_ready: "В пункте выдачи",
+  waiting_pickup: "В пункте выдачи",
+  // завершён
   delivered: "Завершен",
   completed: "Завершен",
+  done: "Завершен",
+  finished: "Завершен",
+  success: "Завершен",
+  // отмена
   cancelled: "Отменён",
   canceled: "Отменён",
+  cancel: "Отменён",
+  refunded: "Отменён",
+  // уже русские фразы бэка
+  ожидает_оплаты: "Новый (не оплачен)",
+  новый: "Новый (не оплачен)",
+  не_оплачен: "Новый (не оплачен)",
+  оплачен: "Оплачен",
+  собирается: "Собирается",
+  доставляется: "Доставляется",
+  в_пути: "Доставляется",
+  в_пункте_выдачи: "В пункте выдачи",
+  доставлен: "Завершен",
+  завершен: "Завершен",
+  завершён: "Завершен",
+  отменён: "Отменён",
+  отменен: "Отменён",
 };
 
+const normalizeOrderStatusKey = (status: string): string =>
+  (status || "")
+    .trim()
+    .toLowerCase()
+    .replace(/ё/g, "е")
+    .replace(/[\s-]+/g, "_");
+
 const getStatusDisplayName = (status: string): string => {
-  const s = (status || "").toLowerCase();
-  if (STATUS_LABELS[s]) return STATUS_LABELS[s];
+  const raw = (status || "").trim();
+  if (!raw) return "—";
+
+  const key = normalizeOrderStatusKey(raw);
+  if (STATUS_LABELS[key]) return STATUS_LABELS[key];
+
+  // Подстроки на случай произвольных формулировок бэка
   if (
-    s === "pending_payment" ||
-    s === "created" ||
-    s === "новый" ||
-    s.includes("ожидает")
+    key.includes("pending_payment") ||
+    key.includes("awaiting_payment") ||
+    key.includes("ожидает") ||
+    key.includes("неоплачен") ||
+    key.includes("не_оплачен") ||
+    key === "created" ||
+    key === "new"
   ) {
     return "Новый (не оплачен)";
   }
-  if (s === "paid" || s === "оплачен") return "Оплачен";
-  if (s === "shipped" || s.includes("доставляется") || s.includes("в пути")) {
+  if (key === "paid" || key.includes("оплачен") || key.includes("payment_success")) {
+    return "Оплачен";
+  }
+  if (
+    key.includes("process") ||
+    key.includes("assembl") ||
+    key.includes("prepar") ||
+    key.includes("собира")
+  ) {
+    return "Собирается";
+  }
+  if (
+    key.includes("ready_for_pickup") ||
+    key.includes("pickup") ||
+    key.includes("пункт")
+  ) {
+    return "В пункте выдачи";
+  }
+  if (
+    key.includes("ship") ||
+    key.includes("transit") ||
+    key.includes("delivering") ||
+    key.includes("доставля") ||
+    key.includes("в_пути")
+  ) {
     return "Доставляется";
   }
   if (
-    s === "completed" ||
-    s === "завершен" ||
-    s === "завершён" ||
-    s.includes("доставлен")
+    key.includes("deliver") ||
+    key.includes("complete") ||
+    key.includes("доставлен") ||
+    key.includes("завершен")
   ) {
     return "Завершен";
   }
-  if (s.includes("отмен") || s === "cancelled" || s === "canceled") {
+  if (key.includes("cancel") || key.includes("отмен") || key.includes("refund")) {
     return "Отменён";
   }
-  return status || "—";
+
+  // Никогда не отдаём сырой английский ответ бэка в UI
+  if (/^[a-z0-9_]+$/i.test(raw)) return "—";
+  return raw;
 };
 
-const isUnpaidStatus = (status: string) => {
-  const s = (status || "").toLowerCase();
-  return (
-    s === "created" ||
-    s === "pending_payment" ||
-    status === "не оплачен" ||
-    s.includes("неоплачен") ||
-    s.includes("ожидает")
-  );
-};
+const isUnpaidStatus = (status: string) =>
+  getStatusDisplayName(status) === "Новый (не оплачен)";
 
-const isDeliveredStatus = (status: string) => {
-  const s = (status || "").toLowerCase();
-  return (
-    s === "delivered" ||
-    s === "completed" ||
-    s === "завершен" ||
-    s === "завершён" ||
-    s.includes("доставлен")
-  );
-};
+const isDeliveredStatus = (status: string) =>
+  getStatusDisplayName(status) === "Завершен";
 
 const getDetailStatusLabel = (status: string): string => {
   return getStatusDisplayName(status);
@@ -244,15 +320,12 @@ const formatSizeLabel = (size: string): string => {
 };
 
 const isPaidTrackableStatus = (status: string) => {
-  const s = (status || "").toLowerCase();
+  const label = getStatusDisplayName(status);
   return (
-    s === "paid" ||
-    s === "оплачен" ||
-    s.includes("доставляется") ||
-    s.includes("в пути") ||
-    s === "processing" ||
-    s === "shipped" ||
-    s === "ready_for_pickup"
+    label === "Оплачен" ||
+    label === "Собирается" ||
+    label === "Доставляется" ||
+    label === "В пункте выдачи"
   );
 };
 

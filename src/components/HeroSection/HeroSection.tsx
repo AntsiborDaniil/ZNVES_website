@@ -5,36 +5,19 @@ import { HERO_RELEASE_EVENT } from "../NavigationTracker/NavigationTracker";
 import styles from "./HeroSection.module.css";
 
 const HERO_DESKTOP_VIDEO = "/videos/home/hero-desktop-v4.mp4";
-const HERO_MOBILE_VIDEO = "/videos/home/hero-mobile-v8.mp4";
-/** Кадр из hero-mobile-v8 (последние 10с с v3, CRF20) — маска до playing */
-const HERO_MOBILE_POSTER = "/images/home/hero-mobile.webp?v=8";
+/** Статичный кадр до появления hero-video — без ролика на мобилке. */
+const HERO_MOBILE_IMAGE = "/images/home/hero-mobile.webp";
 
-/** Узкий экран ИЛИ тач-телефон (в т.ч. landscape >768px) — mobile-ролик. */
+/** Узкий экран ИЛИ тач-телефон (в т.ч. landscape >768px) — мобильный hero. */
 const NARROW_MQ = "(max-width: 768px)";
 const TOUCH_PHONE_MQ = "(pointer: coarse) and (max-width: 1024px)";
 
-type NetworkInformationLike = {
-  saveData?: boolean;
-  effectiveType?: string;
-};
-
-const shouldUseMobileHeroVideo = (): boolean => {
+const shouldUseMobileHero = (): boolean => {
   if (typeof window === "undefined") return true;
   return (
     window.matchMedia(NARROW_MQ).matches ||
     window.matchMedia(TOUCH_PHONE_MQ).matches
   );
-};
-
-/** 2g / Save-Data — оставляем только постер, видео не качаем. */
-const isConstrainedMobileNetwork = (): boolean => {
-  if (typeof navigator === "undefined") return false;
-  const conn = (navigator as Navigator & { connection?: NetworkInformationLike })
-    .connection;
-  if (!conn) return false;
-  if (conn.saveData) return true;
-  const type = conn.effectiveType;
-  return type === "slow-2g" || type === "2g";
 };
 
 const releaseVideo = (video: HTMLVideoElement | null) => {
@@ -94,11 +77,12 @@ const HeroSection = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const releasedRef = useRef(false);
   const playRetryRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  /** null = ещё не выбрали; desktop video src или null на мобилке. */
   const [src, setSrc] = useState<string | null>(null);
-  // true по умолчанию → SSR уже отдаёт mobile poster (LCP), не чёрный экран
+  // true по умолчанию → SSR уже отдаёт mobile image (LCP), не чёрный экран
   const [useMobile, setUseMobile] = useState(true);
   const [screenHeight, setScreenHeight] = useState<number | null>(null);
-  /** Постер/маска сверху, пока video не в playing — нативная ▶/❚❚ не видна. */
+  /** Маска поверх desktop-видео, пока оно не в playing. */
   const [coverVisible, setCoverVisible] = useState(true);
 
   const stopPlayRetry = () => {
@@ -155,36 +139,16 @@ const HeroSection = () => {
     const narrowMq = window.matchMedia(NARROW_MQ);
     const touchPhoneMq = window.matchMedia(TOUCH_PHONE_MQ);
     releasedRef.current = false;
-    let mobileSrcTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const clearMobileSrcTimer = () => {
-      if (mobileSrcTimer != null) {
-        clearTimeout(mobileSrcTimer);
-        mobileSrcTimer = null;
-      }
-    };
 
     const sync = () => {
-      const mobile = shouldUseMobileHeroVideo();
+      const mobile = shouldUseMobileHero();
       setUseMobile(mobile);
       setCoverVisible(true);
-      clearMobileSrcTimer();
 
       if (mobile) {
-        if (isConstrainedMobileNetwork()) {
-          setSrc(null);
-          return;
-        }
-        // LTE: сначала poster + bestsellers covers, видео позже
-        mobileSrcTimer = setTimeout(() => {
-          if (releasedRef.current) return;
-          setSrc((prev) =>
-            prev === HERO_MOBILE_VIDEO ? prev : HERO_MOBILE_VIDEO
-          );
-        }, 2500);
-        if (videoRef.current?.currentSrc?.includes("hero-mobile")) {
-          ensurePlaying(videoRef.current);
-        }
+        // Мобилка: только статичная картинка, видео не качаем
+        releaseVideo(videoRef.current);
+        setSrc(null);
         return;
       }
 
@@ -214,7 +178,6 @@ const HeroSection = () => {
     window.addEventListener("scroll", unlock, { passive: true, once: true });
 
     return () => {
-      clearMobileSrcTimer();
       stopPlayRetry();
       releaseVideo(videoRef.current);
       narrowMq.removeEventListener("change", sync);
@@ -248,7 +211,6 @@ const HeroSection = () => {
       if (releasedRef.current) return;
       if (document.visibilityState !== "visible") return;
       if (!video.getAttribute("src") && !video.currentSrc) return;
-      // Снова маска — нативная кнопка паузы/play не должна мелькать
       setCoverVisible(true);
       ensurePlaying(video);
     };
@@ -286,7 +248,7 @@ const HeroSection = () => {
         screenHeight ? { ...heroStyle, height: `${screenHeight}px` } : heroStyle
       }
     >
-      {src ? (
+      {src && !useMobile ? (
         <video
           key={src}
           ref={bindVideoRef}
@@ -296,7 +258,7 @@ const HeroSection = () => {
           autoPlay
           loop
           playsInline
-          preload={useMobile ? "metadata" : "auto"}
+          preload="auto"
           controls={false}
           controlsList="nodownload nofullscreen noremoteplayback noplaybackrate"
           disablePictureInPicture
@@ -306,26 +268,25 @@ const HeroSection = () => {
         />
       ) : null}
 
-      {/* Непрозрачная маска: нативный ▶/❚❚ браузера остаётся под ней */}
-      <div
-        className={`${styles.cover} ${
-          coverVisible ? styles.coverVisible : styles.coverHidden
-        }`}
-        aria-hidden
-      >
-        {useMobile ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={HERO_MOBILE_POSTER}
-            alt=""
-            className={styles.coverImage}
-            decoding="async"
-            fetchPriority="high"
-          />
-        ) : (
+      {useMobile ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={HERO_MOBILE_IMAGE}
+          alt=""
+          className={styles.coverImage}
+          decoding="async"
+          fetchPriority="high"
+        />
+      ) : (
+        <div
+          className={`${styles.cover} ${
+            coverVisible ? styles.coverVisible : styles.coverHidden
+          }`}
+          aria-hidden
+        >
           <div className={styles.coverSolid} />
-        )}
-      </div>
+        </div>
+      )}
     </section>
   );
 };
