@@ -7,6 +7,7 @@ import {
   fetchAccountOrders,
   apiOrderToAccountView,
   getPaymentUrl,
+  openPaymentTab,
   getYandexPaymentUrl,
   redirectToPaymentUrl,
   resolvePaymentRedirectUrl,
@@ -472,14 +473,19 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
       setOrderPayError(ORDER_ERROR_MESSAGE);
       return;
     }
+    const method = (selectedOrder.payment?.method || "").toLowerCase();
+    const useYandex = method === "yandexpay" || method === "installment";
+    let paymentTab = useYandex ? null : openPaymentTab();
+    if (!useYandex && !paymentTab) {
+      setOrderPayError("Разрешите открытие новой вкладки для оплаты и повторите попытку.");
+      return;
+    }
     setIsPaying(true);
     try {
       const baseUrl =
         typeof window !== "undefined" ? `${window.location.origin}/account` : "";
       const returnUrl = `${baseUrl}?payment=success`;
       const cancelUrl = `${baseUrl}?payment=cancel`;
-      const method = (selectedOrder.payment?.method || "").toLowerCase();
-      const useYandex = method === "yandexpay" || method === "installment";
       const paymentResponse = useYandex
         ? await getYandexPaymentUrl(orderId, {
             return_url: returnUrl,
@@ -491,13 +497,15 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
           });
       const paymentUrl = resolvePaymentRedirectUrl(paymentResponse);
       if (paymentUrl) {
-        redirectToPaymentUrl(paymentUrl);
+        redirectToPaymentUrl(paymentUrl, paymentTab ?? undefined);
+        paymentTab = null;
         return;
       }
       setOrderPayError(ORDER_ERROR_MESSAGE);
     } catch {
       setOrderPayError(ORDER_ERROR_MESSAGE);
     } finally {
+      paymentTab?.close();
       setIsPaying(false);
     }
   };

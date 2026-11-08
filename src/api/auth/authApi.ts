@@ -1,5 +1,4 @@
 import { API_BASE_URL } from "../../lib/apiConfig";
-import { getCsrfToken } from "../../lib/csrf";
 import { shouldUseMocks } from "../../lib/useMocks";
 import { AuthApiError, parseAuthApiErrorResponse } from "./authApiErrors";
 
@@ -84,15 +83,26 @@ export const parseAuthUser = (data: unknown): AuthUser | null => {
   };
 };
 
-const authJsonHeaders = (): Record<string, string> => {
+const authJsonHeaders = async (): Promise<Record<string, string>> => {
+  // Cookie API-домена недоступна через document.cookie на домене сайта.
+  // Получаем свежий masked token и устанавливаем CSRF-cookie самим API.
+  const response = await fetch(`${API_BASE_URL}/api/order/csrf/`, {
+    credentials: "include",
+    cache: "no-store",
+    headers: { Accept: "application/json" },
+  });
+  if (!response.ok) {
+    throw await parseAuthApiErrorResponse(response, "Не удалось подготовить защищённый запрос. Повторите попытку.");
+  }
+  const data = await response.json();
+  if (typeof data.csrfToken !== "string" || !data.csrfToken) {
+    throw new AuthApiError("Не удалось получить CSRF-токен. Повторите попытку.");
+  }
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     Accept: "application/json",
   };
-  const csrf = getCsrfToken();
-  if (csrf) {
-    headers["X-CSRFToken"] = csrf;
-  }
+  headers["X-CSRFToken"] = data.csrfToken;
   return headers;
 };
 
@@ -108,7 +118,7 @@ const authPost = async (
   const response = await fetch(url, {
     method: "POST",
     credentials: "include",
-    headers: authJsonHeaders(),
+    headers: await authJsonHeaders(),
     body: JSON.stringify(payload),
   });
 
@@ -125,7 +135,7 @@ const authPostVerify = async (url: string, payload: object): Promise<AuthUser> =
   const response = await fetch(url, {
     method: "POST",
     credentials: "include",
-    headers: authJsonHeaders(),
+    headers: await authJsonHeaders(),
     body: JSON.stringify(payload),
   });
 
@@ -223,7 +233,7 @@ export const verifyPasswordResetCode = async (
   const response = await fetch(PASSWORD_RESET_VERIFY_URL, {
     method: "POST",
     credentials: "include",
-    headers: authJsonHeaders(),
+    headers: await authJsonHeaders(),
     body: JSON.stringify({ email: email.trim(), code: code.trim() }),
   });
 
@@ -247,7 +257,7 @@ export const changePasswordWithResetToken = async (newPassword: string): Promise
   const response = await fetch(PASSWORD_RESET_CHANGE_URL, {
     method: "POST",
     credentials: "include",
-    headers: authJsonHeaders(),
+    headers: await authJsonHeaders(),
     body: JSON.stringify({ new_password: newPassword }),
   });
 
@@ -330,7 +340,7 @@ export const updateCurrentUser = async (
   const response = await fetch(AUTH_USER_URL, {
     method: "PATCH",
     credentials: "include",
-    headers: authJsonHeaders(),
+    headers: await authJsonHeaders(),
     body: JSON.stringify(payload),
   });
   if (!response.ok) {
@@ -366,7 +376,7 @@ export const updateUserDeliveryData = async (
   const response = await fetch(AUTH_USER_DELIVERY_URL, {
     method: "PATCH",
     credentials: "include",
-    headers: authJsonHeaders(),
+    headers: await authJsonHeaders(),
     body: JSON.stringify(payload),
   });
   if (!response.ok) {
@@ -404,7 +414,7 @@ export const changePassword = async (
   const response = await fetch(AUTH_CHANGE_PASSWORD_URL, {
     method: "POST",
     credentials: "include",
-    headers: authJsonHeaders(),
+    headers: await authJsonHeaders(),
     body: JSON.stringify(payload),
   });
   if (!response.ok) {

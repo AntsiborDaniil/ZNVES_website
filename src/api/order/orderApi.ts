@@ -229,6 +229,7 @@ export interface OrderRequest {
 }
 
 export interface OrderResponse {
+  access_token?: string | null;
   id: number;
   status: string;
   message: string;
@@ -265,11 +266,23 @@ export function resolvePaymentRedirectUrl(
   return null;
 }
 
+/** Резервируем вкладку до await, пока браузер разрешает открытие по клику. */
+export function openPaymentTab(): Window | null {
+  const tab = window.open("about:blank", "_blank");
+  if (tab) tab.opener = null;
+  return tab;
+}
+
 /**
  * Редирект на оплату. После await Safari иногда игнорирует location.href —
  * поэтому assign + fallback через <a click> и повторный href.
  */
-export function redirectToPaymentUrl(url: string): void {
+export function redirectToPaymentUrl(url: string, tab?: Window): void {
+  if (tab) {
+    if (tab.closed) throw new Error("Вкладка оплаты закрыта");
+    tab.location.replace(url);
+    return;
+  }
   if (typeof window === "undefined" || !url) return;
 
   try {
@@ -368,6 +381,7 @@ function getRelativePaymentUrls(): { return_url: string; cancel_url: string } {
 }
 
 export interface PaymentUrlRequest {
+  access_token?: string | null;
   /** URL, на который вернуть пользователя после успешной оплаты */
   return_url?: string;
   /** URL при отмене/ошибке оплаты */
@@ -392,6 +406,7 @@ export const getPaymentUrl = async (
     };
 
     const payHeaders: Record<string, string> = { "Content-Type": "application/json" };
+    if (options?.access_token) payHeaders["X-Order-Token"] = options.access_token;
     const payCsrf = getCsrfToken();
     if (payCsrf) payHeaders["X-CSRFToken"] = payCsrf;
 
@@ -426,7 +441,7 @@ export const getPaymentUrl = async (
   }
 };
 
-export interface YandexPayRequest {
+export interface YandexPayRequest extends PaymentUrlRequest {
   /** URL успешной оплаты (onSuccess) */
   return_url?: string;
   /** URL при ошибке (onError) */
@@ -451,6 +466,7 @@ export const getYandexPaymentUrl = async (
     };
 
     const yandexHeaders: Record<string, string> = { "Content-Type": "application/json" };
+    if (options?.access_token) yandexHeaders["X-Order-Token"] = options.access_token;
     const yandexCsrf = getCsrfToken();
     if (yandexCsrf) yandexHeaders["X-CSRFToken"] = yandexCsrf;
 

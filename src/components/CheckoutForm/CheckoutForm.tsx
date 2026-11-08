@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { getProductById } from "../../data/products";
-import { createOrder, getPaymentUrl, getYandexPaymentUrl, invalidateMyOrdersCache, redirectToPaymentUrl, resolvePaymentRedirectUrl, type OrderRequest } from "../../api/order/orderApi";
+import { createOrder, openPaymentTab, getPaymentUrl, getYandexPaymentUrl, invalidateMyOrdersCache, redirectToPaymentUrl, resolvePaymentRedirectUrl, type OrderRequest } from "../../api/order/orderApi";
 import PromoErrorToast from "../PromoErrorToast/PromoErrorToast";
 import { fetchCatalogProductRaw, type ApiProductDetail, type ApiWarehouseItem } from "../../api/product/productApi";
 import { fetchCatalogColors } from "../../api/catalog/catalogApi";
@@ -1458,6 +1458,12 @@ const CheckoutForm = ({
       return;
     }
 
+    const usePaymentTab = formData.paymentMethod === "card" || formData.paymentMethod === "sberbank";
+    let paymentTab = usePaymentTab ? openPaymentTab() : null;
+    if (usePaymentTab && !paymentTab) {
+      setPaymentErrorToast("Разрешите открытие новой вкладки для оплаты и повторите попытку.");
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -1630,12 +1636,13 @@ const CheckoutForm = ({
           const paymentResponse =
             formData.paymentMethod === "yandexpay" ||
             formData.paymentMethod === "installment"
-              ? await getYandexPaymentUrl(orderId)
-              : await getPaymentUrl(orderId);
+              ? await getYandexPaymentUrl(orderId, { access_token: orderResponse.access_token })
+              : await getPaymentUrl(orderId, { access_token: orderResponse.access_token });
 
           const paymentUrl = resolvePaymentRedirectUrl(paymentResponse);
           if (paymentUrl) {
-            redirectToPaymentUrl(paymentUrl);
+            redirectToPaymentUrl(paymentUrl, paymentTab ?? undefined);
+            paymentTab = null;
             return;
           }
 
@@ -1742,6 +1749,7 @@ const CheckoutForm = ({
       clearCart();
       redirectToCartWithError(message);
     } finally {
+      paymentTab?.close();
       setIsSubmitting(false);
       setShowConfirmModal(false);
     }

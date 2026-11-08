@@ -34,6 +34,9 @@ describe("authApi verify flow", () => {
       "fetch",
       vi.fn(async (input: RequestInfo | URL) => {
         const url = String(input);
+        if (url.includes("/api/order/csrf/")) {
+          return new Response(JSON.stringify({ csrfToken: "api-csrf-token" }), { status: 200 });
+        }
 
         if (url.includes("/api/auth/login/verify/")) {
           return new Response(JSON.stringify({ detail: "Вход выполнен." }), {
@@ -81,6 +84,9 @@ describe("authApi verify flow", () => {
       "fetch",
       vi.fn(async (input: RequestInfo | URL) => {
         const url = String(input);
+        if (url.includes("/api/order/csrf/")) {
+          return new Response(JSON.stringify({ csrfToken: "api-csrf-token" }), { status: 200 });
+        }
 
         if (url.includes("/api/auth/login/verify/")) {
           return new Response(JSON.stringify({ detail: "Вход выполнен." }), {
@@ -121,6 +127,9 @@ describe("authApi verify flow", () => {
       "fetch",
       vi.fn(async (input: RequestInfo | URL) => {
         const url = String(input);
+        if (url.includes("/api/order/csrf/")) {
+          return new Response(JSON.stringify({ csrfToken: "api-csrf-token" }), { status: 200 });
+        }
 
         if (url.includes("/api/auth/login/verify/")) {
           return new Response(JSON.stringify({ detail: "Вход выполнен." }), {
@@ -167,6 +176,9 @@ describe("getCurrentUserWithRetry", () => {
       "fetch",
       vi.fn(async (input: RequestInfo | URL) => {
         const url = String(input);
+        if (url.includes("/api/order/csrf/")) {
+          return new Response(JSON.stringify({ csrfToken: "api-csrf-token" }), { status: 200 });
+        }
         if (!url.includes("/api/auth/user/")) {
           return new Response(null, { status: 404 });
         }
