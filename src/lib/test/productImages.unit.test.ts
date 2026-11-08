@@ -16,8 +16,8 @@ describe("productImages", () => {
     );
 
     expect(urls).toEqual([
-      "https://api.znves.ru/media/main-1.jpg",
-      "https://api.znves.ru/media/main-2.jpg",
+      "/api/media/main-1.jpg",
+      "/api/media/main-2.jpg",
     ]);
   });
 
@@ -27,8 +27,8 @@ describe("productImages", () => {
       "https://api.znves.ru"
     );
     expect(urls).toEqual([
-      "https://api.znves.ru/media/a.jpg",
-      "https://api.znves.ru/media/b.jpg",
+      "/api/media/a.jpg",
+      "/api/media/b.jpg",
     ]);
   });
 
@@ -44,10 +44,10 @@ describe("productImages", () => {
     );
 
     expect(urls).toEqual([
-      "https://api.znves.ru/media/m1.jpg",
-      "https://api.znves.ru/media/m2.jpg",
-      "https://api.znves.ru/media/g1.jpg",
-      "https://api.znves.ru/media/g2.jpg",
+      "/api/media/m1.jpg",
+      "/api/media/m2.jpg",
+      "/api/media/g1.jpg",
+      "/api/media/g2.jpg",
     ]);
   });
 });

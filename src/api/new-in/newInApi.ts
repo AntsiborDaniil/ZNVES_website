@@ -127,6 +127,7 @@ export const fetchNewInProducts = async (
 
     return transformedProducts;
   } catch {
+    if (typeof window !== "undefined") throw new Error("Не удалось загрузить товары. Повторите попытку.");
     return [];
   }
 };

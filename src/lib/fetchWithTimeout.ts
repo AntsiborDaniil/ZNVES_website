@@ -1,3 +1,5 @@
+import { fetchPublicApi } from "./publicApi";
+
 /** Таймаут fetch. 10s на LTE часто мало — запас для мобилки. */
 export const DEFAULT_FETCH_TIMEOUT_MS = 25_000;
 
@@ -34,7 +36,7 @@ export const fetchWithTimeout = (
     }
   }
 
-  return fetch(input, { ...rest, signal: controller.signal }).finally(() => {
+  return fetchPublicApi(input, { ...rest, signal: controller.signal }).finally(() => {
     clearTimeout(timerId);
     outerSignal?.removeEventListener("abort", onOuterAbort);
   });

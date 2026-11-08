@@ -1,6 +1,12 @@
-/** Локальные ассеты из /public — не дополняем API_BASE_URL. */
+/** Use a same-origin image URL in SSR and browser output to keep hydration consistent. */
 export const resolveApiImageUrl = (img: string, baseUrl: string): string => {
-  if (img.startsWith("http")) return img;
-  if (img.startsWith("/images/")) return img;
-  return img.startsWith("/") ? `${baseUrl}${img}` : `${baseUrl}/${img}`;
+  if (img.startsWith("/images/") || img.startsWith("/api/media/")) return img;
+  try {
+    const base = new URL(baseUrl);
+    const url = new URL(img, `${base.origin}/`);
+    if (url.origin === base.origin && url.pathname.startsWith("/media/")) {
+      return `/api/media/${url.pathname.slice("/media/".length)}`;
+    }
+    return url.toString();
+  } catch { return img; }
 };

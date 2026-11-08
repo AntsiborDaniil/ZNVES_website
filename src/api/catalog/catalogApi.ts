@@ -288,6 +288,7 @@ export const fetchCatalogProductsPage = async (
 
     return parsed;
   } catch {
+    if (typeof window !== "undefined") throw new Error("Не удалось загрузить товары. Повторите попытку.");
     return {
       products: [],
       hasMore: false,

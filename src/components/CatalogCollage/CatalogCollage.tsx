@@ -31,9 +31,9 @@ const CatalogCollage = ({
   products: productsProp,
   featuredImage: featuredImageProp,
 }: CatalogCollageProps) => {
-  const hasServerData = productsProp != null;
-  const { data, isLoading } = useGetAllCatalogProductsQuery(undefined, { skip: hasServerData });
-  const products = productsProp ?? data ?? [];
+  const hasServerData = productsProp != null && productsProp.length > 0;
+  const { data, isLoading, isError, refetch } = useGetAllCatalogProductsQuery(undefined, { skip: hasServerData });
+  const products = hasServerData ? productsProp : data ?? [];
   const featuredImage = resolveFeaturedImage(featuredImageProp);
 
   const gridProducts = products.slice(0, 4);
@@ -45,7 +45,10 @@ const CatalogCollage = ({
       {isLoading ? (
         <div className={styles.skeleton} aria-busy aria-label="Загрузка каталога" />
       ) : products.length === 0 ? (
-        <div className={styles.empty}>Товары не найдены</div>
+        <div className={styles.empty}>{isError ? <>
+          <p role="alert">Не удалось загрузить товары.</p>
+          <button type="button" onClick={() => void refetch()}>Повторить попытку</button>
+        </> : "Товары не найдены"}</div>
       ) : (
         <>
           <div className={styles.desktopGrid}>

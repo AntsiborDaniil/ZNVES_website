@@ -1,3 +1,5 @@
+import { fetchWithTimeout } from "../../lib/fetchWithTimeout";
+import { resolveApiImageUrl } from "../../lib/imageUrl";
 import { API_BASE_URL } from "../../lib/apiConfig";
 import { shouldUseMocks } from "../../lib/useMocks";
 import type { HomePageContent } from "../../types/home";
@@ -21,7 +23,7 @@ export const fetchHomePage = async (): Promise<HomePageContent> => {
   }
 
   try {
-    const response = await fetch(HOME_API_URL, {
+    const response = await fetchWithTimeout(HOME_API_URL, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       next: { revalidate: REVALIDATE_SECONDS },
@@ -31,7 +33,8 @@ export const fetchHomePage = async (): Promise<HomePageContent> => {
       throw new Error(`API error: ${response.status}`);
     }
 
-    const data = (await response.json()) as HomePageContent;
+    const raw = (await response.json()) as HomePageContent;
+    const data = { ...raw, catalog_featured_image: raw.catalog_featured_image ? resolveApiImageUrl(raw.catalog_featured_image, API_BASE_URL) : raw.catalog_featured_image };
     memoryCache = { data, timestamp: Date.now() };
     return data;
   } catch {

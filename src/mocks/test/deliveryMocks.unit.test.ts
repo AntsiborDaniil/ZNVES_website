@@ -10,9 +10,9 @@ describe("resolveApiImageUrl", () => {
     );
   });
 
-  it("prepends API base for backend media paths", () => {
+  it("uses the same-origin proxy for backend media paths", () => {
     expect(resolveApiImageUrl("/media/product.jpg", "https://api.znves.ru")).toBe(
-      "https://api.znves.ru/media/product.jpg"
+      "/api/media/product.jpg"
     );
   });
 });

@@ -284,7 +284,12 @@ const ProductDisplaySection = ({
             ))
           )
         ) : (
-          <div className={styles.emptyState}>Товары не найдены</div>
+          <div className={styles.emptyState}>
+            {!hasServerProducts && query.isError ? <>
+              <p role="alert">Не удалось загрузить товары.</p>
+              <button type="button" onClick={() => void query.refetch()}>Повторить попытку</button>
+            </> : "Товары не найдены"}
+          </div>
         )}
       </div>
       {pageCount > 1 && displayProducts.length > 0 && (

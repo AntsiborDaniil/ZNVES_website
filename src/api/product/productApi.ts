@@ -1,3 +1,4 @@
+import { fetchWithTimeout } from "../../lib/fetchWithTimeout";
 // API для страницы товара
 
 import type {
@@ -206,7 +207,7 @@ const fetchProductBySlugInternal = async (slug: string): Promise<ProductDetail |
   }
 
   const url = `${CATALOG_API_URL}${slug}/`;
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     next: { revalidate: 5 * 60 },
@@ -265,7 +266,7 @@ export const fetchCatalogProductRaw = async (slug: string): Promise<ApiProductDe
         }
 
         const url = `${CATALOG_API_URL}${slug}/`;
-        const response = await fetch(url, {
+        const response = await fetchWithTimeout(url, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           next: { revalidate: 5 * 60 },
@@ -296,7 +297,7 @@ const fetchProductImagesByColorInternal = async (
 ): Promise<string[]> => {
   const url = `${CATALOG_API_URL}${productSlug}/${colorSlug}/`;
   const baseUrl = API_BASE_URL;
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     next: { revalidate: 5 * 60 },

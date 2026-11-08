@@ -74,7 +74,13 @@ const ProductPage = async ({ params }: ProductPageProps) => {
   const { slug } = await params;
 
   // SSR: товар в HTML сразу — на мобилке нет пустого «Загрузка…» до client fetch
-  const data = await fetchProductWithWarehouse(slug);
+  let data;
+  try {
+    data = await fetchProductWithWarehouse(slug);
+  } catch {
+    // A transport failure is not a missing product. The client retries through the BFF.
+    return <ProductPageClient slug={slug} />;
+  }
 
   if (!data) {
     notFound();

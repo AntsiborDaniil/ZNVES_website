@@ -148,6 +148,7 @@ export const fetchCatalogProducts = async (
 
     return transformedProducts;
   } catch {
+    if (typeof window !== "undefined") throw new Error("Не удалось загрузить товары. Повторите попытку.");
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
       const retried = await loadOnce();

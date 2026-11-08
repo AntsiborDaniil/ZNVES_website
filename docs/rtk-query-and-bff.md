@@ -99,3 +99,24 @@ Email policy is a product restriction: forms and the Next auth proxy reject
 This does not purport to be a statutory ban on Gmail addresses. Article 8(10) of
 149-FZ regulates authentication systems; using an email as a login with the
 shop's own password/code verification differs from Google OAuth.
+
+## Public catalog and image transport
+
+Browser catalog/home/product reads now pass through `/api/shop/*`. Public SSR
+fetches remain direct, while image URLs are rewritten identically in SSR and
+browser DTOs to `/api/media/*`. The media handler fetches only raster files below
+the configured backend's `/media/` path, with no user cookies or Authorization,
+no redirects, a 30-second timeout and a 20 MB limit. Successful images carry
+public browser/CDN caching headers; failures use no-store. It streams original
+image bytes and does not transcode images or require sharp.
+
+Catalog fetch failures surface as errors with an explicit retry action instead
+of being presented as an empty catalog. A transient product SSR fetch failure
+falls back to the client BFF loader; a genuine upstream 404 remains a 404.
+
+LTE acceptance test after deployment: reload with DevTools cache disabled and
+check catalog requests use `znves.ru/api/shop/catalog...`, while product images
+use `znves.ru/api/media/...`. No requests for these resources should go directly
+to `api.znves.ru`. Compare card and gallery loading while the direct API exhibits
+the previously reported delay. This avoids the client-to-Selectel path; it does
+not remove the frontend server's dependency on Selectel availability.

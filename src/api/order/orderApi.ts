@@ -1,3 +1,4 @@
+import { resolveApiImageUrl } from "../../lib/imageUrl";
 // API для оформления заказа
 
 import { apiUrl } from "../../lib/apiUrl";
@@ -10,11 +11,7 @@ function buildProductImageUrl(value: string | undefined): string {
   if (!value || typeof value !== "string") return "";
   const trimmed = value.trim();
   if (!trimmed) return "";
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  // Локальные ассеты из public/ (мок-каталог) оставляем как есть
-  if (trimmed.startsWith("/images/")) return trimmed;
-  const base = API_BASE_URL.replace(/\/$/, "");
-  return trimmed.startsWith("/") ? `${base}${trimmed}` : `${base}/${trimmed}`;
+  return resolveApiImageUrl(trimmed, API_BASE_URL);
 }
 
 const ORDER_API_URL = apiUrl("/order/");
