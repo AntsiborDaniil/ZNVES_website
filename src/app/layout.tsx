@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
+import ChunkRecovery from "../components/ChunkRecovery/ChunkRecovery";
 import NavigationTracker from "../components/NavigationTracker/NavigationTracker";
 import { CartProvider } from "../contexts/CartContext";
 import { AuthProvider } from "../contexts/AuthContext";
@@ -70,6 +71,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   return (
     <html lang="ru" className={inter.variable}>
+      <head><ChunkRecovery /></head>
       <body className={inter.className}>
         <MockProvider>
           <StoreProvider>

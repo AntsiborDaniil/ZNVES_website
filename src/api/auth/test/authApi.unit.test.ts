@@ -38,14 +38,14 @@ describe("authApi verify flow", () => {
           return new Response(JSON.stringify({ csrfToken: "api-csrf-token" }), { status: 200 });
         }
 
-        if (url.includes("/api/shop/auth/login/verify/")) {
+        if (url.includes("/api/shop/auth/login/verify")) {
           return new Response(JSON.stringify({ detail: "Вход выполнен." }), {
             status: 200,
             headers: { "Content-Type": "application/json" },
           });
         }
 
-        if (url.includes("/api/shop/auth/user/")) {
+        if (url.includes("/api/shop/auth/user")) {
           return mockUserResponse();
         }
 
@@ -88,14 +88,14 @@ describe("authApi verify flow", () => {
           return new Response(JSON.stringify({ csrfToken: "api-csrf-token" }), { status: 200 });
         }
 
-        if (url.includes("/api/shop/auth/login/verify/")) {
+        if (url.includes("/api/shop/auth/login/verify")) {
           return new Response(JSON.stringify({ detail: "Вход выполнен." }), {
             status: 200,
             headers: { "Content-Type": "application/json" },
           });
         }
 
-        if (url.includes("/api/shop/auth/user/")) {
+        if (url.includes("/api/shop/auth/user")) {
           userCalls += 1;
           if (userCalls === 1) {
             return new Response(
@@ -131,14 +131,14 @@ describe("authApi verify flow", () => {
           return new Response(JSON.stringify({ csrfToken: "api-csrf-token" }), { status: 200 });
         }
 
-        if (url.includes("/api/shop/auth/login/verify/")) {
+        if (url.includes("/api/shop/auth/login/verify")) {
           return new Response(JSON.stringify({ detail: "Вход выполнен." }), {
             status: 200,
             headers: { "Content-Type": "application/json" },
           });
         }
 
-        if (url.includes("/api/shop/auth/user/")) {
+        if (url.includes("/api/shop/auth/user")) {
           userCalls += 1;
           return new Response(
             JSON.stringify({ detail: "Учетные данные не были предоставлены." }),
@@ -179,7 +179,7 @@ describe("getCurrentUserWithRetry", () => {
         if (url.includes("/api/order/csrf/")) {
           return new Response(JSON.stringify({ csrfToken: "api-csrf-token" }), { status: 200 });
         }
-        if (!url.includes("/api/shop/auth/user/")) {
+        if (!url.includes("/api/shop/auth/user")) {
           return new Response(null, { status: 404 });
         }
 

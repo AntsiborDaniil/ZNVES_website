@@ -5,7 +5,7 @@ import { shouldUseMocks } from "./useMocks";
 export function apiUrl(path: string): string {
   const normalized = path.startsWith("/") ? path : `/${path}`;
   if (typeof window !== "undefined" && !shouldUseMocks()) {
-    return `/api/shop${normalized}`;
+    return `/api/shop${normalized.replace(/\/+$/, "")}`;
   }
   return `${API_BASE_URL}/api${normalized}`;
 }

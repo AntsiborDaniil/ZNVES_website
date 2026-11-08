@@ -20,9 +20,8 @@ export const validateEmail = (email: string): string | true => {
 export const validateLoginEmail = (email: string): string | true => {
   const trimmed = email.trim();
   if (!trimmed) return "Введите email";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-    return "Введите корректный email";
-  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return "Введите корректный email";
+  if (isGmailAddress(trimmed)) return "Вход через Gmail недоступен. Используйте другой email";
   return true;
 };
 

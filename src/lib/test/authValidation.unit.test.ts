@@ -20,12 +20,13 @@ describe("authValidation", () => {
     );
   });
 
-  it("allows non-gmail addresses for registration", () => {
-    expect(validateEmail("user@yandex.ru")).toBe(true);
+  it.each(["user@yandex.ru", "user@mail.ru", "user@outlook.com", "user@yahoo.com", "user@company.example"])("allows valid non-Gmail address: %s", (email) => {
+    expect(validateEmail(email)).toBe(true);
+    expect(validateLoginEmail(email)).toBe(true);
   });
 
-  it("allows gmail for login email validation", () => {
-    expect(validateLoginEmail("user@gmail.com")).toBe(true);
+  it("blocks gmail for login email validation", () => {
+    expect(validateLoginEmail("user@gmail.com")).toBe("Вход через Gmail недоступен. Используйте другой email");
   });
 
   it("validates password length for login", () => {

@@ -381,7 +381,7 @@ export const getPaymentUrl = async (
   options?: PaymentUrlRequest
 ): Promise<PaymentResponse> => {
   try {
-    const url = `${ORDER_API_URL}${orderId}/pay/`;
+    const url = apiUrl(`/order/${orderId}/pay/`);
     const urls = getRelativePaymentUrls();
     const body = {
       request_id: toRequestId(orderId),
@@ -440,7 +440,7 @@ export const getYandexPaymentUrl = async (
   options?: YandexPayRequest
 ): Promise<PaymentResponse> => {
   try {
-    const url = `${ORDER_API_URL}${orderId}/pay/yandex/`;
+    const url = apiUrl(`/order/${orderId}/pay/yandex/`);
     const urls = getRelativePaymentUrls();
     const body = {
       request_id: toRequestId(orderId),

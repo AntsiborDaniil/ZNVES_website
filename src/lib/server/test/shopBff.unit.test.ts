@@ -9,6 +9,29 @@ const json = (value: unknown, status = 200, cookie?: string) => new Response(JSO
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 
 describe("shop BFF", () => {
+  it.each(["auth/user", "auth/user/"])("canonicalizes slashless browser path before calling Django: %s", async (path) => {
+    const fetchMock = vi.fn().mockResolvedValue(json({ detail: "Unauthorized" }, 401));
+    vi.stubGlobal("fetch", fetchMock);
+    const response = await proxyShopRequest(new NextRequest(`${origin}/api/shop/${path}?test=1`), ["auth", "user"]);
+    expect(String(fetchMock.mock.calls[0][0])).toMatch(/\/api\/auth\/user\/\?test=1$/);
+    expect(response.status).toBe(401);
+  });
+  it("posts login to the Django slash endpoint instead of returning its redirect", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(json({ csrfToken: "csrf" })).mockResolvedValueOnce(json({ detail: "Code sent" }));
+    vi.stubGlobal("fetch", fetchMock);
+    const response = await proxyShopRequest(request("auth/login", { email: "user@outlook.com", password: "test-password" }), ["auth", "login"]);
+    expect(response.status).toBe(200);
+    expect(String(fetchMock.mock.calls[1][0])).toMatch(/\/api\/auth\/login\/$/);
+    expect(fetchMock.mock.calls[1][1].method).toBe("POST");
+  });
+  it.each(["user@gmail.com", "USER@GOOGLEMAIL.COM"])("rejects Gmail at BFF before sending credentials upstream: %s", async (email) => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const response = await proxyShopRequest(request("auth/login", { email }), ["auth", "login"]);
+    expect(response.status).toBe(400);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("validates HTTPS payment hostnames and rejects lookalike hosts", () => {
     expect(isAllowedPaymentUrl("https://yoomoney.ru/checkout/payments/v2/contract?orderId=1")).toBe(true);
     expect(isAllowedPaymentUrl("https://checkout.pay.yandex.ru/pay")).toBe(true);

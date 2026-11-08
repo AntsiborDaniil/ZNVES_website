@@ -7,7 +7,6 @@ import { getProductById } from "../../data/products";
 import { fetchCatalogProductRaw, type ApiProductDetail } from "../product/productApi";
 import type { CartItem } from "../../types/cart";
 
-const DISCOUNTS_API_URL = apiUrl("/discounts/promo");
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -136,7 +135,7 @@ export async function applyPromoCode(
   if (params.previousPromoCode != null) body.previous_promo_code = params.previousPromoCode;
   if (params.previousDiscount != null) body.previous_discount = params.previousDiscount;
 
-  const url = `${DISCOUNTS_API_URL}/${encodeURIComponent(trimmed)}/`;
+  const url = apiUrl(`/discounts/promo/${encodeURIComponent(trimmed)}/`);
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   const csrf = getCsrfToken();
   if (csrf) headers["X-CSRFToken"] = csrf;

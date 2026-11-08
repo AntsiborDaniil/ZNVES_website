@@ -73,3 +73,29 @@ Mock mode keeps existing fixtures and MSW endpoints; checkout mock composition
 never creates a real order/payment. Tests cover isolation, deduplication,
 invalidation, session reset, serializable errors, cookie/CSRF continuity,
 capability redaction/tampering, payment hostname checks and Origin/path rejection.
+
+## URL canonicalization and deployment recovery
+
+Browser BFF URLs must not end in `/` (Next.js default canonicalization).
+The BFF independently adds Django's required trailing `/` before the query string.
+Do not preserve the incoming slash convention when forming upstream URLs:
+Django redirects slashless POST endpoints and the proxy intentionally does not
+follow arbitrary upstream redirects. Regression tests cover slashless GET/login
+and query strings; a production-mode HTTP smoke test should return JSON 401 for
+an anonymous profile and JSON 400 for an empty login, never 301/308 from the BFF.
+
+An inline script before application chunks detects failed Next.js scripts and
+ChunkLoadError rejections. It requests fresh HTML with a cache-busting query at
+most once per minute per browser session. Navigation removes that temporary
+query after successful hydration; an error boundary offers manual refresh.
+Existing tabs loaded before this script ships require one manual refresh.
+This is recovery, not asset retention: keep previous deployment static chunks
+available during rollout and ensure the reverse proxy/CDN does not reuse HTML
+from another deployment after deleting its assets. Never remove nosniff to mask
+a chunk 404; HTML error responses are not executable JavaScript.
+
+Email policy is a product restriction: forms and the Next auth proxy reject
+`gmail.com` and `googlemail.com`, accepting other syntactically valid addresses.
+This does not purport to be a statutory ban on Gmail addresses. Article 8(10) of
+149-FZ regulates authentication systems; using an email as a login with the
+shop's own password/code verification differs from Google OAuth.

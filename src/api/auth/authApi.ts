@@ -31,20 +31,18 @@ export interface AuthUser {
   delivery_data?: AuthUserDeliveryData | null;
 }
 
-const AUTH_BASE_URL = apiUrl("/auth");
+const AUTH_USER_URL = apiUrl("/auth/user/");
+const AUTH_USER_DELIVERY_URL = apiUrl("/auth/user/delivery-data/");
+const AUTH_CHANGE_PASSWORD_URL = apiUrl("/auth/change-password/");
 
-const AUTH_USER_URL = `${AUTH_BASE_URL}/user/`;
-const AUTH_USER_DELIVERY_URL = `${AUTH_BASE_URL}/user/delivery-data/`;
-const AUTH_CHANGE_PASSWORD_URL = `${AUTH_BASE_URL}/change-password/`;
-
-const REGISTER_URL = `${AUTH_BASE_URL}/register/`;
-const REGISTER_VERIFY_URL = `${AUTH_BASE_URL}/register/verify/`;
-const LOGIN_URL = `${AUTH_BASE_URL}/login/`;
-const LOGIN_VERIFY_URL = `${AUTH_BASE_URL}/login/verify/`;
-const RESEND_CODE_URL = `${AUTH_BASE_URL}/register/resend-code/`;
-const PASSWORD_RESET_REQUEST_URL = `${AUTH_BASE_URL}/password-reset/request/`;
-const PASSWORD_RESET_VERIFY_URL = `${AUTH_BASE_URL}/password-reset/verify/`;
-const PASSWORD_RESET_CHANGE_URL = `${AUTH_BASE_URL}/password-reset/change/`;
+const REGISTER_URL = apiUrl("/auth/register/");
+const REGISTER_VERIFY_URL = apiUrl("/auth/register/verify/");
+const LOGIN_URL = apiUrl("/auth/login/");
+const LOGIN_VERIFY_URL = apiUrl("/auth/login/verify/");
+const RESEND_CODE_URL = apiUrl("/auth/register/resend-code/");
+const PASSWORD_RESET_REQUEST_URL = apiUrl("/auth/password-reset/request/");
+const PASSWORD_RESET_VERIFY_URL = apiUrl("/auth/password-reset/verify/");
+const PASSWORD_RESET_CHANGE_URL = apiUrl("/auth/password-reset/change/");
 
 export type RegisterPayload = {
   email: string;
@@ -416,5 +414,5 @@ export async function logoutUser(): Promise<void> {
     clearMockAuthSession();
     return;
   }
-  await authPost(`${AUTH_BASE_URL}/logout/`, {});
+  await authPost(apiUrl("/auth/logout/"), {});
 }

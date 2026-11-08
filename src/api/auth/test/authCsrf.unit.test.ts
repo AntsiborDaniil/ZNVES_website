@@ -10,7 +10,7 @@ it("sends login and reset to the same-origin BFF without exposing CSRF bootstrap
   await loginUser({ email: "test@example.com", password: "password" });
   await changePasswordWithResetToken("new-password");
   expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
-    "/api/shop/auth/login/", "/api/shop/auth/password-reset/change/",
+    "/api/shop/auth/login", "/api/shop/auth/password-reset/change",
   ]);
   for (const [, init] of fetchMock.mock.calls) {
     expect(init.credentials).toBe("include");

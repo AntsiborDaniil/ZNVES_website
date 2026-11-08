@@ -20,6 +20,11 @@ const NavigationTracker = () => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("__znves_reload")) {
+      url.searchParams.delete("__znves_reload");
+      window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+    }
     setIsMounted(true);
   }, []);
 

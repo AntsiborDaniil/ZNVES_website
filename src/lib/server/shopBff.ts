@@ -1,6 +1,7 @@
 import "server-only";
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { isGmailAddress } from "../authValidation";
 
 const developmentSecret = randomBytes(32).toString("hex");
 const guestLifetimeSeconds = 86400;
@@ -138,7 +139,8 @@ function trustedReturnUrl(value: unknown, request: NextRequest, outcome: string)
 function fail(status: number, detail: string): NextResponse { return NextResponse.json({ detail }, { status, headers: privateHeaders }); }
 export async function proxyShopRequest(request: NextRequest, segments: string[]): Promise<NextResponse> {
   if (segments.some(s => !s || s === "." || s === ".." || /[\\/%?#\u0000-\u001f]/.test(s))) return fail(404, "Маршрут не найден.");
-  const path = segments.join("/") + (request.nextUrl.pathname.endsWith("/") ? "/" : "");
+  // Next.js uses slashless browser URLs; Django requires its canonical trailing slash.
+  const path = `${segments.join("/")}/`;
   if (!isAllowedShopPath(path, request.method)) return fail(404, "Маршрут не найден.");
   if (request.method !== "GET" && !isTrustedMutation(request)) return fail(403, "Недопустимый источник запроса.");
   try {
@@ -153,6 +155,13 @@ export async function proxyShopRequest(request: NextRequest, segments: string[])
       body = JSON.stringify(data);
     }
     if (body && body.length > 128000) return fail(413, "Слишком большой запрос.");
+    if (body && ["POST", "PATCH"].includes(request.method) && path.startsWith("auth/") && !["auth/logout/", "auth/token/refresh/"].includes(path)) {
+      let payload;
+      try { payload = JSON.parse(body); } catch { return fail(400, "Некорректный JSON запроса."); }
+      if (typeof payload?.email === "string" && isGmailAddress(payload.email)) {
+        return session.response({ email: ["Вход и регистрация через Gmail недоступны. Используйте другой email."] }, 400);
+      }
+    }
     const upstreamPath = path.replace(/^auth\/user\/change-password\/?$/, "auth/change-password/");
     const upstream = await session.fetch(upstreamPath + request.nextUrl.search, request.method, body, token || undefined);
     const data = await responseBody(upstream);
