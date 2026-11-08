@@ -5,17 +5,9 @@ import { Controller, useForm } from "react-hook-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  changePasswordWithResetToken,
-  getCurrentUserWithRetry,
-  loginUser,
-  registerUser,
-  requestPasswordReset,
-  resendAuthCode,
-  verifyLogin,
-  verifyPasswordResetCode,
-  verifyRegistration,
   type AuthUser,
 } from "../../api/auth/authApi";
+import { useLazyGetCurrentUserWithRetryQuery, useLoginMutation, useRegisterMutation, useVerifyLoginMutation, useVerifyRegistrationMutation, useResendAuthCodeMutation, useRequestPasswordResetMutation, useVerifyPasswordResetCodeMutation, useChangePasswordWithResetTokenMutation } from "../../store/api";
 import OtpInput from "../OtpInput/OtpInput";
 import PhoneInput from "../PhoneInput/PhoneInput";
 import { useAuth } from "../../contexts/AuthContext";
@@ -202,6 +194,15 @@ const AccountAuth = ({
   redirectOnSuccess,
 }: AccountAuthProps) => {
   const router = useRouter();
+  const [getCurrentUserWithRetry] = useLazyGetCurrentUserWithRetryQuery();
+  const [loginUser] = useLoginMutation();
+  const [registerUser] = useRegisterMutation();
+  const [verifyLogin] = useVerifyLoginMutation();
+  const [verifyRegistration] = useVerifyRegistrationMutation();
+  const [resendAuthCode] = useResendAuthCodeMutation();
+  const [requestPasswordReset] = useRequestPasswordResetMutation();
+  const [verifyPasswordResetCode] = useVerifyPasswordResetCodeMutation();
+  const [changePasswordWithResetToken] = useChangePasswordWithResetTokenMutation();
   const { checkAuth, updateUser } = useAuth();
   const isModal = variant === "modal";
   const shouldRedirectOnSuccess = redirectOnSuccess ?? !isModal;
@@ -350,7 +351,7 @@ const AccountAuth = ({
       await loginUser({
         email: values.email.trim(),
         password: values.password,
-      });
+      }).unwrap();
       setPendingEmail(values.email.trim());
       setLoginPassword(values.password);
       setStep("verify");
@@ -379,7 +380,7 @@ const AccountAuth = ({
         first_name: values.first_name.trim(),
         last_name: values.last_name.trim(),
         phone_number: values.phone_number.trim(),
-      });
+      }).unwrap();
       setPendingEmail(values.email.trim());
       setStep("verify");
       verifyForm.reset();
@@ -414,8 +415,8 @@ const AccountAuth = ({
 
       const verifiedUser =
         mode === "login"
-          ? await verifyLogin(payload)
-          : await verifyRegistration(payload);
+          ? await verifyLogin(payload).unwrap()
+          : await verifyRegistration(payload).unwrap();
 
       await completeAuth(verifiedUser);
     } catch (error) {
@@ -437,12 +438,12 @@ const AccountAuth = ({
     setInfoMessage(null);
     try {
       if (mode === "register") {
-        await resendAuthCode(pendingEmail);
+        await resendAuthCode(pendingEmail).unwrap();
       } else {
         await loginUser({
           email: pendingEmail,
           password: loginPassword,
-        });
+        }).unwrap();
       }
       startResendCooldown();
       setInfoMessage("Код отправлен повторно");
@@ -473,7 +474,7 @@ const AccountAuth = ({
     setFormError(null);
     setInfoMessage(null);
     try {
-      await requestPasswordReset(values.email.trim());
+      await requestPasswordReset(values.email.trim()).unwrap();
       setPendingEmail(values.email.trim());
       setStep("reset-code");
       verifyForm.reset();
@@ -495,7 +496,7 @@ const AccountAuth = ({
     setFormError(null);
     setInfoMessage(null);
     try {
-      await verifyPasswordResetCode(pendingEmail, values.code.trim());
+      await verifyPasswordResetCode({ email: pendingEmail, code: values.code.trim() }).unwrap();
       setStep("reset-password");
       resetPasswordForm.reset();
       setInfoMessage(null);
@@ -524,9 +525,9 @@ const AccountAuth = ({
     }
 
     try {
-      await changePasswordWithResetToken(values.password);
+      await changePasswordWithResetToken(values.password).unwrap();
 
-      const user = await getCurrentUserWithRetry();
+      const user = await getCurrentUserWithRetry(undefined, false).unwrap();
       if (user) {
         await completeAuth(user);
         return;
@@ -552,7 +553,7 @@ const AccountAuth = ({
     setFormError(null);
     setInfoMessage(null);
     try {
-      await requestPasswordReset(pendingEmail);
+      await requestPasswordReset(pendingEmail).unwrap();
       startResendCooldown();
       setInfoMessage("Код отправлен повторно");
     } catch (error) {

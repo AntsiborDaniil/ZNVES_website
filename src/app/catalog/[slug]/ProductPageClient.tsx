@@ -7,7 +7,7 @@ import ProductPageView from "../../../components/ProductPage/ProductPageView";
 import LoadingStub from "../../../components/LoadingStub/LoadingStub";
 import Header from "../../../components/Header/Header";
 import Footer from "../../../components/Footer/Footer";
-import { fetchProductWithWarehouse } from "../../../api/product/productApi";
+import { useLazyGetProductWithWarehouseQuery } from "../../../store/api";
 import type { ProductDetail } from "../../../types/products";
 import type { ApiWarehouseItem } from "../../../api/product/productApi";
 import styles from "../../not-found.module.css";
@@ -33,6 +33,7 @@ const ProductPageBody = ({
   initialProduct = null,
   initialWarehouseItems = [],
 }: ProductPageClientProps) => {
+  const [loadProduct] = useLazyGetProductWithWarehouseQuery();
   const hasSsr = initialProduct != null;
 
   const [state, setState] = useState<LoadState>(() =>
@@ -55,7 +56,7 @@ const ProductPageBody = ({
     let cancelled = false;
     setState({ status: "loading" });
 
-    fetchProductWithWarehouse(slug)
+    loadProduct(slug, false).unwrap()
       .then((data) => {
         if (cancelled) return;
         if (data) {
@@ -77,7 +78,7 @@ const ProductPageBody = ({
     return () => {
       cancelled = true;
     };
-  }, [slug, attempt, hasSsr]);
+  }, [slug, attempt, hasSsr, loadProduct]);
 
   const handleRetry = useCallback(() => setAttempt((value) => value + 1), []);
 

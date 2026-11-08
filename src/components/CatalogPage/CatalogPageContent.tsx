@@ -15,12 +15,11 @@ import Link from "next/link";
 import type { CatalogProduct } from "../../types/products";
 import {
   CATALOG_PAGE_SIZE,
-  fetchCatalogProductsPage,
-  fetchCatalogProductsPageByCategory,
   getCatalogCategoryLabel,
   resolveCategorySlug,
   type ApiCatalogCategory,
 } from "../../api/catalog/catalogApi";
+import { useLazyGetCatalogProductsPageQuery, useLazyGetCatalogProductsPageByCategoryQuery } from "../../store/api";
 import { buildProductHref } from "../../lib/productNavigation";
 import { useCatalogCategories } from "../../contexts/CatalogCategoriesContext";
 
@@ -47,6 +46,10 @@ const CatalogPageContent = ({
   initialCategoryParam = null,
   initialHasMore = false,
 }: CatalogPageContentProps) => {
+  const [loadPage] = useLazyGetCatalogProductsPageQuery();
+  const [loadCategoryPage] = useLazyGetCatalogProductsPageByCategoryQuery();
+  const fetchCatalogProductsPage = useCallback((params: Parameters<typeof loadPage>[0]) => loadPage(params, true).unwrap(), [loadPage]);
+  const fetchCatalogProductsPageByCategory = useCallback((category: string | undefined, page: number, pageSize: number) => loadCategoryPage({ category, page, pageSize }, true).unwrap(), [loadCategoryPage]);
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const {
@@ -178,7 +181,7 @@ const CatalogPageContent = ({
     return () => {
       cancelled = true;
     };
-  }, [categoryParam, initialProducts.length, isNewIn]);
+  }, [categoryParam, initialProducts.length, isNewIn, fetchCatalogProductsPage, fetchCatalogProductsPageByCategory]);
 
   const appendNextPage = useCallback(async () => {
     if (loadingMoreRef.current || !hasMore) return;
@@ -226,7 +229,7 @@ const CatalogPageContent = ({
       loadingMoreRef.current = false;
       setIsLoadingMore(false);
     }
-  }, [categoryParam, hasMore, isNewIn, nextPage]);
+  }, [categoryParam, hasMore, isNewIn, nextPage, fetchCatalogProductsPage, fetchCatalogProductsPageByCategory]);
 
   const filteredProducts = useMemo(() => {
     return [...products].sort((a, b) => a.sortOrder - b.sortOrder);
@@ -286,7 +289,7 @@ const CatalogPageContent = ({
         setIsLoading(false);
       }
     })();
-  }, [categoryParam, isNewIn, refreshSharedCategories]);
+  }, [categoryParam, isNewIn, refreshSharedCategories, fetchCatalogProductsPage, fetchCatalogProductsPageByCategory]);
 
   const showSentinel =
     !isLoading && filteredProducts.length > 0 && hasMore;

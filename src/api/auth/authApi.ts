@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../../lib/apiConfig";
+import { apiUrl } from "../../lib/apiUrl";
 import { shouldUseMocks } from "../../lib/useMocks";
 import { AuthApiError, parseAuthApiErrorResponse } from "./authApiErrors";
 
@@ -31,11 +31,11 @@ export interface AuthUser {
   delivery_data?: AuthUserDeliveryData | null;
 }
 
-const AUTH_BASE_URL = `${API_BASE_URL}/api/auth`;
+const AUTH_BASE_URL = apiUrl("/auth");
 
 const AUTH_USER_URL = `${AUTH_BASE_URL}/user/`;
 const AUTH_USER_DELIVERY_URL = `${AUTH_BASE_URL}/user/delivery-data/`;
-const AUTH_CHANGE_PASSWORD_URL = `${AUTH_BASE_URL}/user/change-password/`;
+const AUTH_CHANGE_PASSWORD_URL = `${AUTH_BASE_URL}/change-password/`;
 
 const REGISTER_URL = `${AUTH_BASE_URL}/register/`;
 const REGISTER_VERIFY_URL = `${AUTH_BASE_URL}/register/verify/`;
@@ -84,25 +84,11 @@ export const parseAuthUser = (data: unknown): AuthUser | null => {
 };
 
 const authJsonHeaders = async (): Promise<Record<string, string>> => {
-  // Cookie API-домена недоступна через document.cookie на домене сайта.
-  // Получаем свежий masked token и устанавливаем CSRF-cookie самим API.
-  const response = await fetch(`${API_BASE_URL}/api/order/csrf/`, {
-    credentials: "include",
-    cache: "no-store",
-    headers: { Accept: "application/json" },
-  });
-  if (!response.ok) {
-    throw await parseAuthApiErrorResponse(response, "Не удалось подготовить защищённый запрос. Повторите попытку.");
-  }
-  const data = await response.json();
-  if (typeof data.csrfToken !== "string" || !data.csrfToken) {
-    throw new AuthApiError("Не удалось получить CSRF-токен. Повторите попытку.");
-  }
+  // CSRF bootstrap and cookie forwarding are handled by the same-origin BFF.
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     Accept: "application/json",
   };
-  headers["X-CSRFToken"] = data.csrfToken;
   return headers;
 };
 
@@ -421,3 +407,14 @@ export const changePassword = async (
     throw await parseAuthApiErrorResponse(response, "Не удалось изменить пароль");
   }
 };
+
+
+/** Clear the HttpOnly session through the BFF. */
+export async function logoutUser(): Promise<void> {
+  if (shouldUseMocks()) {
+    const { clearMockAuthSession } = await import("../../mocks/state/authStore");
+    clearMockAuthSession();
+    return;
+  }
+  await authPost(`${AUTH_BASE_URL}/logout/`, {});
+}

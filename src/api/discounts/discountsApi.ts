@@ -1,13 +1,13 @@
 // API для проверки и применения промокодов
 
-import { API_BASE_URL } from "../../lib/apiConfig";
+import { apiUrl } from "../../lib/apiUrl";
 import { getCsrfToken } from "../../lib/csrf";
 import { shouldUseMocks } from "../../lib/useMocks";
 import { getProductById } from "../../data/products";
 import { fetchCatalogProductRaw, type ApiProductDetail } from "../product/productApi";
 import type { CartItem } from "../../types/cart";
 
-const DISCOUNTS_API_URL = `${API_BASE_URL}/api/discounts/promo`;
+const DISCOUNTS_API_URL = apiUrl("/discounts/promo");
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 

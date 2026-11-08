@@ -11,9 +11,10 @@ import {
   type ReactNode,
 } from "react";
 import {
-  fetchCatalogCategories,
   type ApiCatalogCategory,
 } from "../api/catalog/catalogApi";
+
+import { useLazyGetCategoriesQuery } from "../store/api";
 
 type CatalogCategoriesContextValue = {
   categories: ApiCatalogCategory[];
@@ -34,6 +35,7 @@ export const CatalogCategoriesProvider = ({
   children,
   initialCategories = [],
 }: CatalogCategoriesProviderProps) => {
+  const [loadCategories] = useLazyGetCategoriesQuery();
   const [categories, setCategories] = useState<ApiCatalogCategory[]>(
     initialCategories
   );
@@ -46,7 +48,7 @@ export const CatalogCategoriesProvider = ({
     setIsLoading(true);
     setError(null);
     try {
-      const next = await fetchCatalogCategories();
+      const next = await loadCategories(undefined, false).unwrap();
       if (next.length > 0) {
         setCategories(next);
       } else if (categoriesRef.current.length === 0) {
@@ -59,7 +61,7 @@ export const CatalogCategoriesProvider = ({
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [loadCategories]);
 
   useEffect(() => {
     if (initialCategories.length > 0) return;

@@ -8,9 +8,8 @@ import { useRouter } from "next/navigation";
 import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { getProductById } from "../../data/products";
-import { fetchCatalogColors } from "../../api/catalog/catalogApi";
+import { useLazyGetColorsQuery, useApplyPromoCodeMutation } from "../../store/api";
 import {
-  applyPromoCode,
   buildCartItemsForPromo,
 } from "../../api/discounts/discountsApi";
 import Button from "../ui/Button/Button";
@@ -76,6 +75,9 @@ const CartModal = ({
   onPaymentReturnHandled,
 }: CartModalProps) => {
   const router = useRouter();
+  const [loadColors] = useLazyGetColorsQuery();
+  const [applyPromoCodeMutation] = useApplyPromoCodeMutation();
+  const fetchCatalogColors = useCallback(() => loadColors(undefined, true).unwrap(), [loadColors]);
   const {
     items,
     removeItem,
@@ -239,7 +241,7 @@ const CartModal = ({
       });
       setColorSlugToLabel(map);
     });
-  }, [items]);
+  }, [items, fetchCatalogColors]);
 
   useEffect(() => {
     if (!showSuccessModal && orderNumber && items.length > 0) {
@@ -313,12 +315,12 @@ const CartModal = ({
       }
 
       const orderTotal = getTotalPrice().toFixed(2);
-      const result = await applyPromoCode(promo, {
+      const result = await applyPromoCodeMutation({ promoCode: promo, params: {
         cartItems: cartItemsForApi,
         orderTotal,
         previousPromoCode: appliedPromo?.promoCode ?? null,
         previousDiscount: appliedPromo ? appliedPromo.discount : undefined,
-      });
+      } }).unwrap();
 
       if (result.success) {
         lastFailedPromoRef.current = null;

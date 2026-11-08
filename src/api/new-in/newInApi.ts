@@ -70,7 +70,7 @@ export const fetchNewInProducts = async (
   const cacheKey = JSON.stringify({ category: categorySlug, is_new: true });
   const cached = cache.get(cacheKey);
 
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+  if (typeof window === "undefined" && cached && Date.now() - cached.timestamp < CACHE_DURATION) {
     return cached.data;
   }
 
@@ -83,7 +83,7 @@ export const fetchNewInProducts = async (
     const transformedProducts = data.map((product, index) =>
       transformApiProduct(product, index)
     );
-    cache.set(cacheKey, {
+    if (typeof window === "undefined") cache.set(cacheKey, {
       data: transformedProducts,
       timestamp: Date.now(),
     });
@@ -119,7 +119,7 @@ export const fetchNewInProducts = async (
     );
 
     if (transformedProducts.length > 0) {
-      cache.set(cacheKey, {
+      if (typeof window === "undefined") cache.set(cacheKey, {
         data: transformedProducts,
         timestamp: Date.now(),
       });

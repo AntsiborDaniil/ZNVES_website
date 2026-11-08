@@ -232,7 +232,7 @@ export const fetchCatalogProductsPage = async (
   const cacheKey = JSON.stringify(requestParams);
   const cached = cache.get(cacheKey);
 
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+  if (typeof window === "undefined" && cached && Date.now() - cached.timestamp < CACHE_DURATION) {
     return cached.result;
   }
 
@@ -240,7 +240,7 @@ export const fetchCatalogProductsPage = async (
     const { getMockCatalogPage } = await import("../../mocks/catalogMocks");
     const payload = getMockCatalogPage(requestParams);
     const parsed = parseCatalogPayload(payload, page, pageSize, sortOffset);
-    cache.set(cacheKey, {
+    if (typeof window === "undefined") cache.set(cacheKey, {
       result: parsed,
       timestamp: Date.now(),
     });
@@ -281,7 +281,7 @@ export const fetchCatalogProductsPage = async (
       return { ...parsed, products: [], hasMore: false };
     }
 
-    cache.set(cacheKey, {
+    if (typeof window === "undefined") cache.set(cacheKey, {
       result: parsed,
       timestamp: Date.now(),
     });
@@ -352,13 +352,13 @@ let sizesCacheState: { data: ApiCatalogSize[]; timestamp: number } | null = null
 
 // Получение списка категорий для фильтров (с in-memory кешем)
 export const fetchCatalogCategories = async (): Promise<ApiCatalogCategory[]> => {
-  if (categoriesCacheState && Date.now() - categoriesCacheState.timestamp < FILTERS_CACHE_DURATION) {
+  if (typeof window === "undefined" && categoriesCacheState && Date.now() - categoriesCacheState.timestamp < FILTERS_CACHE_DURATION) {
     return categoriesCacheState.data;
   }
   if (shouldUseMocks()) {
     const { getMockCatalogCategories } = await import("../../mocks/catalogMocks");
     const list = getMockCatalogCategories();
-    categoriesCacheState = { data: list, timestamp: Date.now() };
+    if (typeof window === "undefined") categoriesCacheState = { data: list, timestamp: Date.now() };
     return list;
   }
   try {
@@ -372,7 +372,7 @@ export const fetchCatalogCategories = async (): Promise<ApiCatalogCategory[]> =>
     }
     const data = (await response.json()) as ApiCatalogCategory[];
     const list = Array.isArray(data) ? data : [];
-    categoriesCacheState = { data: list, timestamp: Date.now() };
+    if (typeof window === "undefined") categoriesCacheState = { data: list, timestamp: Date.now() };
     return list;
   } catch (error) {
     return categoriesCacheState?.data ?? [];
@@ -381,13 +381,13 @@ export const fetchCatalogCategories = async (): Promise<ApiCatalogCategory[]> =>
 
 // Получение списка цветов для фильтров (с in-memory кешем)
 export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
-  if (colorsCacheState && Date.now() - colorsCacheState.timestamp < FILTERS_CACHE_DURATION) {
+  if (typeof window === "undefined" && colorsCacheState && Date.now() - colorsCacheState.timestamp < FILTERS_CACHE_DURATION) {
     return colorsCacheState.data;
   }
   if (shouldUseMocks()) {
     const { getMockCatalogColors } = await import("../../mocks/catalogMocks");
     const data = getMockCatalogColors();
-    colorsCacheState = { data, timestamp: Date.now() };
+    if (typeof window === "undefined") colorsCacheState = { data, timestamp: Date.now() };
     return data;
   }
   try {
@@ -400,7 +400,7 @@ export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
     const data = await response.json();
-    colorsCacheState = { data, timestamp: Date.now() };
+    if (typeof window === "undefined") colorsCacheState = { data, timestamp: Date.now() };
     return data;
   } catch (error) {
     return colorsCacheState?.data ?? [];
@@ -409,13 +409,13 @@ export const fetchCatalogColors = async (): Promise<ApiCatalogColor[]> => {
 
 // Получение списка размеров для фильтров (с in-memory кешем)
 export const fetchCatalogSizes = async (): Promise<ApiCatalogSize[]> => {
-  if (sizesCacheState && Date.now() - sizesCacheState.timestamp < FILTERS_CACHE_DURATION) {
+  if (typeof window === "undefined" && sizesCacheState && Date.now() - sizesCacheState.timestamp < FILTERS_CACHE_DURATION) {
     return sizesCacheState.data;
   }
   if (shouldUseMocks()) {
     const { getMockCatalogSizes } = await import("../../mocks/catalogMocks");
     const data = getMockCatalogSizes();
-    sizesCacheState = { data, timestamp: Date.now() };
+    if (typeof window === "undefined") sizesCacheState = { data, timestamp: Date.now() };
     return data;
   }
   try {
@@ -428,7 +428,7 @@ export const fetchCatalogSizes = async (): Promise<ApiCatalogSize[]> => {
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
     const data = await response.json();
-    sizesCacheState = { data, timestamp: Date.now() };
+    if (typeof window === "undefined") sizesCacheState = { data, timestamp: Date.now() };
     return data;
   } catch (error) {
     return sizesCacheState?.data ?? [];

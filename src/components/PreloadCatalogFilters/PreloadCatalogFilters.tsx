@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
-import { preloadCatalogFilters } from "../../api/catalog/catalogApi";
+import { useGetCategoriesQuery, useGetColorsQuery, useGetSizesQuery } from "../../store/api";
 
-/** При монтировании предзагружает категории, цвета и размеры в кеш — на странице каталога фильтры появятся без задержки. */
+/** Прогреваем общий RTK-кеш фильтров каталога. */
 export default function PreloadCatalogFilters() {
-  useEffect(() => {
-    preloadCatalogFilters();
-  }, []);
+  useGetCategoriesQuery();
+  useGetColorsQuery();
+  useGetSizesQuery();
   return null;
 }

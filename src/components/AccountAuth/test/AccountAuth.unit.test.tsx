@@ -2,6 +2,8 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AccountAuth from "../AccountAuth";
+import { Provider } from "react-redux";
+import { makeStore } from "../../../store/store";
 
 const checkAuth = vi.fn();
 const updateUser = vi.fn();
@@ -35,7 +37,7 @@ describe("AccountAuth", () => {
   });
 
   it("renders login form by default", () => {
-    render(<AccountAuth />);
+    render(<Provider store={makeStore()}><AccountAuth /></Provider>);
 
     expect(screen.getByRole("heading", { name: "Вход в личный кабинет" })).toBeInTheDocument();
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
@@ -44,7 +46,7 @@ describe("AccountAuth", () => {
 
   it("switches to registration form", async () => {
     const user = userEvent.setup();
-    render(<AccountAuth />);
+    render(<Provider store={makeStore()}><AccountAuth /></Provider>);
 
     await user.click(screen.getByRole("button", { name: "Регистрация" }));
 
@@ -55,7 +57,7 @@ describe("AccountAuth", () => {
 
   it("toggles password visibility", async () => {
     const user = userEvent.setup();
-    render(<AccountAuth />);
+    render(<Provider store={makeStore()}><AccountAuth /></Provider>);
 
     const passwordInput = screen.getByLabelText("Пароль");
     expect(passwordInput).toHaveAttribute("type", "password");
@@ -69,7 +71,7 @@ describe("AccountAuth", () => {
 
   it("shows validation errors for empty login submit", async () => {
     const user = userEvent.setup();
-    render(<AccountAuth />);
+    render(<Provider store={makeStore()}><AccountAuth /></Provider>);
 
     await user.click(screen.getByRole("button", { name: "Войти" }));
 
@@ -79,7 +81,7 @@ describe("AccountAuth", () => {
 
   it("shows forgot password entry on login form", async () => {
     const user = userEvent.setup();
-    render(<AccountAuth />);
+    render(<Provider store={makeStore()}><AccountAuth /></Provider>);
 
     expect(screen.getByRole("button", { name: "Забыли пароль?" })).toBeInTheDocument();
 

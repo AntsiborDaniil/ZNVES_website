@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CdekPvzPoint } from "../../api/delivery/cdekApi";
-import { getRegionPvzCdek } from "../../api/delivery/pvzRegionCache";
+import { useLazyGetCdekPvzByCityQuery, useLazyGetDeliveryConfigQuery, useLazyGetCdekEstimateQuery, useLazyReverseGeocodeQuery, useLazyGeocodeQuery } from "../../store/api";
 import {
   buildCdekPvzSelection,
   buildYaDeliveryWidgetParams,
@@ -102,6 +102,11 @@ const Map = ({
   onYandexContinueClick,
   onYandexWidgetInteraction,
 }: MapProps) => {
+  const [loadCdekPvz] = useLazyGetCdekPvzByCityQuery();
+  const [loadDeliveryConfig] = useLazyGetDeliveryConfigQuery();
+  const [loadCdekEstimate] = useLazyGetCdekEstimateQuery();
+  const [reverseGeocodeQuery] = useLazyReverseGeocodeQuery();
+  const [loadGeocode] = useLazyGeocodeQuery();
   const containerRef = useRef<HTMLDivElement>(null);
   const courierMapRef = useRef<HTMLDivElement>(null);
   const widgetInitedRef = useRef(false);
@@ -159,8 +164,7 @@ const Map = ({
       if (cancelled) return;
       setDeliveryConfig((prev) => prev ?? { yaDeliverySourceAddress: DEFAULT_YA_SOURCE_ADDRESS, cdekConfigured: false });
     }, 4000);
-    fetch("/api/delivery/config")
-      .then((r) => r.json())
+    loadDeliveryConfig(undefined, true).unwrap()
       .then((data: { yaDeliverySourceAddress?: string; cdekConfigured?: boolean }) => {
         if (cancelled) return;
         setDeliveryConfig({
@@ -177,7 +181,7 @@ const Map = ({
       cancelled = true;
       clearTimeout(timeout);
     };
-  }, [isPickupYandex, isCourier]);
+  }, [isPickupYandex, isCourier, loadDeliveryConfig]);
 
   const cdekPvzFiltered = filterCdekPvzPoints(cdekPvzList, cdekPvzSearch);
 
@@ -194,8 +198,9 @@ const Map = ({
     const ac = new AbortController();
     setCdekPvzLoading(true);
     setSelectedCdekPvzCode(null);
-    getRegionPvzCdek(city, ac.signal)
+    loadCdekPvz(city, true).unwrap()
       .then((list) => {
+        if (ac.signal.aborted) return;
         setCdekPvzList(list);
         if (onPvzListLoaded && list.length > 0) {
           onPvzListLoaded(
@@ -210,20 +215,18 @@ const Map = ({
           );
         }
       })
-      .catch(() => setCdekPvzList([]))
-      .finally(() => setCdekPvzLoading(false));
+      .catch(() => { if (!ac.signal.aborted) setCdekPvzList([]); })
+      .finally(() => { if (!ac.signal.aborted) setCdekPvzLoading(false); });
     return () => ac.abort();
-  }, [isPickupCdek, city, onPvzListLoaded]);
+  }, [isPickupCdek, city, onPvzListLoaded, loadCdekPvz]);
 
   // Расчёт доставки СДЭК (срок и стоимость) — опционально, если есть роут
   useEffect(() => {
     if (!isPickupCdek || !city || (totalWeightGrams ?? 0) <= 0) return;
     const ac = new AbortController();
-    fetch(`/api/cdek/calculate?city=${encodeURIComponent(city)}&weight_grams=${totalWeightGrams ?? 1000}`, {
-      signal: ac.signal,
-    })
-      .then((r) => (r.ok || r.status === 503 ? r.json() : null))
+    loadCdekEstimate({ city, weightGrams: totalWeightGrams ?? 1000 }, true).unwrap()
       .then((data: { price?: number; days_min?: number; days_max?: number; from_api?: boolean; reason?: string } | null) => {
+        if (ac.signal.aborted) return;
         if (data && data.from_api === true && typeof data.price === "number") {
           setCdekDeliveryEstimate({
             price: data.price,
@@ -235,10 +238,11 @@ const Map = ({
         }
       })
       .catch(() => {
+        if (ac.signal.aborted) return;
         setCdekDeliveryEstimate(null);
       });
     return () => ac.abort();
-  }, [isPickupCdek, city, totalWeightGrams]);
+  }, [isPickupCdek, city, totalWeightGrams, loadCdekEstimate]);
 
   // Пробрасываем расчёт СДЭК наверх для отображения в блоке «Доставка»
   useEffect(() => {
@@ -544,11 +548,7 @@ const Map = ({
 
         const reverseGeocode = (coords: [number, number]) => {
           const [lat, lon] = coords;
-          const base = typeof window !== "undefined" ? window.location.origin : "";
-          const url = `${base}/api/reverse-geocode?lat=${lat}&lon=${lon}`;
-
-          fetch(url)
-            .then((r) => r.json())
+          reverseGeocodeQuery({ lat, lon }, true).unwrap()
             .then((data: { city?: string; street?: string; house?: string; fullAddress?: string; error?: string }) => {
               if (data.error || !data.fullAddress) {
                 return;
@@ -629,7 +629,7 @@ const Map = ({
         courierMapInstanceRef.current = null;
       }
     };
-  }, [isCourier]);
+  }, [isCourier, reverseGeocodeQuery]);
 
   // Адрес из инпутов → метка на карте: геокодируем через наш API (без scriptError в браузере).
   useEffect(() => {
@@ -638,8 +638,6 @@ const Map = ({
     if (!query || query === "Доставка только по Москве" || query.length < 5) return;
 
     const geocodeQuery = /москва/i.test(query) ? query : `${query}, Москва`;
-    const base = typeof window !== "undefined" ? window.location.origin : "";
-    const url = `${base}/api/geocode?address=${encodeURIComponent(geocodeQuery)}`;
     const abort = new AbortController();
 
     const applyCoords = (
@@ -678,10 +676,9 @@ const Map = ({
 
     const delay = 300;
     const timer = setTimeout(() => {
-      fetch(url, { signal: abort.signal })
-        .then((r) => r.json())
+      loadGeocode(geocodeQuery, true).unwrap()
         .then((data: { lat?: number; lon?: number; city?: string; street?: string; house?: string; fullAddress?: string; error?: string }) => {
-          if (data.error || data.lat == null || data.lon == null) return;
+          if (abort.signal.aborted || data.error || data.lat == null || data.lon == null) return;
           applyCoords({
             lat: data.lat,
             lon: data.lon,
@@ -700,7 +697,7 @@ const Map = ({
       clearTimeout(timer);
       abort.abort();
     };
-  }, [isCourier, searchValue]);
+  }, [isCourier, searchValue, loadGeocode]);
 
   if (isPickupCdek) {
     return (

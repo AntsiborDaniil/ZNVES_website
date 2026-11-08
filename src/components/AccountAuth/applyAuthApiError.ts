@@ -16,8 +16,13 @@ export const applyAuthApiError = <T extends FieldValues>({
   setFormError,
   fallback,
 }: ApplyAuthApiErrorOptions<T>): void => {
-  if (!(error instanceof AuthApiError)) {
-    setFormError(error instanceof Error ? error.message : fallback);
+  const apiError = error instanceof AuthApiError
+    ? error
+    : error && typeof error === "object" && "fieldErrors" in error
+      ? error as { message?: string; fieldErrors: Partial<Record<AuthFieldName, string>> }
+      : null;
+  if (!apiError) {
+    setFormError(error && typeof error === "object" && "message" in error && typeof error.message === "string" ? error.message : fallback);
     return;
   }
 
@@ -26,15 +31,15 @@ export const applyAuthApiError = <T extends FieldValues>({
   for (const [apiField, formField] of Object.entries(fieldMap) as Array<
     [AuthFieldName, Path<T>]
   >) {
-    const message = error.fieldErrors[apiField];
+    const message = apiError.fieldErrors?.[apiField];
     if (!message || !formField) continue;
 
     form.setError(formField, { type: "server", message });
     appliedFieldError = true;
   }
 
-  if (error.message) {
-    setFormError(error.message);
+  if (apiError.message) {
+    setFormError(apiError.message);
     return;
   }
 

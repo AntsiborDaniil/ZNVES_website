@@ -9,6 +9,7 @@ import { CatalogCategoriesProvider } from "../contexts/CatalogCategoriesContext"
 import { ToastProvider } from "../components/ui/ToastProvider/ToastProvider";
 import ClientModalHosts from "../components/ClientModalHosts/ClientModalHosts";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
+import StoreProvider from "../components/StoreProvider/StoreProvider";
 import MockProvider from "../components/MockProvider/MockProvider";
 import { fetchCatalogCategories } from "../api/catalog/catalogApi";
 
@@ -71,6 +72,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html lang="ru" className={inter.variable}>
       <body className={inter.className}>
         <MockProvider>
+          <StoreProvider>
           <ToastProvider>
             <AuthProvider>
               <CartProvider>
@@ -83,6 +85,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
               </CartProvider>
             </AuthProvider>
           </ToastProvider>
+          </StoreProvider>
         </MockProvider>
       </body>
     </html>

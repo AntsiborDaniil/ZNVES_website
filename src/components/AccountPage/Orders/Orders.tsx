@@ -4,15 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import styles from "./Orders.module.css";
 import Image from "next/image";
 import {
-  fetchAccountOrders,
   apiOrderToAccountView,
-  getPaymentUrl,
   openPaymentTab,
-  getYandexPaymentUrl,
   redirectToPaymentUrl,
   resolvePaymentRedirectUrl,
   type AccountOrderView,
 } from "../../../api/order/orderApi";
+import { useGetAccountOrdersQuery, useGetPaymentUrlMutation, useGetYandexPaymentUrlMutation } from "../../../store/api";
 import LoadingStub from "../../LoadingStub/LoadingStub";
 import CartOrderErrorModal from "../../CartOrderErrorModal/CartOrderErrorModal";
 
@@ -367,10 +365,12 @@ type OrdersProps = {
 };
 
 const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
+  const { data: accountOrders, isLoading } = useGetAccountOrdersQuery();
+  const [getPaymentUrl] = useGetPaymentUrlMutation();
+  const [getYandexPaymentUrl] = useGetYandexPaymentUrlMutation();
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
   const [isPaying, setIsPaying] = useState(false);
   const [orderPayError, setOrderPayError] = useState<string | null>(null);
   const [isBuyerExpanded, setIsBuyerExpanded] = useState(false);
@@ -380,8 +380,12 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
     "К сожалению, оплатить заказ не удалось: один или несколько товаров отсутствуют в наличии или их количество ограничено. Пожалуйста, обновите состав заказа и попробуйте снова либо свяжитесь со службой поддержки.";
 
   useEffect(() => {
-    fetchAccountOrders()
-      .then((apiOrders) => {
+    if (!accountOrders) {
+      setOrders([]);
+      return;
+    }
+    const apiOrders = accountOrders;
+    {
         const sorted = apiOrders
           .map(apiOrderToAccountView)
           .slice()
@@ -413,10 +417,8 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
           setIsDetailsOpen(false);
           onOrderSelect?.(null);
         }
-      })
-      .catch(() => setOrders([]))
-      .finally(() => setIsLoading(false));
-  }, [initialOrderId]);
+    }
+  }, [initialOrderId, accountOrders]);
 
   const openOrder = (order: OrderData) => {
     setSelectedOrder(order);
@@ -487,14 +489,14 @@ const Orders = ({ initialOrderId, onOrderSelect }: OrdersProps) => {
       const returnUrl = `${baseUrl}?payment=success`;
       const cancelUrl = `${baseUrl}?payment=cancel`;
       const paymentResponse = useYandex
-        ? await getYandexPaymentUrl(orderId, {
+        ? await getYandexPaymentUrl({ orderId, options: {
             return_url: returnUrl,
             cancel_url: cancelUrl,
-          })
-        : await getPaymentUrl(orderId, {
+          } }).unwrap()
+        : await getPaymentUrl({ orderId, options: {
             return_url: returnUrl,
             cancel_url: cancelUrl,
-          });
+          } }).unwrap();
       const paymentUrl = resolvePaymentRedirectUrl(paymentResponse);
       if (paymentUrl) {
         redirectToPaymentUrl(paymentUrl, paymentTab ?? undefined);

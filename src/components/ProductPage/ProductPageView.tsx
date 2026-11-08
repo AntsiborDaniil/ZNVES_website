@@ -23,12 +23,9 @@ import ProductGallerySwiper from "./ProductGallerySwiper";
 import LazyRelatedSection from "./LazyRelatedSection";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import {
-  fetchProductImagesByColor,
   type ApiWarehouseItem,
 } from "../../api/product/productApi";
 import {
-  fetchCatalogCategories,
-  fetchCatalogColors,
   findCatalogCategory,
   getCategoryDisplayName,
   resolveCategorySlug,
@@ -37,6 +34,8 @@ import {
 import {
   getBreadcrumbOrigin,
 } from "../../lib/productNavigation";
+
+import { useLazyGetProductImagesQuery, useLazyGetCategoriesQuery, useLazyGetColorsQuery } from "../../store/api";
 
 const sameImageList = (a: string[], b: string[]) =>
   a.length === b.length && a.every((url, i) => url === b[i]);
@@ -69,6 +68,12 @@ const ProductPageView = ({
   product,
   warehouseItems = [],
 }: ProductPageViewProps) => {
+  const [loadImages] = useLazyGetProductImagesQuery();
+  const [loadCategories] = useLazyGetCategoriesQuery();
+  const [loadColors] = useLazyGetColorsQuery();
+  const fetchProductImagesByColor = useCallback((productSlug: string, colorSlug: string) => loadImages({ productSlug, colorSlug }, true).unwrap(), [loadImages]);
+  const fetchCatalogCategories = useCallback(() => loadCategories(undefined, true).unwrap(), [loadCategories]);
+  const fetchCatalogColors = useCallback(() => loadColors(undefined, true).unwrap(), [loadColors]);
   const { addItem } = useCart();
   const { showToast } = useToast();
   const searchParams = useSearchParams();
@@ -254,7 +259,7 @@ const ProductPageView = ({
       }
       if (timeoutId != null) clearTimeout(timeoutId);
     };
-  }, []);
+  }, [fetchCatalogColors, fetchCatalogCategories]);
 
   useEffect(() => {
     const inProduct = product.availableColors.some((color) => color.value === selectedColor);
@@ -328,7 +333,7 @@ const ProductPageView = ({
     return () => {
       cancelled = true;
     };
-  }, [product.slug, selectedColor, product.images]);
+  }, [product.slug, selectedColor, product.images, fetchProductImagesByColor]);
 
   const handleToggleSection = (id: string) => {
     setSelectedSection(id);

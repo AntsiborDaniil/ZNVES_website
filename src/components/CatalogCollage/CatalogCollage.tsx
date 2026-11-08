@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "../ProductCard/ProductCard";
@@ -8,8 +7,7 @@ import SectionHeader from "../SectionHeader/SectionHeader";
 import Button from "../ui/Button/Button";
 import styles from "./CatalogCollage.module.css";
 import type { CatalogProduct } from "../../types/products";
-import { fetchAllCatalogProducts } from "../../api/home/catalogApi";
-import { fetchHomePage } from "../../api/home/homeApi";
+import { useGetAllCatalogProductsQuery } from "../../store/api";
 import { buildProductHref } from "../../lib/productNavigation";
 import { releaseHomeHero } from "../NavigationTracker/NavigationTracker";
 
@@ -34,35 +32,9 @@ const CatalogCollage = ({
   featuredImage: featuredImageProp,
 }: CatalogCollageProps) => {
   const hasServerData = productsProp != null;
-  const [products, setProducts] = useState<CatalogProduct[]>(
-    productsProp ?? []
-  );
-  const [featuredImage, setFeaturedImage] = useState(
-    resolveFeaturedImage(featuredImageProp)
-  );
-  const [isLoading, setIsLoading] = useState(!hasServerData);
-
-  useEffect(() => {
-    if (hasServerData) return;
-
-    const load = async () => {
-      setIsLoading(true);
-      try {
-        const [catalogProducts, homePage] = await Promise.all([
-          fetchAllCatalogProducts(),
-          fetchHomePage(),
-        ]);
-        setProducts(catalogProducts);
-        setFeaturedImage(resolveFeaturedImage(homePage.catalog_featured_image));
-      } catch {
-        setProducts([]);
-        setFeaturedImage(DEFAULT_FEATURED_IMAGE);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    void load();
-  }, [hasServerData]);
+  const { data, isLoading } = useGetAllCatalogProductsQuery(undefined, { skip: hasServerData });
+  const products = productsProp ?? data ?? [];
+  const featuredImage = resolveFeaturedImage(featuredImageProp);
 
   const gridProducts = products.slice(0, 4);
 

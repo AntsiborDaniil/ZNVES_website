@@ -1,13 +1,15 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+vi.mock("../../../lib/useMocks", () => ({ shouldUseMocks: () => false }));
 import { getPaymentUrl, getYandexPaymentUrl, openPaymentTab, redirectToPaymentUrl } from "../orderApi";
 
 afterEach(() => vi.restoreAllMocks());
 
 describe("payment access", () => {
-  it.each([getPaymentUrl, getYandexPaymentUrl])("passes guest capability in the payment header", async (pay) => {
+  it.each([getPaymentUrl, getYandexPaymentUrl])("uses the BFF without putting guest capabilities into browser headers", async (pay) => {
     const fetch = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ confirmation_url: "https://example.com/pay" }), { status: 201 }));
-    await pay(123, { access_token: "guest-order-token" });
-    expect(fetch.mock.calls[0][1]?.headers).toMatchObject({ "X-Order-Token": "guest-order-token" });
+    await pay(123);
+    expect(String(fetch.mock.calls[0][0])).toMatch(/^\/api\/shop\/order\/123\/pay\//);
+    expect(fetch.mock.calls[0][1]?.headers).not.toHaveProperty("X-Order-Token");
     expect(fetch.mock.calls[0][1]?.credentials).toBe("include");
   });
 

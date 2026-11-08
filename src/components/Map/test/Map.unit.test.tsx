@@ -1,9 +1,16 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render as rtlRender, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CdekPvzPoint } from "../../../api/delivery/cdekApi";
 import Map from "../Map";
+import { Provider } from "react-redux";
+import { makeStore } from "../../../store/store";
 import { YANDEX_PVZ_CONTAINER_ID } from "../mapWidgetUtils";
+
+const render = (ui: React.ReactNode) => {
+  const store = makeStore();
+  return rtlRender(ui, { wrapper: ({ children }) => <Provider store={store}>{children}</Provider> });
+};
 
 const mockPvzList: CdekPvzPoint[] = [
   {
@@ -24,9 +31,8 @@ const mockPvzList: CdekPvzPoint[] = [
 
 const getRegionPvzCdek = vi.fn();
 
-vi.mock("../../../api/delivery/pvzRegionCache", () => ({
-  getRegionPvzCdek: (...args: unknown[]) => getRegionPvzCdek(...args),
-  getRegionPvzYandex: vi.fn(),
+vi.mock("../../../api/delivery/cdekApi", () => ({
+  getCdekPvzByCity: (...args: unknown[]) => getRegionPvzCdek(...args),
 }));
 
 describe("Map", () => {

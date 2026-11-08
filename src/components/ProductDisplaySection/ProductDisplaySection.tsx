@@ -16,8 +16,7 @@ import Button from "../ui/Button/Button";
 import SliderSkeleton from "./SliderSkeleton";
 import styles from "./ProductDisplaySection.module.css";
 import type { CatalogProduct } from "../../types/products";
-import { fetchAllCatalogProducts } from "../../api/home/catalogApi";
-import { fetchNewInProducts } from "../../api/new-in/newInApi";
+import { useGetAllCatalogProductsQuery, useGetNewInProductsQuery } from "../../store/api";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css";
@@ -64,12 +63,8 @@ const ProductDisplaySection = ({
   // Mobile-first: не стартуем с 4 → 2 после hydration (layout thrash на LTE)
   const [maxVisible, setMaxVisible] = useState<number | "auto">(2);
   const [spaceBetween, setSpaceBetween] = useState(8);
-  const [products, setProducts] = useState<CatalogProduct[]>(
-    initialProducts ?? []
-  );
   const hasServerProducts =
     initialProducts != null && initialProducts.length > 0;
-  const [isLoading, setIsLoading] = useState(!hasServerProducts);
   const [progress, setProgress] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   /** Слайды, для которых уже можно монтировать cover (viewport + буфер) */
@@ -78,6 +73,12 @@ const ProductDisplaySection = ({
 
   const isLimitedSlider = maxProducts != null;
   const wantsNewIn = isNewInTitle(title);
+  const allProductsQuery = useGetAllCatalogProductsQuery(undefined, { skip: hasServerProducts || wantsNewIn });
+  const newInQuery = useGetNewInProductsQuery(undefined, { skip: hasServerProducts || !wantsNewIn });
+  const query = wantsNewIn ? newInQuery : allProductsQuery;
+  const products = useMemo(() => hasServerProducts ? initialProducts! : query.data ?? [], [hasServerProducts, initialProducts, query.data]);
+  const isLoading = !hasServerProducts && query.isLoading;
+
 
   useEffect(() => {
     if (width === 0) return;
@@ -93,54 +94,6 @@ const ProductDisplaySection = ({
       setSpaceBetween(20);
     }
   }, [width]);
-
-  // SSR уже отдал список — синхронизируем без скелетона и без лишнего refetch
-  useEffect(() => {
-    if (!hasServerProducts || !initialProducts) return;
-    setProducts(initialProducts);
-    setIsLoading(false);
-  }, [hasServerProducts, initialProducts]);
-
-  useEffect(() => {
-    // Есть SSR-данные — не конкурируем за сеть повторным запросом
-    if (hasServerProducts) return;
-
-    let cancelled = false;
-
-    const loadProducts = async () => {
-      setIsLoading(true);
-
-      const loadOnce = () =>
-        wantsNewIn ? fetchNewInProducts() : fetchAllCatalogProducts();
-
-      try {
-        let nextProducts = await loadOnce();
-        // LTE abort → один retry, не сразу empty
-        if (!cancelled && nextProducts.length === 0) {
-          await new Promise((resolve) => setTimeout(resolve, 700));
-          if (!cancelled) nextProducts = await loadOnce();
-        }
-        if (cancelled) return;
-        setProducts(nextProducts);
-      } catch {
-        if (!cancelled) {
-          try {
-            await new Promise((resolve) => setTimeout(resolve, 700));
-            if (!cancelled) setProducts(await loadOnce());
-          } catch {
-            if (!cancelled) setProducts([]);
-          }
-        }
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
-
-    void loadProducts();
-    return () => {
-      cancelled = true;
-    };
-  }, [title, hasServerProducts, wantsNewIn]);
 
   useEffect(() => {
     const visible = typeof maxVisible === "number" ? maxVisible : 4;

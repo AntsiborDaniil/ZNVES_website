@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
-import { updateCurrentUser, updateUserDeliveryData, changePassword } from "../../../api/auth/authApi";
+import { getApiErrorMessage, useUpdateCurrentUserMutation, useUpdateUserDeliveryDataMutation, useChangePasswordMutation } from "../../../store/api";
 import PhoneInput from "../../PhoneInput/PhoneInput";
 import styles from "./PersonalData.module.css";
 
@@ -62,6 +62,9 @@ type PersonalDataProps = {
 
 const PersonalData = ({ standalone = false, onPasswordModeChange }: PersonalDataProps) => {
   const { user, updateUser } = useAuth();
+  const [updateCurrentUserMutation] = useUpdateCurrentUserMutation();
+  const [updateUserDeliveryDataMutation] = useUpdateUserDeliveryDataMutation();
+  const [changePasswordMutation] = useChangePasswordMutation();
   const [profileData, setProfileData] = useState({ ...emptyProfileData });
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [deliveryData, setDeliveryData] = useState({ ...emptyDeliveryData });
@@ -134,12 +137,12 @@ const PersonalData = ({ standalone = false, onPasswordModeChange }: PersonalData
     setIsSaving(true);
     setSaveStatus(null);
     try {
-      const updated = await updateCurrentUser({
+      const updated = await updateCurrentUserMutation({
         first_name: profileData.firstName || undefined,
         last_name: profileData.lastName || undefined,
         email: profileData.email || undefined,
         phone_number: profileData.phone || undefined,
-      });
+      }).unwrap();
       setHasUnsavedChanges(false);
       setHighlightSection("profile");
       setShowSuccessModal(true);
@@ -149,7 +152,7 @@ const PersonalData = ({ standalone = false, onPasswordModeChange }: PersonalData
       setSaveStatus({
         type: "error",
         message:
-          error instanceof Error ? error.message : "Не удалось сохранить изменения",
+          getApiErrorMessage(error, "Не удалось сохранить изменения"),
       });
     } finally {
       setIsSaving(false);
@@ -169,7 +172,7 @@ const PersonalData = ({ standalone = false, onPasswordModeChange }: PersonalData
     setIsSaving(true);
     setSaveStatus(null);
     try {
-      const updated = await updateUserDeliveryData({
+      const updated = await updateUserDeliveryDataMutation({
         cdek_full_pvz_address: deliveryData.cdekPvz.trim() || undefined,
         yandex_full_pvz_address: deliveryData.yandexPvz.trim() || undefined,
         city: deliveryData.city.trim() || undefined,
@@ -179,7 +182,7 @@ const PersonalData = ({ standalone = false, onPasswordModeChange }: PersonalData
         floor: deliveryData.floor.trim() || undefined,
         intercom: deliveryData.intercom.trim() || undefined,
         comment: deliveryData.comment.trim() || undefined,
-      });
+      }).unwrap();
       setHasDeliveryChanges(false);
       setHighlightSection("delivery");
       setShowSuccessModal(true);
@@ -189,9 +192,7 @@ const PersonalData = ({ standalone = false, onPasswordModeChange }: PersonalData
       setSaveStatus({
         type: "error",
         message:
-          error instanceof Error
-            ? error.message
-            : "Не удалось сохранить адреса доставки",
+          getApiErrorMessage(error, "Не удалось сохранить адреса доставки"),
       });
     } finally {
       setIsSaving(false);
@@ -227,15 +228,15 @@ const PersonalData = ({ standalone = false, onPasswordModeChange }: PersonalData
     setIsSavingPassword(true);
     setPasswordError(null);
     try {
-      await changePassword({
+      await changePasswordMutation({
         current_password: passwordForm.current,
         new_password: passwordForm.next,
-      });
+      }).unwrap();
       handleCancelPassword();
       setShowSuccessModal(true);
     } catch (error) {
       setPasswordError(
-        error instanceof Error ? error.message : "Не удалось изменить пароль"
+        getApiErrorMessage(error, "Не удалось изменить пароль")
       );
     } finally {
       setIsSavingPassword(false);

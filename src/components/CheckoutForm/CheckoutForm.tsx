@@ -4,14 +4,14 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { getProductById } from "../../data/products";
-import { createOrder, openPaymentTab, getPaymentUrl, getYandexPaymentUrl, invalidateMyOrdersCache, redirectToPaymentUrl, resolvePaymentRedirectUrl, type OrderRequest } from "../../api/order/orderApi";
+import { openPaymentTab, redirectToPaymentUrl, resolvePaymentRedirectUrl, type OrderRequest } from "../../api/order/orderApi";
 import PromoErrorToast from "../PromoErrorToast/PromoErrorToast";
-import { fetchCatalogProductRaw, type ApiProductDetail, type ApiWarehouseItem } from "../../api/product/productApi";
-import { fetchCatalogColors } from "../../api/catalog/catalogApi";
+import { type ApiProductDetail, type ApiWarehouseItem } from "../../api/product/productApi";
 import type { PvzListOption } from "../Map/Map";
-import { getAddressSuggestions, type AddressSuggestion } from "../../api/delivery/addressSuggestApi";
+import { type AddressSuggestion } from "../../api/delivery/addressSuggestApi";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { validatePhone } from "../../lib/authValidation";
+import { useCheckoutOrderMutation, useGetPaymentUrlMutation, useGetYandexPaymentUrlMutation, useLazyGetCatalogProductRawQuery, useLazyGetCatalogColorsQuery, useLazyGetAddressSuggestionsQuery, useLazyGetCourierEstimateQuery } from "../../store/api";
 import styles from "./CheckoutFormModal.module.css";
 import CheckoutPersonalSection from "./sections/CheckoutPersonalSection";
 import CheckoutDeliverySection, {
@@ -24,9 +24,6 @@ import OrderConfirmModal, {
 } from "../OrderConfirmModal/OrderConfirmModal";
 import { MOCK_CHECKOUT_AUTOFILL } from "../../mocks/data/account";
 import { shouldUseMocks } from "../../lib/useMocks";
-
-/** Кеш по slug на время сессии — меньше повторных запросов при оформлении заказа */
-const productRawCache = new Map<string, ApiProductDetail | null>();
 
 const EMPTY_CHECKOUT_FORM = {
   firstName: "",
@@ -121,8 +118,8 @@ const CheckoutForm = ({
   initialColorSlugToLabel: initialColors = {},
   modalPromo,
 }: CheckoutFormProps) => {
-  const { items, getTotalPrice, clearCart, appliedPromo, setAppliedPromo, openCart } = useCart();
-  const { user, updateUser } = useAuth();
+  const { items, getTotalPrice, appliedPromo, setAppliedPromo, openCart } = useCart();
+  const { user } = useAuth();
   const { width } = useWindowSize();
   const isCartMobilePvz = width > 0 && width < 480;
 
@@ -139,6 +136,15 @@ const CheckoutForm = ({
     openCart();
   };
   const [formData, setFormData] = useState(getInitialCheckoutForm);
+  const [checkout] = useCheckoutOrderMutation();
+  const [payOrder] = useGetPaymentUrlMutation();
+  const [payYandexOrder] = useGetYandexPaymentUrlMutation();
+  const [loadProductRaw] = useLazyGetCatalogProductRawQuery();
+  const [loadColors] = useLazyGetCatalogColorsQuery();
+  const [loadAddressSuggestions] = useLazyGetAddressSuggestionsQuery();
+  const [loadCourierEstimate] = useLazyGetCourierEstimateQuery();
+  const pendingPaymentRef = useRef<{ signature: string; orderId: number } | null>(null);
+
   const isModalCourier = formData.deliveryMethod === "yandex";
   const isModalPickup = formData.deliveryMethod === "pickup";
   const modalDeliveryOption: ModalDeliveryOption =
@@ -312,13 +318,7 @@ const CheckoutForm = ({
     const slugToProduct: Record<string, ApiProductDetail | null> = {};
     Promise.all(
       uniqueSlugs.map(async (slug) => {
-        const cached = productRawCache.get(slug);
-        if (cached !== undefined) {
-          slugToProduct[slug] = cached;
-          return;
-        }
-        const data = await fetchCatalogProductRaw(slug);
-        productRawCache.set(slug, data ?? null);
+        const data = await loadProductRaw(slug, true).unwrap();
         if (data) slugToProduct[slug] = data;
       })
     ).then(() => {
@@ -380,7 +380,7 @@ const CheckoutForm = ({
     return () => {
       cancelled = true;
     };
-  }, [items]);
+  }, [items, loadProductRaw]);
 
   // Автозаполнение личных данных и адресов доставки из личного кабинета (GET /api/auth/user/)
   useEffect(() => {
@@ -472,14 +472,14 @@ const CheckoutForm = ({
     const needsColors = items.some((item) => !item.colorLabel);
     if (!needsColors) return;
     if (Object.keys(initialColors).length > 0) return;
-    fetchCatalogColors().then((colors) => {
+    loadColors(undefined, true).unwrap().then((colors) => {
       const map: Record<string, string> = {};
       colors.forEach((c) => {
         map[c.slug] = c.value;
       });
       setColorSlugToLabel(map);
     });
-  }, [items, initialColors]);
+  }, [items, initialColors, loadColors]);
 
   // Яндекс ПВЗ и курьер — город всегда Москва
   useEffect(() => {
@@ -879,10 +879,7 @@ const CheckoutForm = ({
         courierCalcAbortRef.current?.abort();
         const courierAc = new AbortController();
         courierCalcAbortRef.current = courierAc;
-        fetch(`/api/yandex/courier/calculate?${params.toString()}`, {
-          signal: courierAc.signal,
-        })
-          .then((r) => r.json())
+        loadCourierEstimate(Object.fromEntries(params), true).unwrap()
           .then((data: {
             from_api?: boolean;
             price?: number;
@@ -959,7 +956,7 @@ const CheckoutForm = ({
     setTimeout(() => {
       isUpdatingFromMapRef.current = false;
     }, 1000);
-  }, [formData.deliveryMethod, mapSearchValue]);
+  }, [formData.deliveryMethod, formData.deliveryType, mapSearchValue, totalWeightGrams, loadCourierEstimate]);
 
   const handleAddressSelectRef = useRef(handleAddressSelectImpl);
   handleAddressSelectRef.current = handleAddressSelectImpl;
@@ -1067,7 +1064,7 @@ const CheckoutForm = ({
       addressSuggestAbortRef.current?.abort();
       const ac = new AbortController();
       addressSuggestAbortRef.current = ac;
-      getAddressSuggestions(query, ac.signal)
+      loadAddressSuggestions(query, true).unwrap()
         .then((list) => {
           if (!ac.signal.aborted) setAddressSuggestions(list);
         })
@@ -1083,7 +1080,7 @@ const CheckoutForm = ({
       }
       addressSuggestAbortRef.current?.abort();
     };
-  }, [formData.pvzAddress, formData.deliveryMethod]);
+  }, [formData.pvzAddress, formData.deliveryMethod, loadAddressSuggestions]);
 
   // Закрытие списков по Escape
   useEffect(() => {
@@ -1516,13 +1513,7 @@ const CheckoutForm = ({
       const slugToProduct: Record<string, ApiProductDetail | null> = {};
       await Promise.all(
         uniqueSlugs.map(async (slug) => {
-          const cached = productRawCache.get(slug);
-          if (cached !== undefined) {
-            slugToProduct[slug] = cached;
-            return;
-          }
-          const data = await fetchCatalogProductRaw(slug);
-          productRawCache.set(slug, data ?? null);
+          const data = await loadProductRaw(slug, true).unwrap();
           if (data) slugToProduct[slug] = data;
         })
       );
@@ -1612,54 +1603,36 @@ const CheckoutForm = ({
         };
       }
 
-      // Создаем заказ
-      const orderResponse = await createOrder(orderRequest);
-
-      invalidateMyOrdersCache();
-
-      // Сбрасываем применённый промокод после успешного создания заказа
-      setAppliedPromo(null);
-
-      // Сохраняем order_id для дальнейшего использования
-      const orderId = orderResponse.id;
-
-      // Обработка оплаты в зависимости от выбранного способа.
-      // Онлайн-оплата: при успехе уходим на ЮKassa/Яндекс; при ошибке — только тост, без модалки «спасибо».
-      const isOnlinePayment =
-        formData.paymentMethod === "card" ||
-        formData.paymentMethod === "sberbank" ||
-        formData.paymentMethod === "yandexpay" ||
-        formData.paymentMethod === "installment";
-
-      if (isOnlinePayment) {
-        try {
-          const paymentResponse =
-            formData.paymentMethod === "yandexpay" ||
-            formData.paymentMethod === "installment"
-              ? await getYandexPaymentUrl(orderId, { access_token: orderResponse.access_token })
-              : await getPaymentUrl(orderId, { access_token: orderResponse.access_token });
-
-          const paymentUrl = resolvePaymentRedirectUrl(paymentResponse);
-          if (paymentUrl) {
-            redirectToPaymentUrl(paymentUrl, paymentTab ?? undefined);
-            paymentTab = null;
-            return;
-          }
-
-          setPaymentErrorToast(
-            "Не удалось получить ссылку на оплату. Попробуйте ещё раз или свяжитесь с поддержкой."
-          );
-        } catch {
-          setPaymentErrorToast(
-            formData.paymentMethod === "yandexpay" ||
-              formData.paymentMethod === "installment"
-              ? "Не удалось перейти к оплате. Попробуйте оплатить картой или СБП, либо свяжитесь с поддержкой."
-              : "Не удалось перейти к оплате. Попробуйте ещё раз или свяжитесь с поддержкой."
-          );
+      const paymentProvider = formData.paymentMethod === "yandexpay" || formData.paymentMethod === "installment"
+        ? "yandex" : usePaymentTab ? "yookassa" : null;
+      const signature = JSON.stringify({ orderRequest, paymentProvider });
+      const pending = pendingPaymentRef.current;
+      let orderResponse;
+      let paymentResponse;
+      if (paymentProvider && pending?.signature === signature) {
+        // Retry payment for the existing order; never create another order after a known payment failure.
+        orderResponse = { id: pending.orderId, status: "success", message: "Заказ создан" };
+        paymentResponse = paymentProvider === "yandex"
+          ? await payYandexOrder({ orderId: pending.orderId }).unwrap()
+          : await payOrder({ orderId: pending.orderId }).unwrap();
+      } else {
+        const result = await checkout({ order: orderRequest, paymentProvider }).unwrap();
+        orderResponse = result.order;
+        paymentResponse = result.payment;
+        if (paymentProvider) pendingPaymentRef.current = { signature, orderId: orderResponse.id };
+      }
+      if (paymentProvider) {
+        const paymentUrl = resolvePaymentRedirectUrl(paymentResponse);
+        if (paymentUrl) {
+          redirectToPaymentUrl(paymentUrl, paymentTab ?? undefined);
+          paymentTab = null;
+        } else {
+          setPaymentErrorToast(`Заказ №${orderResponse.id} создан, но ссылку на оплату получить не удалось. Повторите оплату или свяжитесь с поддержкой.`);
         }
         return;
       }
 
+      setAppliedPromo(null);
       // Сохраняем заказ в sessionStorage для отображения в личном кабинете
       const newOrderNumber = orderResponse.id.toString();
       const orderDate = new Date();
@@ -1735,19 +1708,13 @@ const CheckoutForm = ({
           const orders = existingOrders ? JSON.parse(existingOrders) : [];
           orders.push(orderData);
           sessionStorage.setItem("znves:orders", JSON.stringify(orders));
-        } catch (error) {
-        }
+        } catch { /* Local order history is optional. */ }
       }
-
-      if (onOrderSubmit) {
-        onOrderSubmit(newOrderNumber);
-      }
+      if (onOrderSubmit) onOrderSubmit(newOrderNumber);
     } catch (error) {
-      const message =
-        "К сожалению, оформить заказ не удалось: один или несколько товаров отсутствуют в наличии или их количество ограничено. Пожалуйста, обновите корзину и попробуйте оформить заказ повторно либо свяжитесь со службой поддержки.";
-      setIsSubmitting(false);
-      clearCart();
-      redirectToCartWithError(message);
+      const message = error && typeof error === "object" && "message" in error && typeof error.message === "string"
+        ? error.message : "Не удалось оформить заказ. Проверьте статус заказа перед повторной попыткой или свяжитесь с поддержкой.";
+      setPaymentErrorToast(message);
     } finally {
       paymentTab?.close();
       setIsSubmitting(false);

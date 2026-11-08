@@ -4,30 +4,23 @@ import { loginUser, changePasswordWithResetToken } from "../authApi";
 
 afterEach(() => vi.unstubAllGlobals());
 
-it("bootstraps API CSRF before login and fetches a fresh token before password reset", async () => {
-  let generation = 0;
-  const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-    if (String(input).endsWith("/api/order/csrf/")) {
-      generation++;
-      expect(init?.credentials).toBe("include");
-      expect(init?.cache).toBe("no-store");
-      return new Response(JSON.stringify({ csrfToken: `token-${generation}` }));
-    }
-    expect(init?.headers).toMatchObject({ "X-CSRFToken": `token-${generation}` });
-    expect(init?.credentials).toBe("include");
-    return new Response("{}");
-  });
+it("sends login and reset to the same-origin BFF without exposing CSRF bootstrap", async () => {
+  const fetchMock = vi.fn().mockResolvedValue(new Response("{}"));
   vi.stubGlobal("fetch", fetchMock);
   await loginUser({ email: "test@example.com", password: "password" });
   await changePasswordWithResetToken("new-password");
-  expect(fetchMock.mock.calls.map(([url]) => String(url).split("/api/")[1])).toEqual([
-    "order/csrf/", "auth/login/", "order/csrf/", "auth/password-reset/change/",
+  expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+    "/api/shop/auth/login/", "/api/shop/auth/password-reset/change/",
   ]);
+  for (const [, init] of fetchMock.mock.calls) {
+    expect(init.credentials).toBe("include");
+    expect(init.headers).not.toHaveProperty("X-CSRFToken");
+  }
 });
 
-it("does not submit credentials when CSRF bootstrap fails", async () => {
-  const fetchMock = vi.fn().mockResolvedValue(new Response("{}", { status: 503 }));
+it("preserves BFF CSRF errors for the form", async () => {
+  const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ detail: "CSRF Failed" }), { status: 403 }));
   vi.stubGlobal("fetch", fetchMock);
-  await expect(loginUser({ email: "test@example.com", password: "password" })).rejects.toThrow();
+  await expect(loginUser({ email: "test@example.com", password: "password" })).rejects.toThrow("CSRF Failed");
   expect(fetchMock).toHaveBeenCalledTimes(1);
 });

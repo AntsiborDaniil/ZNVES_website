@@ -1,5 +1,6 @@
 // API для оформления заказа
 
+import { apiUrl } from "../../lib/apiUrl";
 import { API_BASE_URL } from "../../lib/apiConfig";
 import { getCsrfToken } from "../../lib/csrf";
 import { shouldUseMocks } from "../../lib/useMocks";
@@ -16,8 +17,8 @@ function buildProductImageUrl(value: string | undefined): string {
   return trimmed.startsWith("/") ? `${base}${trimmed}` : `${base}/${trimmed}`;
 }
 
-const ORDER_API_URL = `${API_BASE_URL}/api/order/`;
-const MY_ORDERS_URL = `${API_BASE_URL}/api/order/my/`;
+const ORDER_API_URL = apiUrl("/order/");
+const MY_ORDERS_URL = apiUrl("/order/my/");
 
 /** Позиция заказа в ответе API */
 export interface ApiOrderPosition {
@@ -52,15 +53,9 @@ export interface ApiMyOrderItem {
   };
 }
 
-const MY_ORDERS_CACHE_TTL_MS = 60 * 1000; // 1 мин
-const myOrdersCache: { active: { data: ApiMyOrderItem[]; at: number } | null; all: { data: ApiMyOrderItem[]; at: number } | null } = {
-  active: null,
-  all: null,
-};
-
 /**
  * Заказы пользователя: active=true — последний активный заказ, active=false — все остальные.
- * С куками (credentials). Результат кешируется на 1 минуту.
+ * С куками (credentials). Кешированием управляет RTK Query.
  */
 export const getMyOrders = async (active: boolean): Promise<ApiMyOrderItem[]> => {
   if (typeof window === "undefined") return [];
@@ -70,11 +65,6 @@ export const getMyOrders = async (active: boolean): Promise<ApiMyOrderItem[]> =>
     return getMockOrders(active);
   }
 
-  const key = active ? "active" : "all";
-  const cached = myOrdersCache[key];
-  if (cached && Date.now() - cached.at < MY_ORDERS_CACHE_TTL_MS) {
-    return cached.data;
-  }
   try {
     const url = `${MY_ORDERS_URL}?active=${active}`;
     const response = await fetch(url, {
@@ -85,9 +75,6 @@ export const getMyOrders = async (active: boolean): Promise<ApiMyOrderItem[]> =>
     if (!response.ok) return [];
     const data = (await response.json()) as ApiMyOrderItem[];
     const list = Array.isArray(data) ? data : [];
-    if (list.length > 0) {
-      myOrdersCache[key] = { data: list, at: Date.now() };
-    }
     return list;
   } catch {
     return [];
@@ -118,8 +105,7 @@ export const fetchAccountOrders = async (): Promise<ApiMyOrderItem[]> => {
 
 /** Сброс кеша заказов (вызвать после создания заказа и т.п.) */
 export const invalidateMyOrdersCache = () => {
-  myOrdersCache.active = null;
-  myOrdersCache.all = null;
+  // Kept for older callers; RTK Query owns invalidation via Orders tags.
 };
 
 /** Вид заказа для отображения в кабинете (данные из API) */
@@ -229,7 +215,6 @@ export interface OrderRequest {
 }
 
 export interface OrderResponse {
-  access_token?: string | null;
   id: number;
   status: string;
   message: string;
@@ -381,7 +366,6 @@ function getRelativePaymentUrls(): { return_url: string; cancel_url: string } {
 }
 
 export interface PaymentUrlRequest {
-  access_token?: string | null;
   /** URL, на который вернуть пользователя после успешной оплаты */
   return_url?: string;
   /** URL при отмене/ошибке оплаты */
@@ -406,7 +390,6 @@ export const getPaymentUrl = async (
     };
 
     const payHeaders: Record<string, string> = { "Content-Type": "application/json" };
-    if (options?.access_token) payHeaders["X-Order-Token"] = options.access_token;
     const payCsrf = getCsrfToken();
     if (payCsrf) payHeaders["X-CSRFToken"] = payCsrf;
 
@@ -466,7 +449,6 @@ export const getYandexPaymentUrl = async (
     };
 
     const yandexHeaders: Record<string, string> = { "Content-Type": "application/json" };
-    if (options?.access_token) yandexHeaders["X-Order-Token"] = options.access_token;
     const yandexCsrf = getCsrfToken();
     if (yandexCsrf) yandexHeaders["X-CSRFToken"] = yandexCsrf;
 
@@ -501,3 +483,35 @@ export const getYandexPaymentUrl = async (
   }
 };
 
+
+export type PaymentProvider = "yookassa" | "yandex" | null;
+export interface CheckoutResponse {
+  order: OrderResponse;
+  payment: PaymentResponse | null;
+  payment_error?: string;
+}
+
+/** The BFF consumes guest capabilities; neither RTK state nor browser JSON receives them. */
+export async function checkoutOrder(
+  orderData: OrderRequest,
+  paymentProvider: PaymentProvider
+): Promise<CheckoutResponse> {
+  if (shouldUseMocks()) {
+    const order = await createOrder(orderData);
+    const payment = paymentProvider === "yandex"
+      ? await getYandexPaymentUrl(order.id)
+      : paymentProvider === "yookassa" ? await getPaymentUrl(order.id) : null;
+    return { order, payment };
+  }
+  const response = await fetch(apiUrl("/checkout"), {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ order: orderData, paymentProvider }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(typeof data.detail === "string" ? data.detail : "Не удалось оформить заказ. Проверьте статус заказа перед повторной попыткой.");
+  }
+  return data as CheckoutResponse;
+}

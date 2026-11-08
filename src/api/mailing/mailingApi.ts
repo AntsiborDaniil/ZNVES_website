@@ -1,6 +1,6 @@
-import { API_BASE_URL } from "../../lib/apiConfig";
+import { apiUrl } from "../../lib/apiUrl";
 
-const MAILING_URL = `${API_BASE_URL}/api/mailing/`;
+const MAILING_URL = apiUrl("/mailing/");
 
 /**
  * Подписка на рассылку: POST /api/mailing/ с телом { email }.

@@ -201,7 +201,7 @@ const fetchProductBySlugInternal = async (slug: string): Promise<ProductDetail |
     const data = getMockProductDetailBySlug(slug);
     if (!data) return null;
     const transformedProduct = transformApiProduct(data, slug);
-    cache.set(slug, { data: transformedProduct, timestamp: Date.now() });
+    if (typeof window === "undefined") cache.set(slug, { data: transformedProduct, timestamp: Date.now() });
     return transformedProduct;
   }
 
@@ -217,14 +217,14 @@ const fetchProductBySlugInternal = async (slug: string): Promise<ProductDetail |
   }
   const data: ApiProductDetail = await response.json();
   const transformedProduct = transformApiProduct(data, slug);
-  cache.set(slug, { data: transformedProduct, timestamp: Date.now() });
+  if (typeof window === "undefined") cache.set(slug, { data: transformedProduct, timestamp: Date.now() });
   return transformedProduct;
 };
 
 /** Получение товара по slug с кешем и дедупликацией одновременных запросов */
 export const fetchProductBySlug = async (slug: string): Promise<ProductDetail | null> => {
   const cached = cache.get(slug);
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) return cached.data;
+  if (typeof window === "undefined" && cached && Date.now() - cached.timestamp < CACHE_DURATION) return cached.data;
 
   let promise = inFlightBySlug.get(slug);
   if (!promise) {
@@ -250,7 +250,7 @@ export const fetchProductWithWarehouse = async (
 /** Сырой ответ каталога по slug (warehouse_items и т.д.) — для чекаута, с кешем и дедупликацией */
 export const fetchCatalogProductRaw = async (slug: string): Promise<ApiProductDetail | null> => {
   const cached = rawCache.get(slug);
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) return cached.data;
+  if (typeof window === "undefined" && cached && Date.now() - cached.timestamp < CACHE_DURATION) return cached.data;
 
   let promise = inFlightRaw.get(slug);
   if (!promise) {
@@ -260,7 +260,7 @@ export const fetchCatalogProductRaw = async (slug: string): Promise<ApiProductDe
           const { getMockProductDetailBySlug } = await import("../../mocks/catalogMocks");
           const data = getMockProductDetailBySlug(slug);
           if (!data) return null;
-          rawCache.set(slug, { data, timestamp: Date.now() });
+          if (typeof window === "undefined") rawCache.set(slug, { data, timestamp: Date.now() });
           return data;
         }
 
@@ -275,7 +275,7 @@ export const fetchCatalogProductRaw = async (slug: string): Promise<ApiProductDe
           throw new Error(`API error: ${response.status}`);
         }
         const data: ApiProductDetail = await response.json();
-        rawCache.set(slug, { data, timestamp: Date.now() });
+        if (typeof window === "undefined") rawCache.set(slug, { data, timestamp: Date.now() });
         return data;
       } finally {
         inFlightRaw.delete(slug);
@@ -307,7 +307,7 @@ const fetchProductImagesByColorInternal = async (
   }
   const imagePaths: string[] = await response.json();
   const images = imagePaths.map((img) => resolveApiImageUrl(img, baseUrl));
-  colorImagesCache.set(`${productSlug}-${colorSlug}`, { data: images, timestamp: Date.now() });
+  if (typeof window === "undefined") colorImagesCache.set(`${productSlug}-${colorSlug}`, { data: images, timestamp: Date.now() });
   return images;
 };
 
@@ -318,7 +318,7 @@ export const fetchProductImagesByColor = async (
 ): Promise<string[]> => {
   const cacheKey = `${productSlug}-${colorSlug}`;
   const cached = colorImagesCache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < COLOR_IMAGES_CACHE_DURATION) return cached.data;
+  if (typeof window === "undefined" && cached && Date.now() - cached.timestamp < COLOR_IMAGES_CACHE_DURATION) return cached.data;
 
   let promise = inFlightImages.get(cacheKey);
   if (!promise) {

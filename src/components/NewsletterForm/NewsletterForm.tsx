@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { subscribeToMailing } from "../../api/mailing/mailingApi";
+import { getApiErrorMessage, useSubscribeToMailingMutation } from "../../store/api";
 import { useToast } from "../ui/ToastProvider/ToastProvider";
 import Button from "../ui/Button/Button";
 import styles from "./NewsletterForm.module.css";
@@ -17,6 +17,7 @@ const NewsletterForm = ({
   layout = "row",
 }: NewsletterFormProps) => {
   const { showToast } = useToast();
+  const [subscribeToMailing] = useSubscribeToMailingMutation();
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,12 +34,12 @@ const NewsletterForm = ({
     }
     setIsSubmitting(true);
     try {
-      await subscribeToMailing(value);
+      await subscribeToMailing(value).unwrap();
       setEmail("");
       onSuccess?.();
     } catch (err) {
       showToast(
-        err instanceof Error ? err.message : "Не удалось подписаться на рассылку"
+        getApiErrorMessage(err, "Не удалось подписаться на рассылку")
       );
     } finally {
       setIsSubmitting(false);
